@@ -950,11 +950,6 @@
             });
 
 
-        /*
-         * Các nút khác có data-page,
-         * ví dụ "Xem tất cả".
-         */
-
         $$(".text-button[data-page]")
             .forEach(button => {
 
@@ -1191,24 +1186,58 @@
                     template.id;
 
 
+                button.setAttribute(
+                    "aria-pressed",
+                    state.selectedTemplate &&
+                    String(
+                        state.selectedTemplate.id
+                    ) ===
+                    String(
+                        template.id
+                    )
+                        ? "true"
+                        : "false"
+                );
+
+
                 button.innerHTML = `
 
-                    <div class="template-option-title">
-
+                    <span class="template-option-icon">
                         ${escapeHTML(
-                            template.name
+                            template.icon
                         )}
+                    </span>
 
-                    </div>
+
+                    <span class="template-option-content">
+
+                        <span class="template-option-code">
+                            ${escapeHTML(
+                                template.code
+                            )}
+                        </span>
+
+                        <span class="template-option-title">
+                            ${escapeHTML(
+                                template.name
+                            )}
+                        </span>
+
+                        <span class="template-option-description">
+                            ${escapeHTML(
+                                template.description
+                            )}
+                        </span>
+
+                    </span>
 
 
-                    <div class="template-option-description">
-
-                        ${escapeHTML(
-                            template.description
-                        )}
-
-                    </div>
+                    <span
+                        class="template-option-check"
+                        aria-hidden="true"
+                    >
+                        ✓
+                    </span>
 
                 `;
 
@@ -1231,12 +1260,23 @@
                                         "selected"
                                     );
 
+                                    item.setAttribute(
+                                        "aria-pressed",
+                                        "false"
+                                    );
+
                                 }
                             );
 
 
                         button.classList.add(
                             "selected"
+                        );
+
+
+                        button.setAttribute(
+                            "aria-pressed",
+                            "true"
                         );
 
                     }
