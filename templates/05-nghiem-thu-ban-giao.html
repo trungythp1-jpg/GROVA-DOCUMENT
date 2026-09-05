@@ -1,0 +1,3807 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>
+    GROVA DOCUMENT – Biên bản nghiệm thu và bàn giao
+  </title>
+
+
+  <style>
+
+    :root {
+      --grova: #0b7a5a;
+      --grova-dark: #075b44;
+      --green-light: #eaf6f1;
+      --text: #222;
+      --muted: #666;
+      --border: #d7d7d7;
+      --bg: #f3f6f5;
+    }
+
+
+    * {
+      box-sizing: border-box;
+    }
+
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+
+    /* =========================
+       TOPBAR
+    ========================= */
+
+    .app-topbar {
+
+      position: sticky;
+      top: 0;
+      z-index: 100;
+
+      height: 64px;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      padding: 0 22px;
+
+      background: #fff;
+
+      border-bottom: 1px solid #e5e8e7;
+
+      box-shadow:
+        0 2px 12px rgba(0, 0, 0, 0.05);
+    }
+
+
+    .topbar-left {
+
+      display: flex;
+      align-items: center;
+
+      gap: 12px;
+    }
+
+
+    .back-button {
+
+      width: 38px;
+      height: 38px;
+
+      border: 1px solid #dce3e0;
+      border-radius: 10px;
+
+      background: #fff;
+      color: var(--grova);
+
+      cursor: pointer;
+
+      font-size: 20px;
+    }
+
+
+    .back-button:hover {
+      background: var(--green-light);
+    }
+
+
+    .brand-mini {
+
+      display: flex;
+      flex-direction: column;
+
+      line-height: 1.1;
+    }
+
+
+    .brand-mini strong {
+
+      color: var(--grova);
+
+      font-size: 14px;
+
+      letter-spacing: .4px;
+    }
+
+
+    .brand-mini span {
+
+      margin-top: 3px;
+
+      color: #777;
+
+      font-size: 11px;
+    }
+
+
+    .save-status {
+
+      color: #66706d;
+
+      font-size: 12px;
+    }
+
+
+    /* =========================
+       PAGE
+    ========================= */
+
+    .page {
+
+      width: 100%;
+
+      max-width: 1500px;
+
+      margin: 0 auto;
+
+      padding: 24px;
+    }
+
+
+    .workspace {
+
+      display: grid;
+
+      grid-template-columns:
+        390px
+        minmax(0, 1fr);
+
+      gap: 24px;
+
+      align-items: start;
+    }
+
+
+    /* =========================
+       FORM
+    ========================= */
+
+    .form-panel {
+
+      position: sticky;
+
+      top: 88px;
+
+      background: #fff;
+
+      border: 1px solid #e1e7e4;
+
+      border-radius: 16px;
+
+      box-shadow:
+        0 8px 28px rgba(0, 0, 0, .06);
+
+      overflow: hidden;
+    }
+
+
+    .form-header {
+
+      padding: 20px;
+
+      border-bottom: 1px solid #edf0ef;
+
+      background:
+        linear-gradient(
+          180deg,
+          #fff 0%,
+          #f8fbfa 100%
+        );
+    }
+
+
+    .eyebrow {
+
+      display: block;
+
+      margin-bottom: 6px;
+
+      color: var(--grova);
+
+      font-size: 11px;
+
+      font-weight: 700;
+
+      letter-spacing: 1px;
+    }
+
+
+    .form-header h1 {
+
+      margin: 0;
+
+      font-size: 20px;
+
+      line-height: 1.3;
+    }
+
+
+    .form-header p {
+
+      margin: 7px 0 0;
+
+      color: var(--muted);
+
+      font-size: 13px;
+
+      line-height: 1.5;
+    }
+
+
+    .form-body {
+
+      padding: 18px;
+
+      max-height:
+        calc(100vh - 110px);
+
+      overflow-y: auto;
+    }
+
+
+    .section-title {
+
+      margin: 20px 0 10px;
+
+      padding-bottom: 7px;
+
+      border-bottom:
+        1px solid #edf0ef;
+
+      color: var(--grova-dark);
+
+      font-size: 13px;
+
+      font-weight: 700;
+
+      text-transform: uppercase;
+
+      letter-spacing: .4px;
+    }
+
+
+    .section-title:first-child {
+      margin-top: 0;
+    }
+
+
+    .field {
+      margin-bottom: 12px;
+    }
+
+
+    .field label {
+
+      display: block;
+
+      margin-bottom: 5px;
+
+      color: #39413e;
+
+      font-size: 12px;
+
+      font-weight: 600;
+    }
+
+
+    .field input,
+    .field textarea {
+
+      width: 100%;
+
+      border: 1px solid #d9e0dd;
+
+      border-radius: 9px;
+
+      background: #fff;
+
+      padding: 10px 11px;
+
+      color: #222;
+
+      outline: none;
+    }
+
+
+    .field input {
+
+      height: 40px;
+    }
+
+
+    .field textarea {
+
+      min-height: 90px;
+
+      resize: vertical;
+
+      line-height: 1.45;
+    }
+
+
+    .field input:focus,
+    .field textarea:focus {
+
+      border-color:
+        var(--grova);
+
+      box-shadow:
+        0 0 0 3px
+        rgba(11, 122, 90, .10);
+    }
+
+
+    .two-col {
+
+      display: grid;
+
+      grid-template-columns:
+        1fr 1fr;
+
+      gap: 10px;
+    }
+
+
+    /* =========================
+       CHECKBOX
+    ========================= */
+
+    .check-list {
+
+      display: grid;
+
+      gap: 7px;
+    }
+
+
+    .check-item {
+
+      display: flex;
+
+      align-items:
+        flex-start;
+
+      gap: 8px;
+
+      padding: 8px 9px;
+
+      border: 1px solid #e2e7e5;
+
+      border-radius: 8px;
+
+      cursor: pointer;
+
+      background: #fff;
+    }
+
+
+    .check-item:hover {
+
+      background: #f8fbfa;
+
+      border-color:
+        #cbdcd5;
+    }
+
+
+    .check-item input {
+
+      margin-top: 2px;
+
+      accent-color:
+        var(--grova);
+    }
+
+
+    .check-item span {
+
+      font-size: 12px;
+
+      line-height: 1.4;
+    }
+
+
+    /* =========================
+       ACTION
+    ========================= */
+
+    .action-row {
+
+      display: flex;
+
+      gap: 9px;
+
+      margin-top: 18px;
+    }
+
+
+    .btn {
+
+      min-height: 42px;
+
+      border-radius: 9px;
+
+      border: 0;
+
+      padding: 0 15px;
+
+      cursor: pointer;
+
+      font-weight: 700;
+
+      font-size: 13px;
+    }
+
+
+    .btn-primary {
+
+      flex: 1;
+
+      background:
+        var(--grova);
+
+      color: #fff;
+    }
+
+
+    .btn-primary:hover {
+
+      background:
+        var(--grova-dark);
+    }
+
+
+    .btn-secondary {
+
+      background: #edf2f0;
+
+      color: #34413d;
+    }
+
+
+    .btn-secondary:hover {
+
+      background: #e1e9e5;
+    }
+
+
+    /* =========================
+       PREVIEW
+    ========================= */
+
+    .preview-panel {
+
+      min-width: 0;
+    }
+
+
+    .preview-toolbar {
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: space-between;
+
+      gap: 12px;
+
+      margin-bottom: 14px;
+    }
+
+
+    .preview-toolbar h2 {
+
+      margin: 0;
+
+      font-size: 16px;
+    }
+
+
+    .preview-toolbar span {
+
+      color: #747c79;
+
+      font-size: 12px;
+    }
+
+
+    .preview-container {
+
+      display: flex;
+
+      flex-direction: column;
+
+      align-items: center;
+
+      gap: 24px;
+    }
+
+
+    /*
+      KHÔNG ÉP MẪU VÀO 1 TRANG.
+
+      Mẫu gốc có 3 trang.
+      Nội dung HTML được phép dài tự nhiên.
+      Khi in sẽ tự động phân trang A4.
+    */
+
+    .paper {
+
+      width: 210mm;
+
+      min-height: 297mm;
+
+      height: auto;
+
+      padding:
+        17mm
+        17mm
+        18mm;
+
+      background: #fff;
+
+      box-shadow:
+        0 10px 30px
+        rgba(0, 0, 0, .10);
+
+      color: #111;
+
+      font-family:
+        "Times New Roman",
+        Times,
+        serif;
+
+      font-size: 13pt;
+
+      line-height: 1.42;
+    }
+
+
+    /* =========================
+       HEADER
+    ========================= */
+
+    .doc-header {
+
+      display: grid;
+
+      grid-template-columns:
+        1fr 1fr;
+
+      gap: 14mm;
+
+      align-items: start;
+
+      margin-bottom: 7mm;
+    }
+
+
+    .doc-logo-box {
+
+      display: flex;
+
+      align-items: flex-start;
+
+      justify-content:
+        flex-start;
+    }
+
+
+    .doc-logo {
+
+      width: 45mm;
+
+      max-width: 100%;
+
+      height: auto;
+
+      object-fit: contain;
+    }
+
+
+    .national-header {
+
+      text-align: center;
+
+      font-weight: 700;
+
+      line-height: 1.3;
+    }
+
+
+    .national-header .country {
+
+      font-size: 12.5pt;
+    }
+
+
+    .national-header .motto {
+
+      margin-top: 2px;
+
+      font-size: 12.5pt;
+    }
+
+
+    .national-header .underline {
+
+      width: 34mm;
+
+      height: 1px;
+
+      margin:
+        2px auto 0;
+
+      background: #111;
+    }
+
+
+    /* =========================
+       TITLE
+    ========================= */
+
+    .doc-title {
+
+      margin:
+        4mm 0 1mm;
+
+      text-align: center;
+
+      font-size: 17pt;
+
+      font-weight: 700;
+
+      text-transform:
+        uppercase;
+
+      line-height: 1.25;
+    }
+
+
+    .doc-subtitle {
+
+      margin:
+        0 0 5mm;
+
+      text-align: center;
+
+      font-size: 14pt;
+
+      font-weight: 700;
+
+      text-transform:
+        uppercase;
+    }
+
+
+    .doc-number {
+
+      margin:
+        0 0 5mm;
+
+      text-align: center;
+
+      font-size: 12.5pt;
+    }
+
+
+    .doc-bases {
+
+      margin-bottom: 5mm;
+    }
+
+
+    .doc-bases div {
+
+      margin:
+        1.5mm 0;
+    }
+
+
+    .doc-date {
+
+      margin:
+        5mm 0;
+
+      text-align: right;
+
+      font-style: italic;
+    }
+
+
+    .doc-section-title {
+
+      margin:
+        6mm 0 2mm;
+
+      font-weight: 700;
+
+      text-transform:
+        uppercase;
+    }
+
+
+    .doc-line {
+
+      margin:
+        1.5mm 0;
+    }
+
+
+    .bold {
+      font-weight: 700;
+    }
+
+
+    /* =========================
+       STEEL INFORMATION
+    ========================= */
+
+    .bullet-line {
+
+      margin:
+        1.8mm 0;
+
+      padding-left: 5mm;
+
+      text-indent: -5mm;
+    }
+
+
+    /* =========================
+       ACCEPTANCE TABLE
+    ========================= */
+
+    .acceptance-table {
+
+      width: 100%;
+
+      border-collapse:
+        collapse;
+
+      margin:
+        3mm 0 5mm;
+
+      table-layout:
+        fixed;
+
+      font-size: 11.5pt;
+    }
+
+
+    .acceptance-table th,
+    .acceptance-table td {
+
+      border:
+        1px solid #111;
+
+      padding:
+        2.5mm 2mm;
+
+      vertical-align:
+        middle;
+    }
+
+
+    .acceptance-table th {
+
+      text-align:
+        center;
+
+      font-weight:
+        700;
+    }
+
+
+    .acceptance-table .stt {
+
+      width: 9%;
+
+      text-align:
+        center;
+    }
+
+
+    .acceptance-table .item {
+
+      width: 48%;
+    }
+
+
+    .acceptance-table .pass {
+
+      width: 12%;
+
+      text-align:
+        center;
+    }
+
+
+    .acceptance-table .fail {
+
+      width: 13%;
+
+      text-align:
+        center;
+    }
+
+
+    .acceptance-table .note {
+
+      width: 18%;
+    }
+
+
+    .table-check {
+
+      display: inline-block;
+
+      font-size: 14pt;
+
+      line-height: 1;
+    }
+
+
+    /* =========================
+       CONFIRMATION
+    ========================= */
+
+    .confirmation-line {
+
+      margin:
+        2mm 0;
+
+      line-height:
+        1.45;
+    }
+
+
+    .sub-confirm {
+
+      margin:
+        2mm 0 2mm 6mm;
+    }
+
+
+    .blank-line {
+
+      min-height:
+        7mm;
+
+      margin:
+        1mm 0 2mm;
+
+      border-bottom:
+        1px dotted #777;
+    }
+
+
+    /* =========================
+       CLOSING
+    ========================= */
+
+    .closing {
+
+      margin-top:
+        5mm;
+
+      text-align:
+        justify;
+    }
+
+
+    .signature-grid {
+
+      display: grid;
+
+      grid-template-columns:
+        1fr 1fr;
+
+      gap: 15mm;
+
+      margin-top:
+        12mm;
+
+      text-align:
+        center;
+    }
+
+
+    .signature-box {
+
+      min-height:
+        48mm;
+    }
+
+
+    .signature-title {
+
+      font-weight:
+        700;
+
+      text-transform:
+        uppercase;
+    }
+
+
+    .signature-company {
+
+      margin-top:
+        2mm;
+
+      font-weight:
+        700;
+    }
+
+
+    .signature-note {
+
+      margin-top:
+        25mm;
+
+      font-style:
+        italic;
+    }
+
+
+    /* =========================
+       RESPONSIVE
+    ========================= */
+
+    @media (max-width: 900px) {
+
+      .app-topbar {
+        padding: 0 14px;
+      }
+
+
+      .page {
+        padding: 14px;
+      }
+
+
+      .workspace {
+
+        grid-template-columns:
+          1fr;
+      }
+
+
+      .form-panel {
+
+        position: static;
+      }
+
+
+      .form-body {
+
+        max-height: none;
+      }
+
+
+      .preview-panel {
+
+        overflow-x: auto;
+      }
+
+
+      .preview-container {
+
+        align-items:
+          flex-start;
+      }
+
+    }
+
+
+    @media (max-width: 600px) {
+
+      .brand-mini span,
+      .save-status {
+
+        display: none;
+      }
+
+
+      .two-col {
+
+        grid-template-columns:
+          1fr;
+      }
+
+
+      .page {
+
+        padding: 10px;
+      }
+
+
+      .paper {
+
+        width: 210mm;
+      }
+
+    }
+
+
+    /* =========================
+       PRINT
+    ========================= */
+
+    @page {
+
+      size: A4 portrait;
+
+      margin: 0;
+    }
+
+
+    @media print {
+
+      html,
+      body {
+
+        margin: 0;
+
+        padding: 0;
+
+        background: #fff;
+      }
+
+
+      body {
+
+        width: 210mm;
+      }
+
+
+      .app-topbar,
+      .form-panel,
+      .preview-toolbar {
+
+        display: none !important;
+      }
+
+
+      .page,
+      .workspace,
+      .preview-panel,
+      .preview-container {
+
+        display: block;
+
+        width: auto;
+
+        max-width: none;
+
+        margin: 0;
+
+        padding: 0;
+
+        overflow: visible;
+      }
+
+
+      .paper {
+
+        width: 210mm;
+
+        min-height: 0;
+
+        height: auto;
+
+        margin: 0;
+
+        padding:
+          17mm
+          17mm
+          18mm;
+
+        box-shadow: none;
+
+        overflow: visible;
+
+        page-break-after: auto;
+
+        break-after: auto;
+      }
+
+
+      .acceptance-table {
+
+        break-inside: auto;
+      }
+
+
+      .acceptance-table tr {
+
+        break-inside: avoid;
+      }
+
+
+      .signature-grid {
+
+        break-inside: avoid;
+      }
+
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+
+  <!-- =========================
+       TOPBAR
+  ========================= -->
+
+  <header class="app-topbar">
+
+    <div class="topbar-left">
+
+      <button
+        type="button"
+        class="back-button"
+        onclick="goBack()"
+        aria-label="Quay lại"
+      >
+        ←
+      </button>
+
+
+      <div class="brand-mini">
+
+        <strong>
+          GROVA DOCUMENT
+        </strong>
+
+        <span>
+          Biên bản nghiệm thu và bàn giao
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <div>
+
+      <span
+        id="saveStatus"
+        class="save-status"
+      >
+        Đang soạn thảo
+      </span>
+
+    </div>
+
+  </header>
+
+
+
+  <!-- =========================
+       MAIN
+  ========================= -->
+
+  <main class="page">
+
+    <div class="workspace">
+
+
+      <!-- =========================
+           FORM
+      ========================= -->
+
+      <section class="form-panel">
+
+
+        <div class="form-header">
+
+          <span class="eyebrow">
+            GROVA DOCUMENT
+          </span>
+
+
+          <h1>
+            Biên bản nghiệm thu và bàn giao
+          </h1>
+
+
+          <p>
+            Nhập thông tin để cập nhật trực tiếp
+            vào biên bản.
+          </p>
+
+        </div>
+
+
+
+        <div class="form-body">
+
+
+          <!-- VĂN BẢN -->
+
+          <div class="section-title">
+            Thông tin văn bản
+          </div>
+
+
+          <div class="two-col">
+
+
+            <div class="field">
+
+              <label for="documentNo">
+                Số biên bản
+              </label>
+
+              <input
+                id="documentNo"
+                type="text"
+              >
+
+            </div>
+
+
+            <div class="field">
+
+              <label for="documentDate">
+                Ngày lập
+              </label>
+
+              <input
+                id="documentDate"
+                type="date"
+              >
+
+            </div>
+
+
+          </div>
+
+
+
+          <div class="field">
+
+            <label for="contractNo">
+              Hợp đồng nguyên tắc số
+            </label>
+
+            <input
+              id="contractNo"
+              type="text"
+              value="01/2026/HĐNT"
+            >
+
+          </div>
+
+
+
+          <div class="field">
+
+            <label for="appendixNo">
+              Phụ lục công trình số
+            </label>
+
+            <input
+              id="appendixNo"
+              type="text"
+              placeholder="Nhập số phụ lục"
+            >
+
+          </div>
+
+
+
+          <!-- CÔNG TRÌNH -->
+
+          <div class="section-title">
+            I. Thông tin công trình
+          </div>
+
+
+          <div class="field">
+
+            <label for="projectName">
+              Tên công trình
+            </label>
+
+            <input
+              id="projectName"
+              type="text"
+            >
+
+          </div>
+
+
+          <div class="field">
+
+            <label for="projectAddress">
+              Địa chỉ
+            </label>
+
+            <input
+              id="projectAddress"
+              type="text"
+            >
+
+          </div>
+
+
+
+          <!-- THÀNH PHẦN -->
+
+          <div class="section-title">
+            II. Thành phần tham gia
+          </div>
+
+
+          <div class="field">
+
+            <label>
+              Bên A – Công ty
+            </label>
+
+            <input
+              type="text"
+              value="CÔNG TY CỔ PHẦN GROVA HOLDINGS"
+              readonly
+            >
+
+          </div>
+
+
+          <div class="field">
+
+            <label for="partyAName">
+              Ông/Bà – Bên A
+            </label>
+
+            <input
+              id="partyAName"
+              type="text"
+            >
+
+          </div>
+
+
+          <div class="field">
+
+            <label for="partyAPosition">
+              Chức vụ – Bên A
+            </label>
+
+            <input
+              id="partyAPosition"
+              type="text"
+            >
+
+          </div>
+
+
+          <div class="field">
+
+            <label for="partyBCompany">
+              Tên công ty – Bên B
+            </label>
+
+            <input
+              id="partyBCompany"
+              type="text"
+            >
+
+          </div>
+
+
+          <div class="field">
+
+            <label for="partyBName">
+              Ông/Bà – Bên B
+            </label>
+
+            <input
+              id="partyBName"
+              type="text"
+            >
+
+          </div>
+
+
+          <div class="field">
+
+            <label for="partyBPosition">
+              Chức vụ – Bên B
+            </label>
+
+            <input
+              id="partyBPosition"
+              type="text"
+            >
+
+          </div>
+
+
+
+          <!-- KHUNG THÉP -->
+
+          <div class="section-title">
+            III. Thông tin khung thép
+          </div>
+
+
+          <div class="field">
+
+            <label for="stopCount">
+              Số stop
+            </label>
+
+            <input
+              id="stopCount"
+              type="text"
+            >
+
+          </div>
+
+
+          <div class="two-col">
+
+
+            <div class="field">
+
+              <label for="shaftWidth">
+                Kích thước hố thang – chiều 1
+              </label>
+
+              <input
+                id="shaftWidth"
+                type="text"
+              >
+
+            </div>
+
+
+            <div class="field">
+
+              <label for="shaftDepth">
+                Kích thước hố thang – chiều 2
+              </label>
+
+              <input
+                id="shaftDepth"
+                type="text"
+              >
+
+            </div>
+
+
+          </div>
+
+
+          <div class="field">
+
+            <label for="frameType">
+              Loại khung
+            </label>
+
+            <input
+              id="frameType"
+              type="text"
+            >
+
+          </div>
+
+
+
+          <!-- NGHIỆM THU -->
+
+          <div class="section-title">
+            IV. Nội dung nghiệm thu
+          </div>
+
+
+          <div class="check-list">
+
+
+            <div class="check-item">
+
+              <input
+                type="checkbox"
+                id="pass1"
+              >
+
+              <span>
+                Thi công đúng vị trí theo bản vẽ
+              </span>
+
+            </div>
+
+
+            <div class="check-item">
+
+              <input
+                type="checkbox"
+                id="pass2"
+              >
+
+              <span>
+                Kích thước tổng thể khung thép
+              </span>
+
+            </div>
+
+
+            <div class="check-item">
+
+              <input
+                type="checkbox"
+                id="pass3"
+              >
+
+              <span>
+                Độ thẳng đứng của khung
+              </span>
+
+            </div>
+
+
+            <div class="check-item">
+
+              <input
+                type="checkbox"
+                id="pass4"
+              >
+
+              <span>
+                Độ cân bằng của khung
+              </span>
+
+            </div>
+
+
+            <div class="check-item">
+
+              <input
+                type="checkbox"
+                id="pass5"
+              >
+
+              <span>
+                Bulong, bản mã lắp đặt đầy đủ
+              </span>
+
+            </div>
+
+
+            <div class="check-item">
+
+              <input
+                type="checkbox"
+                id="pass6"
+              >
+
+              <span>
+                Liên kết kết cấu chắc chắn
+              </span>
+
+            </div>
+
+
+            <div class="check-item">
+
+              <input
+                type="checkbox"
+                id="pass7"
+              >
+
+              <span>
+                Hoàn thành bọc bảo vệ bằng bạt dứa
+              </span>
+
+            </div>
+
+
+            <div class="check-item">
+
+              <input
+                type="checkbox"
+                id="pass8"
+              >
+
+              <span>
+                Vệ sinh khu vực thi công
+              </span>
+
+            </div>
+
+
+          </div>
+
+
+
+          <div class="section-title">
+            V. Kết luận
+          </div>
+
+
+          <div class="check-list">
+
+
+            <label class="check-item">
+
+              <input
+                type="checkbox"
+                id="conclusionPass"
+              >
+
+              <span>
+                Đạt yêu cầu kỹ thuật và đủ điều kiện bàn giao.
+              </span>
+
+            </label>
+
+
+            <label class="check-item">
+
+              <input
+                type="checkbox"
+                id="conclusionFix"
+              >
+
+              <span>
+                Đạt yêu cầu, đề nghị khắc phục các nội dung sau:
+              </span>
+
+            </label>
+
+
+            <label class="check-item">
+
+              <input
+                type="checkbox"
+                id="conclusionNotPass"
+              >
+
+              <span>
+                Chưa đạt yêu cầu, cần hoàn thiện các nội dung sau:
+              </span>
+
+            </label>
+
+
+          </div>
+
+
+          <div class="field">
+
+            <label for="conclusionDetails">
+              Nội dung cần khắc phục / hoàn thiện
+            </label>
+
+            <textarea
+              id="conclusionDetails"
+              rows="4"
+            ></textarea>
+
+          </div>
+
+
+
+          <!-- BÀN GIAO -->
+
+          <div class="section-title">
+            VI. Bàn giao công trình
+          </div>
+
+
+          <div class="field">
+
+            <label>
+              Bên A xác nhận
+            </label>
+
+
+            <div class="check-list">
+
+
+              <label class="check-item">
+
+                <input
+                  type="checkbox"
+                  id="handoverA1"
+                  checked
+                >
+
+                <span>
+                  Đã hoàn thành toàn bộ khối lượng công việc theo Hợp đồng và Phụ lục công trình.
+                </span>
+
+              </label>
+
+
+              <label class="check-item">
+
+                <input
+                  type="checkbox"
+                  id="handoverA2"
+                  checked
+                >
+
+                <span>
+                  Đã vệ sinh khu vực thi công.
+                </span>
+
+              </label>
+
+
+              <label class="check-item">
+
+                <input
+                  type="checkbox"
+                  id="handoverA3"
+                  checked
+                >
+
+                <span>
+                  Đã bọc bảo vệ khung thép bằng bạt dứa.
+                </span>
+
+              </label>
+
+
+              <label class="check-item">
+
+                <input
+                  type="checkbox"
+                  id="handoverA4"
+                  checked
+                >
+
+                <span>
+                  Đã bàn giao hiện trạng công trình cho Bên B.
+                </span>
+
+              </label>
+
+
+            </div>
+
+          </div>
+
+
+
+          <div class="field">
+
+            <label>
+              Bên B xác nhận
+            </label>
+
+
+            <div class="check-list">
+
+
+              <label class="check-item">
+
+                <input
+                  type="checkbox"
+                  id="handoverB1"
+                >
+
+                <span>
+                  Đã kiểm tra đầy đủ khối lượng thi công.
+                </span>
+
+              </label>
+
+
+              <label class="check-item">
+
+                <input
+                  type="checkbox"
+                  id="handoverB2"
+                >
+
+                <span>
+                  Đã kiểm tra đầy đủ chất lượng kỹ thuật.
+                </span>
+
+              </label>
+
+
+              <label class="check-item">
+
+                <input
+                  type="checkbox"
+                  id="handoverB3"
+                >
+
+                <span>
+                  Kích thước và kết cấu khung thép phù hợp yêu cầu.
+                </span>
+
+              </label>
+
+
+              <label class="check-item">
+
+                <input
+                  type="checkbox"
+                  id="handoverB4"
+                >
+
+                <span>
+                  Đã tiếp nhận hiện trạng công trình.
+                </span>
+
+              </label>
+
+
+              <label class="check-item">
+
+                <input
+                  type="checkbox"
+                  id="handoverB5"
+                >
+
+                <span>
+                  Đồng ý nghiệm thu và bàn giao.
+                </span>
+
+              </label>
+
+
+              <label class="check-item">
+
+                <input
+                  type="checkbox"
+                  id="handoverB6"
+                >
+
+                <span>
+                  Không có ý kiến hoặc khiếu nại tại thời điểm ký biên bản.
+                </span>
+
+              </label>
+
+
+            </div>
+
+          </div>
+
+
+
+          <!-- CAM KẾT -->
+
+          <div class="section-title">
+            VII. Cam kết của các bên
+          </div>
+
+
+          <div class="field">
+
+            <label>
+              Sau khi ký biên bản này
+            </label>
+
+
+            <div class="check-list">
+
+
+              <label class="check-item">
+
+                <input
+                  type="checkbox"
+                  id="commit1"
+                  checked
+                >
+
+                <span>
+                  Phần công việc của Bên A được xem là đã hoàn thành và bàn giao.
+                </span>
+
+              </label>
+
+
+              <label class="check-item">
+
+                <input
+                  type="checkbox"
+                  id="commit2"
+                  checked
+                >
+
+                <span>
+                  Biên bản này là căn cứ để thực hiện thanh toán theo Hợp đồng và Phụ lục công trình.
+                </span>
+
+              </label>
+
+
+              <label class="check-item">
+
+                <input
+                  type="checkbox"
+                  id="commit3"
+                  checked
+                >
+
+                <span>
+                  Mọi hư hỏng, cong vênh, móp méo, trầy xước hoặc thay đổi kết cấu phát sinh sau thời điểm bàn giao do chủ đầu tư, đơn vị thi công khác hoặc bên thứ ba gây ra sẽ không thuộc trách nhiệm của Bên A.
+                </span>
+
+              </label>
+
+
+              <label class="check-item">
+
+                <input
+                  type="checkbox"
+                  id="commit4"
+                  checked
+                >
+
+                <span>
+                  Trường hợp có đơn vị khác tiếp tục thi công trên phần khung thép hoặc tiến hành lắp đặt thiết bị thang máy thì được xem là Bên B đã chấp thuận toàn bộ hiện trạng và chất lượng phần việc do Bên A thực hiện.
+                </span>
+
+              </label>
+
+
+            </div>
+
+          </div>
+
+
+
+          <!-- GHI CHÚ -->
+
+          <div class="section-title">
+            VIII. Ghi chú khác (nếu có)
+          </div>
+
+
+          <div class="field">
+
+            <textarea
+              id="notes"
+              rows="5"
+            ></textarea>
+
+          </div>
+
+
+
+          <!-- ACTION -->
+
+          <div class="action-row">
+
+
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="clearDraft()"
+            >
+              Xóa nhập
+            </button>
+
+
+            <button
+              type="button"
+              class="btn btn-primary"
+              onclick="printDocument()"
+            >
+              In / Xuất PDF
+            </button>
+
+
+          </div>
+
+
+        </div>
+
+      </section>
+
+
+
+      <!-- =========================
+           PREVIEW
+      ========================= -->
+
+      <section class="preview-panel">
+
+
+        <div class="preview-toolbar">
+
+          <div>
+
+            <h2>
+              Xem trước văn bản
+            </h2>
+
+            <span>
+              Khổ A4 – tự động phân trang
+            </span>
+
+          </div>
+
+        </div>
+
+
+
+        <div class="preview-container">
+
+
+          <article
+            class="paper"
+            id="documentPreview"
+          >
+
+
+            <!-- HEADER -->
+
+            <div class="doc-header">
+
+
+              <div class="doc-logo-box">
+
+                <img
+                  src="../data/grova_logo.png"
+                  class="doc-logo"
+                  alt="GROVA HOLDINGS"
+                >
+
+              </div>
+
+
+              <div class="national-header">
+
+                <div class="country">
+                  CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM
+                </div>
+
+                <div class="motto">
+                  Độc lập – Tự do – Hạnh phúc
+                </div>
+
+                <div class="underline"></div>
+
+              </div>
+
+
+            </div>
+
+
+
+            <!-- TITLE -->
+
+            <div class="doc-title">
+              BIÊN BẢN NGHIỆM THU VÀ BÀN GIAO
+            </div>
+
+
+            <div class="doc-subtitle">
+              KHUNG THÉP THANG MÁY
+            </div>
+
+
+            <div class="doc-number">
+
+              Số:
+              <span id="previewDocumentNo">
+                01/BBNTBG/2026
+              </span>
+
+            </div>
+
+
+
+            <!-- BASES -->
+
+            <div class="doc-bases">
+
+              <div>
+
+                Căn cứ Hợp đồng nguyên tắc số:
+                <span id="previewContractNo">
+                  01/2026/HĐNT
+                </span>
+
+              </div>
+
+
+              <div>
+
+                Căn cứ Phụ lục công trình số:
+                <span id="previewAppendixNo">
+                  ....../PLHĐ/20......
+                </span>
+
+              </div>
+
+            </div>
+
+
+
+            <!-- DATE -->
+
+            <div class="doc-date">
+
+              Hôm nay, ngày
+              <span id="previewDay">
+                ......
+              </span>
+              tháng
+              <span id="previewMonth">
+                ......
+              </span>
+              năm
+              <span id="previewYear">
+                20......
+              </span>,
+              tại công trình:
+
+            </div>
+
+
+
+            <!-- I -->
+
+            <div class="doc-section-title">
+              I. THÔNG TIN CÔNG TRÌNH
+            </div>
+
+
+            <div class="doc-line">
+
+              Tên công trình:
+              <span id="previewProjectName">
+                ....................................................................
+              </span>
+
+            </div>
+
+
+            <div class="doc-line">
+
+              Địa chỉ:
+              <span id="previewProjectAddress">
+                ....................................................................
+              </span>
+
+            </div>
+
+
+
+            <!-- II -->
+
+            <div class="doc-section-title">
+              II. THÀNH PHẦN THAM GIA
+            </div>
+
+
+            <div class="doc-line bold">
+
+              ĐẠI DIỆN BÊN A (ĐƠN VỊ THI CÔNG)
+
+            </div>
+
+
+            <div class="doc-line bold">
+
+              CÔNG TY CỔ PHẦN GROVA HOLDINGS
+
+            </div>
+
+
+            <div class="doc-line">
+
+              Ông/Bà:
+              <span id="previewPartyAName">
+                ..........................................................
+              </span>
+
+            </div>
+
+
+            <div class="doc-line">
+
+              Chức vụ:
+              <span id="previewPartyAPosition">
+                ..........................................................
+              </span>
+
+            </div>
+
+
+
+            <div
+              class="doc-line bold"
+              style="margin-top:4mm;"
+            >
+
+              ĐẠI DIỆN BÊN B (ĐƠN VỊ THUÊ THI CÔNG)
+
+            </div>
+
+
+            <div class="doc-line">
+
+              Tên công ty:
+              <span id="previewPartyBCompany">
+                ..........................................................
+              </span>
+
+            </div>
+
+
+            <div class="doc-line">
+
+              Ông/Bà:
+              <span id="previewPartyBName">
+                ..........................................................
+              </span>
+
+            </div>
+
+
+            <div class="doc-line">
+
+              Chức vụ:
+              <span id="previewPartyBPosition">
+                ..........................................................
+              </span>
+
+            </div>
+
+
+
+            <!-- III -->
+
+            <div class="doc-section-title">
+              III. THÔNG TIN KHUNG THÉP
+            </div>
+
+
+            <div class="bullet-line">
+
+               Số stop:
+              <span id="previewStopCount">
+                ............
+              </span>
+
+            </div>
+
+
+            <div class="bullet-line">
+
+               Kích thước hố thang:
+              <span id="previewShaftWidth">
+                ............
+              </span>
+              x
+              <span id="previewShaftDepth">
+                ............
+              </span>
+              mm
+
+            </div>
+
+
+            <div class="bullet-line">
+
+               Loại khung:
+              <span id="previewFrameType">
+                ....................................................
+              </span>
+
+            </div>
+
+
+
+            <!-- IV -->
+
+            <div class="doc-section-title">
+              IV. NỘI DUNG NGHIỆM THU
+            </div>
+
+
+            <table class="acceptance-table">
+
+
+              <thead>
+
+                <tr>
+
+                  <th class="stt">
+                    STT
+                  </th>
+
+                  <th class="item">
+                    Hạng mục kiểm tra
+                  </th>
+
+                  <th class="pass">
+                    Đạt
+                  </th>
+
+                  <th class="fail">
+                    Không đạt
+                  </th>
+
+                  <th class="note">
+                    Ghi chú
+                  </th>
+
+                </tr>
+
+              </thead>
+
+
+              <tbody>
+
+
+                <tr>
+
+                  <td class="stt">
+                    1
+                  </td>
+
+                  <td class="item">
+                    Thi công đúng vị trí theo bản vẽ
+                  </td>
+
+                  <td
+                    class="pass"
+                    id="previewPass1"
+                  >
+                    ☐
+                  </td>
+
+                  <td class="fail">
+                    ☐
+                  </td>
+
+                  <td></td>
+
+                </tr>
+
+
+                <tr>
+
+                  <td class="stt">
+                    2
+                  </td>
+
+                  <td class="item">
+                    Kích thước tổng thể khung thép
+                  </td>
+
+                  <td
+                    class="pass"
+                    id="previewPass2"
+                  >
+                    ☐
+                  </td>
+
+                  <td class="fail">
+                    ☐
+                  </td>
+
+                  <td></td>
+
+                </tr>
+
+
+                <tr>
+
+                  <td class="stt">
+                    3
+                  </td>
+
+                  <td class="item">
+                    Độ thẳng đứng của khung
+                  </td>
+
+                  <td
+                    class="pass"
+                    id="previewPass3"
+                  >
+                    ☐
+                  </td>
+
+                  <td class="fail">
+                    ☐
+                  </td>
+
+                  <td></td>
+
+                </tr>
+
+
+                <tr>
+
+                  <td class="stt">
+                    4
+                  </td>
+
+                  <td class="item">
+                    Độ cân bằng của khung
+                  </td>
+
+                  <td
+                    class="pass"
+                    id="previewPass4"
+                  >
+                    ☐
+                  </td>
+
+                  <td class="fail">
+                    ☐
+                  </td>
+
+                  <td></td>
+
+                </tr>
+
+
+                <tr>
+
+                  <td class="stt">
+                    5
+                  </td>
+
+                  <td class="item">
+                    Bulong, bản mã lắp đặt đầy đủ
+                  </td>
+
+                  <td
+                    class="pass"
+                    id="previewPass5"
+                  >
+                    ☐
+                  </td>
+
+                  <td class="fail">
+                    ☐
+                  </td>
+
+                  <td></td>
+
+                </tr>
+
+
+                <tr>
+
+                  <td class="stt">
+                    6
+                  </td>
+
+                  <td class="item">
+                    Liên kết kết cấu chắc chắn
+                  </td>
+
+                  <td
+                    class="pass"
+                    id="previewPass6"
+                  >
+                    ☐
+                  </td>
+
+                  <td class="fail">
+                    ☐
+                  </td>
+
+                  <td></td>
+
+                </tr>
+
+
+                <tr>
+
+                  <td class="stt">
+                    7
+                  </td>
+
+                  <td class="item">
+                    Hoàn thành bọc bảo vệ bằng bạt dứa
+                  </td>
+
+                  <td
+                    class="pass"
+                    id="previewPass7"
+                  >
+                    ☐
+                  </td>
+
+                  <td class="fail">
+                    ☐
+                  </td>
+
+                  <td></td>
+
+                </tr>
+
+
+                <tr>
+
+                  <td class="stt">
+                    8
+                  </td>
+
+                  <td class="item">
+                    Vệ sinh khu vực thi công
+                  </td>
+
+                  <td
+                    class="pass"
+                    id="previewPass8"
+                  >
+                    ☐
+                  </td>
+
+                  <td class="fail">
+                    ☐
+                  </td>
+
+                  <td></td>
+
+                </tr>
+
+
+              </tbody>
+
+            </table>
+
+
+
+            <!-- V -->
+
+            <div class="doc-section-title">
+              V. KẾT LUẬN
+            </div>
+
+
+            <div class="confirmation-line">
+
+              <span id="previewConclusionPass">
+                ☐
+              </span>
+
+              Đạt yêu cầu kỹ thuật và đủ điều kiện bàn giao.
+
+            </div>
+
+
+            <div class="confirmation-line">
+
+              <span id="previewConclusionFix">
+                ☐
+              </span>
+
+              Đạt yêu cầu, đề nghị khắc phục các nội dung sau:
+
+            </div>
+
+
+            <div class="blank-line"></div>
+
+            <div class="blank-line"></div>
+
+
+            <div class="confirmation-line">
+
+              <span id="previewConclusionNotPass">
+                ☐
+              </span>
+
+              Chưa đạt yêu cầu, cần hoàn thiện các nội dung sau:
+
+            </div>
+
+
+            <div class="blank-line"></div>
+
+            <div class="blank-line"></div>
+
+
+
+            <!-- VI -->
+
+            <div class="doc-section-title">
+              VI. BÀN GIAO CÔNG TRÌNH
+            </div>
+
+
+            <div class="doc-line bold">
+              Bên A xác nhận:
+            </div>
+
+
+            <div class="confirmation-line">
+
+              <span id="previewHandoverA1">
+                ☑
+              </span>
+
+              Đã hoàn thành toàn bộ khối lượng công việc theo Hợp đồng và Phụ lục công trình.
+
+            </div>
+
+
+            <div class="confirmation-line">
+
+              <span id="previewHandoverA2">
+                ☑
+              </span>
+
+              Đã vệ sinh khu vực thi công.
+
+            </div>
+
+
+            <div class="confirmation-line">
+
+              <span id="previewHandoverA3">
+                ☑
+              </span>
+
+              Đã bọc bảo vệ khung thép bằng bạt dứa.
+
+            </div>
+
+
+            <div class="confirmation-line">
+
+              <span id="previewHandoverA4">
+                ☑
+              </span>
+
+              Đã bàn giao hiện trạng công trình cho Bên B.
+
+            </div>
+
+
+
+            <div
+              class="doc-line bold"
+              style="margin-top:4mm;"
+            >
+
+              Bên B xác nhận:
+
+            </div>
+
+
+            <div class="confirmation-line">
+
+              <span id="previewHandoverB1">
+                ☐
+              </span>
+
+              Đã kiểm tra đầy đủ khối lượng thi công.
+
+            </div>
+
+
+            <div class="confirmation-line">
+
+              <span id="previewHandoverB2">
+                ☐
+              </span>
+
+              Đã kiểm tra đầy đủ chất lượng kỹ thuật.
+
+            </div>
+
+
+            <div class="confirmation-line">
+
+              <span id="previewHandoverB3">
+                ☐
+              </span>
+
+              Kích thước và kết cấu khung thép phù hợp yêu cầu.
+
+            </div>
+
+
+            <div class="confirmation-line">
+
+              <span id="previewHandoverB4">
+                ☐
+              </span>
+
+              Đã tiếp nhận hiện trạng công trình.
+
+            </div>
+
+
+            <div class="confirmation-line">
+
+              <span id="previewHandoverB5">
+                ☐
+              </span>
+
+              Đồng ý nghiệm thu và bàn giao.
+
+            </div>
+
+
+            <div class="confirmation-line">
+
+              <span id="previewHandoverB6">
+                ☐
+              </span>
+
+              Không có ý kiến hoặc khiếu nại tại thời điểm ký biên bản.
+
+            </div>
+
+
+
+            <!-- VII -->
+
+            <div class="doc-section-title">
+              VII. CAM KẾT CỦA CÁC BÊN
+            </div>
+
+
+            <div class="doc-line">
+              Sau khi ký biên bản này:
+            </div>
+
+
+            <div class="confirmation-line">
+
+              <span id="previewCommit1">
+                
+              </span>
+
+              Phần công việc của Bên A được xem là đã hoàn thành và bàn giao.
+
+            </div>
+
+
+            <div class="confirmation-line">
+
+              <span id="previewCommit2">
+                
+              </span>
+
+              Biên bản này là căn cứ để thực hiện thanh toán theo Hợp đồng và Phụ lục công trình.
+
+            </div>
+
+
+            <div class="confirmation-line">
+
+              <span id="previewCommit3">
+                
+              </span>
+
+              Mọi hư hỏng, cong vênh, móp méo, trầy xước hoặc thay đổi kết cấu phát sinh sau thời điểm bàn giao do chủ đầu tư, đơn vị thi công khác hoặc bên thứ ba gây ra sẽ không thuộc trách nhiệm của Bên A.
+
+            </div>
+
+
+            <div class="confirmation-line">
+
+              <span id="previewCommit4">
+                
+              </span>
+
+              Trường hợp có đơn vị khác tiếp tục thi công trên phần khung thép hoặc tiến hành lắp đặt thiết bị thang máy thì được xem là Bên B đã chấp thuận toàn bộ hiện trạng và chất lượng phần việc do Bên A thực hiện.
+
+            </div>
+
+
+
+            <!-- VIII -->
+
+            <div class="doc-section-title">
+              VIII. GHI CHÚ KHÁC (NẾU CÓ)
+            </div>
+
+
+            <div
+              class="blank-line"
+              id="previewNote1"
+            ></div>
+
+
+            <div
+              class="blank-line"
+              id="previewNote2"
+            ></div>
+
+
+
+            <!-- CLOSING -->
+
+            <div class="closing">
+
+              Biên bản được lập thành 02 bản có giá trị pháp lý như nhau, mỗi bên giữ 01 bản.
+
+            </div>
+
+
+
+            <!-- SIGNATURE -->
+
+            <div class="signature-grid">
+
+
+              <div class="signature-box">
+
+                <div class="signature-title">
+                  ĐẠI DIỆN BÊN A
+                </div>
+
+
+                <div class="signature-company">
+                  CÔNG TY CỔ PHẦN GROVA HOLDINGS
+                </div>
+
+
+                <div class="signature-note">
+                  (Ký, ghi rõ họ tên)
+                </div>
+
+              </div>
+
+
+
+              <div class="signature-box">
+
+                <div class="signature-title">
+                  ĐẠI DIỆN BÊN B
+                </div>
+
+
+                <div class="signature-note">
+                  (Ký, ghi rõ họ tên, đóng dấu)
+                </div>
+
+              </div>
+
+
+            </div>
+
+
+          </article>
+
+        </div>
+
+      </section>
+
+    </div>
+
+  </main>
+
+
+
+  <script>
+
+    /* =====================================
+       GROVA DOCUMENT – TEMPLATE 05
+    ===================================== */
+
+
+    const STORAGE_KEY =
+      "grova_document_template_05";
+
+
+    const COUNTER_KEY =
+      "grova_bbntbg_counter";
+
+
+    const inputIds = [
+
+      "documentNo",
+      "documentDate",
+
+      "contractNo",
+      "appendixNo",
+
+      "projectName",
+      "projectAddress",
+
+      "partyAName",
+      "partyAPosition",
+
+      "partyBCompany",
+      "partyBName",
+      "partyBPosition",
+
+      "stopCount",
+      "shaftWidth",
+      "shaftDepth",
+      "frameType",
+
+      "conclusionDetails",
+
+      "notes"
+
+    ];
+
+
+    const checkboxIds = [
+
+      "pass1",
+      "pass2",
+      "pass3",
+      "pass4",
+      "pass5",
+      "pass6",
+      "pass7",
+      "pass8",
+
+      "conclusionPass",
+      "conclusionFix",
+      "conclusionNotPass",
+
+      "handoverA1",
+      "handoverA2",
+      "handoverA3",
+      "handoverA4",
+
+      "handoverB1",
+      "handoverB2",
+      "handoverB3",
+      "handoverB4",
+      "handoverB5",
+      "handoverB6",
+
+      "commit1",
+      "commit2",
+      "commit3",
+      "commit4"
+
+    ];
+
+
+    function $(id) {
+      return document.getElementById(id);
+    }
+
+
+    function currentYear() {
+
+      return new Date()
+        .getFullYear();
+
+    }
+
+
+    function createDocumentNumber() {
+
+      const year =
+        currentYear();
+
+
+      const key =
+        COUNTER_KEY
+        + "_"
+        + year;
+
+
+      let counter =
+        Number(
+          localStorage.getItem(key)
+        ) || 0;
+
+
+      counter++;
+
+
+      localStorage.setItem(
+        key,
+        counter
+      );
+
+
+      return (
+        String(counter)
+          .padStart(2, "0")
+        + "/BBNTBG/"
+        + year
+      );
+
+    }
+
+
+    function setText(
+      id,
+      value,
+      fallback = ""
+    ) {
+
+      const element =
+        $(id);
+
+
+      if (!element) {
+        return;
+      }
+
+
+      if (
+        value === undefined ||
+        value === null ||
+        String(value).trim() === ""
+      ) {
+
+        element.textContent =
+          fallback;
+
+      } else {
+
+        element.textContent =
+          value;
+
+      }
+
+    }
+
+
+    function formatDateVN(value) {
+
+      if (!value) {
+
+        return {
+          day: "......",
+          month: "......",
+          year: "20......"
+        };
+
+      }
+
+
+      const parts =
+        value.split("-");
+
+
+      if (parts.length !== 3) {
+
+        return {
+          day: "......",
+          month: "......",
+          year: "20......"
+        };
+
+      }
+
+
+      return {
+
+        day: parts[2],
+
+        month: parts[1],
+
+        year: parts[0]
+
+      };
+
+    }
+
+
+    function updatePreview() {
+
+
+      /* -------------------------
+         BASIC INFORMATION
+      ------------------------- */
+
+      setText(
+        "previewDocumentNo",
+        $("documentNo").value,
+        "01/BBNTBG/2026"
+      );
+
+
+      setText(
+        "previewContractNo",
+        $("contractNo").value,
+        "01/2026/HĐNT"
+      );
+
+
+      setText(
+        "previewAppendixNo",
+        $("appendixNo").value,
+        "....../PLHĐ/20......"
+      );
+
+
+      const date =
+        formatDateVN(
+          $("documentDate").value
+        );
+
+
+      setText(
+        "previewDay",
+        date.day
+      );
+
+
+      setText(
+        "previewMonth",
+        date.month
+      );
+
+
+      setText(
+        "previewYear",
+        date.year
+      );
+
+
+      /* -------------------------
+         PROJECT
+      ------------------------- */
+
+      setText(
+        "previewProjectName",
+        $("projectName").value,
+        "...................................................................."
+      );
+
+
+      setText(
+        "previewProjectAddress",
+        $("projectAddress").value,
+        "...................................................................."
+      );
+
+
+      /* -------------------------
+         PARTIES
+      ------------------------- */
+
+      setText(
+        "previewPartyAName",
+        $("partyAName").value,
+        ".........................................................."
+      );
+
+
+      setText(
+        "previewPartyAPosition",
+        $("partyAPosition").value,
+        ".........................................................."
+      );
+
+
+      setText(
+        "previewPartyBCompany",
+        $("partyBCompany").value,
+        ".........................................................."
+      );
+
+
+      setText(
+        "previewPartyBName",
+        $("partyBName").value,
+        ".........................................................."
+      );
+
+
+      setText(
+        "previewPartyBPosition",
+        $("partyBPosition").value,
+        ".........................................................."
+      );
+
+
+      /* -------------------------
+         STEEL
+      ------------------------- */
+
+      setText(
+        "previewStopCount",
+        $("stopCount").value,
+        "............"
+      );
+
+
+      setText(
+        "previewShaftWidth",
+        $("shaftWidth").value,
+        "............"
+      );
+
+
+      setText(
+        "previewShaftDepth",
+        $("shaftDepth").value,
+        "............"
+      );
+
+
+      setText(
+        "previewFrameType",
+        $("frameType").value,
+        "...................................................."
+      );
+
+
+      /* -------------------------
+         ACCEPTANCE
+      ------------------------- */
+
+      for (
+        let i = 1;
+        i <= 8;
+        i++
+      ) {
+
+        const checkbox =
+          $("pass" + i);
+
+
+        const preview =
+          $("previewPass" + i);
+
+
+        if (checkbox.checked) {
+
+          preview.textContent =
+            "☑";
+
+        } else {
+
+          preview.textContent =
+            "☐";
+
+        }
+
+      }
+
+
+      /* -------------------------
+         CONCLUSION
+      ------------------------- */
+
+      setText(
+        "previewConclusionPass",
+        $("conclusionPass").checked
+          ? "☑"
+          : "☐"
+      );
+
+
+      setText(
+        "previewConclusionFix",
+        $("conclusionFix").checked
+          ? "☑"
+          : "☐"
+      );
+
+
+      setText(
+        "previewConclusionNotPass",
+        $("conclusionNotPass").checked
+          ? "☑"
+          : "☐"
+      );
+
+
+      /* -------------------------
+         CONCLUSION DETAILS
+      ------------------------- */
+
+      const conclusion =
+        $("conclusionDetails")
+          .value
+          .trim();
+
+
+      const conclusionLines =
+        conclusion
+          ? conclusion.split(/\r?\n/)
+          : [];
+
+
+      const conclusionBlankLines =
+        document.querySelectorAll(
+          "#documentPreview .blank-line"
+        );
+
+
+      /*
+        Không đưa nội dung này vào
+        dòng ghi chú cuối văn bản.
+        Phần kết luận giữ riêng.
+      */
+
+
+      /* -------------------------
+         HANDOVER A
+      ------------------------- */
+
+      for (
+        let i = 1;
+        i <= 4;
+        i++
+      ) {
+
+        $("previewHandoverA" + i)
+          .textContent =
+          $("handoverA" + i).checked
+            ? "☑"
+            : "☐";
+
+      }
+
+
+      /* -------------------------
+         HANDOVER B
+      ------------------------- */
+
+      for (
+        let i = 1;
+        i <= 6;
+        i++
+      ) {
+
+        $("previewHandoverB" + i)
+          .textContent =
+          $("handoverB" + i).checked
+            ? "☑"
+            : "☐";
+
+      }
+
+
+      /* -------------------------
+         COMMITMENTS
+      ------------------------- */
+
+      for (
+        let i = 1;
+        i <= 4;
+        i++
+      ) {
+
+        $("previewCommit" + i)
+          .textContent =
+          "";
+
+      }
+
+
+      /* -------------------------
+         NOTES
+      ------------------------- */
+
+      const notes =
+        $("notes")
+          .value
+          .trim();
+
+
+      const noteLines =
+        notes
+          ? notes.split(/\r?\n/)
+          : [];
+
+
+      const noteElements = [
+        $("previewNote1"),
+        $("previewNote2")
+      ];
+
+
+      noteElements.forEach(
+        (element, index) => {
+
+          element.textContent =
+            noteLines[index] || "";
+
+        }
+      );
+
+
+      saveDraft();
+
+    }
+
+
+    function saveDraft() {
+
+      const data = {
+        fields: {},
+        checkboxes: {}
+      };
+
+
+      inputIds.forEach(
+        id => {
+
+          const element =
+            $(id);
+
+
+          if (element) {
+
+            data.fields[id] =
+              element.value;
+
+          }
+
+        }
+      );
+
+
+      checkboxIds.forEach(
+        id => {
+
+          const element =
+            $(id);
+
+
+          if (element) {
+
+            data.checkboxes[id] =
+              element.checked;
+
+          }
+
+        }
+      );
+
+
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(data)
+      );
+
+
+      const status =
+        $("saveStatus");
+
+
+      if (status) {
+
+        status.textContent =
+          "Đã lưu nháp";
+
+      }
+
+    }
+
+
+    function loadDraft() {
+
+      const raw =
+        localStorage.getItem(
+          STORAGE_KEY
+        );
+
+
+      if (!raw) {
+        return false;
+      }
+
+
+      try {
+
+        const data =
+          JSON.parse(raw);
+
+
+        if (data.fields) {
+
+          Object.entries(
+            data.fields
+          ).forEach(
+            ([id, value]) => {
+
+              const element =
+                $(id);
+
+
+              if (element) {
+
+                element.value =
+                  value ?? "";
+
+              }
+
+            }
+          );
+
+        }
+
+
+        if (data.checkboxes) {
+
+          Object.entries(
+            data.checkboxes
+          ).forEach(
+            ([id, value]) => {
+
+              const element =
+                $(id);
+
+
+              if (element) {
+
+                element.checked =
+                  Boolean(value);
+
+              }
+
+            }
+          );
+
+        }
+
+
+        return true;
+
+      } catch (error) {
+
+        console.warn(
+          "Không thể đọc bản nháp:",
+          error
+        );
+
+
+        return false;
+
+      }
+
+    }
+
+
+    function clearDraft() {
+
+      const confirmed =
+        window.confirm(
+          "Xóa toàn bộ dữ liệu đang nhập?"
+        );
+
+
+      if (!confirmed) {
+        return;
+      }
+
+
+      localStorage.removeItem(
+        STORAGE_KEY
+      );
+
+
+      $("documentNo").value =
+        createDocumentNumber();
+
+
+      $("documentDate").value =
+        new Date()
+          .toISOString()
+          .slice(0, 10);
+
+
+      $("contractNo").value =
+        "01/2026/HĐNT";
+
+
+      inputIds.forEach(
+        id => {
+
+          if (
+            id === "documentNo" ||
+            id === "documentDate" ||
+            id === "contractNo"
+          ) {
+            return;
+          }
+
+
+          const element =
+            $(id);
+
+
+          if (element) {
+
+            element.value = "";
+
+          }
+
+        }
+      );
+
+
+      checkboxIds.forEach(
+        id => {
+
+          const element =
+            $(id);
+
+
+          if (!element) {
+            return;
+          }
+
+
+          /*
+            Các lựa chọn mặc định
+            theo file gốc:
+            Bên A xác nhận = ☑
+            Cam kết = nội dung cố định.
+          */
+
+          if (
+            id === "handoverA1" ||
+            id === "handoverA2" ||
+            id === "handoverA3" ||
+            id === "handoverA4" ||
+            id === "commit1" ||
+            id === "commit2" ||
+            id === "commit3" ||
+            id === "commit4"
+          ) {
+
+            element.checked = true;
+
+          } else {
+
+            element.checked = false;
+
+          }
+
+        }
+      );
+
+
+      updatePreview();
+
+    }
+
+
+    function printDocument() {
+
+      updatePreview();
+
+      window.print();
+
+    }
+
+
+    function goBack() {
+
+      if (
+        document.referrer &&
+        document.referrer.indexOf(
+          window.location.origin
+        ) === 0
+      ) {
+
+        window.history.back();
+
+      } else {
+
+        window.location.href =
+          "../index.html";
+
+      }
+
+    }
+
+
+    function bindInputs() {
+
+
+      inputIds.forEach(
+        id => {
+
+          const element =
+            $(id);
+
+
+          if (!element) {
+            return;
+          }
+
+
+          element.addEventListener(
+            "input",
+            updatePreview
+          );
+
+
+          element.addEventListener(
+            "change",
+            updatePreview
+          );
+
+        }
+      );
+
+
+      checkboxIds.forEach(
+        id => {
+
+          const element =
+            $(id);
+
+
+          if (!element) {
+            return;
+          }
+
+
+          element.addEventListener(
+            "change",
+            updatePreview
+          );
+
+        }
+      );
+
+    }
+
+
+    function init() {
+
+
+      const loaded =
+        loadDraft();
+
+
+      if (!loaded) {
+
+        $("documentNo").value =
+          createDocumentNumber();
+
+
+        $("documentDate").value =
+          new Date()
+            .toISOString()
+            .slice(0, 10);
+
+      }
+
+
+      bindInputs();
+
+      updatePreview();
+
+    }
+
+
+    init();
+
+  </script>
+
+
+</body>
+
+</html>
