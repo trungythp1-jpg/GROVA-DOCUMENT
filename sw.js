@@ -1,12 +1,19 @@
-const CACHE_NAME = "grova-document-v5";
+const CACHE_NAME = "grova-document-v6";
 
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./style.css?v=201",
-  "./app.js?v=201",
-  "./data/data.js?v=201",
-  "./manifest.json?v=201",
+
+  "./style.css?v=202",
+  "./auth.css?v=202",
+
+  "./app.js?v=202",
+  "./auth.js?v=202",
+
+  "./data/data.js?v=202",
+
+  "./manifest.json?v=202",
+
   "./data/grova_logo.png"
 ];
 
@@ -21,11 +28,13 @@ self.addEventListener("install", (event) => {
 
     caches
       .open(CACHE_NAME)
+
       .then((cache) => {
 
         return cache.addAll(APP_SHELL);
 
       })
+
       .then(() => {
 
         return self.skipWaiting();
@@ -47,24 +56,32 @@ self.addEventListener("activate", (event) => {
 
     caches
       .keys()
+
       .then((cacheNames) => {
 
         return Promise.all(
 
           cacheNames
-            .filter(
-              (name) =>
+
+            .filter((name) => {
+
+              return (
                 name.startsWith("grova-document-") &&
                 name !== CACHE_NAME
-            )
-            .map(
-              (name) =>
-                caches.delete(name)
-            )
+              );
+
+            })
+
+            .map((name) => {
+
+              return caches.delete(name);
+
+            })
 
         );
 
       })
+
       .then(() => {
 
         return self.clients.claim();
@@ -103,16 +120,24 @@ self.addEventListener("fetch", (event) => {
 
   const request = event.request;
 
+
+  /* ===================================================
+     Chỉ xử lý GET
+  =================================================== */
+
   if (request.method !== "GET") {
+
     return;
+
   }
 
 
-  const url = new URL(request.url);
+  const url =
+    new URL(request.url);
 
 
   /* ===================================================
-     Chỉ xử lý request cùng website
+     Chỉ xử lý tài nguyên cùng website
   =================================================== */
 
   if (
@@ -125,13 +150,16 @@ self.addEventListener("fetch", (event) => {
 
 
   /* ===================================================
-     HTML
-     
+     HTML / NAVIGATION
+
      Ưu tiên mạng để luôn lấy phiên bản mới.
-     Offline → dùng cache.
+
+     Nếu mất mạng:
+     → dùng bản đã cache.
   =================================================== */
 
   if (
+    request.mode === "navigate" ||
     request.destination === "document" ||
     url.pathname.endsWith(".html")
   ) {
@@ -139,6 +167,7 @@ self.addEventListener("fetch", (event) => {
     event.respondWith(
 
       fetch(request)
+
         .then((response) => {
 
           if (
@@ -149,30 +178,44 @@ self.addEventListener("fetch", (event) => {
             const clone =
               response.clone();
 
-            caches
-              .open(CACHE_NAME)
-              .then((cache) => {
+            event.waitUntil(
 
-                cache.put(
-                  request,
-                  clone
-                );
+              caches
+                .open(CACHE_NAME)
 
-              });
+                .then((cache) => {
+
+                  return cache.put(
+                    request,
+                    clone
+                  );
+
+                })
+
+            );
 
           }
 
           return response;
 
         })
+
         .catch(() => {
 
-          return caches.match(request)
-            .then((cached) => {
+          return caches
+            .match(request)
 
-              return (
-                cached ||
-                caches.match("./index.html")
+            .then((cachedResponse) => {
+
+              if (cachedResponse) {
+
+                return cachedResponse;
+
+              }
+
+
+              return caches.match(
+                "./index.html"
               );
 
             });
@@ -187,13 +230,16 @@ self.addEventListener("fetch", (event) => {
 
 
   /* ===================================================
-     JAVASCRIPT / CSS / DATA
-     
-     Ưu tiên mạng.
-     Nếu offline → cache.
-     
-     Điều này giúp khi anh commit phiên bản mới,
-     app không bị giữ JS/CSS cũ.
+     JAVASCRIPT / CSS / JSON
+
+     Network First.
+
+     Online:
+     → lấy phiên bản mới
+     → cập nhật cache.
+
+     Offline:
+     → dùng cache.
   =================================================== */
 
   if (
@@ -205,6 +251,7 @@ self.addEventListener("fetch", (event) => {
     event.respondWith(
 
       fetch(request)
+
         .then((response) => {
 
           if (
@@ -215,22 +262,28 @@ self.addEventListener("fetch", (event) => {
             const clone =
               response.clone();
 
-            caches
-              .open(CACHE_NAME)
-              .then((cache) => {
+            event.waitUntil(
 
-                cache.put(
-                  request,
-                  clone
-                );
+              caches
+                .open(CACHE_NAME)
 
-              });
+                .then((cache) => {
+
+                  return cache.put(
+                    request,
+                    clone
+                  );
+
+                })
+
+            );
 
           }
 
           return response;
 
         })
+
         .catch(() => {
 
           return caches.match(request);
@@ -246,14 +299,22 @@ self.addEventListener("fetch", (event) => {
 
   /* ===================================================
      ẢNH / ICON / FILE KHÁC
-     
-     Cache trước → mạng sau.
+
+     Cache First.
+
+     Có cache:
+     → dùng cache.
+
+     Chưa có:
+     → lấy mạng.
+     → lưu vào cache.
   =================================================== */
 
   event.respondWith(
 
     caches
       .match(request)
+
       .then((cachedResponse) => {
 
         if (cachedResponse) {
@@ -264,6 +325,7 @@ self.addEventListener("fetch", (event) => {
 
 
         return fetch(request)
+
           .then((response) => {
 
             if (
@@ -281,16 +343,21 @@ self.addEventListener("fetch", (event) => {
               response.clone();
 
 
-            caches
-              .open(CACHE_NAME)
-              .then((cache) => {
+            event.waitUntil(
 
-                cache.put(
-                  request,
-                  clone
-                );
+              caches
+                .open(CACHE_NAME)
 
-              });
+                .then((cache) => {
+
+                  return cache.put(
+                    request,
+                    clone
+                  );
+
+                })
+
+            );
 
 
             return response;
