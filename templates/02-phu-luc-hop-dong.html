@@ -2,6 +2,7 @@
 <html lang="vi">
 
 <head>
+
   <meta charset="UTF-8">
 
   <meta
@@ -24,111 +25,228 @@
        ===================================================== */
 
     .document-editor {
+      width: 100%;
       min-height: 100vh;
+
+      display: block;
+
       background: #eef3f1;
     }
 
+
+    /* =====================================================
+       HEADER
+       ===================================================== */
+
     .document-editor-header {
+      width: 100%;
       height: 76px;
+
       background: #ffffff;
+
       border-bottom: 1px solid #dfe7e3;
+
       display: flex;
       align-items: center;
       justify-content: space-between;
+
       padding: 0 28px;
+
       position: sticky;
       top: 0;
+
       z-index: 100;
     }
 
     .document-title-area {
       display: flex;
       align-items: center;
+
       gap: 16px;
+
+      min-width: 0;
     }
 
     .back-button {
       width: 48px;
       height: 48px;
+
+      flex: 0 0 48px;
+
       border: 0;
       border-radius: 14px;
+
       background: #edf7f3;
+
       color: #378166;
+
       font-size: 25px;
+
       cursor: pointer;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .back-button:hover {
+      background: #e3f1eb;
     }
 
     .document-title-area h1 {
       margin: 0;
+
       font-size: 21px;
       line-height: 1.2;
+
+      font-weight: 800;
+
+      color: #202a33;
     }
 
     .document-title-area span {
       display: block;
+
       margin-top: 3px;
+
       color: #87918e;
+
       font-size: 14px;
     }
 
     .print-button {
       border: 0;
+
       background: #378166;
+
       color: #ffffff;
-      padding: 15px 28px;
+
+      padding: 13px 22px;
+
+      min-height: 46px;
+
       border-radius: 13px;
-      font-size: 16px;
+
+      font-size: 15px;
       font-weight: 700;
+
       cursor: pointer;
+
+      white-space: nowrap;
+
+      transition:
+        background .2s ease,
+        transform .2s ease;
     }
 
-    .editor-layout {
-      display: grid;
-      grid-template-columns: 390px minmax(0, 1fr);
-      min-height: calc(100vh - 76px);
+    .print-button:hover {
+      background: #2e7259;
     }
+
+    .print-button:active {
+      transform: scale(.98);
+    }
+
 
     /* =====================================================
-       FORM
+       MAIN EDITOR
+       ===================================================== */
+
+    .editor-layout {
+      width: 100%;
+
+      display: grid;
+
+      grid-template-columns:
+        390px
+        minmax(0, 1fr);
+
+      min-height:
+        calc(100vh - 76px);
+    }
+
+
+    /* =====================================================
+       FORM PANEL
        ===================================================== */
 
     .form-panel {
+      width: 100%;
+
       background: #ffffff;
+
       border-right: 1px solid #dfe7e3;
+
       padding: 30px;
+
       overflow-y: auto;
-      height: calc(100vh - 76px);
+
+      height:
+        calc(100vh - 76px);
+
+      overscroll-behavior: contain;
     }
 
     .form-panel h2 {
       margin: 0 0 8px;
+
       font-size: 29px;
+      line-height: 1.2;
+
+      font-weight: 800;
+
+      color: #202a33;
     }
 
     .form-description {
       color: #7d8785;
+
       line-height: 1.55;
+
       margin: 0 0 28px;
+
+      font-size: 14px;
     }
+
+
+    /* =====================================================
+       FORM SECTION
+       ===================================================== */
 
     .form-section {
       border-top: 1px solid #e4ebe8;
+
       padding-top: 24px;
+
       margin-top: 24px;
     }
 
     .form-section:first-of-type {
       border-top: 0;
+
       padding-top: 0;
+
       margin-top: 0;
     }
 
     .form-section h3 {
       color: #378166;
+
       font-size: 17px;
+
+      line-height: 1.3;
+
       margin: 0 0 18px;
+
       text-transform: uppercase;
+
+      font-weight: 800;
     }
+
+
+    /* =====================================================
+       FIELD
+       ===================================================== */
 
     .field {
       margin-bottom: 15px;
@@ -136,9 +254,13 @@
 
     .field label {
       display: block;
+
       font-size: 14px;
+
       font-weight: 700;
+
       color: #56615e;
+
       margin-bottom: 7px;
     }
 
@@ -146,52 +268,98 @@
     .field textarea,
     .field select {
       width: 100%;
+
       box-sizing: border-box;
+
       border: 1px solid #d4ded9;
+
       border-radius: 11px;
+
       padding: 13px 14px;
+
       background: #ffffff;
+
       color: #27302e;
+
       font-size: 15px;
+
       outline: none;
-      transition: .2s;
+
+      transition:
+        border-color .2s ease,
+        box-shadow .2s ease;
+    }
+
+    .field input {
+      min-height: 47px;
+    }
+
+    .field select {
+      min-height: 47px;
     }
 
     .field input:focus,
     .field textarea:focus,
     .field select:focus {
       border-color: #378166;
-      box-shadow: 0 0 0 3px rgba(55,129,102,.10);
+
+      box-shadow:
+        0 0 0 3px
+        rgba(55, 129, 102, .10);
     }
 
     .field textarea {
       min-height: 82px;
+
       resize: vertical;
     }
 
+
+    /* =====================================================
+       COLUMNS
+       ===================================================== */
+
     .two-columns {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+
+      grid-template-columns:
+        1fr 1fr;
+
       gap: 10px;
     }
 
     .three-columns {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
+
+      grid-template-columns:
+        1fr 1fr 1fr;
+
       gap: 8px;
     }
 
+
+    /* =====================================================
+       FIXED FIELD
+       ===================================================== */
+
     .fixed-field {
       background: #f3f7f5 !important;
+
       color: #66716e !important;
+
+      cursor: not-allowed;
     }
 
     .locked-note {
       font-size: 12px;
+
       color: #8a9491;
+
       margin-top: 6px;
+
       line-height: 1.45;
     }
+
 
     /* =====================================================
        CHECKBOX
@@ -199,60 +367,150 @@
 
     .check-group {
       display: flex;
+
       flex-direction: column;
+
       gap: 10px;
     }
 
     .check-item {
       display: flex;
+
       align-items: flex-start;
+
       gap: 9px;
+
       font-size: 14px;
+
       color: #414b48;
+
       line-height: 1.4;
+
+      cursor: pointer;
     }
 
     .check-item input {
       width: 18px;
       height: 18px;
+
       margin-top: 1px;
+
       accent-color: #378166;
+
       flex: 0 0 auto;
     }
 
+
     /* =====================================================
-       PREVIEW
+       PREVIEW PANEL
        ===================================================== */
 
     .preview-panel {
+      min-width: 0;
+
       padding: 35px;
+
       overflow: auto;
+
+      background: #eef3f1;
+
+      -webkit-overflow-scrolling: touch;
     }
 
     .preview-label {
       color: #7d8785;
+
       font-size: 14px;
+
       margin: 0 auto 12px;
+
       max-width: 794px;
     }
 
+
+    /* =====================================================
+       A4 PAGE
+       ===================================================== */
+
     .a4-page {
       width: 794px;
+
       min-height: 1123px;
+
       box-sizing: border-box;
+
       background: #ffffff;
+
       margin: 0 auto 30px;
-      padding: 65px 68px 65px 68px;
-      box-shadow: 0 3px 20px rgba(28, 55, 45, .12);
+
+      padding:
+        52px
+        68px
+        65px
+        68px;
+
+      box-shadow:
+        0 3px 20px
+        rgba(28, 55, 45, .12);
+
       color: #111111;
-      font-family: "Times New Roman", Times, serif;
+
+      font-family:
+        "Times New Roman",
+        Times,
+        serif;
+
       font-size: 16px;
+
       line-height: 1.45;
+
+      overflow: hidden;
     }
 
     .a4-page p {
       margin: 0 0 10px;
     }
+
+
+    /* =====================================================
+       GROVA LOGO
+       ===================================================== */
+
+    .doc-logo-wrap {
+      width: 100%;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      margin:
+        0 0 12px;
+    }
+
+    .a4-page .doc-logo {
+      display: block;
+
+      width: 150px;
+
+      max-width: 150px;
+
+      height: auto;
+
+      max-height: 78px;
+
+      object-fit: contain;
+
+      object-position: center;
+
+      margin: 0 auto;
+    }
+
+
+    /* =====================================================
+       DOCUMENT TEXT
+       ===================================================== */
 
     .center {
       text-align: center;
@@ -264,32 +522,55 @@
 
     .national-title {
       font-size: 18px;
+
       font-weight: 700;
     }
 
     .national-subtitle {
       font-size: 16px;
+
       font-weight: 700;
+
       margin-top: 3px;
     }
 
     .document-heading {
-      margin-top: 35px;
+      margin-top: 30px;
+
       font-size: 22px;
+
       font-weight: 700;
     }
 
     .document-number {
       margin-top: 7px;
+
       font-style: italic;
     }
 
-    .section-heading {
+
+    /* =====================================================
+       SECTION HEADING INSIDE A4
+       ===================================================== */
+
+    .a4-page .section-heading {
       font-weight: 700;
+
       font-size: 17px;
+
+      line-height: 1.3;
+
       margin-top: 20px;
+
       margin-bottom: 9px;
+
+      color: #111111;
     }
+
+
+    /* =====================================================
+       BULLET
+       ===================================================== */
 
     .indent {
       margin-left: 0;
@@ -297,15 +578,28 @@
 
     .bullet {
       margin-left: 20px;
+
       margin-bottom: 4px;
     }
 
+
+    /* =====================================================
+       PREVIEW LINE
+       ===================================================== */
+
     .preview-line {
       display: inline-block;
+
       min-width: 180px;
-      border-bottom: 1px dotted #333;
+
+      border-bottom:
+        1px dotted #333333;
+
       padding: 0 4px;
+
       min-height: 20px;
+
+      vertical-align: bottom;
     }
 
     .preview-line.long {
@@ -316,30 +610,54 @@
       min-width: 80px;
     }
 
+
+    /* =====================================================
+       TABLE
+       ===================================================== */
+
     .preview-table {
       width: 100%;
+
       border-collapse: collapse;
-      margin: 10px 0 15px;
+
+      margin:
+        10px 0 15px;
+
       font-size: 14px;
     }
 
     .preview-table th,
     .preview-table td {
-      border: 1px solid #333;
-      padding: 7px 6px;
+      border:
+        1px solid #333333;
+
+      padding:
+        7px 6px;
+
       vertical-align: middle;
     }
 
     .preview-table th {
       text-align: center;
+
       font-weight: 700;
     }
 
+
+    /* =====================================================
+       SIGNATURE
+       ===================================================== */
+
     .signature-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+
+      grid-template-columns:
+        1fr 1fr;
+
       gap: 35px;
+
       margin-top: 35px;
+
       text-align: center;
     }
 
@@ -349,6 +667,7 @@
 
     .signature-company {
       font-weight: 700;
+
       margin-top: 5px;
     }
 
@@ -357,17 +676,23 @@
     }
 
     .preview-checkbox {
-      font-family: "Times New Roman", Times, serif;
+      font-family:
+        "Times New Roman",
+        Times,
+        serif;
     }
 
+
     /* =====================================================
-       RESPONSIVE
+       RESPONSIVE - TABLET
        ===================================================== */
 
     @media (max-width: 1100px) {
 
       .editor-layout {
-        grid-template-columns: 350px minmax(0, 1fr);
+        grid-template-columns:
+          350px
+          minmax(0, 1fr);
       }
 
       .form-panel {
@@ -380,36 +705,190 @@
 
     }
 
+
+    /* =====================================================
+       RESPONSIVE - iPAD PORTRAIT / SMALL TABLET
+       ===================================================== */
+
     @media (max-width: 850px) {
+
+      .document-editor-header {
+        height: 70px;
+
+        padding:
+          0 15px;
+      }
+
+      .document-title-area {
+        gap: 10px;
+      }
+
+      .back-button {
+        width: 44px;
+        height: 44px;
+
+        flex-basis: 44px;
+
+        border-radius: 12px;
+
+        font-size: 22px;
+      }
+
+      .document-title-area h1 {
+        font-size: 18px;
+      }
+
+      .document-title-area span {
+        font-size: 12px;
+      }
 
       .editor-layout {
         display: block;
+
+        min-height: auto;
       }
 
       .form-panel {
         height: auto;
+
         max-height: none;
+
         border-right: 0;
+
+        border-bottom:
+          1px solid #dfe7e3;
+
+        padding: 22px;
       }
 
       .preview-panel {
-        overflow-x: auto;
-      }
+        width: 100%;
 
-      .document-editor-header {
-        padding: 0 15px;
+        overflow-x: auto;
+
+        padding:
+          24px 15px 40px;
       }
 
       .print-button {
-        padding: 12px 16px;
+        padding:
+          11px 15px;
+
+        min-height: 43px;
+
+        font-size: 13px;
       }
 
     }
 
+
+    /* =====================================================
+       RESPONSIVE - PHONE
+       ===================================================== */
+
+    @media (max-width: 600px) {
+
+      .document-editor-header {
+        height: 64px;
+      }
+
+      .document-title-area h1 {
+        font-size: 17px;
+      }
+
+      .document-title-area span {
+        display: none;
+      }
+
+      .document-editor-header > .print-button {
+        font-size: 0;
+
+        width: 43px;
+        height: 43px;
+
+        min-height: 43px;
+
+        padding: 0;
+
+        border-radius: 11px;
+      }
+
+      .document-editor-header > .print-button::before {
+        content: "🖨";
+
+        font-size: 18px;
+      }
+
+      .form-panel {
+        padding: 18px;
+      }
+
+      .form-panel h2 {
+        font-size: 25px;
+      }
+
+      .form-description {
+        font-size: 13px;
+      }
+
+      .two-columns {
+        grid-template-columns: 1fr;
+      }
+
+      .three-columns {
+        grid-template-columns:
+          1fr 1fr 1fr;
+      }
+
+      .preview-panel {
+        padding:
+          20px 10px 35px;
+      }
+
+      .preview-label {
+        padding: 0 5px;
+
+        font-size: 13px;
+      }
+
+    }
+
+
+    /* =====================================================
+       A4 PREVIEW - VERY SMALL SCREEN
+       ===================================================== */
+
+    @media (max-width: 430px) {
+
+      .a4-page {
+        margin-left: 0;
+        margin-right: 0;
+      }
+
+    }
+
+
+    /* =====================================================
+       PRINT
+       ===================================================== */
+
     @media print {
 
+      html,
       body {
-        background: #ffffff !important;
+        width: 100%;
+
+        margin: 0;
+
+        padding: 0;
+
+        background:
+          #ffffff !important;
+      }
+
+      .document-editor {
+        background:
+          #ffffff !important;
       }
 
       .document-editor-header,
@@ -418,34 +897,74 @@
         display: none !important;
       }
 
+      .editor-layout {
+        display: block;
+
+        min-height: auto;
+      }
+
       .preview-panel {
+        display: block;
+
+        width: 100%;
+
         padding: 0 !important;
+
+        margin: 0 !important;
+
         overflow: visible !important;
+
+        background:
+          #ffffff !important;
       }
 
       .a4-page {
         width: 210mm;
+
         min-height: 297mm;
+
         margin: 0;
-        padding: 17mm 18mm;
+
+        padding:
+          17mm
+          18mm;
+
         box-shadow: none;
+
+        overflow: visible;
+
         page-break-after: always;
+      }
+
+      .a4-page:last-child {
+        page-break-after: auto;
+      }
+
+      .a4-page .doc-logo {
+        width: 34mm;
+
+        max-width: 34mm;
+
+        max-height: 18mm;
       }
 
       @page {
         size: A4 portrait;
+
         margin: 0;
       }
 
     }
 
   </style>
+
 </head>
 
 
 <body>
 
 <div class="document-editor">
+
 
   <!-- =====================================================
        HEADER
@@ -478,6 +997,7 @@
 
     </div>
 
+
     <button
       class="print-button"
       type="button"
@@ -487,6 +1007,7 @@
     </button>
 
   </header>
+
 
 
   <!-- =====================================================
@@ -510,6 +1031,7 @@
         Nhập các thông tin được phép thay đổi.
         Nội dung điều khoản của mẫu được khóa.
       </p>
+
 
 
       <!-- ===============================================
@@ -573,6 +1095,7 @@
         </div>
 
       </section>
+
 
 
       <!-- ===============================================
@@ -680,6 +1203,7 @@
       </section>
 
 
+
       <!-- ===============================================
            BÊN B
            =============================================== -->
@@ -775,6 +1299,7 @@
         </div>
 
       </section>
+
 
 
       <!-- ===============================================
@@ -900,6 +1425,7 @@
       </section>
 
 
+
       <!-- ===============================================
            PHẠM VI CÔNG VIỆC
            =============================================== -->
@@ -913,75 +1439,101 @@
         <div class="check-group">
 
           <label class="check-item">
+
             <input
               type="checkbox"
               id="work1"
               checked
             >
+
             <span>
               Lắp đặt khung thép thang máy
             </span>
+
           </label>
 
+
           <label class="check-item">
+
             <input
               type="checkbox"
               id="work2"
               checked
             >
+
             <span>
               Căn chỉnh kết cấu khung
             </span>
+
           </label>
 
+
           <label class="check-item">
+
             <input
               type="checkbox"
               id="work3"
               checked
             >
+
             <span>
               Liên kết bulong, bản mã
             </span>
+
           </label>
 
+
           <label class="check-item">
+
             <input
               type="checkbox"
               id="work4"
               checked
             >
+
             <span>
               Bọc bảo vệ chống xước sau lắp đặt
             </span>
+
           </label>
 
+
           <label class="check-item">
+
             <input
               type="checkbox"
               id="work5"
               checked
             >
+
             <span>
               Vệ sinh khu vực thi công
             </span>
+
           </label>
 
+
           <label class="check-item">
+
             <input
               type="checkbox"
               id="work6"
               checked
             >
+
             <span>
               Hỗ trợ nghiệm thu kỹ thuật
             </span>
+
           </label>
 
         </div>
 
 
-        <div class="field" style="margin-top:15px;">
+        <div
+          class="field"
+          style="margin-top:15px;"
+        >
 
           <label>
             Công việc khác
@@ -996,6 +1548,7 @@
         </div>
 
       </section>
+
 
 
       <!-- ===============================================
@@ -1024,6 +1577,7 @@
 
         </div>
 
+
         <div class="field">
 
           <label>
@@ -1038,6 +1592,7 @@
           >
 
         </div>
+
 
         <div class="field">
 
@@ -1054,6 +1609,7 @@
 
         </div>
 
+
         <div class="field">
 
           <label>
@@ -1069,6 +1625,7 @@
         </div>
 
       </section>
+
 
 
       <!-- ===============================================
@@ -1094,6 +1651,7 @@
 
         </div>
 
+
         <div class="field">
 
           <label>
@@ -1106,6 +1664,7 @@
           >
 
         </div>
+
 
         <div class="field">
 
@@ -1122,6 +1681,7 @@
 
         </div>
 
+
         <div class="field">
 
           <label>
@@ -1136,6 +1696,7 @@
         </div>
 
       </section>
+
 
 
       <!-- ===============================================
@@ -1164,6 +1725,7 @@
 
         </div>
 
+
         <div class="field">
 
           <label>
@@ -1178,6 +1740,7 @@
           >
 
         </div>
+
 
         <div class="field">
 
@@ -1195,6 +1758,7 @@
 
         </div>
 
+
         <div class="field">
 
           <label>
@@ -1208,6 +1772,7 @@
           >
 
         </div>
+
 
         <div class="field">
 
@@ -1224,6 +1789,7 @@
         </div>
 
       </section>
+
 
 
       <!-- ===============================================
@@ -1249,7 +1815,11 @@
 
         </label>
 
-        <div class="field" style="margin-top:15px;">
+
+        <div
+          class="field"
+          style="margin-top:15px;"
+        >
 
           <label>
             Công trình có yêu cầu đặc biệt
@@ -1263,6 +1833,7 @@
         </div>
 
       </section>
+
 
 
       <!-- ===============================================
@@ -1280,6 +1851,7 @@
       >
         🖨 In / Xuất PDF
       </button>
+
 
       <button
         type="button"
@@ -1303,6 +1875,7 @@
     </aside>
 
 
+
     <!-- ===================================================
          PREVIEW
          =================================================== -->
@@ -1314,11 +1887,31 @@
       </p>
 
 
+
       <!-- =================================================
            PAGE 1
            ================================================= -->
 
-      <article class="a4-page" id="page1">
+      <article
+        class="a4-page"
+        id="page1"
+      >
+
+
+        <!-- =================================================
+             GROVA LOGO
+             ================================================= -->
+
+        <div class="doc-logo-wrap">
+
+          <img
+            class="doc-logo"
+            src="../data/grova_logo.png"
+            alt="GROVA HOLDINGS"
+          >
+
+        </div>
+
 
         <div class="center">
 
@@ -1337,28 +1930,49 @@
 
           <div class="document-number">
             Số:
+
             <span id="pvAppendixNumber">
               ...../PLHĐ/2026
             </span>
+
           </div>
 
         </div>
 
 
+
         <p style="margin-top:25px;">
+
           Hôm nay, ngày
-          <span class="preview-line short" id="pvDay"></span>
+
+          <span
+            class="preview-line short"
+            id="pvDay"
+          ></span>
+
           tháng
-          <span class="preview-line short" id="pvMonth"></span>
+
+          <span
+            class="preview-line short"
+            id="pvMonth"
+          ></span>
+
           năm
-          <span id="pvYear">2026</span>,
+
+          <span id="pvYear">
+            2026
+          </span>,
+
           chúng tôi gồm:
+
         </p>
+
 
 
         <div class="section-heading">
           BÊN A (BÊN THI CÔNG)
         </div>
+
 
         <p>
           CÔNG TY CỔ PHẦN GROVA HOLDINGS
@@ -1378,146 +1992,215 @@
         </p>
 
         <p>
+
           Chức vụ:
+
           <span
             class="preview-line"
             id="pvAPosition"
           ></span>
+
         </p>
 
         <p>
+
           Điện thoại:
+
           <span
             class="preview-line"
             id="pvAPhone"
           ></span>
+
         </p>
 
 
-        <div class="center bold" style="margin:12px 0;">
+
+        <div
+          class="center bold"
+          style="margin:12px 0;"
+        >
           VÀ
         </div>
+
 
 
         <div class="section-heading">
           BÊN B (BÊN THUÊ THI CÔNG)
         </div>
 
+
         <p>
+
           Tên công ty:
+
           <span
             class="preview-line long"
             id="pvBCompany"
           ></span>
+
         </p>
 
+
         <p>
+
           Mã số thuế:
+
           <span
             class="preview-line"
             id="pvBTax"
           ></span>
+
         </p>
 
+
         <p>
+
           Địa chỉ:
+
           <span
             class="preview-line long"
             id="pvBAddress"
           ></span>
+
         </p>
 
+
         <p>
+
           Đại diện:
+
           <span
             class="preview-line"
             id="pvBRepresentative"
           ></span>
+
         </p>
 
+
         <p>
+
           Chức vụ:
+
           <span
             class="preview-line"
             id="pvBPosition"
           ></span>
+
         </p>
 
+
         <p>
+
           Điện thoại:
+
           <span
             class="preview-line"
             id="pvBPhone"
           ></span>
+
         </p>
 
+
         <p style="margin-top:18px;">
+
           Hai bên thống nhất ký Phụ lục công trình
           với các nội dung như sau:
+
         </p>
+
 
 
         <div class="section-heading">
           ĐIỀU 1. THÔNG TIN CÔNG TRÌNH
         </div>
 
+
         <p>
+
           Địa chỉ công trình:
+
           <span
             class="preview-line long"
             id="pvProjectAddress"
           ></span>
+
         </p>
 
+
         <p>
+
           Chủ đầu tư:
+
           <span
             class="preview-line long"
             id="pvInvestor"
           ></span>
+
         </p>
+
 
         <p>
           Thông số phục vụ thi công khung thang máy:
         </p>
 
+
         <p class="bullet">
+
            Số tầng lắp đặt:
+
           <span
             class="preview-line short"
             id="pvFloorCount"
           ></span>
+
         </p>
 
+
         <p class="bullet">
+
            Loại khung:
+
           <span class="preview-checkbox">
+
             ☐ Khung thép
             ☐ Khung thép bọc inox
             ☐ Khung nhôm
+
           </span>
+
         </p>
 
+
         <p class="bullet">
+
            Vị trí lắp đặt:
+
           <span class="preview-checkbox">
+
             ☐ Trong nhà
             ☐ Ngoài trời
+
           </span>
+
         </p>
+
 
         <p class="bullet">
            Ghi chú kỹ thuật khác (nếu có):
         </p>
 
+
         <p>
+
           <span
             class="preview-line long"
             id="pvTechnicalNote"
           ></span>
+
         </p>
 
       </article>
+
 
 
       <!-- =================================================
@@ -1526,13 +2209,16 @@
 
       <article class="a4-page">
 
+
         <div class="section-heading">
           ĐIỀU 2. PHẠM VI CÔNG VIỆC
         </div>
 
+
         <p>
           Bên A thực hiện:
         </p>
+
 
         <div id="pvWorkList">
 
@@ -1561,14 +2247,18 @@
           </p>
 
           <p class="bullet">
+
             ☐ Công việc khác:
+
             <span
               class="preview-line"
               id="pvOtherWork"
             ></span>
+
           </p>
 
         </div>
+
 
 
         <div class="section-heading">
@@ -1576,11 +2266,13 @@
         </div>
 
 
+
         <table class="preview-table">
 
           <thead>
 
             <tr>
+
               <th>
                 Nội dung
               </th>
@@ -1600,9 +2292,11 @@
               <th>
                 Thành tiền (VNĐ)
               </th>
+
             </tr>
 
           </thead>
+
 
           <tbody>
 
@@ -1613,7 +2307,9 @@
                 thang máy
               </td>
 
-              <td style="text-align:center;">
+              <td
+                style="text-align:center;"
+              >
                 Stop
               </td>
 
@@ -1645,7 +2341,9 @@
         </table>
 
 
+
         <p>
+
           <strong>
             TỔNG GIÁ TRỊ PHỤ LỤC:
           </strong>
@@ -1653,20 +2351,27 @@
           <span id="pvTotalValue">
             .................................................. VNĐ
           </span>
+
         </p>
 
+
         <p>
+
           (Bằng chữ:
+
           <span
             class="preview-line long"
             id="pvTotalWords"
           ></span>)
+
         </p>
+
 
 
         <p style="margin-top:15px;">
           Giá trên:
         </p>
+
 
         <p class="bullet">
           ☑ Đã bao gồm VAT
@@ -1686,69 +2391,102 @@
         </p>
 
 
+
         <div class="section-heading">
           ĐIỀU 4. TIẾN ĐỘ VÀ THANH TOÁN
         </div>
+
 
         <p class="bold">
           1. Tiến độ thi công
         </p>
 
+
         <p class="bullet">
+
            Ngày bàn giao mặt bằng:
+
           <span id="pvHandoverDate">
             ..... / ..... / 20.....
           </span>
+
         </p>
 
+
         <p class="bullet">
+
            Ngày khởi công:
+
           <span id="pvStartDate">
             ..... / ..... / 20.....
           </span>
+
         </p>
 
+
         <p class="bullet">
+
            Thời gian thực hiện:
+
           <span id="pvDuration">
             ..........
           </span>
+
           ngày
+
         </p>
 
+
         <p class="bullet">
+
            Ngày hoàn thành dự kiến:
+
           <span id="pvFinishDate">
             ..... / ..... / 20.....
           </span>
+
         </p>
+
 
 
         <p class="bold">
           2. Thanh toán
         </p>
 
+
         <p>
+
           ☐ Tạm ứng:
+
           <span id="pvAdvancePercent">
             ..........
           </span>
+
           % tương đương:
+
           <span id="pvAdvanceAmount">
             ........................
           </span>
+
           VNĐ
+
         </p>
 
+
         <p>
+
           ☐ Thanh toán còn lại:
+
           <span id="pvRemainingPercent">
             ..........
           </span>
+
           % sau khi nghiệm thu kỹ thuật khung thép.
+
         </p>
 
       </article>
+
 
 
       <!-- =================================================
@@ -1757,9 +2495,11 @@
 
       <article class="a4-page">
 
+
         <p>
           Hình thức thanh toán:
         </p>
+
 
         <p>
           ☑ Chuyển khoản
@@ -1770,65 +2510,94 @@
           Thông tin tài khoản:
         </p>
 
+
         <p>
           Tên tài khoản:
           CÔNG TY CỔ PHẦN GROVA HOLDINGS
         </p>
 
+
         <p>
+
           Số tài khoản:
+
           <span
             class="preview-line"
             id="pvBankAccount"
           ></span>
+
         </p>
 
+
         <p>
+
           Ngân hàng:
+
           <span
             class="preview-line"
             id="pvBankName"
           ></span>
+
         </p>
 
 
-        <p class="bold" style="margin-top:18px;">
+
+        <p
+          class="bold"
+          style="margin-top:18px;"
+        >
           Lưu ý:
         </p>
 
+
         <p>
+
           Các khoảng thời gian chờ điện, chờ mặt bằng,
           chờ vật tư, chờ thiết bị nâng hạ hoặc chờ xử lý
           sai sót công trình không tính vào tiến độ thi công
           của Bên A.
+
         </p>
+
 
 
         <div class="section-heading">
           ĐIỀU 5. ĐIỀU KIỆN THI CÔNG ĐẶC BIỆT
         </div>
 
+
         <p>
+
           <span id="pvNightWork">
             ☐
           </span>
+
           Công trình thi công ban đêm
+
         </p>
+
 
         <p>
           ☐ Công trình có yêu cầu đặc biệt:
         </p>
 
+
         <p>
+
           <span
             class="preview-line long"
             id="pvSpecialRequirement"
           ></span>
+
         </p>
 
+
         <p>
+
           <span class="preview-line long"></span>
+
         </p>
+
 
 
         <!-- GIỮ NGUYÊN ĐIỀU 7 THEO FILE GỐC -->
@@ -1837,42 +2606,57 @@
           ĐIỀU 7. PHÁT SINH
         </div>
 
+
         <p>
+
           Các phát sinh ngoài phạm vi hợp đồng nguyên tắc
           hoặc ngoài nội dung phụ lục này sẽ được xác nhận
           riêng bằng:
+
         </p>
+
 
         <p class="bullet">
            Biên bản phát sinh; Email, Zalo, Viber , Wechat …
         </p>
+
 
         <p class="bullet">
            Tin nhắn của người phụ trách công trình.
         </p>
 
 
+
         <div class="section-heading">
           ĐIỀU 8. HIỆU LỰC
         </div>
 
-        <p>
-          Phụ lục này là một phần không tách rời của
-          Hợp đồng nguyên tắc số 01/2026/HĐNT.
-        </p>
 
         <p>
+
+          Phụ lục này là một phần không tách rời của
+          Hợp đồng nguyên tắc số 01/2026/HĐNT.
+
+        </p>
+
+
+        <p>
+
           Các nội dung không quy định trong phụ lục này
           được áp dụng theo Hợp đồng nguyên tắc số
           01/2026/HĐNT.
+
         </p>
+
 
         <p>
           Phụ lục có hiệu lực kể từ ngày ký.
         </p>
 
 
+
         <div class="signature-grid">
+
 
           <div>
 
@@ -1891,6 +2675,7 @@
             </div>
 
           </div>
+
 
 
           <div>
@@ -1916,6 +2701,7 @@
   </main>
 
 </div>
+
 
 
 <script>
@@ -1945,6 +2731,7 @@
 
     element.textContent =
       value || "";
+
   }
 
 
@@ -1958,20 +2745,25 @@
     return new Intl.NumberFormat(
       "vi-VN"
     ).format(number);
+
   }
 
 
   function formatDate(value) {
 
     if (!value) {
+
       return "..... / ..... / 20.....";
+
     }
 
     const parts =
       value.split("-");
 
     if (parts.length !== 3) {
+
       return value;
+
     }
 
     return (
@@ -1981,6 +2773,7 @@
       " / " +
       parts[0]
     );
+
   }
 
 
@@ -1989,6 +2782,7 @@
      ===================================================== */
 
   function updatePreview() {
+
 
     /* -----------------------------------------------
        THÔNG TIN PHỤ LỤC
@@ -2012,7 +2806,8 @@
 
     setText(
       "pvYear",
-      getValue("signYear") || "2026"
+      getValue("signYear") ||
+      "2026"
     );
 
 
@@ -2101,21 +2896,34 @@
     const frameText =
       frameType === "Khung thép"
         ? "☑ Khung thép   ☐ Khung thép bọc inox   ☐ Khung nhôm"
+
         : frameType === "Khung thép bọc inox"
           ? "☐ Khung thép   ☑ Khung thép bọc inox   ☐ Khung nhôm"
+
           : frameType === "Khung nhôm"
             ? "☐ Khung thép   ☐ Khung thép bọc inox   ☑ Khung nhôm"
+
             : "☐ Khung thép   ☐ Khung thép bọc inox   ☐ Khung nhôm";
 
+
+    const floorElement =
+      document.getElementById(
+        "pvFloorCount"
+      );
+
+
     const frameContainer =
-      document.querySelector(
-        "#pvFloorCount"
-      )?.parentElement?.nextElementSibling;
+      floorElement
+        ?.parentElement
+        ?.nextElementSibling;
+
 
     if (frameContainer) {
+
       frameContainer.innerHTML =
         " Loại khung: " +
         frameText;
+
     }
 
 
@@ -2124,25 +2932,36 @@
        ----------------------------------------------- */
 
     const location =
-      getValue("installationLocation");
+      getValue(
+        "installationLocation"
+      );
+
 
     const locationText =
       location === "Trong nhà"
+
         ? "☑ Trong nhà   ☐ Ngoài trời"
+
         : location === "Ngoài trời"
+
           ? "☐ Trong nhà   ☑ Ngoài trời"
+
           : "☐ Trong nhà   ☐ Ngoài trời";
 
+
     const locationContainer =
-      document.querySelector(
-        "#pvFloorCount"
-      )?.parentElement?.nextElementSibling
+      floorElement
+        ?.parentElement
+        ?.nextElementSibling
         ?.nextElementSibling;
 
+
     if (locationContainer) {
+
       locationContainer.innerHTML =
         " Vị trí lắp đặt: " +
         locationText;
+
     }
 
 
@@ -2151,40 +2970,50 @@
        ----------------------------------------------- */
 
     const works = [
+
       {
         id: "work1",
         text: "Lắp đặt khung thép thang máy"
       },
+
       {
         id: "work2",
         text: "Căn chỉnh kết cấu khung"
       },
+
       {
         id: "work3",
         text: "Liên kết bulong, bản mã"
       },
+
       {
         id: "work4",
         text: "Bọc bảo vệ chống xước sau lắp đặt"
       },
+
       {
         id: "work5",
         text: "Vệ sinh khu vực thi công"
       },
+
       {
         id: "work6",
         text: "Hỗ trợ nghiệm thu kỹ thuật"
       }
+
     ];
+
 
     const workList =
       document.getElementById(
         "pvWorkList"
       );
 
+
     if (workList) {
 
       let html = "";
+
 
       works.forEach(work => {
 
@@ -2193,27 +3022,44 @@
             work.id
           )?.checked;
 
+
         html += `
+
           <p class="bullet">
+
             ${checked ? "☑" : "☐"}
+
             ${work.text}
+
           </p>
+
         `;
 
       });
 
+
       html += `
+
         <p class="bullet">
+
           ☐ Công việc khác:
+
           <span class="preview-line">
+
             ${escapeHTML(
               getValue("otherWork")
             )}
+
           </span>
+
         </p>
+
       `;
 
-      workList.innerHTML = html;
+
+      workList.innerHTML =
+        html;
+
     }
 
 
@@ -2226,13 +3072,16 @@
         getValue("quantity") || 0
       );
 
+
     const unitPrice =
       Number(
         getValue("unitPrice") || 0
       );
 
+
     const total =
       quantity * unitPrice;
+
 
     setText(
       "pvQuantity",
@@ -2241,12 +3090,14 @@
         : "......"
     );
 
+
     setText(
       "pvUnitPrice",
       unitPrice
         ? formatMoney(unitPrice)
         : "2.500.000"
     );
+
 
     setText(
       "pvTotalValueTable",
@@ -2255,17 +3106,42 @@
         : ".............."
     );
 
+
     setText(
       "pvTotalValue",
       total
-        ? formatMoney(total) + " VNĐ"
+
+        ? formatMoney(total) +
+          " VNĐ"
+
         : ".................................................. VNĐ"
     );
+
 
     setText(
       "pvTotalWords",
       getValue("totalWords")
     );
+
+
+    /* -----------------------------------------------
+       FORM TOTAL VALUE
+       ----------------------------------------------- */
+
+    const totalValue =
+      document.getElementById(
+        "totalValue"
+      );
+
+
+    if (totalValue) {
+
+      totalValue.value =
+        total
+          ? formatMoney(total)
+          : "";
+
+    }
 
 
     /* -----------------------------------------------
@@ -2279,6 +3155,7 @@
       )
     );
 
+
     setText(
       "pvStartDate",
       formatDate(
@@ -2286,11 +3163,13 @@
       )
     );
 
+
     setText(
       "pvDuration",
       getValue("duration") ||
       ".........."
     );
+
 
     setText(
       "pvFinishDate",
@@ -2309,10 +3188,12 @@
         getValue("advancePercent") || 0
       );
 
+
     const advanceAmount =
       total *
       advancePercent /
       100;
+
 
     setText(
       "pvAdvancePercent",
@@ -2321,12 +3202,36 @@
         : ".........."
     );
 
+
     setText(
       "pvAdvanceAmount",
       advanceAmount
-        ? formatMoney(advanceAmount)
+
+        ? formatMoney(
+            advanceAmount
+          )
+
         : "........................"
     );
+
+
+    const advanceAmountInput =
+      document.getElementById(
+        "advanceAmount"
+      );
+
+
+    if (advanceAmountInput) {
+
+      advanceAmountInput.value =
+        advanceAmount
+          ? formatMoney(
+              advanceAmount
+            )
+          : "";
+
+    }
+
 
     setText(
       "pvRemainingPercent",
@@ -2334,10 +3239,12 @@
       ".........."
     );
 
+
     setText(
       "pvBankAccount",
       getValue("bankAccount")
     );
+
 
     setText(
       "pvBankName",
@@ -2351,16 +3258,22 @@
 
     setText(
       "pvNightWork",
+
       document.getElementById(
         "nightWork"
       )?.checked
+
         ? "☑"
+
         : "☐"
     );
 
+
     setText(
       "pvSpecialRequirement",
-      getValue("specialRequirement")
+      getValue(
+        "specialRequirement"
+      )
     );
 
   }
@@ -2373,11 +3286,32 @@
   function escapeHTML(value) {
 
     return String(value || "")
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
+
+      .replace(
+        /&/g,
+        "&amp;"
+      )
+
+      .replace(
+        /</g,
+        "&lt;"
+      )
+
+      .replace(
+        />/g,
+        "&gt;"
+      )
+
+      .replace(
+        /"/g,
+        "&quot;"
+      )
+
+      .replace(
+        /'/g,
+        "&#039;"
+      );
+
   }
 
 
@@ -2389,6 +3323,7 @@
     "input",
     updatePreview
   );
+
 
   document.addEventListener(
     "change",
@@ -2429,44 +3364,39 @@
         window.grovaData ||
         window.GROVA;
 
+
       if (!data) {
+
         updatePreview();
+
         return;
+
       }
+
 
       const company =
         data.company || {};
+
 
       const companyName =
         company.name ||
         "CÔNG TY CỔ PHẦN GROVA HOLDINGS";
 
+
       const taxCode =
         company.taxCode ||
         "0202328361";
+
 
       const address =
         company.address ||
         "49A/348 Trần Nguyên Hãn, Phường An Biên, Thành phố Hải Phòng";
 
+
       const representative =
         company.representative ||
         "PHẠM VĂN HỌC";
 
-
-      /*
-       * Cập nhật các trường cố định
-       */
-      const fixedInputs =
-        document.querySelectorAll(
-          ".fixed-field"
-        );
-
-      /*
-       * Không cần ghi đè toàn bộ,
-       * các giá trị đã được khai báo
-       * đúng theo dữ liệu GROVA.
-       */
 
       console.log(
         "GROVA DATA loaded:",
@@ -2478,6 +3408,7 @@
         }
       );
 
+
     } catch (error) {
 
       console.warn(
@@ -2487,7 +3418,9 @@
 
     }
 
+
     updatePreview();
+
   }
 
 
