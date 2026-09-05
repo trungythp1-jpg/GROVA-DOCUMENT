@@ -1,47 +1,53 @@
-/* =========================================================
-   GROVA DOCUMENT
-   app.js
-   Version 1.2
-   Compatible with current index.html
-   ========================================================= */
+/*
+ * ============================================================
+ * GROVA DOCUMENT
+ * Application Controller
+ * ============================================================
+ *
+ * File này:
+ * - Đọc cấu hình từ window.GROVA_DATA
+ * - Hiển thị danh sách mẫu văn bản
+ * - Điều hướng các trang
+ * - Mở modal chọn mẫu
+ * - Mở đúng file template
+ * - Hiển thị thống kê
+ * - Hiển thị hoạt động gần đây
+ *
+ * Không chứa nội dung của các mẫu văn bản.
+ * ============================================================
+ */
 
 (function () {
+
     "use strict";
 
 
-    /* =====================================================
-       STATE
-    ===================================================== */
+    /* ========================================================
+       GLOBAL DATA
+    ======================================================== */
 
-    const state = {
-        currentPage: "dashboard",
-        selectedTemplate: null,
-        initialized: false
-    };
+    var DATA = window.GROVA_DATA;
 
 
-    /* =====================================================
-       HELPERS
-    ===================================================== */
+    /* ========================================================
+       DOM HELPERS
+    ======================================================== */
 
-    function $(selector, parent) {
-        return (parent || document).querySelector(selector);
+    function $(selector) {
+        return document.querySelector(selector);
     }
 
 
-    function $$(selector, parent) {
-        return Array.from(
-            (parent || document).querySelectorAll(selector)
+    function $all(selector) {
+        return Array.prototype.slice.call(
+            document.querySelectorAll(selector)
         );
     }
 
 
     function escapeHTML(value) {
 
-        if (
-            value === null ||
-            value === undefined
-        ) {
+        if (value === null || value === undefined) {
             return "";
         }
 
@@ -51,67 +57,1091 @@
             .replace(/>/g, "&gt;")
             .replace(/"/g, "&quot;")
             .replace(/'/g, "&#039;");
+
     }
 
 
-    /* =====================================================
-       DATA
-    ===================================================== */
+    /* ========================================================
+       ERROR STATE
+    ======================================================== */
 
-    function getAppData() {
+    function showApplicationError(message) {
 
-        return (
-            window.GROVA_DATA ||
-            window.grovaData ||
-            window.GROVA ||
-            {}
+        console.error(
+            "[GROVA DOCUMENT]",
+            message
         );
+
+        var grids = [
+            $("#documentGrid"),
+            $("#documentsPageGrid")
+        ];
+
+        grids.forEach(function (grid) {
+
+            if (!grid) {
+                return;
+            }
+
+            grid.innerHTML = `
+                <div class="empty-state grova-error-state">
+
+                    <div class="empty-icon">
+                        !
+                    </div>
+
+                    <h3>
+                        Không thể tải danh sách văn bản
+                    </h3>
+
+                    <p>
+                        ${escapeHTML(message)}
+                    </p>
+
+                    <button
+                        type="button"
+                        class="primary-button"
+                        onclick="window.location.reload()"
+                    >
+                        Tải lại trang
+                    </button>
+
+                </div>
+            `;
+
+        });
+
     }
 
+
+    /* ========================================================
+       VALIDATE DATA
+    ======================================================== */
+
+    function validateData() {
+
+        if (!DATA) {
+
+            showApplicationError(
+                "Không tìm thấy GROVA_DATA. Hãy kiểm tra file data/data.js."
+            );
+
+            return false;
+        }
+
+
+        if (!Array.isArray(DATA.templates)) {
+
+            showApplicationError(
+                "Danh sách templates không hợp lệ trong data/data.js."
+            );
+
+            return false;
+        }
+
+
+        return true;
+    }
+
+
+    /* ========================================================
+       TEMPLATE DATA
+    ======================================================== */
 
     function getTemplates() {
 
-        const data = getAppData();
-
         if (
-            !Array.isArray(data.templates)
+            !DATA ||
+            !Array.isArray(DATA.templates)
         ) {
             return [];
         }
 
-        return data.templates.filter(
-            function (template) {
 
-                return (
-                    template &&
-                    template.enabled !== false
+        return DATA.templates.filter(function (template) {
+
+            return (
+                template &&
+                template.enabled !== false
+            );
+
+        });
+
+    }
+
+
+    function getTemplateId(template) {
+
+        if (!template) {
+            return "";
+        }
+
+        return (
+            template.id ||
+            template.code ||
+            ""
+        );
+
+    }
+
+
+    function getTemplateName(template) {
+
+        if (!template) {
+            return "Văn bản";
+        }
+
+        return (
+            template.name ||
+            template.title ||
+            "Văn bản"
+        );
+
+    }
+
+
+    function getTemplateDescription(template) {
+
+        if (!template) {
+            return "";
+        }
+
+        return (
+            template.description ||
+            ""
+        );
+
+    }
+
+
+    function getTemplateCategory(template) {
+
+        if (!template) {
+            return "Văn bản";
+        }
+
+        return (
+            template.category ||
+            "Văn bản"
+        );
+
+    }
+
+
+    function getTemplateIcon(template) {
+
+        if (!template) {
+            return "📄";
+        }
+
+        return (
+            template.icon ||
+            "📄"
+        );
+
+    }
+
+
+    function getTemplateFile(template) {
+
+        if (!template) {
+            return "";
+        }
+
+        return (
+            template.file ||
+            template.path ||
+            ""
+        );
+
+    }
+
+
+    /* ========================================================
+       DOCUMENT CARD
+    ======================================================== */
+
+    function createDocumentCard(template) {
+
+        var id = getTemplateId(template);
+
+        var name = getTemplateName(template);
+
+        var description =
+            getTemplateDescription(template);
+
+        var category =
+            getTemplateCategory(template);
+
+        var icon =
+            getTemplateIcon(template);
+
+
+        return `
+            <article
+                class="document-card"
+                data-template-id="${escapeHTML(id)}"
+            >
+
+                <div class="document-card-top">
+
+                    <div class="document-icon">
+                        ${escapeHTML(icon)}
+                    </div>
+
+                    <span class="document-category">
+                        ${escapeHTML(category)}
+                    </span>
+
+                </div>
+
+
+                <div class="document-card-body">
+
+                    <h3 class="document-name">
+                        ${escapeHTML(name)}
+                    </h3>
+
+                    <p class="document-description">
+                        ${escapeHTML(description)}
+                    </p>
+
+                </div>
+
+
+                <div class="document-card-footer">
+
+                    <span class="document-code">
+                        ${escapeHTML(id)}
+                    </span>
+
+                    <span class="document-open">
+                        Mở mẫu →
+                    </span>
+
+                </div>
+
+            </article>
+        `;
+    }
+
+
+    /* ========================================================
+       RENDER DOCUMENTS
+    ======================================================== */
+
+    function renderDocumentGrid(container) {
+
+        if (!container) {
+            return;
+        }
+
+
+        var templates = getTemplates();
+
+
+        if (!templates.length) {
+
+            container.innerHTML = `
+                <div class="empty-state">
+
+                    <div class="empty-icon">
+                        ▤
+                    </div>
+
+                    <h3>
+                        Chưa có mẫu văn bản
+                    </h3>
+
+                    <p>
+                        Chưa có mẫu văn bản nào được kích hoạt.
+                    </p>
+
+                </div>
+            `;
+
+            return;
+        }
+
+
+        container.innerHTML = templates
+            .map(createDocumentCard)
+            .join("");
+
+
+        bindDocumentCards(container);
+    }
+
+
+    function renderDocuments() {
+
+        renderDocumentGrid(
+            $("#documentGrid")
+        );
+
+
+        renderDocumentGrid(
+            $("#documentsPageGrid")
+        );
+    }
+
+
+    /* ========================================================
+       DOCUMENT CARD EVENTS
+    ======================================================== */
+
+    function bindDocumentCards(container) {
+
+        var cards =
+            container.querySelectorAll(
+                ".document-card"
+            );
+
+
+        Array.prototype.forEach.call(
+            cards,
+            function (card) {
+
+                card.addEventListener(
+                    "click",
+                    function () {
+
+                        var id =
+                            card.getAttribute(
+                                "data-template-id"
+                            );
+
+
+                        var template =
+                            getTemplates().find(
+                                function (item) {
+
+                                    return (
+                                        String(
+                                            getTemplateId(item)
+                                        ) === String(id)
+                                    );
+
+                                }
+                            );
+
+
+                        if (!template) {
+
+                            console.warn(
+                                "Không tìm thấy mẫu:",
+                                id
+                            );
+
+                            return;
+                        }
+
+
+                        openTemplate(template);
+
+                    }
                 );
 
             }
         );
+
     }
 
 
-    function getTemplateById(id) {
+    /* ========================================================
+       TEMPLATE MODAL
+    ======================================================== */
 
-        return getTemplates().find(
-            function (template) {
+    var selectedTemplateId = null;
 
-                return String(
-                    template.id ??
-                    template.code
-                ) === String(id);
+
+    function getModal() {
+        return $("#documentModal");
+    }
+
+
+    function getTemplateSelector() {
+        return $("#templateSelector");
+    }
+
+
+    function openModal() {
+
+        var modal =
+            getModal();
+
+        var selector =
+            getTemplateSelector();
+
+
+        if (!modal || !selector) {
+            return;
+        }
+
+
+        var templates =
+            getTemplates();
+
+
+        if (!templates.length) {
+
+            selector.innerHTML = `
+                <div class="empty-state">
+
+                    <div class="empty-icon">
+                        ▤
+                    </div>
+
+                    <h3>
+                        Chưa có mẫu văn bản
+                    </h3>
+
+                    <p>
+                        Không có mẫu văn bản đang được kích hoạt.
+                    </p>
+
+                </div>
+            `;
+
+            selectedTemplateId = null;
+
+        } else {
+
+            selectedTemplateId =
+                getTemplateId(
+                    templates[0]
+                );
+
+
+            selector.innerHTML =
+                templates
+                    .map(
+                        createTemplateSelectorItem
+                    )
+                    .join("");
+
+
+            bindTemplateSelector();
+        }
+
+
+        modal.classList.remove(
+            "hidden"
+        );
+
+
+        modal.setAttribute(
+            "aria-hidden",
+            "false"
+        );
+
+
+        document.body.classList.add(
+            "modal-open"
+        );
+
+    }
+
+
+    function closeModal() {
+
+        var modal =
+            getModal();
+
+
+        if (!modal) {
+            return;
+        }
+
+
+        modal.classList.add(
+            "hidden"
+        );
+
+
+        modal.setAttribute(
+            "aria-hidden",
+            "true"
+        );
+
+
+        document.body.classList.remove(
+            "modal-open"
+        );
+
+    }
+
+
+    function createTemplateSelectorItem(template) {
+
+        var id =
+            getTemplateId(template);
+
+        var name =
+            getTemplateName(template);
+
+        var description =
+            getTemplateDescription(template);
+
+        var category =
+            getTemplateCategory(template);
+
+        var icon =
+            getTemplateIcon(template);
+
+
+        var selected =
+            String(id) ===
+            String(selectedTemplateId);
+
+
+        return `
+            <button
+                type="button"
+                class="template-option ${selected ? "selected" : ""}"
+                data-template-id="${escapeHTML(id)}"
+            >
+
+                <span class="template-option-icon">
+                    ${escapeHTML(icon)}
+                </span>
+
+
+                <span class="template-option-content">
+
+                    <strong>
+                        ${escapeHTML(name)}
+                    </strong>
+
+                    <small>
+                        ${escapeHTML(description)}
+                    </small>
+
+                </span>
+
+
+                <span class="template-option-category">
+                    ${escapeHTML(category)}
+                </span>
+
+            </button>
+        `;
+    }
+
+
+    function bindTemplateSelector() {
+
+        var selector =
+            getTemplateSelector();
+
+
+        if (!selector) {
+            return;
+        }
+
+
+        var options =
+            selector.querySelectorAll(
+                ".template-option"
+            );
+
+
+        Array.prototype.forEach.call(
+            options,
+            function (option) {
+
+                option.addEventListener(
+                    "click",
+                    function () {
+
+                        selectedTemplateId =
+                            option.getAttribute(
+                                "data-template-id"
+                            );
+
+
+                        Array.prototype.forEach.call(
+                            options,
+                            function (item) {
+
+                                item.classList.remove(
+                                    "selected"
+                                );
+
+                            }
+                        );
+
+
+                        option.classList.add(
+                            "selected"
+                        );
+
+                    }
+                );
 
             }
         );
+
     }
 
 
-    /* =====================================================
-       PAGE CONFIG
-    ===================================================== */
+    /* ========================================================
+       OPEN TEMPLATE
+    ======================================================== */
 
-    const PAGE_CONFIG = {
+    function openSelectedTemplate() {
+
+        if (!selectedTemplateId) {
+            return;
+        }
+
+
+        var templates =
+            getTemplates();
+
+
+        var template =
+            templates.find(
+                function (item) {
+
+                    return (
+                        String(
+                            getTemplateId(item)
+                        ) ===
+                        String(
+                            selectedTemplateId
+                        )
+                    );
+
+                }
+            );
+
+
+        if (!template) {
+
+            alert(
+                "Không tìm thấy mẫu văn bản."
+            );
+
+            return;
+        }
+
+
+        openTemplate(template);
+    }
+
+
+    function openTemplate(template) {
+
+        var file =
+            getTemplateFile(template);
+
+
+        if (!file) {
+
+            alert(
+                "Mẫu văn bản chưa được cấu hình đường dẫn."
+            );
+
+            return;
+        }
+
+
+        var normalizedFile =
+            normalizeTemplatePath(file);
+
+
+        /*
+         * Lưu lịch sử mở mẫu.
+         */
+
+        saveRecentDocument(
+            template
+        );
+
+
+        /*
+         * Đóng modal trước khi chuyển trang.
+         */
+
+        closeModal();
+
+
+        /*
+         * Mở file template.
+         */
+
+        window.location.href =
+            normalizedFile;
+
+    }
+
+
+    function normalizeTemplatePath(path) {
+
+        if (!path) {
+            return "";
+        }
+
+
+        var value =
+            String(path).trim();
+
+
+        /*
+         * Nếu data.js đã có "./templates/..."
+         * thì giữ nguyên.
+         */
+
+        if (
+            value.indexOf("./") === 0
+        ) {
+            return value;
+        }
+
+
+        /*
+         * Nếu chỉ có "templates/..."
+         */
+
+        if (
+            value.indexOf("templates/") === 0
+        ) {
+            return "./" + value;
+        }
+
+
+        return value;
+
+    }
+
+
+    /* ========================================================
+       RECENT DOCUMENTS
+    ======================================================== */
+
+    function getRecentDocuments() {
+
+        try {
+
+            var raw =
+                localStorage.getItem(
+                    "grova_document_recent"
+                );
+
+
+            if (!raw) {
+                return [];
+            }
+
+
+            var parsed =
+                JSON.parse(raw);
+
+
+            if (!Array.isArray(parsed)) {
+                return [];
+            }
+
+
+            return parsed;
+
+        } catch (error) {
+
+            console.warn(
+                "Không thể đọc lịch sử:",
+                error
+            );
+
+            return [];
+
+        }
+
+    }
+
+
+    function saveRecentDocument(template) {
+
+        if (!template) {
+            return;
+        }
+
+
+        try {
+
+            var recent =
+                getRecentDocuments();
+
+
+            var item = {
+
+                id:
+                    getTemplateId(template),
+
+                name:
+                    getTemplateName(template),
+
+                category:
+                    getTemplateCategory(template),
+
+                time:
+                    new Date().toISOString()
+
+            };
+
+
+            recent =
+                recent.filter(
+                    function (oldItem) {
+
+                        return (
+                            String(oldItem.id) !==
+                            String(item.id)
+                        );
+
+                    }
+                );
+
+
+            recent.unshift(
+                item
+            );
+
+
+            recent =
+                recent.slice(
+                    0,
+                    10
+                );
+
+
+            localStorage.setItem(
+                "grova_document_recent",
+                JSON.stringify(recent)
+            );
+
+        } catch (error) {
+
+            console.warn(
+                "Không thể lưu lịch sử:",
+                error
+            );
+
+        }
+
+    }
+
+
+    function renderRecentDocuments() {
+
+        var container =
+            $("#recentDocuments");
+
+
+        if (!container) {
+            return;
+        }
+
+
+        var recent =
+            getRecentDocuments();
+
+
+        if (!recent.length) {
+
+            container.innerHTML = `
+                <div class="empty-state compact-empty">
+
+                    <div class="empty-icon">
+                        ◷
+                    </div>
+
+                    <h3>
+                        Chưa có lịch sử
+                    </h3>
+
+                    <p>
+                        Các văn bản được tạo sẽ xuất hiện tại đây.
+                    </p>
+
+                </div>
+            `;
+
+            return;
+        }
+
+
+        container.innerHTML =
+            recent
+                .map(
+                    function (item) {
+
+                        var date =
+                            formatDate(
+                                item.time
+                            );
+
+
+                        return `
+                            <div class="activity-item">
+
+                                <div class="activity-icon">
+                                    📄
+                                </div>
+
+                                <div class="activity-content">
+
+                                    <strong>
+                                        ${escapeHTML(item.name)}
+                                    </strong>
+
+                                    <small>
+                                        ${escapeHTML(item.category || "Văn bản")}
+                                    </small>
+
+                                </div>
+
+                                <time>
+                                    ${escapeHTML(date)}
+                                </time>
+
+                            </div>
+                        `;
+
+                    }
+                )
+                .join("");
+
+    }
+
+
+    function formatDate(value) {
+
+        if (!value) {
+            return "";
+        }
+
+
+        try {
+
+            var date =
+                new Date(value);
+
+
+            if (
+                isNaN(
+                    date.getTime()
+                )
+            ) {
+                return "";
+            }
+
+
+            return date.toLocaleDateString(
+                "vi-VN",
+                {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric"
+                }
+            );
+
+        } catch (error) {
+
+            return "";
+
+        }
+
+    }
+
+
+    /* ========================================================
+       STATISTICS
+    ======================================================== */
+
+    function renderStatistics() {
+
+        var documents =
+            $("#statDocuments");
+
+        var projects =
+            $("#statProjects");
+
+        var customers =
+            $("#statCustomers");
+
+        var employees =
+            $("#statEmployees");
+
+
+        if (documents) {
+
+            documents.textContent =
+                getTemplates().length;
+
+        }
+
+
+        /*
+         * Các dữ liệu này hiện vẫn lấy từ data.js.
+         * Không tự tạo dữ liệu giả.
+         */
+
+        if (projects) {
+
+            projects.textContent =
+                getStat(
+                    "projects"
+                );
+
+        }
+
+
+        if (customers) {
+
+            customers.textContent =
+                getStat(
+                    "customers"
+                );
+
+        }
+
+
+        if (employees) {
+
+            employees.textContent =
+                getStat(
+                    "employees"
+                );
+
+        }
+
+    }
+
+
+    function getStat(key) {
+
+        if (
+            DATA &&
+            DATA.stats &&
+            DATA.stats[key] !== undefined
+        ) {
+
+            return DATA.stats[key];
+
+        }
+
+
+        return 0;
+
+    }
+
+
+    /* ========================================================
+       NAVIGATION
+    ======================================================== */
+
+    var pageTitles = {
 
         dashboard: {
             title: "Tổng quan",
@@ -146,13 +1176,13 @@
         history: {
             title: "Lịch sử",
             subtitle:
-                "Theo dõi các văn bản đã tạo và xuất PDF"
+                "Theo dõi các văn bản đã tạo"
         },
 
         reports: {
             title: "Báo cáo",
             subtitle:
-                "Tổng hợp dữ liệu hồ sơ và công trình"
+                "Tổng hợp dữ liệu hệ thống"
         },
 
         settings: {
@@ -164,1179 +1194,223 @@
         admin: {
             title: "Quản trị hệ thống",
             subtitle:
-                "Quản lý người dùng, mẫu văn bản và cấu hình hệ thống"
+                "Quản lý người dùng, mẫu văn bản và dữ liệu"
         }
 
     };
 
 
-    /* =====================================================
-       HEADER
-    ===================================================== */
+    function showPage(pageName) {
 
-    function updateHeader(page) {
-
-        const config =
-            PAGE_CONFIG[page] ||
-            PAGE_CONFIG.dashboard;
-
-        const title =
-            $("#pageTitle");
-
-        const subtitle =
-            $("#pageSubtitle");
-
-        if (title) {
-            title.textContent =
-                config.title;
-        }
-
-        if (subtitle) {
-            subtitle.textContent =
-                config.subtitle;
-        }
-    }
-
-
-    /* =====================================================
-       USER
-    ===================================================== */
-
-    function renderUser() {
-
-        const data =
-            getAppData();
-
-        const user =
-            data.currentUser ||
-            data.user ||
-            {};
-
-        const name =
-            user.name ||
-            user.fullName ||
-            "Quản trị viên";
-
-        const role =
-            user.role ||
-            user.position ||
-            "Administrator";
-
-        const nameElement =
-            $("#currentUserName");
-
-        const roleElement =
-            $("#currentUserRole");
-
-        const avatar =
-            $(".user-avatar");
-
-        if (nameElement) {
-            nameElement.textContent =
-                name;
-        }
-
-        if (roleElement) {
-            roleElement.textContent =
-                role;
-        }
-
-        if (avatar) {
-
-            const words =
-                String(name)
-                    .trim()
-                    .split(/\s+/)
-                    .filter(Boolean);
-
-            if (words.length >= 2) {
-
-                avatar.textContent =
-                    (
-                        words[0][0] +
-                        words[words.length - 1][0]
-                    ).toUpperCase();
-
-            } else {
-
-                avatar.textContent =
-                    String(name)
-                        .substring(0, 2)
-                        .toUpperCase();
-
-            }
-        }
-    }
-
-
-    /* =====================================================
-       STATS
-    ===================================================== */
-
-    function renderStats() {
-
-        const data =
-            getAppData();
-
-        const stats =
-            data.stats || {};
-
-        const values = {
-
-            documents:
-                stats.documents ??
-                stats.totalDocuments ??
-                0,
-
-            projects:
-                stats.projects ??
-                stats.totalProjects ??
-                0,
-
-            customers:
-                stats.customers ??
-                stats.totalCustomers ??
-                0,
-
-            employees:
-                stats.employees ??
-                stats.totalEmployees ??
-                0
-
-        };
-
-
-        const mapping = {
-
-            documents:
-                "#statDocuments",
-
-            projects:
-                "#statProjects",
-
-            customers:
-                "#statCustomers",
-
-            employees:
-                "#statEmployees"
-
-        };
-
-
-        Object.keys(mapping).forEach(
-            function (key) {
-
-                const element =
-                    $(mapping[key]);
-
-                if (element) {
-
-                    element.textContent =
-                        values[key];
-
-                }
-
-            }
-        );
-    }
-
-
-    /* =====================================================
-       DOCUMENT CARD
-    ===================================================== */
-
-    function createDocumentCard(
-        template
-    ) {
-
-        const id =
-            template.id ??
-            template.code ??
-            "";
-
-        const name =
-            template.name ??
-            template.title ??
-            `Mẫu ${id}`;
-
-        const description =
-            template.description ??
-            "";
-
-        const category =
-            template.category ??
-            "Văn bản";
-
-
-        return `
-
-            <article
-                class="document-card"
-                data-template-id="${escapeHTML(id)}"
-            >
-
-                <div class="document-card-top">
-
-                    <span class="document-tag">
-                        ${escapeHTML(category)}
-                    </span>
-
-                </div>
-
-
-                <h3 class="document-name">
-                    ${escapeHTML(name)}
-                </h3>
-
-
-                <p class="document-description">
-                    ${escapeHTML(description)}
-                </p>
-
-
-                <div class="document-card-footer">
-
-                    <span class="document-category">
-                        Mẫu ${escapeHTML(id)}
-                    </span>
-
-
-                    <button
-                        type="button"
-                        class="document-action"
-                        data-action="open-template"
-                        data-template-id="${escapeHTML(id)}"
-                    >
-                        Mở mẫu →
-                    </button>
-
-                </div>
-
-            </article>
-
-        `;
-    }
-
-
-    /* =====================================================
-       RENDER DOCUMENTS
-    ===================================================== */
-
-    function renderDocuments() {
-
-        const templates =
-            getTemplates();
-
-
-        const dashboardGrid =
-            $("#documentGrid");
-
-        const documentsGrid =
-            $("#documentsPageGrid");
-
-
-        if (
-            !templates.length
-        ) {
-
-            const emptyHTML = `
-
-                <div class="empty-state">
-
-                    <div class="empty-icon">
-                        ▤
-                    </div>
-
-                    <h3>
-                        Chưa có mẫu văn bản
-                    </h3>
-
-                    <p>
-                        Kiểm tra cấu hình trong
-                        data/data.js.
-                    </p>
-
-                </div>
-
-            `;
-
-
-            if (dashboardGrid) {
-                dashboardGrid.innerHTML =
-                    emptyHTML;
-            }
-
-            if (documentsGrid) {
-                documentsGrid.innerHTML =
-                    emptyHTML;
-            }
-
-            return;
+        if (!pageName) {
+            pageName = "dashboard";
         }
 
 
-        const html =
-            templates
-                .map(createDocumentCard)
-                .join("");
-
-
-        if (dashboardGrid) {
-
-            dashboardGrid.innerHTML =
-                html;
-
-        }
-
-
-        if (documentsGrid) {
-
-            documentsGrid.innerHTML =
-                html;
-
-        }
-    }
-
-
-    /* =====================================================
-       RECENT DOCUMENTS
-    ===================================================== */
-
-    function renderRecentDocuments() {
-
-        const container =
-            $("#recentDocuments");
-
-        if (!container) {
-            return;
-        }
-
-
-        const data =
-            getAppData();
-
-        const recent =
-            Array.isArray(
-                data.recentDocuments
-            )
-                ? data.recentDocuments
-                : [];
-
-
-        if (!recent.length) {
-
-            container.innerHTML = `
-
-                <div class="empty-state">
-
-                    <div class="empty-icon">
-                        ◷
-                    </div>
-
-                    <h3>
-                        Chưa có hoạt động
-                    </h3>
-
-                    <p>
-                        Các hồ sơ vừa xử lý
-                        sẽ xuất hiện tại đây.
-                    </p>
-
-                </div>
-
-            `;
-
-            return;
-        }
-
-
-        container.innerHTML =
-            recent
-                .map(
-                    function (item) {
-
-                        const name =
-                            item.name ||
-                            item.title ||
-                            "Văn bản";
-
-                        const date =
-                            item.date ||
-                            item.createdAt ||
-                            "";
-
-
-                        return `
-
-                            <div
-                                class="activity-item"
-                            >
-
-                                <div>
-
-                                    <strong>
-                                        ${escapeHTML(name)}
-                                    </strong>
-
-                                    <small>
-                                        ${escapeHTML(date)}
-                                    </small>
-
-                                </div>
-
-                            </div>
-
-                        `;
-
-                    }
-                )
-                .join("");
-    }
-
-
-    /* =====================================================
-       PAGE SWITCH
-    ===================================================== */
-
-    function switchPage(page) {
-
-        const pageElement =
-            document.getElementById(
-                "page-" + page
+        var pages =
+            $all(
+                ".page"
             );
 
-        if (!pageElement) {
 
-            console.warn(
-                "Không tìm thấy page:",
-                page
-            );
+        pages.forEach(
+            function (page) {
 
-            return;
-        }
-
-
-        $$(".page").forEach(
-            function (element) {
-
-                element.classList.remove(
-                    "active-page"
-                );
-
-                element.classList.add(
+                page.classList.add(
                     "hidden"
                 );
 
-            }
-        );
-
-
-        pageElement.classList.remove(
-            "hidden"
-        );
-
-        pageElement.classList.add(
-            "active-page"
-        );
-
-
-        $$(".menu-item").forEach(
-            function (item) {
-
-                if (
-                    item.dataset.page ===
-                    page
-                ) {
-
-                    item.classList.add(
-                        "active"
-                    );
-
-                } else {
-
-                    item.classList.remove(
-                        "active"
-                    );
-
-                }
+                page.classList.remove(
+                    "active-page"
+                );
 
             }
         );
 
 
-        state.currentPage =
-            page;
-
-
-        updateHeader(page);
-
-
-        closeSidebar();
-
-
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth"
-        });
-    }
-
-
-    /* =====================================================
-       NAVIGATION
-    ===================================================== */
-
-    function bindNavigation() {
-
-        $$(".menu-item[data-page]")
-            .forEach(
-                function (item) {
-
-                    item.addEventListener(
-                        "click",
-                        function (event) {
-
-                            event.preventDefault();
-
-                            switchPage(
-                                item.dataset.page
-                            );
-
-                        }
-                    );
-
-                }
+        var target =
+            document.getElementById(
+                "page-" + pageName
             );
 
 
+        if (!target) {
+
+            console.warn(
+                "Không tìm thấy page:",
+                pageName
+            );
+
+            target =
+                document.getElementById(
+                    "page-dashboard"
+                );
+
+            pageName =
+                "dashboard";
+
+        }
+
+
+        if (target) {
+
+            target.classList.remove(
+                "hidden"
+            );
+
+            target.classList.add(
+                "active-page"
+            );
+
+        }
+
+
         /*
-         * Các nút "Xem tất cả"
+         * Active menu
          */
 
-        $$("[data-page]").forEach(
-            function (element) {
-
-                if (
-                    element.classList.contains(
-                        "menu-item"
-                    )
-                ) {
-                    return;
-                }
+        var menuItems =
+            $all(
+                ".menu-item[data-page]"
+            );
 
 
-                element.addEventListener(
+        menuItems.forEach(
+            function (item) {
+
+                item.classList.toggle(
+                    "active",
+                    item.getAttribute(
+                        "data-page"
+                    ) === pageName
+                );
+
+            }
+        );
+
+
+        /*
+         * Header
+         */
+
+        var title =
+            $("#pageTitle");
+
+        var subtitle =
+            $("#pageSubtitle");
+
+
+        var config =
+            pageTitles[pageName];
+
+
+        if (config) {
+
+            if (title) {
+                title.textContent =
+                    config.title;
+            }
+
+
+            if (subtitle) {
+                subtitle.textContent =
+                    config.subtitle;
+            }
+
+        }
+
+
+        /*
+         * Đóng sidebar mobile
+         */
+
+        closeSidebar();
+
+    }
+
+
+    function bindNavigation() {
+
+        var menuItems =
+            $all(
+                ".menu-item[data-page]"
+            );
+
+
+        menuItems.forEach(
+            function (item) {
+
+                item.addEventListener(
                     "click",
-                    function (event) {
+                    function () {
 
-                        const page =
-                            element.dataset.page;
+                        var page =
+                            item.getAttribute(
+                                "data-page"
+                            );
 
-                        if (!page) {
-                            return;
-                        }
 
-                        event.preventDefault();
-
-                        switchPage(page);
+                        showPage(
+                            page
+                        );
 
                     }
                 );
 
             }
         );
-    }
-
-
-    /* =====================================================
-       MODAL
-    ===================================================== */
-
-    function getModal() {
-
-        return $("#documentModal");
-    }
-
-
-    function openModal() {
-
-        const modal =
-            getModal();
-
-        if (!modal) {
-            return;
-        }
-
-
-        renderTemplateSelector();
-
-
-        modal.classList.remove(
-            "hidden"
-        );
-
-        modal.classList.add(
-            "open"
-        );
-
-        modal.setAttribute(
-            "aria-hidden",
-            "false"
-        );
-
-
-        document.body.style.overflow =
-            "hidden";
-    }
-
-
-    function closeModal() {
-
-        const modal =
-            getModal();
-
-        if (!modal) {
-            return;
-        }
-
-
-        modal.classList.remove(
-            "open"
-        );
-
-        modal.classList.add(
-            "hidden"
-        );
-
-        modal.setAttribute(
-            "aria-hidden",
-            "true"
-        );
-
-
-        document.body.style.overflow =
-            "";
-    }
-
-
-    /* =====================================================
-       TEMPLATE SELECTOR
-    ===================================================== */
-
-    function renderTemplateSelector() {
-
-        const container =
-            $("#templateSelector");
-
-        if (!container) {
-            return;
-        }
-
-
-        const templates =
-            getTemplates();
-
-
-        if (!templates.length) {
-
-            container.innerHTML = `
-
-                <div class="empty-state">
-
-                    <div class="empty-icon">
-                        ▤
-                    </div>
-
-                    <h3>
-                        Chưa có mẫu văn bản
-                    </h3>
-
-                    <p>
-                        Không tìm thấy mẫu trong data.js.
-                    </p>
-
-                </div>
-
-            `;
-
-            return;
-        }
-
-
-        container.innerHTML =
-            templates
-                .map(
-                    function (template) {
-
-                        const id =
-                            template.id ??
-                            template.code ??
-                            "";
-
-                        const name =
-                            template.name ??
-                            template.title ??
-                            `Mẫu ${id}`;
-
-                        const description =
-                            template.description ??
-                            "";
-
-
-                        return `
-
-                            <button
-                                type="button"
-                                class="template-option"
-                                data-template-id="${escapeHTML(id)}"
-                            >
-
-                                <span class="template-option-number">
-                                    ${escapeHTML(id)}
-                                </span>
-
-
-                                <span class="template-option-content">
-
-                                    <strong>
-                                        ${escapeHTML(name)}
-                                    </strong>
-
-                                    <small>
-                                        ${escapeHTML(description)}
-                                    </small>
-
-                                </span>
-
-                            </button>
-
-                        `;
-
-                    }
-                )
-                .join("");
-
-
-        updateTemplateSelection();
-    }
-
-
-    /* =====================================================
-       SELECT TEMPLATE
-    ===================================================== */
-
-    function selectTemplate(id) {
-
-        const template =
-            getTemplateById(id);
-
-        if (!template) {
-
-            console.warn(
-                "Không tìm thấy template:",
-                id
-            );
-
-            return;
-        }
-
-
-        state.selectedTemplate =
-            String(
-                template.id ??
-                template.code
-            );
-
-
-        updateTemplateSelection();
-    }
-
-
-    function updateTemplateSelection() {
-
-        $$(".template-option")
-            .forEach(
-                function (option) {
-
-                    const isSelected =
-                        String(
-                            option.dataset.templateId
-                        ) ===
-                        String(
-                            state.selectedTemplate
-                        );
-
-
-                    option.classList.toggle(
-                        "selected",
-                        isSelected
-                    );
-
-                }
-            );
-    }
-
-
-    /* =====================================================
-       OPEN NEW DOCUMENT
-    ===================================================== */
-
-    function openNewDocument() {
-
-        state.selectedTemplate =
-            null;
-
-        openModal();
-    }
-
-
-    /* =====================================================
-       OPEN SELECTED TEMPLATE
-    ===================================================== */
-
-    function openSelectedTemplate() {
-
-        let id =
-            state.selectedTemplate;
 
 
         /*
-         * Nếu chưa chọn bằng click,
-         * lấy option đang selected.
+         * Các nút có data-page nhưng không
+         * phải menu item.
          */
 
-        if (!id) {
-
-            const selected =
-                $(".template-option.selected");
-
-            if (selected) {
-
-                id =
-                    selected.dataset.templateId;
-
-            }
-
-        }
-
-
-        if (!id) {
-
-            alert(
-                "Vui lòng chọn một mẫu văn bản."
+        var pageButtons =
+            $all(
+                "[data-page]:not(.menu-item)"
             );
 
-            return;
-        }
 
-
-        const template =
-            getTemplateById(id);
-
-
-        if (!template) {
-
-            alert(
-                "Không tìm thấy mẫu văn bản."
-            );
-
-            return;
-        }
-
-
-        const file =
-            template.file ||
-            template.path ||
-            template.url;
-
-
-        if (!file) {
-
-            alert(
-                "Mẫu văn bản chưa được cấu hình đường dẫn."
-            );
-
-            return;
-        }
-
-
-        closeModal();
-
-
-        /*
-         * Đảm bảo đường dẫn luôn tính từ thư mục
-         * GROVA-DOCUMENT.
-         */
-
-        let target = file;
-
-
-        if (
-            target.startsWith("./")
-        ) {
-
-            target =
-                target.substring(2);
-
-        }
-
-
-        window.location.href =
-            "./" + target;
-    }
-
-
-    /* =====================================================
-       ACTIONS
-    ===================================================== */
-
-    function bindActions() {
-
-        /*
-         * Tạo văn bản
-         */
-
-        $$(
-            "[data-action='new-document']"
-        ).forEach(
+        pageButtons.forEach(
             function (button) {
 
                 button.addEventListener(
                     "click",
-                    function (event) {
-
-                        event.preventDefault();
-
-                        openNewDocument();
-
-                    }
-                );
-
-            }
-        );
-
-
-        /*
-         * Mở mẫu
-         */
-
-        document.addEventListener(
-            "click",
-            function (event) {
-
-                const button =
-                    event.target.closest(
-                        "[data-action='open-template']"
-                    );
-
-
-                if (!button) {
-                    return;
-                }
-
-
-                event.preventDefault();
-
-
-                const id =
-                    button.dataset.templateId;
-
-
-                if (id) {
-
-                    const template =
-                        getTemplateById(id);
-
-
-                    if (!template) {
-
-                        alert(
-                            "Không tìm thấy mẫu văn bản."
-                        );
-
-                        return;
-                    }
-
-
-                    const file =
-                        template.file ||
-                        template.path ||
-                        template.url;
-
-
-                    if (!file) {
-
-                        alert(
-                            "Mẫu văn bản chưa có đường dẫn."
-                        );
-
-                        return;
-                    }
-
-
-                    let target = file;
-
-
-                    if (
-                        target.startsWith("./")
-                    ) {
-
-                        target =
-                            target.substring(2);
-
-                    }
-
-
-                    window.location.href =
-                        "./" + target;
-
-                }
-
-            }
-        );
-
-
-        /*
-         * Chọn mẫu trong modal
-         */
-
-        document.addEventListener(
-            "click",
-            function (event) {
-
-                const option =
-                    event.target.closest(
-                        ".template-option"
-                    );
-
-
-                if (!option) {
-                    return;
-                }
-
-
-                event.preventDefault();
-
-
-                selectTemplate(
-                    option.dataset.templateId
-                );
-
-            }
-        );
-
-
-        /*
-         * Nút Mở mẫu
-         */
-
-        const openButton =
-            $("#openTemplate");
-
-
-        if (openButton) {
-
-            openButton.addEventListener(
-                "click",
-                function (event) {
-
-                    event.preventDefault();
-
-                    openSelectedTemplate();
-
-                }
-            );
-
-        }
-
-
-        /*
-         * Nút Hủy
-         */
-
-        const cancelButton =
-            $("#cancelModal");
-
-
-        if (cancelButton) {
-
-            cancelButton.addEventListener(
-                "click",
-                function (event) {
-
-                    event.preventDefault();
-
-                    closeModal();
-
-                }
-            );
-
-        }
-
-
-        /*
-         * Nút X đóng modal
-         */
-
-        const closeButton =
-            $("#closeModal");
-
-
-        if (closeButton) {
-
-            closeButton.addEventListener(
-                "click",
-                function (event) {
-
-                    event.preventDefault();
-
-                    closeModal();
-
-                }
-            );
-
-        }
-
-
-        /*
-         * Click nền modal
-         */
-
-        const modal =
-            $("#documentModal");
-
-
-        if (modal) {
-
-            const overlay =
-                $(".modal-overlay", modal);
-
-
-            if (overlay) {
-
-                overlay.addEventListener(
-                    "click",
                     function () {
 
-                        closeModal();
+                        var page =
+                            button.getAttribute(
+                                "data-page"
+                            );
+
+
+                        if (page) {
+
+                            showPage(
+                                page
+                            );
+
+                        }
 
                     }
                 );
 
             }
-
-        }
+        );
 
     }
 
 
-    /* =====================================================
+    /* ========================================================
        SIDEBAR
-    ===================================================== */
+    ======================================================== */
 
     function openSidebar() {
 
-        const sidebar =
+        var sidebar =
             $("#sidebar");
+
 
         if (!sidebar) {
             return;
@@ -1344,80 +1418,46 @@
 
 
         sidebar.classList.add(
-            "open"
+            "sidebar-open"
         );
 
 
-        let backdrop =
-            $(".sidebar-backdrop");
-
-
-        if (!backdrop) {
-
-            backdrop =
-                document.createElement(
-                    "div"
-                );
-
-            backdrop.className =
-                "sidebar-backdrop";
-
-
-            backdrop.addEventListener(
-                "click",
-                closeSidebar
-            );
-
-
-            document.body.appendChild(
-                backdrop
-            );
-        }
-
-
-        backdrop.classList.add(
-            "active"
+        document.body.classList.add(
+            "sidebar-open"
         );
+
     }
 
 
     function closeSidebar() {
 
-        const sidebar =
+        var sidebar =
             $("#sidebar");
 
 
-        if (sidebar) {
-
-            sidebar.classList.remove(
-                "open"
-            );
-
+        if (!sidebar) {
+            return;
         }
 
 
-        const backdrop =
-            $(".sidebar-backdrop");
+        sidebar.classList.remove(
+            "sidebar-open"
+        );
 
 
-        if (backdrop) {
-
-            backdrop.classList.remove(
-                "active"
-            );
-
-        }
+        document.body.classList.remove(
+            "sidebar-open"
+        );
 
     }
 
 
     function bindSidebar() {
 
-        const openButton =
+        var openButton =
             $("#openSidebar");
 
-
-        const closeButton =
+        var closeButton =
             $("#closeSidebar");
 
 
@@ -1425,11 +1465,7 @@
 
             openButton.addEventListener(
                 "click",
-                function () {
-
-                    openSidebar();
-
-                }
+                openSidebar
             );
 
         }
@@ -1439,11 +1475,7 @@
 
             closeButton.addEventListener(
                 "click",
-                function () {
-
-                    closeSidebar();
-
-                }
+                closeSidebar
             );
 
         }
@@ -1451,176 +1483,234 @@
     }
 
 
-    /* =====================================================
-       KEYBOARD
-    ===================================================== */
+    /* ========================================================
+       MODAL EVENTS
+    ======================================================== */
 
-    function bindKeyboard() {
+    function bindModal() {
+
+        var newDocumentButtons =
+            $all(
+                '[data-action="new-document"]'
+            );
+
+
+        newDocumentButtons.forEach(
+            function (button) {
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        openModal();
+
+                    }
+                );
+
+            }
+        );
+
+
+        var closeButton =
+            $("#closeModal");
+
+        var cancelButton =
+            $("#cancelModal");
+
+        var overlay =
+            document.querySelector(
+                ".modal-overlay"
+            );
+
+        var openButton =
+            $("#openTemplate");
+
+
+        if (closeButton) {
+
+            closeButton.addEventListener(
+                "click",
+                closeModal
+            );
+
+        }
+
+
+        if (cancelButton) {
+
+            cancelButton.addEventListener(
+                "click",
+                closeModal
+            );
+
+        }
+
+
+        if (overlay) {
+
+            overlay.addEventListener(
+                "click",
+                closeModal
+            );
+
+        }
+
+
+        if (openButton) {
+
+            openButton.addEventListener(
+                "click",
+                openSelectedTemplate
+            );
+
+        }
+
 
         document.addEventListener(
             "keydown",
             function (event) {
 
                 if (
-                    event.key ===
-                    "Escape"
+                    event.key === "Escape"
                 ) {
 
-                    closeModal();
+                    var modal =
+                        getModal();
 
-                    closeSidebar();
+
+                    if (
+                        modal &&
+                        !modal.classList.contains(
+                            "hidden"
+                        )
+                    ) {
+
+                        closeModal();
+
+                    }
 
                 }
 
             }
         );
+
     }
 
 
-    /* =====================================================
-       REFRESH
-    ===================================================== */
+    /* ========================================================
+       USER INFORMATION
+    ======================================================== */
 
-    function refresh() {
+    function renderUser() {
 
-        renderUser();
+        var name =
+            $("#currentUserName");
 
-        renderStats();
+        var role =
+            $("#currentUserRole");
 
-        renderDocuments();
 
-        renderRecentDocuments();
+        if (name) {
 
-        updateHeader(
-            state.currentPage
-        );
+            name.textContent =
+                "Quản trị viên";
+
+        }
+
+
+        if (role) {
+
+            role.textContent =
+                "Administrator";
+
+        }
+
     }
 
 
-    /* =====================================================
-       SERVICE WORKER
-    ===================================================== */
-
-    function registerServiceWorker() {
-
-        /*
-         * index.html đã có đoạn đăng ký Service Worker.
-         *
-         * Vì vậy app.js KHÔNG đăng ký lần nữa.
-         *
-         * Tránh đăng ký trùng.
-         */
-    }
-
-
-    /* =====================================================
-       INIT
-    ===================================================== */
+    /* ========================================================
+       APP INIT
+    ======================================================== */
 
     function init() {
 
-        if (
-            state.initialized
-        ) {
+        console.log(
+            "GROVA DOCUMENT: khởi tạo ứng dụng..."
+        );
+
+
+        /*
+         * Kiểm tra dữ liệu trước.
+         */
+
+        if (!validateData()) {
             return;
         }
 
 
-        state.initialized =
-            true;
+        console.log(
+            "GROVA_DATA:",
+            DATA
+        );
 
 
-        bindNavigation();
-
-        bindActions();
-
-        bindSidebar();
-
-        bindKeyboard();
-
-
-        refresh();
+        console.log(
+            "Số mẫu văn bản:",
+            getTemplates().length
+        );
 
 
         /*
-         * Đảm bảo dashboard là trang mặc định.
+         * Render chính.
          */
 
-        const dashboard =
-            $("#page-dashboard");
+        renderDocumentGrid(
+            $("#documentGrid")
+        );
 
 
-        const activePage =
-            $(".page.active-page");
+        renderDocumentGrid(
+            $("#documentsPageGrid")
+        );
 
 
-        if (activePage) {
+        renderRecentDocuments();
 
-            const id =
-                activePage.id;
+        renderStatistics();
+
+        renderUser();
 
 
-            if (
-                id &&
-                id.startsWith(
-                    "page-"
-                )
-            ) {
+        /*
+         * Events.
+         */
 
-                state.currentPage =
-                    id.substring(5);
+        bindNavigation();
 
-            }
+        bindSidebar();
 
-        } else if (dashboard) {
+        bindModal();
 
-            switchPage(
-                "dashboard"
-            );
 
-        }
+        /*
+         * Dashboard mặc định.
+         */
+
+        showPage(
+            "dashboard"
+        );
+
+
+        console.log(
+            "GROVA DOCUMENT: khởi tạo hoàn tất."
+        );
 
     }
 
 
-    /* =====================================================
-       PUBLIC API
-    ===================================================== */
-
-    window.GROVA_DOCUMENT = {
-
-        state,
-
-        getAppData,
-
-        getTemplates,
-
-        getTemplateById,
-
-        switchPage,
-
-        openNewDocument,
-
-        openSelectedTemplate,
-
-        selectTemplate,
-
-        closeModal,
-
-        openSidebar,
-
-        closeSidebar,
-
-        refresh,
-
-        init
-
-    };
-
-
-    /* =====================================================
-       START
-    ===================================================== */
+    /* ========================================================
+       DOM READY
+    ======================================================== */
 
     if (
         document.readyState ===
@@ -1637,5 +1727,38 @@
         init();
 
     }
+
+
+    /* ========================================================
+       PUBLIC API
+    ======================================================== */
+
+    window.GROVA_DOCUMENT = {
+
+        openModal:
+            openModal,
+
+        closeModal:
+            closeModal,
+
+        openTemplate:
+            openTemplate,
+
+        showPage:
+            showPage,
+
+        render:
+            function () {
+
+                renderDocuments();
+
+                renderRecentDocuments();
+
+                renderStatistics();
+
+            }
+
+    };
+
 
 })();
