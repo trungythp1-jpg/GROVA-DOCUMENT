@@ -1,12 +1,13 @@
-const CACHE_NAME = "grova-document-v4";
+const CACHE_NAME = "grova-document-v5";
 
 const APP_SHELL = [
-    "./",
-    "./index.html",
-    "./style.css",
-    "./app.js",
-    "./manifest.json",
-    "./data/data.js"
+  "./",
+  "./index.html",
+  "./style.css?v=201",
+  "./app.js?v=201",
+  "./data/data.js?v=201",
+  "./manifest.json?v=201",
+  "./data/grova_logo.png"
 ];
 
 
@@ -16,22 +17,22 @@ const APP_SHELL = [
 
 self.addEventListener("install", (event) => {
 
-    event.waitUntil(
+  event.waitUntil(
 
-        caches
-            .open(CACHE_NAME)
-            .then((cache) => {
+    caches
+      .open(CACHE_NAME)
+      .then((cache) => {
 
-                return cache.addAll(APP_SHELL);
+        return cache.addAll(APP_SHELL);
 
-            })
-            .then(() => {
+      })
+      .then(() => {
 
-                return self.skipWaiting();
+        return self.skipWaiting();
 
-            })
+      })
 
-    );
+  );
 
 });
 
@@ -42,34 +43,54 @@ self.addEventListener("install", (event) => {
 
 self.addEventListener("activate", (event) => {
 
-    event.waitUntil(
+  event.waitUntil(
 
-        caches
-            .keys()
-            .then((keys) => {
+    caches
+      .keys()
+      .then((cacheNames) => {
 
-                return Promise.all(
+        return Promise.all(
 
-                    keys
-                        .filter(
-                            (key) =>
-                                key !== CACHE_NAME
-                        )
-                        .map(
-                            (key) =>
-                                caches.delete(key)
-                        )
+          cacheNames
+            .filter(
+              (name) =>
+                name.startsWith("grova-document-") &&
+                name !== CACHE_NAME
+            )
+            .map(
+              (name) =>
+                caches.delete(name)
+            )
 
-                );
+        );
 
-            })
-            .then(() => {
+      })
+      .then(() => {
 
-                return self.clients.claim();
+        return self.clients.claim();
 
-            })
+      })
 
-    );
+  );
+
+});
+
+
+/* =====================================================
+   MESSAGE
+   Cho phép app yêu cầu cập nhật ngay
+===================================================== */
+
+self.addEventListener("message", (event) => {
+
+  if (
+    event.data &&
+    event.data.type === "SKIP_WAITING"
+  ) {
+
+    self.skipWaiting();
+
+  }
 
 });
 
@@ -80,155 +101,204 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
 
-    const request = event.request;
+  const request = event.request;
 
-    if (request.method !== "GET") {
-        return;
-    }
-
-
-    const url = new URL(request.url);
+  if (request.method !== "GET") {
+    return;
+  }
 
 
-    /* =================================================
-       HTML
-       Luôn ưu tiên bản mới trên mạng.
-       Nếu mất mạng mới dùng cache.
-    ================================================= */
-
-    if (
-        request.destination === "document" ||
-        url.pathname.endsWith(".html")
-    ) {
-
-        event.respondWith(
-
-            fetch(request)
-                .then((response) => {
-
-                    if (
-                        response &&
-                        response.status === 200
-                    ) {
-
-                        const clone =
-                            response.clone();
-
-                        caches
-                            .open(CACHE_NAME)
-                            .then((cache) => {
-
-                                cache.put(
-                                    request,
-                                    clone
-                                );
-
-                            });
-
-                    }
-
-                    return response;
-
-                })
-                .catch(() => {
-
-                    return caches.match(request);
-
-                })
-
-        );
-
-        return;
-
-    }
+  const url = new URL(request.url);
 
 
-    /* =================================================
-       DATA.JS
-       Luôn lấy bản mới trước.
-    ================================================= */
+  /* ===================================================
+     Chỉ xử lý request cùng website
+  =================================================== */
 
-    if (
-        url.pathname.endsWith(
-            "/data/data.js"
-        )
-    ) {
+  if (
+    url.origin !== self.location.origin
+  ) {
 
-        event.respondWith(
+    return;
 
-            fetch(request)
-                .then((response) => {
-
-                    return response;
-
-                })
-                .catch(() => {
-
-                    return caches.match(request);
-
-                })
-
-        );
-
-        return;
-
-    }
+  }
 
 
-    /* =================================================
-       FILE KHÁC
-       Cache trước → mạng sau
-    ================================================= */
+  /* ===================================================
+     HTML
+     
+     Ưu tiên mạng để luôn lấy phiên bản mới.
+     Offline → dùng cache.
+  =================================================== */
+
+  if (
+    request.destination === "document" ||
+    url.pathname.endsWith(".html")
+  ) {
 
     event.respondWith(
 
-        caches
-            .match(request)
-            .then((cachedResponse) => {
+      fetch(request)
+        .then((response) => {
 
-                if (cachedResponse) {
+          if (
+            response &&
+            response.status === 200
+          ) {
 
-                    return cachedResponse;
+            const clone =
+              response.clone();
 
-                }
+            caches
+              .open(CACHE_NAME)
+              .then((cache) => {
 
+                cache.put(
+                  request,
+                  clone
+                );
 
-                return fetch(request)
-                    .then((response) => {
+              });
 
-                        if (
-                            !response ||
-                            response.status !== 200 ||
-                            response.type === "opaque"
-                        ) {
+          }
 
-                            return response;
+          return response;
 
-                        }
+        })
+        .catch(() => {
 
+          return caches.match(request)
+            .then((cached) => {
 
-                        const clone =
-                            response.clone();
+              return (
+                cached ||
+                caches.match("./index.html")
+              );
 
+            });
 
-                        caches
-                            .open(CACHE_NAME)
-                            .then((cache) => {
-
-                                cache.put(
-                                    request,
-                                    clone
-                                );
-
-                            });
-
-
-                        return response;
-
-                    });
-
-            })
+        })
 
     );
+
+    return;
+
+  }
+
+
+  /* ===================================================
+     JAVASCRIPT / CSS / DATA
+     
+     Ưu tiên mạng.
+     Nếu offline → cache.
+     
+     Điều này giúp khi anh commit phiên bản mới,
+     app không bị giữ JS/CSS cũ.
+  =================================================== */
+
+  if (
+    url.pathname.endsWith(".js") ||
+    url.pathname.endsWith(".css") ||
+    url.pathname.endsWith(".json")
+  ) {
+
+    event.respondWith(
+
+      fetch(request)
+        .then((response) => {
+
+          if (
+            response &&
+            response.status === 200
+          ) {
+
+            const clone =
+              response.clone();
+
+            caches
+              .open(CACHE_NAME)
+              .then((cache) => {
+
+                cache.put(
+                  request,
+                  clone
+                );
+
+              });
+
+          }
+
+          return response;
+
+        })
+        .catch(() => {
+
+          return caches.match(request);
+
+        })
+
+    );
+
+    return;
+
+  }
+
+
+  /* ===================================================
+     ẢNH / ICON / FILE KHÁC
+     
+     Cache trước → mạng sau.
+  =================================================== */
+
+  event.respondWith(
+
+    caches
+      .match(request)
+      .then((cachedResponse) => {
+
+        if (cachedResponse) {
+
+          return cachedResponse;
+
+        }
+
+
+        return fetch(request)
+          .then((response) => {
+
+            if (
+              !response ||
+              response.status !== 200 ||
+              response.type === "opaque"
+            ) {
+
+              return response;
+
+            }
+
+
+            const clone =
+              response.clone();
+
+
+            caches
+              .open(CACHE_NAME)
+              .then((cache) => {
+
+                cache.put(
+                  request,
+                  clone
+                );
+
+              });
+
+
+            return response;
+
+          });
+
+      })
+
+  );
 
 });
