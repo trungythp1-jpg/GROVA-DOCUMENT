@@ -2,10 +2,9 @@
 
   "use strict";
 
-
-  /* ==========================================
-     GROVA DOCUMENT
-     ========================================== */
+  /* =========================================================
+     GROVA DOCUMENT APP
+     ========================================================= */
 
   var DATA = window.GROVA_DATA || {};
 
@@ -14,42 +13,25 @@
     : [];
 
 
-  var HISTORY_KEY =
-    "GROVA_DOCUMENT_RECENT";
+  /* =========================================================
+     DOM
+     ========================================================= */
 
-
-  var selectedTemplate = null;
-
-
-  /* ==========================================
-     DOM HELPERS
-     ========================================== */
-
-  function $(selector, parent) {
-
-    var root =
-      parent || document;
-
-    return root.querySelector(selector);
-
+  function $(selector) {
+    return document.querySelector(selector);
   }
 
 
-  function $$(selector, parent) {
-
-    var root =
-      parent || document;
-
+  function $$(selector) {
     return Array.prototype.slice.call(
-      root.querySelectorAll(selector)
+      document.querySelectorAll(selector)
     );
-
   }
 
 
-  /* ==========================================
+  /* =========================================================
      PAGE CONFIG
-     ========================================== */
+     ========================================================= */
 
   var pageConfig = {
 
@@ -101,34 +83,34 @@
   };
 
 
-  /* ==========================================
-     TEMPLATES
-     ========================================== */
+  /* =========================================================
+     ENABLED TEMPLATES
+     ========================================================= */
 
   function getTemplates() {
 
     return templates.filter(function (item) {
 
-      return (
-        item &&
+      return item &&
         item.enabled !== false &&
-        item.file
-      );
+        item.file;
 
     });
 
   }
 
 
-  /* ==========================================
-     HTML ESCAPE
-     ========================================== */
+  /* =========================================================
+     ESCAPE HTML
+     ========================================================= */
 
   function escapeHtml(value) {
 
-    return String(
+    var text = String(
       value == null ? "" : value
-    )
+    );
+
+    return text
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
@@ -138,76 +120,70 @@
   }
 
 
-  /* ==========================================
+  /* =========================================================
      DOCUMENT CARD
-     ========================================== */
+     ========================================================= */
 
   function createCard(template) {
 
     var card =
       document.createElement("article");
 
-
     card.className =
       "document-card";
-
 
     card.setAttribute(
       "data-template-id",
       template.id || ""
     );
 
-
     card.setAttribute(
       "data-file",
       template.file || ""
     );
 
-
-    card.setAttribute(
-      "role",
-      "button"
-    );
-
-
-    card.setAttribute(
-      "tabindex",
-      "0"
-    );
-
-
     card.innerHTML =
 
       '<div class="document-icon">' +
+
         escapeHtml(
           template.icon || "📄"
         ) +
+
       '</div>' +
 
       '<div class="document-content">' +
 
         '<div class="document-code">' +
+
           escapeHtml(
             template.code || ""
           ) +
+
         '</div>' +
 
         '<h3>' +
+
           escapeHtml(
             template.name || ""
           ) +
+
         '</h3>' +
 
         '<p>' +
+
           escapeHtml(
             template.description || ""
           ) +
+
         '</p>' +
 
         '<span class="document-category">' +
+
           escapeHtml(
             template.category || "Văn bản"
           ) +
+
         '</span>' +
 
       '</div>' +
@@ -215,7 +191,6 @@
       '<div class="document-arrow">' +
         "→" +
       '</div>';
-
 
     card.addEventListener(
       "click",
@@ -226,79 +201,25 @@
       }
     );
 
-
-    card.addEventListener(
-      "keydown",
-      function (event) {
-
-        if (
-          event.key === "Enter" ||
-          event.key === " "
-        ) {
-
-          event.preventDefault();
-
-          openTemplate(template);
-
-        }
-
-      }
-    );
-
-
     return card;
 
   }
 
 
-  /* ==========================================
-     DASHBOARD DOCUMENTS
-     ========================================== */
-
-  function syncDashboardCards() {
-
-    var grid =
-      $("#documentGrid");
-
-
-    if (!grid) {
-      return;
-    }
-
-
-    grid.innerHTML = "";
-
-
-    getTemplates().forEach(
-      function (template) {
-
-        grid.appendChild(
-          createCard(template)
-        );
-
-      }
-    );
-
-  }
-
-
-  /* ==========================================
+  /* =========================================================
      DOCUMENTS PAGE
-     ========================================== */
+     ========================================================= */
 
   function renderDocumentsPage() {
 
     var grid =
       $("#documentsPageGrid");
 
-
     if (!grid) {
       return;
     }
 
-
     grid.innerHTML = "";
-
 
     getTemplates().forEach(
       function (template) {
@@ -313,44 +234,68 @@
   }
 
 
-  /* ==========================================
+  /* =========================================================
+     DASHBOARD CARDS
+     ========================================================= */
+
+  function syncDashboardCards() {
+
+    var grid =
+      $("#documentGrid");
+
+    if (!grid) {
+      return;
+    }
+
+    grid.innerHTML = "";
+
+    getTemplates().forEach(
+      function (template) {
+
+        grid.appendChild(
+          createCard(template)
+        );
+
+      }
+    );
+
+  }
+
+
+  /* =========================================================
      MODAL
-     ========================================== */
+     ========================================================= */
+
+  var selectedTemplate = null;
+
 
   function openModal() {
 
     var modal =
       $("#documentModal");
 
-
     if (!modal) {
       return;
     }
 
-
-    selectedTemplate =
-      null;
-
-
     renderTemplateSelector();
-
-    updateModalButton();
-
 
     modal.classList.remove(
       "hidden"
     );
-
 
     modal.setAttribute(
       "aria-hidden",
       "false"
     );
 
-
     document.body.classList.add(
       "modal-open"
     );
+
+    selectedTemplate = null;
+
+    updateModalButton();
 
   }
 
@@ -360,33 +305,24 @@
     var modal =
       $("#documentModal");
 
-
     if (!modal) {
       return;
     }
 
-
     modal.classList.add(
       "hidden"
     );
-
 
     modal.setAttribute(
       "aria-hidden",
       "true"
     );
 
-
     document.body.classList.remove(
       "modal-open"
     );
 
-
-    selectedTemplate =
-      null;
-
-
-    updateModalButton();
+    selectedTemplate = null;
 
   }
 
@@ -396,56 +332,52 @@
     var box =
       $("#templateSelector");
 
-
     if (!box) {
       return;
     }
 
-
     box.innerHTML = "";
-
 
     getTemplates().forEach(
       function (template) {
 
         var item =
-          document.createElement("button");
-
+          document.createElement(
+            "button"
+          );
 
         item.type =
           "button";
 
-
         item.className =
           "template-option";
-
-
-        item.setAttribute(
-          "data-template-id",
-          template.id || ""
-        );
-
 
         item.innerHTML =
 
           '<span class="template-option-icon">' +
+
             escapeHtml(
               template.icon || "📄"
             ) +
+
           '</span>' +
 
           '<span class="template-option-content">' +
 
             '<strong>' +
+
               escapeHtml(
                 template.name || ""
               ) +
+
             '</strong>' +
 
             '<small>' +
+
               escapeHtml(
                 template.description || ""
               ) +
+
             '</small>' +
 
           '</span>' +
@@ -454,7 +386,6 @@
             "✓" +
           '</span>';
 
-
         item.addEventListener(
           "click",
           function () {
@@ -462,8 +393,7 @@
             selectedTemplate =
               template;
 
-
-            $$(".template-option", box)
+            $$(".template-option")
               .forEach(
                 function (element) {
 
@@ -474,17 +404,14 @@
                 }
               );
 
-
             item.classList.add(
               "selected"
             );
-
 
             updateModalButton();
 
           }
         );
-
 
         box.appendChild(
           item
@@ -501,11 +428,9 @@
     var button =
       $("#openTemplate");
 
-
     if (!button) {
       return;
     }
-
 
     button.disabled =
       !selectedTemplate;
@@ -519,7 +444,6 @@
       return;
     }
 
-
     openTemplate(
       selectedTemplate
     );
@@ -527,9 +451,9 @@
   }
 
 
-  /* ==========================================
-     OPEN DOCUMENT
-     ========================================== */
+  /* =========================================================
+     OPEN TEMPLATE
+     ========================================================= */
 
   function openTemplate(template) {
 
@@ -540,11 +464,9 @@
       return;
     }
 
-
     saveRecentDocument(
       template
     );
-
 
     window.location.href =
       template.file;
@@ -552,9 +474,13 @@
   }
 
 
-  /* ==========================================
-     HISTORY
-     ========================================== */
+  /* =========================================================
+     HISTORY STORAGE
+     ========================================================= */
+
+  var HISTORY_KEY =
+    "GROVA_DOCUMENT_RECENT";
+
 
   function getRecentDocuments() {
 
@@ -565,28 +491,22 @@
           HISTORY_KEY
         );
 
-
       if (!raw) {
         return [];
       }
 
-
       var parsed =
         JSON.parse(raw);
-
 
       if (!Array.isArray(parsed)) {
         return [];
       }
 
-
       return parsed.filter(
         function (item) {
 
-          return (
-            item &&
-            typeof item === "object"
-          );
+          return item &&
+            typeof item === "object";
 
         }
       );
@@ -598,7 +518,6 @@
         error
       );
 
-
       return [];
 
     }
@@ -606,16 +525,18 @@
   }
 
 
+  /* =========================================================
+     SAVE HISTORY
+     ========================================================= */
+
   function saveRecentDocument(template) {
 
     if (!template) {
       return;
     }
 
-
     var list =
       getRecentDocuments();
-
 
     var activity = {
 
@@ -651,15 +572,12 @@
 
     };
 
-
     list.unshift(
       activity
     );
 
-
     list =
       list.slice(0, 20);
-
 
     try {
 
@@ -677,7 +595,6 @@
 
     }
 
-
     renderRecentDocuments();
 
     renderHistoryDocuments();
@@ -687,9 +604,9 @@
   }
 
 
-  /* ==========================================
-     TIME
-     ========================================== */
+  /* =========================================================
+     FORMAT TIME
+     ========================================================= */
 
   function formatRecentTime(value) {
 
@@ -697,46 +614,36 @@
       return "";
     }
 
-
     var date =
       new Date(value);
-
 
     if (isNaN(date.getTime())) {
       return "";
     }
 
-
     var now =
       new Date();
-
 
     var diff =
       now.getTime() -
       date.getTime();
 
-
     var minute =
       60 * 1000;
-
 
     var hour =
       60 * minute;
 
-
     var day =
       24 * hour;
-
 
     if (diff < 0) {
       diff = 0;
     }
 
-
     if (diff < minute) {
       return "Vừa xong";
     }
-
 
     if (diff < hour) {
 
@@ -749,7 +656,6 @@
 
     }
 
-
     if (diff < day) {
 
       return (
@@ -761,26 +667,23 @@
 
     }
 
-
     try {
 
-      return (
-        date.toLocaleDateString(
-          "vi-VN",
-          {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric"
-          }
-        ) +
-        " • " +
-        date.toLocaleTimeString(
-          "vi-VN",
-          {
-            hour: "2-digit",
-            minute: "2-digit"
-          }
-        )
+      return date.toLocaleDateString(
+        "vi-VN",
+        {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric"
+        }
+      ) +
+      " • " +
+      date.toLocaleTimeString(
+        "vi-VN",
+        {
+          hour: "2-digit",
+          minute: "2-digit"
+        }
       );
 
     } catch (error) {
@@ -792,54 +695,58 @@
   }
 
 
-  /* ==========================================
-     HISTORY ROW
-     ========================================== */
+  /* =========================================================
+     CREATE HISTORY ROW
+     ========================================================= */
 
   function createHistoryRow(item) {
 
     var row =
-      document.createElement("button");
-
+      document.createElement(
+        "button"
+      );
 
     row.type =
       "button";
 
-
     row.className =
       "recent-row";
-
 
     row.setAttribute(
       "data-template-id",
       item.id || ""
     );
 
-
     row.innerHTML =
 
       '<span class="recent-row-icon">' +
+
         escapeHtml(
           item.icon || "📄"
         ) +
+
       '</span>' +
 
       '<span class="recent-row-content">' +
 
         '<strong>' +
+
           escapeHtml(
             item.name ||
             item.title ||
             "Văn bản"
           ) +
+
         '</strong>' +
 
         '<small>' +
 
           '<span>' +
+
             escapeHtml(
               item.code || ""
             ) +
+
           '</span>' +
 
           '<span class="recent-row-separator">' +
@@ -847,10 +754,12 @@
           '</span>' +
 
           '<span>' +
+
             escapeHtml(
               item.action ||
               "Mở văn bản"
             ) +
+
           '</span>' +
 
           '<span class="recent-row-separator">' +
@@ -858,11 +767,13 @@
           '</span>' +
 
           '<span class="recent-time">' +
+
             escapeHtml(
               formatRecentTime(
                 item.createdAt
               )
             ) +
+
           '</span>' +
 
         '</small>' +
@@ -873,7 +784,6 @@
         "→" +
       '</span>';
 
-
     row.addEventListener(
       "click",
       function () {
@@ -882,22 +792,20 @@
           return;
         }
 
-
         window.location.href =
           item.file;
 
       }
     );
 
-
     return row;
 
   }
 
 
-  /* ==========================================
+  /* =========================================================
      EMPTY STATE
-     ========================================== */
+     ========================================================= */
 
   function renderEmptyState(
     container,
@@ -907,7 +815,6 @@
     if (!container) {
       return;
     }
-
 
     container.innerHTML =
 
@@ -936,37 +843,125 @@
   }
 
 
-  /* ==========================================
+  /* =========================================================
+     HISTORY CONTAINER
+     ========================================================= */
+
+  function ensureHistoryContainer() {
+
+    var page =
+      $("#page-history");
+
+    if (!page) {
+      return null;
+    }
+
+    /*
+     * Ưu tiên container riêng.
+     */
+
+    var container =
+      page.querySelector(
+        "#historyDocuments"
+      );
+
+    if (container) {
+      return container;
+    }
+
+    /*
+     * Tương thích với index.html
+     * đang dùng #recentDocuments
+     * bên trong trang History.
+     */
+
+    container =
+      page.querySelector(
+        "#recentDocuments"
+      );
+
+    if (container) {
+
+      container.classList.add(
+        "history-list"
+      );
+
+      return container;
+
+    }
+
+    /*
+     * Nếu chưa có thì tự tạo.
+     */
+
+    var existingEmpty =
+      page.querySelector(
+        ".empty-state"
+      );
+
+    container =
+      document.createElement(
+        "div"
+      );
+
+    container.id =
+      "historyDocuments";
+
+    container.className =
+      "activity-list history-list recent-box";
+
+    if (existingEmpty) {
+
+      existingEmpty.parentNode.replaceChild(
+        container,
+        existingEmpty
+      );
+
+    } else {
+
+      page.appendChild(
+        container
+      );
+
+    }
+
+    return container;
+
+  }
+
+
+  /* =========================================================
      DASHBOARD RECENT
-     ========================================== */
+     ========================================================= */
 
   function renderRecentDocuments() {
 
-    var page =
+    /*
+     * Chỉ lấy recentDocuments của Dashboard.
+     * Tránh nhầm với ID trong trang History.
+     */
+
+    var dashboard =
       $("#page-dashboard");
 
-
-    if (!page) {
+    if (!dashboard) {
       return;
     }
 
-
     var container =
-      $("#recentDocuments", page);
-
+      dashboard.querySelector(
+        "#recentDocuments"
+      );
 
     if (!container) {
       return;
     }
 
-
     var list =
       getRecentDocuments();
 
-
     var recent =
       list.slice(0, 4);
-
 
     if (!recent.length) {
 
@@ -979,9 +974,7 @@
 
     }
 
-
     container.innerHTML = "";
-
 
     recent.forEach(
       function (item) {
@@ -996,33 +989,21 @@
   }
 
 
-  /* ==========================================
+  /* =========================================================
      HISTORY PAGE
-     ========================================== */
+     ========================================================= */
 
   function renderHistoryDocuments() {
 
-    var page =
-      $("#page-history");
-
-
-    if (!page) {
-      return;
-    }
-
-
     var container =
-      $("#historyDocuments", page);
-
+      ensureHistoryContainer();
 
     if (!container) {
       return;
     }
 
-
     var list =
       getRecentDocuments();
-
 
     if (!list.length) {
 
@@ -1035,51 +1016,49 @@
 
     }
 
-
     container.innerHTML = "";
 
+    /*
+     * Thanh công cụ.
+     */
 
     var toolbar =
-      document.createElement("div");
-
+      document.createElement(
+        "div"
+      );
 
     toolbar.className =
       "history-toolbar";
 
-
     var count =
-      document.createElement("span");
-
+      document.createElement(
+        "span"
+      );
 
     count.className =
       "history-count";
-
 
     count.textContent =
       list.length +
       " hoạt động";
 
-
     toolbar.appendChild(
       count
     );
 
-
     var clear =
-      document.createElement("button");
-
+      document.createElement(
+        "button"
+      );
 
     clear.type =
       "button";
 
-
     clear.className =
       "secondary-button history-clear-button";
 
-
     clear.textContent =
       "Xóa lịch sử";
-
 
     clear.addEventListener(
       "click",
@@ -1090,27 +1069,45 @@
             "Bạn có chắc muốn xóa toàn bộ lịch sử hoạt động?"
           );
 
-
         if (!confirmed) {
           return;
         }
 
+        try {
 
-        clearHistory();
+          localStorage.removeItem(
+            HISTORY_KEY
+          );
+
+        } catch (error) {
+
+          console.warn(
+            "Không thể xóa lịch sử.",
+            error
+          );
+
+        }
+
+        renderRecentDocuments();
+
+        renderHistoryDocuments();
+
+        updateStats();
 
       }
     );
-
 
     toolbar.appendChild(
       clear
     );
 
-
     container.appendChild(
       toolbar
     );
 
+    /*
+     * Hiển thị tối đa 20 hoạt động.
+     */
 
     list.forEach(
       function (item) {
@@ -1125,55 +1122,21 @@
   }
 
 
-  /* ==========================================
-     CLEAR HISTORY
-     ========================================== */
-
-  function clearHistory() {
-
-    try {
-
-      localStorage.removeItem(
-        HISTORY_KEY
-      );
-
-    } catch (error) {
-
-      console.warn(
-        "Không thể xóa lịch sử.",
-        error
-      );
-
-    }
-
-
-    renderRecentDocuments();
-
-    renderHistoryDocuments();
-
-    updateStats();
-
-  }
-
-
-  /* ==========================================
-     REFRESH HISTORY TIME
-     ========================================== */
+  /* =========================================================
+     REFRESH TIME
+     ========================================================= */
 
   function refreshRecentTimes() {
 
     var rows =
       $$(".recent-row");
 
-
     if (!rows.length) {
       return;
     }
 
-
     var list =
       getRecentDocuments();
-
 
     rows.forEach(
       function (row) {
@@ -1183,30 +1146,27 @@
             "data-template-id"
           );
 
-
         var item =
           list.find(
             function (entry) {
 
               return String(
                 entry.id || ""
-              ) ===
-              String(
+              ) === String(
                 id || ""
               );
 
             }
           );
 
-
         if (!item) {
           return;
         }
 
-
         var time =
-          $(".recent-time", row);
-
+          row.querySelector(
+            ".recent-time"
+          );
 
         if (time) {
 
@@ -1223,15 +1183,14 @@
   }
 
 
-  /* ==========================================
+  /* =========================================================
      STATS
-     ========================================== */
+     ========================================================= */
 
   function updateStats() {
 
     var documents =
       $("#statDocuments");
-
 
     if (documents) {
 
@@ -1242,10 +1201,8 @@
 
     }
 
-
     var projects =
       $("#statProjects");
-
 
     if (projects) {
 
@@ -1259,10 +1216,8 @@
 
     }
 
-
     var customers =
       $("#statCustomers");
-
 
     if (customers) {
 
@@ -1276,10 +1231,8 @@
 
     }
 
-
     var employees =
       $("#statEmployees");
-
 
     if (employees) {
 
@@ -1296,19 +1249,20 @@
   }
 
 
-  /* ==========================================
+  /* =========================================================
      NAVIGATION
-     ========================================== */
+     ========================================================= */
 
   function showPage(pageName) {
 
     if (!pageConfig[pageName]) {
-
-      pageName =
-        "dashboard";
-
+      pageName = "dashboard";
     }
 
+    /*
+     * Xóa cả 2 class để tương thích
+     * với các phiên bản HTML/CSS.
+     */
 
     $$(".page").forEach(
       function (page) {
@@ -1324,23 +1278,30 @@
       }
     );
 
-
     var target =
       $("#page-" + pageName);
 
-
     if (target) {
+
+      /*
+       * CSS hiện tại dùng .page.active.
+       * Đây là class chính.
+       */
 
       target.classList.add(
         "active"
       );
+
+      /*
+       * Giữ active-page để tương thích
+       * với phiên bản trước.
+       */
 
       target.classList.add(
         "active-page"
       );
 
     }
-
 
     $$(".menu-item").forEach(
       function (item) {
@@ -1355,34 +1316,24 @@
       }
     );
 
-
     var config =
       pageConfig[pageName];
-
 
     var title =
       $("#pageTitle");
 
-
     var subtitle =
       $("#pageSubtitle");
 
-
     if (title) {
-
       title.textContent =
         config.title;
-
     }
-
 
     if (subtitle) {
-
       subtitle.textContent =
         config.subtitle;
-
     }
-
 
     if (pageName === "dashboard") {
 
@@ -1392,13 +1343,11 @@
 
     }
 
-
     if (pageName === "documents") {
 
       renderDocumentsPage();
 
     }
-
 
     if (pageName === "history") {
 
@@ -1406,15 +1355,10 @@
 
     }
 
-
     closeSidebarMobile();
 
   }
 
-
-  /* ==========================================
-     NAVIGATION EVENTS
-     ========================================== */
 
   function bindNavigation() {
 
@@ -1457,28 +1401,49 @@
       }
     );
 
+
+    /*
+     * Nút Xem tất cả / nút chuyển trang.
+     */
+
+    $$(".text-button[data-page]").forEach(
+      function (button) {
+
+        button.addEventListener(
+          "click",
+          function () {
+
+            showPage(
+              button.getAttribute(
+                "data-page"
+              )
+            );
+
+          }
+        );
+
+      }
+    );
+
   }
 
 
-  /* ==========================================
+  /* =========================================================
      SIDEBAR
-     ========================================== */
+     ========================================================= */
 
   function openSidebarMobile() {
 
     var sidebar =
       $("#sidebar");
 
-
     if (!sidebar) {
       return;
     }
 
-
     sidebar.classList.add(
       "open"
     );
-
 
     document.body.classList.add(
       "sidebar-open"
@@ -1492,15 +1457,13 @@
     var sidebar =
       $("#sidebar");
 
-
-    if (sidebar) {
-
-      sidebar.classList.remove(
-        "open"
-      );
-
+    if (!sidebar) {
+      return;
     }
 
+    sidebar.classList.remove(
+      "open"
+    );
 
     document.body.classList.remove(
       "sidebar-open"
@@ -1514,10 +1477,8 @@
     var open =
       $("#openSidebar");
 
-
     var close =
       $("#closeSidebar");
-
 
     if (open) {
 
@@ -1527,7 +1488,6 @@
       );
 
     }
-
 
     if (close) {
 
@@ -1541,9 +1501,9 @@
   }
 
 
-  /* ==========================================
+  /* =========================================================
      MODAL EVENTS
-     ========================================== */
+     ========================================================= */
 
   function bindModal() {
 
@@ -1553,13 +1513,7 @@
 
           button.addEventListener(
             "click",
-            function (event) {
-
-              event.preventDefault();
-
-              openModal();
-
-            }
+            openModal
           );
 
         }
@@ -1568,7 +1522,6 @@
 
     var close =
       $("#closeModal");
-
 
     if (close) {
 
@@ -1583,7 +1536,6 @@
     var cancel =
       $("#cancelModal");
 
-
     if (cancel) {
 
       cancel.addEventListener(
@@ -1597,7 +1549,6 @@
     var openTemplateButton =
       $("#openTemplate");
 
-
     if (openTemplateButton) {
 
       openTemplateButton.addEventListener(
@@ -1610,7 +1561,6 @@
 
     var modal =
       $("#documentModal");
-
 
     if (modal) {
 
@@ -1636,9 +1586,7 @@
       "keydown",
       function (event) {
 
-        if (
-          event.key === "Escape"
-        ) {
+        if (event.key === "Escape") {
 
           closeModal();
 
@@ -1650,9 +1598,9 @@
   }
 
 
-  /* ==========================================
+  /* =========================================================
      INIT
-     ========================================== */
+     ========================================================= */
 
   function init() {
 
@@ -1672,14 +1620,12 @@
 
     bindModal();
 
-    showPage("dashboard");
-
   }
 
 
-  /* ==========================================
+  /* =========================================================
      PUBLIC API
-     ========================================== */
+     ========================================================= */
 
   window.GROVA_DOCUMENT = {
 
@@ -1717,7 +1663,30 @@
       updateStats,
 
     clearHistory:
-      clearHistory,
+      function () {
+
+        try {
+
+          localStorage.removeItem(
+            HISTORY_KEY
+          );
+
+        } catch (error) {
+
+          console.warn(
+            "Không thể xóa lịch sử.",
+            error
+          );
+
+        }
+
+        renderRecentDocuments();
+
+        renderHistoryDocuments();
+
+        updateStats();
+
+      },
 
     refresh:
       init
@@ -1725,9 +1694,9 @@
   };
 
 
-  /* ==========================================
+  /* =========================================================
      START
-     ========================================== */
+     ========================================================= */
 
   if (
     document.readyState === "loading"
@@ -1745,12 +1714,16 @@
   }
 
 
-  /* ==========================================
+  /* =========================================================
      UPDATE TIME
-     ========================================== */
+     ========================================================= */
 
   window.setInterval(
-    refreshRecentTimes,
+    function () {
+
+      refreshRecentTimes();
+
+    },
     60 * 1000
   );
 
