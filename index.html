@@ -44,7 +44,7 @@
 
     <link
         rel="manifest"
-        href="./manifest.json?v=11"
+        href="./manifest.json?v=12"
     >
 
     <link
@@ -65,7 +65,7 @@
 
     <link
         rel="stylesheet"
-        href="./style.css?v=11"
+        href="./style.css?v=12"
     >
 
 </head>
@@ -131,7 +131,6 @@
             class="main-menu"
             aria-label="Menu chính"
         >
-
 
             <button
                 type="button"
@@ -251,16 +250,10 @@
 
             </button>
 
-
         </nav>
 
 
-        <!-- =================================================
-             SIDEBAR BOTTOM
-        ================================================== -->
-
         <div class="sidebar-bottom">
-
 
             <button
                 type="button"
@@ -295,7 +288,6 @@
 
             </button>
 
-
         </div>
 
     </aside>
@@ -315,39 +307,41 @@
 
         <header class="topbar">
 
+            <div class="topbar-left">
 
-            <button
-                id="openSidebar"
-                class="icon-button mobile-only"
-                type="button"
-                aria-label="Mở menu"
-            >
-                ☰
-            </button>
-
-
-            <div class="topbar-title">
-
-                <div
-                    id="pageTitle"
-                    class="page-title"
+                <button
+                    id="openSidebar"
+                    class="icon-button mobile-only"
+                    type="button"
+                    aria-label="Mở menu"
                 >
-                    Tổng quan
-                </div>
+                    ☰
+                </button>
 
 
-                <div
-                    id="pageSubtitle"
-                    class="page-subtitle"
-                >
-                    Hệ thống quản lý hồ sơ và văn bản
+                <div class="topbar-title">
+
+                    <div
+                        id="pageTitle"
+                        class="page-title"
+                    >
+                        Tổng quan
+                    </div>
+
+
+                    <div
+                        id="pageSubtitle"
+                        class="page-subtitle"
+                    >
+                        Hệ thống quản lý hồ sơ và văn bản
+                    </div>
+
                 </div>
 
             </div>
 
 
             <div class="topbar-actions">
-
 
                 <button
                     type="button"
@@ -367,7 +361,6 @@
 
                 <div class="user-mini">
 
-
                     <div class="user-avatar">
                         A
                     </div>
@@ -375,27 +368,20 @@
 
                     <div class="user-info">
 
-                        <strong
-                            id="currentUserName"
-                        >
+                        <strong id="currentUserName">
                             Quản trị viên
                         </strong>
 
 
-                        <small
-                            id="currentUserRole"
-                        >
+                        <small id="currentUserRole">
                             Administrator
                         </small>
 
                     </div>
 
-
                 </div>
 
-
             </div>
-
 
         </header>
 
@@ -425,11 +411,9 @@
                      WELCOME
                 ============================================== -->
 
-                <div class="welcome-card">
-
+                <section class="welcome-card">
 
                     <div class="welcome-brand">
-
 
                         <img
                             src="./data/grova_logo.png"
@@ -439,7 +423,6 @@
 
 
                         <div class="welcome-copy">
-
 
                             <span class="eyebrow">
                                 GROVA HOLDINGS
@@ -456,9 +439,7 @@
                                 công trình tập trung.
                             </p>
 
-
                         </div>
-
 
                     </div>
 
@@ -468,11 +449,11 @@
                         class="primary-button"
                         data-action="new-document"
                     >
-                        + Tạo văn bản
+                        <span class="button-plus">+</span>
+                        <span>Tạo văn bản</span>
                     </button>
 
-
-                </div>
+                </section>
 
 
 
@@ -480,31 +461,47 @@
                      DOCUMENT SECTION
                 ============================================== -->
 
-                <div class="section-heading">
+                <section class="documents-section">
+
+                    <div class="section-heading">
+
+                        <div>
+
+                            <div class="section-kicker">
+                                HỆ THỐNG HỒ SƠ
+                            </div>
+
+                            <h2>
+                                Văn bản
+                            </h2>
 
 
-                    <div>
+                            <p>
+                                Chọn mẫu để bắt đầu tạo hồ sơ
+                            </p>
 
-                        <h2>
-                            Văn bản
-                        </h2>
+                        </div>
 
 
-                        <p>
-                            Chọn mẫu để bắt đầu tạo hồ sơ
-                        </p>
+                        <button
+                            type="button"
+                            class="section-link"
+                            data-page="documents"
+                        >
+                            Xem tất cả
+                            <span>→</span>
+                        </button>
 
                     </div>
 
 
-                </div>
+                    <div
+                        id="documentGrid"
+                        class="document-grid"
+                    >
+                    </div>
 
-
-                <div
-                    id="documentGrid"
-                    class="document-grid"
-                >
-                </div>
+                </section>
 
 
 
@@ -519,13 +516,15 @@
                          RECENT
                     ========================================== -->
 
-                    <div class="panel">
-
+                    <section class="panel recent-panel">
 
                         <div class="panel-header">
 
-
                             <div>
+
+                                <div class="panel-kicker">
+                                    HOẠT ĐỘNG
+                                </div>
 
                                 <h3>
                                     Hoạt động gần đây
@@ -547,7 +546,6 @@
                                 Xem tất cả
                             </button>
 
-
                         </div>
 
 
@@ -557,8 +555,7 @@
                         >
                         </div>
 
-
-                    </div>
+                    </section>
 
 
 
@@ -566,13 +563,15 @@
                          STATS
                     ========================================== -->
 
-                    <div class="panel">
-
+                    <section class="panel stats-panel">
 
                         <div class="panel-header">
 
-
                             <div>
+
+                                <div class="panel-kicker">
+                                    TỔNG QUAN
+                                </div>
 
                                 <h3>
                                     Thống kê
@@ -585,85 +584,117 @@
 
                             </div>
 
-
                         </div>
 
 
                         <div class="stats-list">
 
 
-                            <div class="stat-row">
+                            <div class="stat-card">
 
-                                <span>
-                                    Tổng văn bản
-                                </span>
-
-
-                                <strong
-                                    id="statDocuments"
-                                >
-                                    0
-                                </strong>
-
-                            </div>
+                                <div class="stat-icon stat-icon-document">
+                                    ▤
+                                </div>
 
 
-                            <div class="stat-row">
+                                <div class="stat-content">
 
-                                <span>
-                                    Công trình
-                                </span>
+                                    <span>
+                                        Tổng văn bản
+                                    </span>
 
 
-                                <strong
-                                    id="statProjects"
-                                >
-                                    0
-                                </strong>
+                                    <strong
+                                        id="statDocuments"
+                                    >
+                                        0
+                                    </strong>
+
+                                </div>
 
                             </div>
 
 
-                            <div class="stat-row">
+                            <div class="stat-card">
 
-                                <span>
-                                    Khách hàng
-                                </span>
+                                <div class="stat-icon stat-icon-project">
+                                    ⌂
+                                </div>
 
 
-                                <strong
-                                    id="statCustomers"
-                                >
-                                    0
-                                </strong>
+                                <div class="stat-content">
+
+                                    <span>
+                                        Công trình
+                                    </span>
+
+
+                                    <strong
+                                        id="statProjects"
+                                    >
+                                        0
+                                    </strong>
+
+                                </div>
 
                             </div>
 
 
-                            <div class="stat-row">
+                            <div class="stat-card">
 
-                                <span>
-                                    Nhân sự
-                                </span>
+                                <div class="stat-icon stat-icon-customer">
+                                    ♙
+                                </div>
 
 
-                                <strong
-                                    id="statEmployees"
-                                >
-                                    0
-                                </strong>
+                                <div class="stat-content">
+
+                                    <span>
+                                        Khách hàng
+                                    </span>
+
+
+                                    <strong
+                                        id="statCustomers"
+                                    >
+                                        0
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="stat-card">
+
+                                <div class="stat-icon stat-icon-employee">
+                                    ♙
+                                </div>
+
+
+                                <div class="stat-content">
+
+                                    <span>
+                                        Nhân sự
+                                    </span>
+
+
+                                    <strong
+                                        id="statEmployees"
+                                    >
+                                        0
+                                    </strong>
+
+                                </div>
 
                             </div>
 
 
                         </div>
 
-
-                    </div>
-
+                    </section>
 
                 </div>
-
 
             </div>
 
@@ -678,11 +709,13 @@
                 class="page hidden"
             >
 
-
                 <div class="page-toolbar">
 
-
                     <div>
+
+                        <div class="section-kicker">
+                            HỒ SƠ
+                        </div>
 
                         <h1>
                             Văn bản
@@ -701,9 +734,9 @@
                         class="primary-button"
                         data-action="new-document"
                     >
-                        + Tạo văn bản
+                        <span class="button-plus">+</span>
+                        <span>Tạo văn bản</span>
                     </button>
-
 
                 </div>
 
@@ -713,7 +746,6 @@
                     class="document-grid"
                 >
                 </div>
-
 
             </div>
 
@@ -728,11 +760,13 @@
                 class="page hidden"
             >
 
-
                 <div class="page-toolbar">
 
-
                     <div>
+
+                        <div class="section-kicker">
+                            DỮ LIỆU
+                        </div>
 
                         <h1>
                             Công trình
@@ -754,12 +788,10 @@
                         + Công trình mới
                     </button>
 
-
                 </div>
 
 
                 <div class="empty-state">
-
 
                     <div class="empty-icon">
                         ⌂
@@ -776,9 +808,7 @@
                         và liên kết với các văn bản.
                     </p>
 
-
                 </div>
-
 
             </div>
 
@@ -793,11 +823,13 @@
                 class="page hidden"
             >
 
-
                 <div class="page-toolbar">
 
-
                     <div>
+
+                        <div class="section-kicker">
+                            DỮ LIỆU
+                        </div>
 
                         <h1>
                             Khách hàng
@@ -818,12 +850,10 @@
                         + Khách hàng mới
                     </button>
 
-
                 </div>
 
 
                 <div class="empty-state">
-
 
                     <div class="empty-icon">
                         ♙
@@ -840,9 +870,7 @@
                         tự động điền vào hồ sơ.
                     </p>
 
-
                 </div>
-
 
             </div>
 
@@ -857,11 +885,13 @@
                 class="page hidden"
             >
 
-
                 <div class="page-toolbar">
 
-
                     <div>
+
+                        <div class="section-kicker">
+                            DỮ LIỆU
+                        </div>
 
                         <h1>
                             Nhân sự
@@ -882,12 +912,10 @@
                         + Nhân sự mới
                     </button>
 
-
                 </div>
 
 
                 <div class="empty-state">
-
 
                     <div class="empty-icon">
                         ♙
@@ -904,9 +932,7 @@
                         có thể xem dữ liệu nhân sự.
                     </p>
 
-
                 </div>
-
 
             </div>
 
@@ -921,11 +947,13 @@
                 class="page hidden"
             >
 
-
                 <div class="page-toolbar">
 
-
                     <div>
+
+                        <div class="section-kicker">
+                            NHẬT KÝ
+                        </div>
 
                         <h1>
                             Lịch sử
@@ -938,12 +966,10 @@
 
                     </div>
 
-
                 </div>
 
 
                 <div class="empty-state">
-
 
                     <div class="empty-icon">
                         ◷
@@ -959,9 +985,7 @@
                         Các văn bản được tạo sẽ xuất hiện tại đây.
                     </p>
 
-
                 </div>
-
 
             </div>
 
@@ -976,11 +1000,13 @@
                 class="page hidden"
             >
 
-
                 <div class="page-toolbar">
 
-
                     <div>
+
+                        <div class="section-kicker">
+                            PHÂN TÍCH
+                        </div>
 
                         <h1>
                             Báo cáo
@@ -993,12 +1019,10 @@
 
                     </div>
 
-
                 </div>
 
 
                 <div class="empty-state">
-
 
                     <div class="empty-icon">
                         ▥
@@ -1015,9 +1039,7 @@
                         sau khi có dữ liệu thực.
                     </p>
 
-
                 </div>
-
 
             </div>
 
@@ -1032,11 +1054,13 @@
                 class="page hidden"
             >
 
-
                 <div class="page-toolbar">
 
-
                     <div>
+
+                        <div class="section-kicker">
+                            HỆ THỐNG
+                        </div>
 
                         <h1>
                             Cài đặt
@@ -1049,15 +1073,12 @@
 
                     </div>
 
-
                 </div>
 
 
                 <div class="settings-card">
 
-
                     <div class="setting-item">
-
 
                         <div>
 
@@ -1077,12 +1098,10 @@
                             A4
                         </span>
 
-
                     </div>
 
 
                     <div class="setting-item">
-
 
                         <div>
 
@@ -1102,12 +1121,9 @@
                             PDF
                         </span>
 
-
                     </div>
 
-
                 </div>
-
 
             </div>
 
@@ -1122,11 +1138,13 @@
                 class="page hidden"
             >
 
-
                 <div class="page-toolbar">
 
-
                     <div>
+
+                        <div class="section-kicker">
+                            ADMINISTRATION
+                        </div>
 
                         <h1>
                             Quản trị hệ thống
@@ -1140,12 +1158,10 @@
 
                     </div>
 
-
                 </div>
 
 
                 <div class="admin-grid">
-
 
                     <button
                         type="button"
@@ -1165,7 +1181,6 @@
                         <small>
                             Tài khoản và phân quyền
                         </small>
-
 
                     </button>
 
@@ -1189,7 +1204,6 @@
                             Thêm, sửa, bật/tắt mẫu
                         </small>
 
-
                     </button>
 
 
@@ -1212,21 +1226,16 @@
                             Cấu hình dữ liệu dùng chung
                         </small>
 
-
                     </button>
 
-
                 </div>
-
 
             </div>
 
 
         </section>
 
-
     </main>
-
 
 </div>
 
@@ -1242,10 +1251,7 @@
     aria-hidden="true"
 >
 
-
-    <div
-        class="modal-overlay"
-    ></div>
+    <div class="modal-overlay"></div>
 
 
     <div
@@ -1255,16 +1261,9 @@
         aria-labelledby="modalTitle"
     >
 
-
-        <!-- ================================================
-             MODAL HEADER
-        ================================================= -->
-
         <div class="modal-header">
 
-
             <div>
-
 
                 <span class="eyebrow">
                     TẠO VĂN BẢN
@@ -1274,7 +1273,6 @@
                 <h2 id="modalTitle">
                     Chọn mẫu văn bản
                 </h2>
-
 
             </div>
 
@@ -1288,14 +1286,8 @@
                 ×
             </button>
 
-
         </div>
 
-
-
-        <!-- ================================================
-             TEMPLATE SELECTOR
-        ================================================= -->
 
         <div
             id="templateSelector"
@@ -1304,13 +1296,7 @@
         </div>
 
 
-
-        <!-- ================================================
-             MODAL FOOTER
-        ================================================= -->
-
         <div class="modal-footer">
-
 
             <button
                 type="button"
@@ -1329,12 +1315,9 @@
                 Mở mẫu
             </button>
 
-
         </div>
 
-
     </div>
-
 
 </div>
 
@@ -1345,7 +1328,7 @@
 ========================================================= -->
 
 <script
-    src="./data/data.js?v=11"
+    src="./data/data.js?v=12"
 ></script>
 
 
@@ -1354,7 +1337,7 @@
 ========================================================= -->
 
 <script
-    src="./app.js?v=11"
+    src="./app.js?v=12"
 ></script>
 
 
@@ -1375,7 +1358,7 @@ if (
 
             navigator.serviceWorker
                 .register(
-                    "./sw.js?v=11"
+                    "./sw.js?v=12"
                 )
                 .then(
                     function () {
