@@ -358,14 +358,18 @@
       padding-top:1px;
     }
 
+    /*
+      GIẢM 0,5pt
+    */
+
     .national-header .country{
-      font-size:13.5pt;
+      font-size:13pt;
       font-weight:700;
       text-transform:uppercase;
     }
 
     .national-header .motto{
-      font-size:12.5pt;
+      font-size:12pt;
       font-weight:700;
       margin-top:2px;
     }
@@ -387,7 +391,7 @@
 
     .contract-heading h1{
       margin:0;
-      font-size:17pt;
+      font-size:16.5pt;
       line-height:1.25;
       font-weight:800;
       text-transform:uppercase;
@@ -395,13 +399,13 @@
 
     .contract-heading .subtitle{
       margin-top:4px;
-      font-size:12.5pt;
+      font-size:12pt;
       font-weight:700;
     }
 
     .contract-heading .contract-no{
       margin-top:6px;
-      font-size:11.5pt;
+      font-size:11pt;
     }
 
     /* =========================================================
@@ -458,16 +462,30 @@
       text-align:justify;
     }
 
+    /* =========================================================
+       ARTICLES
+    ========================================================= */
+
     .article{
       margin:0 0 13px;
       break-inside:auto;
       page-break-inside:auto;
     }
 
+    /*
+      Không để tiêu đề Điều nằm ở cuối trang một mình.
+      Tiêu đề luôn cố gắng đi cùng phần nội dung đầu tiên.
+    */
+
     .article-title{
       font-weight:800;
       margin:0 0 5px;
       color:#17201d;
+
+      break-after:avoid-page;
+      page-break-after:avoid;
+      break-inside:avoid;
+      page-break-inside:avoid;
     }
 
     .article-content{
@@ -498,6 +516,9 @@
       position:relative;
       margin:2px 0;
       padding-left:14px;
+
+      break-inside:avoid;
+      page-break-inside:avoid;
     }
 
     .plus-list li::before{
@@ -543,7 +564,7 @@
 
     .signature-note{
       font-style:italic;
-      font-size:10.5pt;
+      font-size:10pt;
     }
 
     /* =========================================================
@@ -551,6 +572,7 @@
     ========================================================= */
 
     @media (max-width:1100px){
+
       .workspace{
         grid-template-columns:330px minmax(0,1fr);
       }
@@ -558,9 +580,11 @@
       .paper{
         transform-origin:top center;
       }
+
     }
 
     @media (max-width:900px){
+
       .workspace{
         grid-template-columns:1fr;
       }
@@ -577,9 +601,11 @@
       .paper{
         margin:0 auto;
       }
+
     }
 
     @media (max-width:650px){
+
       body{
         font-size:14px;
       }
@@ -621,6 +647,7 @@
         align-items:stretch;
         flex-direction:column;
       }
+
     }
 
     /* =========================================================
@@ -677,6 +704,34 @@
         page-break-after:auto;
       }
 
+      .doc{
+        font-size:11pt !important;
+      }
+
+      .national-header .country{
+        font-size:13pt !important;
+      }
+
+      .national-header .motto{
+        font-size:12pt !important;
+      }
+
+      .contract-heading h1{
+        font-size:16.5pt !important;
+      }
+
+      .contract-heading .subtitle{
+        font-size:12pt !important;
+      }
+
+      .contract-heading .contract-no{
+        font-size:11pt !important;
+      }
+
+      .signature-note{
+        font-size:10pt !important;
+      }
+
       .doc-header,
       .party,
       .signature{
@@ -690,30 +745,42 @@
       }
 
       .article-title{
-        break-after:avoid;
+        break-after:avoid-page;
         page-break-after:avoid;
+        break-inside:avoid;
+        page-break-inside:avoid;
+      }
+
+      .plus-list li{
+        break-inside:avoid;
+        page-break-inside:avoid;
       }
 
       a{
         color:inherit !important;
         text-decoration:none !important;
       }
+
     }
+
   </style>
 </head>
 
 <body>
 
 <header class="app-header">
+
   <div class="app-header-inner">
 
     <div class="brand">
+
       <img
         src="../data/grova_logo.png"
         alt="GROVA HOLDINGS"
       >
 
       <div class="brand-text">
+
         <div class="brand-title">
           GROVA DOCUMENT
         </div>
@@ -721,8 +788,11 @@
         <div class="brand-subtitle">
           Hệ thống quản lý văn bản và hồ sơ
         </div>
+
       </div>
+
     </div>
+
 
     <div class="header-actions">
 
@@ -745,6 +815,7 @@
     </div>
 
   </div>
+
 </header>
 
 
@@ -757,11 +828,17 @@
   <aside class="panel form-panel">
 
     <div class="panel-header">
-      <h2>Thông tin hợp đồng</h2>
+
+      <h2>
+        Thông tin hợp đồng
+      </h2>
+
       <p>
         Nhập thông tin người lao động để cập nhật bản xem trước.
       </p>
+
     </div>
+
 
     <div class="form-body">
 
@@ -769,7 +846,9 @@
         Thông tin chung
       </div>
 
+
       <div class="field">
+
         <label for="contractDate">
           Ngày ký hợp đồng
         </label>
@@ -778,6 +857,7 @@
           id="contractDate"
           type="date"
         >
+
       </div>
 
 
@@ -785,7 +865,9 @@
         Bên A – Người sử dụng lao động
       </div>
 
+
       <div class="field">
+
         <label for="companyName">
           Công ty
         </label>
@@ -794,9 +876,12 @@
           id="companyName"
           value="CÔNG TY CỔ PHẦN GROVAHOLDINGS SJC"
         >
+
       </div>
 
+
       <div class="field">
+
         <label for="companyAddress">
           Địa chỉ
         </label>
@@ -805,9 +890,12 @@
           id="companyAddress"
           value="Số 49A/348 Trần Nguyên Hãn , Phường An Biên, Thành phố Hải Phòng, Việt Nam"
         >
+
       </div>
 
+
       <div class="field">
+
         <label for="companyTax">
           Mã số thuế
         </label>
@@ -816,11 +904,14 @@
           id="companyTax"
           value="0202328361"
         >
+
       </div>
+
 
       <div class="grid-2">
 
         <div class="field">
+
           <label for="companyRepresentative">
             Đại diện
           </label>
@@ -829,9 +920,12 @@
             id="companyRepresentative"
             value="Phạm Văn Học"
           >
+
         </div>
 
+
         <div class="field">
+
           <label for="companyPosition">
             Chức vụ
           </label>
@@ -840,11 +934,14 @@
             id="companyPosition"
             value="Giám đốc"
           >
+
         </div>
 
       </div>
 
+
       <div class="field">
+
         <label for="companyNationality">
           Quốc tịch
         </label>
@@ -853,6 +950,7 @@
           id="companyNationality"
           value="Việt Nam"
         >
+
       </div>
 
 
@@ -860,7 +958,9 @@
         Bên B – Người lao động
       </div>
 
+
       <div class="field">
+
         <label for="employeeName">
           ÔNG / BÀ
         </label>
@@ -869,9 +969,12 @@
           id="employeeName"
           placeholder="Nhập họ và tên"
         >
+
       </div>
 
+
       <div class="field">
+
         <label for="employeeNationality">
           Quốc tịch
         </label>
@@ -880,11 +983,14 @@
           id="employeeNationality"
           value="Việt Nam"
         >
+
       </div>
+
 
       <div class="grid-2">
 
         <div class="field">
+
           <label for="employeeBirth">
             Ngày sinh
           </label>
@@ -894,9 +1000,12 @@
             type="text"
             placeholder="dd/mm/yyyy"
           >
+
         </div>
 
+
         <div class="field">
+
           <label for="employeeBirthPlace">
             Tại
           </label>
@@ -905,13 +1014,16 @@
             id="employeeBirthPlace"
             placeholder="Nơi sinh"
           >
+
         </div>
 
       </div>
 
+
       <div class="grid-2">
 
         <div class="field">
+
           <label for="employeeJob">
             Nghề nghiệp
           </label>
@@ -920,9 +1032,12 @@
             id="employeeJob"
             value="Nhân viên"
           >
+
         </div>
 
+
         <div class="field">
+
           <label for="employeeGender">
             Giới tính
           </label>
@@ -931,11 +1046,14 @@
             id="employeeGender"
             placeholder="Nam / Nữ"
           >
+
         </div>
 
       </div>
 
+
       <div class="field">
+
         <label for="employeeAddress">
           Địa chỉ
         </label>
@@ -944,9 +1062,12 @@
           id="employeeAddress"
           placeholder="Địa chỉ thường trú / nơi ở"
         ></textarea>
+
       </div>
 
+
       <div class="field">
+
         <label for="employeeCCCD">
           Số CCCD
         </label>
@@ -954,11 +1075,14 @@
         <input
           id="employeeCCCD"
         >
+
       </div>
+
 
       <div class="grid-2">
 
         <div class="field">
+
           <label for="cccdDate">
             Cấp ngày
           </label>
@@ -968,9 +1092,12 @@
             type="text"
             placeholder="dd/mm/yyyy"
           >
+
         </div>
 
+
         <div class="field">
+
           <label for="cccdPlace">
             Tại
           </label>
@@ -979,6 +1106,7 @@
             id="cccdPlace"
             placeholder="Nơi cấp"
           >
+
         </div>
 
       </div>
@@ -988,7 +1116,9 @@
         Điều 1
       </div>
 
+
       <div class="field">
+
         <label for="contractType">
           Loại hợp đồng
         </label>
@@ -997,11 +1127,14 @@
           id="contractType"
           value="Ký lần thứ 01"
         >
+
       </div>
+
 
       <div class="grid-2">
 
         <div class="field">
+
           <label for="startDate">
             Từ ngày
           </label>
@@ -1011,9 +1144,12 @@
             type="text"
             placeholder="dd/mm/yyyy"
           >
+
         </div>
 
+
         <div class="field">
+
           <label for="endDate">
             Đến ngày
           </label>
@@ -1023,11 +1159,14 @@
             type="text"
             placeholder="dd/mm/yyyy"
           >
+
         </div>
 
       </div>
 
+
       <div class="field">
+
         <label for="workLocation">
           Địa điểm làm việc
         </label>
@@ -1036,9 +1175,12 @@
           id="workLocation"
           value="theo yêu cầu thực tế của doanh nghiệp"
         >
+
       </div>
 
+
       <div class="field">
+
         <label for="position">
           Chức vụ công tác
         </label>
@@ -1047,9 +1189,12 @@
           id="position"
           value="Nhân viên"
         >
+
       </div>
 
+
       <div class="field">
+
         <label for="professionalTitle">
           Chức danh chuyên môn (vị trí công tác)
         </label>
@@ -1058,9 +1203,12 @@
           id="professionalTitle"
           value="Nhân viên"
         >
+
       </div>
 
+
       <div class="field">
+
         <label for="jobDescription">
           Nhiệm vụ công việc
         </label>
@@ -1069,6 +1217,7 @@
           id="jobDescription"
           placeholder="Có thể ghi thêm nếu cần"
         ></textarea>
+
       </div>
 
 
@@ -1076,7 +1225,9 @@
         Điều 2 – Lương
       </div>
 
+
       <div class="field">
+
         <label for="salary">
           Lương căn bản, mức đóng BHXH
         </label>
@@ -1085,9 +1236,12 @@
           id="salary"
           value="6.000.000đồng/tháng"
         >
+
       </div>
 
+
       <div class="field">
+
         <label for="salaryForm">
           Hình thức trả lương
         </label>
@@ -1096,9 +1250,12 @@
           id="salaryForm"
           value="Tiền mặt hoặc chuyển khoản."
         >
+
       </div>
 
+
       <div class="field">
+
         <label for="effectiveSalary">
           Lương hiệu quả
         </label>
@@ -1106,9 +1263,12 @@
         <textarea
           id="effectiveSalary"
         >hưởng lợi theo tình hình kinh doanh thực tế trong tháng và do Giám đốc quyết định .</textarea>
+
       </div>
 
+
       <div class="field">
+
         <label for="salaryPayment">
           Thời hạn trả lương
         </label>
@@ -1116,6 +1276,7 @@
         <textarea
           id="salaryPayment"
         >Được trả linh hoạt theo tình hình tài chính của doanh nghiệp, có thể thanh toán 01 lần bằng hình thức chuyển khoản hoặc thanh toán tối đa 03 lần bằng hình thức tiền mặt.</textarea>
+
       </div>
 
 
@@ -1129,6 +1290,7 @@
           Xóa nháp
         </button>
 
+
         <button
           class="btn btn-primary"
           type="button"
@@ -1138,6 +1300,7 @@
         </button>
 
       </div>
+
 
       <div
         id="saveStatus"
@@ -1160,10 +1323,17 @@
     <div class="preview-toolbar">
 
       <div class="preview-info">
-        <strong>Xem trước hợp đồng</strong>
+
+        <strong>
+          Xem trước hợp đồng
+        </strong>
+
         &nbsp;·&nbsp;
+
         Nội dung tự cập nhật khi nhập dữ liệu
+
       </div>
+
 
       <button
         class="btn btn-primary"
@@ -1186,11 +1356,14 @@
         <header class="doc-header">
 
           <div class="doc-logo">
+
             <img
               src="../data/grova_logo.png"
               alt="GROVA HOLDINGS"
             >
+
           </div>
+
 
           <div class="national-header">
 
@@ -1220,7 +1393,10 @@
           </div>
 
           <div class="contract-no">
-            Số: <span id="previewContractNo">01.HĐLĐ</span>
+            Số:
+            <span id="previewContractNo">
+              01.HĐLĐ
+            </span>
           </div>
 
         </div>
@@ -1229,13 +1405,21 @@
         <div class="doc">
 
           <p class="intro">
+
             Hôm nay, ngày
-            <strong id="previewContractDate">......</strong>,
+
+            <strong id="previewContractDate">
+              ......
+            </strong>,
+
             tại Công ty cổ phần Grovaholdings , chúng tôi gồm:
+
           </p>
 
 
-          <!-- BÊN A -->
+          <!-- =================================================
+               BÊN A
+          ================================================== -->
 
           <section class="party">
 
@@ -1243,48 +1427,84 @@
               Bên A : Người sử dụng lao động
             </div>
 
+
             <div class="party-grid">
 
               <div class="party-line full">
-                <span class="party-label">Công ty:</span>
+
+                <span class="party-label">
+                  Công ty:
+                </span>
+
                 <span id="previewCompany">
                   CÔNG TY CỔ PHẦN GROVAHOLDINGS SJC
                 </span>
+
               </div>
 
+
               <div class="party-line full">
-                <span class="party-label">Địa chỉ:</span>
+
+                <span class="party-label">
+                  Địa chỉ:
+                </span>
+
                 <span id="previewCompanyAddress">
                   Số 49A/348 Trần Nguyên Hãn , Phường An Biên, Thành phố Hải Phòng, Việt Nam
                 </span>
+
               </div>
 
+
               <div class="party-line">
-                <span class="party-label">Mã số thuế :</span>
+
+                <span class="party-label">
+                  Mã số thuế :
+                </span>
+
                 <span id="previewCompanyTax">
                   0202328361
                 </span>
+
               </div>
 
+
               <div class="party-line">
-                <span class="party-label">Đại diện:</span>
+
+                <span class="party-label">
+                  Đại diện:
+                </span>
+
                 <span id="previewCompanyRepresentative">
                   Phạm Văn Học
                 </span>
+
               </div>
 
+
               <div class="party-line">
-                <span class="party-label">Chức vụ:</span>
+
+                <span class="party-label">
+                  Chức vụ:
+                </span>
+
                 <span id="previewCompanyPosition">
                   Giám đốc
                 </span>
+
               </div>
 
+
               <div class="party-line">
-                <span class="party-label">Quốc tịch:</span>
+
+                <span class="party-label">
+                  Quốc tịch:
+                </span>
+
                 <span id="previewCompanyNationality">
                   Việt Nam
                 </span>
+
               </div>
 
             </div>
@@ -1292,7 +1512,9 @@
           </section>
 
 
-          <!-- BÊN B -->
+          <!-- =================================================
+               BÊN B
+          ================================================== -->
 
           <section class="party">
 
@@ -1300,76 +1522,136 @@
               Bên B : Người lao động
             </div>
 
+
             <div class="party-grid">
 
               <div class="party-line">
-                <span class="party-label">ÔNG / BÀ :</span>
+
+                <span class="party-label">
+                  ÔNG / BÀ :
+                </span>
+
                 <span id="previewEmployeeName">
                   ................................................
                 </span>
+
               </div>
 
+
               <div class="party-line">
-                <span class="party-label">Quốc tịch:</span>
+
+                <span class="party-label">
+                  Quốc tịch:
+                </span>
+
                 <span id="previewEmployeeNationality">
                   Việt Nam
                 </span>
+
               </div>
 
+
               <div class="party-line">
-                <span class="party-label">Ngày sinh:</span>
+
+                <span class="party-label">
+                  Ngày sinh:
+                </span>
+
                 <span id="previewEmployeeBirth">
                   ................................
                 </span>
+
               </div>
 
+
               <div class="party-line">
-                <span class="party-label">Tại :</span>
+
+                <span class="party-label">
+                  Tại :
+                </span>
+
                 <span id="previewEmployeeBirthPlace">
                   ................................
                 </span>
+
               </div>
 
+
               <div class="party-line">
-                <span class="party-label">Nghề nghiệp :</span>
+
+                <span class="party-label">
+                  Nghề nghiệp :
+                </span>
+
                 <span id="previewEmployeeJob">
                   Nhân viên
                 </span>
+
               </div>
 
+
               <div class="party-line">
-                <span class="party-label">Giới tính:</span>
+
+                <span class="party-label">
+                  Giới tính:
+                </span>
+
                 <span id="previewEmployeeGender">
                   ................................
                 </span>
+
               </div>
 
+
               <div class="party-line full">
-                <span class="party-label">Điạ chỉ</span>
+
+                <span class="party-label">
+                  Điạ chỉ
+                </span>
+
                 <span id="previewEmployeeAddress">
                   ............................................................
                 </span>
+
               </div>
 
+
               <div class="party-line">
-                <span class="party-label">Số CCCD :</span>
+
+                <span class="party-label">
+                  Số CCCD :
+                </span>
+
                 <span id="previewEmployeeCCCD">
                   ................................
                 </span>
+
               </div>
 
+
               <div class="party-line">
-                <span class="party-label">Cấp ngày:</span>
+
+                <span class="party-label">
+                  Cấp ngày:
+                </span>
+
                 <span id="previewCCCDDate">
                   ................................
                 </span>
+
               </div>
 
+
               <div class="party-line">
-                <span class="party-label">Tại :</span>
+
+                <span class="party-label">
+                  Tại :
+                </span>
+
                 <span id="previewCCCDPlace">
                   ................................
                 </span>
+
               </div>
 
             </div>
@@ -1382,13 +1664,16 @@
           </p>
 
 
-          <!-- ĐIỀU 1 -->
+          <!-- =================================================
+               ĐIỀU 1
+          ================================================== -->
 
           <section class="article">
 
             <p class="article-title">
               Điều 1: Công việc, địa điểm làm việc và thời hạn của Hợp đồng
             </p>
+
 
             <div class="article-content">
 
@@ -1399,16 +1684,20 @@
                 </span>
               </p>
 
+
               <p>
                 Từ ngày :
                 <span id="previewStartDate">
                   ................................
                 </span>
+
                 Đến ngày :
+
                 <span id="previewEndDate">
                   ................................
                 </span>
               </p>
+
 
               <p>
                 - Địa điểm làm việc:
@@ -1417,12 +1706,14 @@
                 </span>
               </p>
 
+
               <p>
                 - Chức vụ công tác:
                 <span id="previewPosition">
                   Nhân viên
                 </span>
               </p>
+
 
               <p>
                 + Chức danh chuyên môn (vị trí công tác):
@@ -1431,9 +1722,11 @@
                 </span>
               </p>
 
+
               <p>
                 - Nhiệm vụ công việc như sau:
               </p>
+
 
               <ul class="plus-list">
 
@@ -1460,13 +1753,16 @@
           </section>
 
 
-          <!-- ĐIỀU 2 -->
+          <!-- =================================================
+               ĐIỀU 2
+          ================================================== -->
 
           <section class="article">
 
             <p class="article-title">
               Điều 2: Lương, phụ cấp, các khoản bổ sung khác
             </p>
+
 
             <div class="article-content">
 
@@ -1477,12 +1773,14 @@
                 </span>
               </p>
 
+
               <p>
                 - Hình thức trả lương:
                 <span id="previewSalaryForm">
                   Tiền mặt hoặc chuyển khoản.
                 </span>
               </p>
+
 
               <p>
                 - Lương hiệu quả :
@@ -1491,12 +1789,14 @@
                 </span>
               </p>
 
+
               <p>
                 - Thời hạn trả lương:
                 <span id="previewSalaryPayment">
                   Được trả linh hoạt theo tình hình tài chính của doanh nghiệp, có thể thanh toán 01 lần bằng hình thức chuyển khoản hoặc thanh toán tối đa 03 lần bằng hình thức tiền mặt.
                 </span>
               </p>
+
 
               <p>
                 - Chế độ nâng bậc, nâng lương: Người lao động được xét nâng bậc, nâng lương theo kết quả làm việc và theo quy định của Người sử dụng lao động.
@@ -1507,7 +1807,9 @@
           </section>
 
 
-          <!-- ĐIỀU 3 -->
+          <!-- =================================================
+               ĐIỀU 3
+          ================================================== -->
 
           <section class="article">
 
@@ -1515,27 +1817,33 @@
               Điều 3: Thời giờ làm việc, nghỉ ngơi, bảo hộ lao động, BHXH, BHYT, BHTN
             </p>
 
+
             <div class="article-content">
 
               <p>
                 - Thời giờ làm việc: 8 giờ/ngày, 40 giờ/tuần, Nghỉ hàng tuần: ngày Chủ nhật.
               </p>
 
+
               <p>
                 - Từ ngày Thứ 2 đến ngày Thứ 7 hàng tuần :
               </p>
+
 
               <p class="indent">
                 + Buổi sáng : 8h00 - 12h00.
               </p>
 
+
               <p class="indent">
                 + Buổi chiều: 13h00 - 17h00.
               </p>
 
+
               <p>
                 - Chế độ nghỉ ngơi các ngày lễ, tết, phép năm:
               </p>
+
 
               <ul class="plus-list">
 
@@ -1549,13 +1857,16 @@
 
               </ul>
 
+
               <p>
                 - Thiết bị và công cụ làm việc sẽ được Công ty cấp phát tùy theo nhu cầu của công việc.
               </p>
 
+
               <p>
                 - Điều kiện an toàn và vệ sinh lao động tại nơi làm việc theo quy định của pháp luật hiện hành.
               </p>
+
 
               <p>
                 - Bảo hiểm xã hội, bảo hiểm y tế và bảo hiểm thất nghiệp: Người lao động được hưởng quyền lợi theo quy định .
@@ -1566,7 +1877,9 @@
           </section>
 
 
-          <!-- ĐIỀU 4 -->
+          <!-- =================================================
+               ĐIỀU 4
+          ================================================== -->
 
           <section class="article">
 
@@ -1574,23 +1887,28 @@
               Điều 4: Đào tạo, bồi dưỡng, các quyền lợi và nghĩa vụ liên quan của người lao động
             </p>
 
+
             <div class="article-content">
 
               <p>
                 - Đào tạo, bồi dưỡng: Người lao động được đào tạo, bồi dưỡng, huấn luyện tại nơi làm việc hoặc được gửi đi đào tạo theo quy định của Công ty và yêu cầu công việc.
               </p>
 
+
               <p>
                 - Khen thưởng: Người lao động được khuyến khích bằng vật chất và tinh thần khi có thành tích trong công tác hoặc theo quy định của Công ty.
               </p>
+
 
               <p>
                 - Các khoản thỏa thuận khác gồm: tiền cơm trưa, thưởng mặc định, hỗ trợ xăng xe, điện thoại, nhà ở, trang phục…, theo quy định của Công ty.
               </p>
 
+
               <p>
                 - Nghĩa vụ liên quan của người lao động:
               </p>
+
 
               <ul class="plus-list">
 
@@ -1616,21 +1934,26 @@
 
               </ul>
 
+
               <p class="indent">
                 Nếu sau khi kết thúc khóa đào tạo mà nhân viên không tiếp tục hợp tác với Công ty thì nhân viên phải hoàn trả lại 100% phí đào tạo và các khoản chế độ đã được nhận trong thời gian đào tạo..
               </p>
+
 
               <p>
                 + Bồi thường vi phạm vật chất: Theo quy định nội bộ cuả Công ty và quy định cuả pháp luật hiện hành;
               </p>
 
+
               <p>
                 + Có trách nhiệm đề xuất các giải pháp nâng cao hiệu quả công việc, giảm thiểu các rủi ro.
               </p>
 
+
               <p class="indent">
                 Khuyến khích các đóng góp này được thực hiện bằng văn bản.
               </p>
+
 
               <p>
                 + Thuế TNCN, nếu có: do người lao động đóng. Công ty sẽ tạm khấu trừ trước khi chi trả cho người lao động theo quy định.
@@ -1641,7 +1964,9 @@
           </section>
 
 
-          <!-- ĐIỀU 5 -->
+          <!-- =================================================
+               ĐIỀU 5
+          ================================================== -->
 
           <section class="article">
 
@@ -1649,11 +1974,13 @@
               Điều 5: Nghĩa vụ và quyền lợi của Người sử dụng lao động
             </p>
 
+
             <div class="article-content">
 
               <p>
                 1. Nghĩa vụ :
               </p>
+
 
               <ul class="dash-list">
 
@@ -1667,9 +1994,11 @@
 
               </ul>
 
+
               <p>
                 2. Quyền lợi:
               </p>
+
 
               <ul class="dash-list">
 
@@ -1700,13 +2029,16 @@
           </section>
 
 
-          <!-- ĐIỀU 6 -->
+          <!-- =================================================
+               ĐIỀU 6
+          ================================================== -->
 
           <section class="article">
 
             <p class="article-title">
               Điều 6: Những thỏa thuận khác
             </p>
+
 
             <div class="article-content">
 
@@ -1719,7 +2051,9 @@
           </section>
 
 
-          <!-- ĐIỀU 7 -->
+          <!-- =================================================
+               ĐIỀU 7
+          ================================================== -->
 
           <section class="article">
 
@@ -1727,15 +2061,18 @@
               Điều 7: Điều khoản thi hành
             </p>
 
+
             <div class="article-content">
 
               <p>
                 - Những vấn đề về lao động không ghi trong hợp đồng lao động này thì áp dụng quy định cuả thỏa ước tập thể, trường hợp chưa có thỏa ước thì áp dụng quy định của pháp luật lao động.
               </p>
 
+
               <p>
                 - Hợp đồng này được lập thành 2 bản có giá trị pháp lý như nhau, mỗi bên giữ 1 bản và có hiệu lực kể từ ngày ký.
               </p>
+
 
               <p>
                 - Khi ký kết các phụ lục hợp đồng lao động thì nội dung của phụ lục cũng có giá trị như các nội dung cuả bản hợp đồng này.
@@ -1746,7 +2083,9 @@
           </section>
 
 
-          <!-- SIGNATURE -->
+          <!-- =================================================
+               SIGNATURE
+          ================================================== -->
 
           <div class="signature">
 
@@ -1845,13 +2184,16 @@
 
 
   function $(id){
+
     return document.getElementById(id);
+
   }
 
 
   function getValue(id){
 
-    const element = $(id);
+    const element =
+      $(id);
 
     if(!element){
       return "";
@@ -1864,14 +2206,17 @@
 
   function setPreview(id,value,fallback){
 
-    const element = $(id);
+    const element =
+      $(id);
 
     if(!element){
       return;
     }
 
     element.textContent =
-      value || fallback || "................................";
+      value ||
+      fallback ||
+      "................................";
 
   }
 
@@ -1911,11 +2256,13 @@
       "CÔNG TY CỔ PHẦN GROVAHOLDINGS SJC"
     );
 
+
     setPreview(
       "previewCompanyAddress",
       getValue("companyAddress"),
       "Số 49A/348 Trần Nguyên Hãn , Phường An Biên, Thành phố Hải Phòng, Việt Nam"
     );
+
 
     setPreview(
       "previewCompanyTax",
@@ -1923,17 +2270,20 @@
       "0202328361"
     );
 
+
     setPreview(
       "previewCompanyRepresentative",
       getValue("companyRepresentative"),
       "Phạm Văn Học"
     );
 
+
     setPreview(
       "previewCompanyPosition",
       getValue("companyPosition"),
       "Giám đốc"
     );
+
 
     setPreview(
       "previewCompanyNationality",
@@ -1948,11 +2298,13 @@
       "................................................"
     );
 
+
     setPreview(
       "previewEmployeeNationality",
       getValue("employeeNationality"),
       "Việt Nam"
     );
+
 
     setPreview(
       "previewEmployeeBirth",
@@ -1960,11 +2312,13 @@
       "................................"
     );
 
+
     setPreview(
       "previewEmployeeBirthPlace",
       getValue("employeeBirthPlace"),
       "................................"
     );
+
 
     setPreview(
       "previewEmployeeJob",
@@ -1972,11 +2326,13 @@
       "Nhân viên"
     );
 
+
     setPreview(
       "previewEmployeeGender",
       getValue("employeeGender"),
       "................................"
     );
+
 
     setPreview(
       "previewEmployeeAddress",
@@ -1984,17 +2340,20 @@
       "............................................................"
     );
 
+
     setPreview(
       "previewEmployeeCCCD",
       getValue("employeeCCCD"),
       "................................"
     );
 
+
     setPreview(
       "previewCCCDDate",
       getValue("cccdDate"),
       "................................"
     );
+
 
     setPreview(
       "previewCCCDPlace",
@@ -2009,11 +2368,13 @@
       "Ký lần thứ 01"
     );
 
+
     setPreview(
       "previewStartDate",
       getValue("startDate"),
       "................................"
     );
+
 
     setPreview(
       "previewEndDate",
@@ -2021,17 +2382,20 @@
       "................................"
     );
 
+
     setPreview(
       "previewWorkLocation",
       getValue("workLocation"),
       "theo yêu cầu thực tế của doanh nghiệp"
     );
 
+
     setPreview(
       "previewPosition",
       getValue("position"),
       "Nhân viên"
     );
+
 
     setPreview(
       "previewProfessionalTitle",
@@ -2046,17 +2410,20 @@
       "6.000.000đồng/tháng"
     );
 
+
     setPreview(
       "previewSalaryForm",
       getValue("salaryForm"),
       "Tiền mặt hoặc chuyển khoản."
     );
 
+
     setPreview(
       "previewEffectiveSalary",
       getValue("effectiveSalary"),
       "hưởng lợi theo tình hình kinh doanh thực tế trong tháng và do Giám đốc quyết định ."
     );
+
 
     setPreview(
       "previewSalaryPayment",
@@ -2074,13 +2441,17 @@
 
     const data = {};
 
+
     fields.forEach(id => {
 
-      const element = $(id);
+      const element =
+        $(id);
 
       if(element){
+
         data[id] =
           element.value;
+
       }
 
     });
@@ -2096,6 +2467,7 @@
 
       const status =
         $("saveStatus");
+
 
       if(status){
 
@@ -2125,9 +2497,11 @@
           STORAGE_KEY
         );
 
+
       if(!raw){
         return;
       }
+
 
       const data =
         JSON.parse(raw);
@@ -2137,6 +2511,7 @@
 
         const element =
           $(id);
+
 
         if(
           element &&
@@ -2172,6 +2547,7 @@
         "Bạn có chắc muốn xóa toàn bộ dữ liệu đang nhập?"
       );
 
+
     if(!confirmed){
       return;
     }
@@ -2200,9 +2576,11 @@
     const dateField =
       $("contractDate");
 
+
     if(!dateField){
       return;
     }
+
 
     if(dateField.value){
       return;
@@ -2212,13 +2590,16 @@
     const now =
       new Date();
 
+
     const yyyy =
       now.getFullYear();
+
 
     const mm =
       String(
         now.getMonth()+1
       ).padStart(2,"0");
+
 
     const dd =
       String(
@@ -2246,6 +2627,7 @@
         const element =
           $(id);
 
+
         if(!element){
           return;
         }
@@ -2255,6 +2637,7 @@
           "input",
           updatePreview
         );
+
 
         element.addEventListener(
           "change",
