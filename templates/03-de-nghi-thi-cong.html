@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -11,9 +10,7 @@
     content="width=device-width, initial-scale=1.0"
   >
 
-  <title>
-    GROVA HOLDINGS – Phiếu đề nghị thi công
-  </title>
+  <title>GROVA HOLDINGS – Phiếu đề nghị thi công</title>
 
   <style>
 
@@ -40,7 +37,6 @@
     }
 
     body {
-      margin: 0;
       font-family: Arial, Helvetica, sans-serif;
       background: var(--background);
       color: var(--text);
@@ -70,11 +66,11 @@
 
       padding: 12px 18px;
 
-      background: rgba(255, 255, 255, 0.97);
+      background: rgba(255,255,255,.97);
 
       border-bottom: 1px solid var(--border);
 
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+      box-shadow: 0 2px 10px rgba(0,0,0,.04);
 
       backdrop-filter: blur(12px);
     }
@@ -101,13 +97,6 @@
       font-size: 19px;
 
       cursor: pointer;
-
-      transition: 0.18s ease;
-    }
-
-    .back-button:hover {
-      background: var(--grova-light);
-      transform: translateY(-1px);
     }
 
     .topbar-title {
@@ -162,27 +151,19 @@
 
       cursor: pointer;
 
-      transition:
-        transform 0.18s ease,
-        background 0.18s ease,
-        box-shadow 0.18s ease;
+      transition: .18s ease;
     }
 
     .btn:hover {
       transform: translateY(-1px);
     }
 
-    .btn:active {
-      transform: translateY(0);
-    }
-
     .btn-primary {
       background: var(--grova-green);
-
       color: #fff;
 
       box-shadow:
-        0 4px 12px rgba(11, 122, 90, 0.18);
+        0 4px 12px rgba(11,122,90,.18);
     }
 
     .btn-primary:hover {
@@ -191,7 +172,6 @@
 
     .btn-secondary {
       background: #edf2f0;
-
       color: #26312d;
     }
 
@@ -208,12 +188,12 @@
       display: grid;
 
       grid-template-columns:
-        minmax(290px, 380px)
-        minmax(0, 1fr);
+        minmax(290px,380px)
+        minmax(0,1fr);
 
       gap: 20px;
 
-      width: min(1500px, calc(100% - 28px));
+      width: min(1500px,calc(100% - 28px));
 
       margin: 20px auto;
 
@@ -235,7 +215,7 @@
       overflow: hidden;
 
       box-shadow:
-        0 8px 28px rgba(18, 46, 37, 0.06);
+        0 8px 28px rgba(18,46,37,.06);
     }
 
     .panel-header {
@@ -255,15 +235,13 @@
 
       font-weight: 800;
 
-      letter-spacing: 0.09em;
+      letter-spacing: .09em;
     }
 
     .panel-header h2 {
       margin: 0;
 
       font-size: 18px;
-
-      color: #17201d;
     }
 
     .panel-body {
@@ -288,7 +266,7 @@
 
       font-weight: 800;
 
-      letter-spacing: 0.025em;
+      letter-spacing: .025em;
 
       text-transform: uppercase;
     }
@@ -330,11 +308,6 @@
       color: var(--text);
 
       outline: none;
-
-      transition:
-        border-color 0.18s ease,
-        box-shadow 0.18s ease,
-        background 0.18s ease;
     }
 
     .field input {
@@ -343,7 +316,6 @@
 
     .field textarea {
       min-height: 68px;
-
       resize: vertical;
     }
 
@@ -354,7 +326,7 @@
       background: #fff;
 
       box-shadow:
-        0 0 0 3px rgba(11, 122, 90, 0.10);
+        0 0 0 3px rgba(11,122,90,.10);
     }
 
     .field input[readonly] {
@@ -412,8 +384,8 @@
       background-color: #eef2f0;
 
       background-image:
-        linear-gradient(#e3e9e6 1px, transparent 1px),
-        linear-gradient(90deg, #e3e9e6 1px, transparent 1px);
+        linear-gradient(#e3e9e6 1px,transparent 1px),
+        linear-gradient(90deg,#e3e9e6 1px,transparent 1px);
 
       background-size: 24px 24px;
     }
@@ -426,7 +398,12 @@
     .paper {
       width: 210mm;
 
-      min-height: 297mm;
+      /*
+       * Không ép chiều cao 297mm.
+       * Nội dung tự quyết định chiều cao để tránh trang trắng.
+       */
+
+      min-height: 0;
 
       margin: 0 auto;
 
@@ -440,16 +417,13 @@
       color: #111;
 
       box-shadow:
-        0 8px 30px rgba(0, 0, 0, 0.14);
+        0 8px 30px rgba(0,0,0,.14);
 
       font-family:
         "Times New Roman",
         Times,
         serif;
 
-      /*
-       * Giảm 0,5pt theo yêu cầu
-       */
       font-size: 12pt;
 
       line-height: 1.35;
@@ -509,7 +483,7 @@
 
       height: 1px;
 
-      margin: 0.8mm auto 0;
+      margin: .8mm auto 0;
 
       background: #111;
     }
@@ -645,7 +619,7 @@
       display: grid;
 
       grid-template-columns:
-        repeat(3, 1fr);
+        repeat(3,1fr);
 
       gap: 6mm;
 
@@ -673,12 +647,12 @@
        TABLET
     ===================================================== */
 
-    @media (max-width: 1050px) {
+    @media (max-width:1050px) {
 
       .workspace {
         grid-template-columns:
           330px
-          minmax(0, 1fr);
+          minmax(0,1fr);
       }
 
       .preview-wrap {
@@ -692,7 +666,7 @@
        MOBILE
     ===================================================== */
 
-    @media (max-width: 820px) {
+    @media (max-width:820px) {
 
       .topbar {
         position: static;
@@ -711,7 +685,7 @@
     }
 
 
-    @media (max-width: 560px) {
+    @media (max-width:560px) {
 
       .workspace {
         width: 100%;
@@ -730,9 +704,7 @@
       }
 
       .topbar {
-        padding:
-          10px
-          12px;
+        padding: 10px 12px;
       }
 
       .topbar-title span {
@@ -740,9 +712,7 @@
       }
 
       .topbar-actions .btn {
-        padding:
-          8px
-          10px;
+        padding: 8px 10px;
       }
 
       .form-actions {
@@ -757,28 +727,30 @@
 
 
     /* =====================================================
-       PRINT
+       PRINT — SỬA LỖI TRANG 2 TRẮNG
     ===================================================== */
 
     @media print {
 
       @page {
         size: A4 portrait;
-
         margin: 0;
       }
 
       html,
       body {
         width: 210mm;
+        height: auto;
+        min-height: 0;
 
-        min-height: 297mm;
+        margin: 0;
+        padding: 0;
 
         background: #fff;
       }
 
       body {
-        margin: 0;
+        overflow: visible;
       }
 
       .topbar,
@@ -790,9 +762,10 @@
       .workspace {
         display: block;
 
-        width: auto;
+        width: 210mm;
 
         margin: 0;
+        padding: 0;
       }
 
       .panel,
@@ -800,23 +773,38 @@
       .preview-wrap {
         display: block;
 
-        width: auto;
+        width: 210mm;
+
+        min-height: 0;
 
         margin: 0;
-
         padding: 0;
 
         border: 0;
 
+        border-radius: 0;
+
         box-shadow: none;
 
         background: #fff;
+
+        overflow: visible;
       }
 
+      /*
+       * QUAN TRỌNG:
+       * Không đặt height/min-height = 297mm khi in.
+       * Đây là phần xử lý trang trắng thứ 2.
+       */
+
       .paper {
+        display: block;
+
         width: 210mm;
 
-        min-height: 297mm;
+        height: auto;
+
+        min-height: 0;
 
         margin: 0;
 
@@ -826,6 +814,19 @@
           12mm;
 
         box-shadow: none;
+
+        overflow: visible;
+
+        break-after: auto;
+
+        page-break-after: auto;
+      }
+
+      .doc-header,
+      .document-section,
+      .signature-block {
+        break-inside: avoid;
+        page-break-inside: avoid;
       }
 
     }
@@ -840,7 +841,7 @@
 
   <!-- =====================================================
        TOP BAR
-  ====================================================== -->
+  ===================================================== -->
 
   <header class="topbar">
 
@@ -854,7 +855,6 @@
       >
         ←
       </button>
-
 
       <div class="topbar-title">
 
@@ -881,7 +881,6 @@
         ← Quay lại
       </button>
 
-
       <button
         class="btn btn-primary"
         type="button"
@@ -897,7 +896,7 @@
 
   <!-- =====================================================
        WORKSPACE
-  ====================================================== -->
+  ===================================================== -->
 
   <main class="workspace">
 
@@ -907,7 +906,6 @@
     ==================================================== -->
 
     <section class="panel form-panel">
-
 
       <div class="panel-header">
 
@@ -924,8 +922,6 @@
 
       <div class="panel-body">
 
-
-        <!-- THÔNG TIN VĂN BẢN -->
 
         <div class="section-title">
           Thông tin văn bản
@@ -960,8 +956,6 @@
 
         </div>
 
-
-        <!-- I -->
 
         <div class="section-title">
           I. Thông tin công trình
@@ -1015,7 +1009,6 @@
 
         <div class="grid-2">
 
-
           <div class="field">
 
             <label for="contactPerson">
@@ -1043,11 +1036,8 @@
 
           </div>
 
-
         </div>
 
-
-        <!-- II -->
 
         <div class="section-title">
           II. Thông tin khung thép
@@ -1069,7 +1059,6 @@
 
 
         <div class="grid-2">
-
 
           <div class="field">
 
@@ -1098,7 +1087,6 @@
 
           </div>
 
-
         </div>
 
 
@@ -1116,15 +1104,12 @@
         </div>
 
 
-        <!-- III -->
-
         <div class="section-title">
           III. Tiến độ
         </div>
 
 
         <div class="grid-2">
-
 
           <div class="field">
 
@@ -1153,11 +1138,8 @@
 
           </div>
 
-
         </div>
 
-
-        <!-- IV -->
 
         <div class="section-title">
           IV. Phân công
@@ -1212,9 +1194,7 @@
             Ghi chú
           </label>
 
-          <textarea
-            id="notes"
-          ></textarea>
+          <textarea id="notes"></textarea>
 
         </div>
 
@@ -1228,7 +1208,6 @@
           >
             Làm mới
           </button>
-
 
           <button
             class="btn btn-primary"
@@ -1277,10 +1256,6 @@
       <div class="preview-wrap">
 
 
-        <!-- =================================================
-             A4 PAPER
-        ================================================== -->
-
         <article
           class="paper"
           id="paper"
@@ -1290,7 +1265,6 @@
           <!-- HEADER -->
 
           <header class="doc-header">
-
 
             <div class="logo-box">
 
@@ -1315,7 +1289,6 @@
               <div class="underline"></div>
 
             </div>
-
 
           </header>
 
@@ -1342,8 +1315,6 @@
           </h1>
 
 
-          <!-- NUMBER -->
-
           <p class="doc-number">
 
             Số:
@@ -1351,8 +1322,6 @@
 
           </p>
 
-
-          <!-- DATE -->
 
           <p class="date-line">
 
@@ -1362,16 +1331,13 @@
           </p>
 
 
-          <!-- =================================================
-               I. THÔNG TIN CÔNG TRÌNH
-          ================================================== -->
+          <!-- I -->
 
           <section class="document-section">
 
             <h3>
               I. THÔNG TIN CÔNG TRÌNH
             </h3>
-
 
             <ul class="doc-list">
 
@@ -1402,16 +1368,13 @@
           </section>
 
 
-          <!-- =================================================
-               II. THÔNG TIN KHUNG THÉP
-          ================================================== -->
+          <!-- II -->
 
           <section class="document-section">
 
             <h3>
               II. THÔNG TIN KHUNG THÉP
             </h3>
-
 
             <ul class="doc-list">
 
@@ -1438,16 +1401,13 @@
           </section>
 
 
-          <!-- =================================================
-               III. TIẾN ĐỘ
-          ================================================== -->
+          <!-- III -->
 
           <section class="document-section">
 
             <h3>
               III. TIẾN ĐỘ
             </h3>
-
 
             <ul class="doc-list">
 
@@ -1466,16 +1426,13 @@
           </section>
 
 
-          <!-- =================================================
-               IV. PHÂN CÔNG
-          ================================================== -->
+          <!-- IV -->
 
           <section class="document-section assignment">
 
             <h3>
               IV. PHÂN CÔNG
             </h3>
-
 
             <div class="assignment-row">
 
@@ -1484,14 +1441,12 @@
 
             </div>
 
-
             <div class="assignment-row">
 
               SĐT:
               <span id="previewTeamPhone"></span>
 
             </div>
-
 
             <div class="assignment-row">
 
@@ -1501,27 +1456,21 @@
 
             </div>
 
-
             <div class="note-title">
               Ghi chú:
             </div>
-
 
             <div
               class="note-line"
               id="previewNotes"
             ></div>
 
-
           </section>
 
 
-          <!-- =================================================
-               SIGNATURE
-          ================================================== -->
+          <!-- SIGNATURE -->
 
           <section class="signature-block">
-
 
             <div>
 
@@ -1561,116 +1510,65 @@
 
             </div>
 
-
           </section>
 
 
         </article>
 
-
       </div>
 
     </section>
 
-
   </main>
 
 
-  <!-- =====================================================
-       JAVASCRIPT
-  ====================================================== -->
-
   <script>
-
-
-    /*
-     * =====================================================
-     * CẤU HÌNH
-     * =====================================================
-     */
 
     const YEAR =
       new Date().getFullYear();
 
-
     const COUNTER_KEY =
       "grova_pdn_tc_counter_" + YEAR;
-
 
     const DRAFT_KEY =
       "grova_document_template_03";
 
 
-    /*
-     * =====================================================
-     * DANH SÁCH TRƯỜNG
-     * =====================================================
-     */
-
     const fields = [
 
       "documentNumber",
-
       "proposalDate",
-
       "projectName",
-
       "projectAddress",
-
       "contractor",
-
       "contactPerson",
-
       "contactPhone",
-
       "stopCount",
-
       "shaftWidth",
-
       "shaftDepth",
-
       "frameType",
-
       "startDate",
-
       "completionDate",
-
       "teamLeader",
-
       "teamPhone",
-
       "staffCount",
-
       "notes"
 
     ];
 
 
-    /*
-     * =====================================================
-     * PAD 2 SỐ
-     * =====================================================
-     */
-
     function pad2(value) {
 
       return String(value)
-        .padStart(2, "0");
+        .padStart(2,"0");
 
     }
 
-
-    /*
-     * =====================================================
-     * NGÀY HIỆN TẠI
-     * =====================================================
-     */
 
     function todayISO() {
 
       const date =
         new Date();
-
 
       return [
 
@@ -1689,12 +1587,6 @@
     }
 
 
-    /*
-     * =====================================================
-     * FORMAT NGÀY
-     * =====================================================
-     */
-
     function formatDate(value) {
 
       if (!value) {
@@ -1703,19 +1595,14 @@
 
       }
 
-
       const parts =
         value.split("-");
 
-
-      if (
-        parts.length !== 3
-      ) {
+      if (parts.length !== 3) {
 
         return value;
 
       }
-
 
       return (
 
@@ -1730,22 +1617,14 @@
     }
 
 
-    /*
-     * =====================================================
-     * TẠO SỐ VĂN BẢN
-     * =====================================================
-     */
-
     function nextDocumentNumber() {
 
       const current =
 
         Number(
-
           localStorage.getItem(
             COUNTER_KEY
           ) || 0
-
         ) + 1;
 
 
@@ -1770,49 +1649,22 @@
     }
 
 
-    /*
-     * =====================================================
-     * ESCAPE HTML
-     * =====================================================
-     */
-
     function escapeHTML(value) {
 
       return String(value)
 
-        .replace(
-          /&/g,
-          "&amp;"
-        )
+        .replace(/&/g,"&amp;")
 
-        .replace(
-          /</g,
-          "&lt;"
-        )
+        .replace(/</g,"&lt;")
 
-        .replace(
-          />/g,
-          "&gt;"
-        )
+        .replace(/>/g,"&gt;")
 
-        .replace(
-          /"/g,
-          "&quot;"
-        )
+        .replace(/"/g,"&quot;")
 
-        .replace(
-          /'/g,
-          "&#039;"
-        );
+        .replace(/'/g,"&#039;");
 
     }
 
-
-    /*
-     * =====================================================
-     * GIÁ TRỊ HOẶC DẤU CHẤM
-     * =====================================================
-     */
 
     function valueOrDots(
       value,
@@ -1830,17 +1682,10 @@
 
       }
 
-
       return dots;
 
     }
 
-
-    /*
-     * =====================================================
-     * ĐỌC BẢN NHÁP
-     * =====================================================
-     */
 
     function getDraft() {
 
@@ -1863,23 +1708,17 @@
     }
 
 
-    /*
-     * =====================================================
-     * LƯU BẢN NHÁP
-     * =====================================================
-     */
-
     function saveDraft() {
 
       const draft = {};
 
 
       fields.forEach(
+
         function(id) {
 
           const element =
             document.getElementById(id);
-
 
           if (element) {
 
@@ -1889,6 +1728,7 @@
           }
 
         }
+
       );
 
 
@@ -1917,12 +1757,6 @@
     }
 
 
-    /*
-     * =====================================================
-     * LOAD BẢN NHÁP
-     * =====================================================
-     */
-
     function loadDraft() {
 
       const draft =
@@ -1930,18 +1764,17 @@
 
 
       fields.forEach(
+
         function(id) {
 
           const element =
             document.getElementById(id);
-
 
           if (!element) {
 
             return;
 
           }
-
 
           if (
             draft[id] !== undefined
@@ -1953,6 +1786,7 @@
           }
 
         }
+
       );
 
 
@@ -1990,16 +1824,9 @@
     }
 
 
-    /*
-     * =====================================================
-     * UPDATE PREVIEW
-     * =====================================================
-     */
-
     function updatePreview() {
 
-      const map = {
-
+      const values = {
 
         previewNumber:
 
@@ -2206,7 +2033,7 @@
       };
 
 
-      Object.entries(map).forEach(
+      Object.entries(values).forEach(
 
         function([
           id,
@@ -2215,7 +2042,6 @@
 
           const element =
             document.getElementById(id);
-
 
           if (element) {
 
@@ -2233,12 +2059,6 @@
 
     }
 
-
-    /*
-     * =====================================================
-     * LÀM MỚI
-     * =====================================================
-     */
 
     function resetDraft() {
 
@@ -2261,11 +2081,11 @@
 
 
       fields.forEach(
+
         function(id) {
 
           const element =
             document.getElementById(id);
-
 
           if (element) {
 
@@ -2274,6 +2094,7 @@
           }
 
         }
+
       );
 
 
@@ -2293,12 +2114,6 @@
 
     }
 
-
-    /*
-     * =====================================================
-     * QUAY LẠI
-     * =====================================================
-     */
 
     function goBack() {
 
@@ -2324,21 +2139,13 @@
     }
 
 
-    /*
-     * =====================================================
-     * KHỞI TẠO
-     * =====================================================
-     */
-
     document.addEventListener(
 
       "DOMContentLoaded",
 
       function() {
 
-
         loadDraft();
-
 
         updatePreview();
 
@@ -2350,19 +2157,16 @@
             const element =
               document.getElementById(id);
 
-
             if (!element) {
 
               return;
 
             }
 
-
             element.addEventListener(
               "input",
               updatePreview
             );
-
 
             element.addEventListener(
               "change",
