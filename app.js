@@ -224,7 +224,7 @@
 
 
     /*
-     * Dashboard đã có HTML fallback.
+     * Dashboard có HTML fallback.
      * Không xoá nếu JS/data không có.
      */
 
@@ -407,16 +407,12 @@
 
 
     /*
-     * Ghi nhận hoạt động trước khi chuyển
-     * sang trang mẫu văn bản.
+     * Ghi nhận hoạt động trước khi
+     * chuyển sang trang mẫu.
      */
 
     saveRecentDocument(template);
 
-
-    /*
-     * Chuyển tới mẫu văn bản.
-     */
 
     window.location.href = template.file;
 
@@ -424,7 +420,7 @@
 
 
   /* ==========================================
-     RECENT DOCUMENTS
+     RECENT STORAGE
      ========================================== */
 
   function getRecentDocuments() {
@@ -442,12 +438,26 @@
       }
 
 
-      var parsed = JSON.parse(raw);
+      var parsed =
+        JSON.parse(raw);
 
 
-      return Array.isArray(parsed)
-        ? parsed
-        : [];
+      if (!Array.isArray(parsed)) {
+        return [];
+      }
+
+
+      /*
+       * Lọc dữ liệu lỗi.
+       */
+
+      return parsed.filter(function (item) {
+
+        return item &&
+               typeof item === "object";
+
+      });
+
 
     } catch (error) {
 
@@ -469,46 +479,58 @@
     }
 
 
-    var list = getRecentDocuments();
+    var list =
+      getRecentDocuments();
 
 
     var activity = {
 
-      id: template.id || "",
+      id:
+        template.id || "",
 
-      code: template.code || "",
+      code:
+        template.code || "",
 
-      name: template.name || "",
+      name:
+        template.name || "",
 
-      title: template.title || "",
+      title:
+        template.title || "",
 
-      description: template.description || "",
+      description:
+        template.description || "",
 
-      category: template.category || "Văn bản",
+      category:
+        template.category || "Văn bản",
 
-      icon: template.icon || "📄",
+      icon:
+        template.icon || "📄",
 
-      file: template.file || "",
+      file:
+        template.file || "",
 
-      action: "Mở văn bản",
+      action:
+        "Mở văn bản",
 
-      createdAt: new Date().toISOString()
+      createdAt:
+        new Date().toISOString()
 
     };
 
 
     /*
-     * Đưa hoạt động mới nhất lên đầu.
+     * Hoạt động mới nhất lên đầu.
      */
 
     list.unshift(activity);
 
 
     /*
-     * Giữ tối đa 20 hoạt động.
+     * Chỉ giữ tối đa 20 hoạt động.
      */
 
-    list = list.slice(0, 20);
+    list =
+      list.slice(0, 20);
 
 
     try {
@@ -528,11 +550,6 @@
     }
 
 
-    /*
-     * Nếu đang ở trang Dashboard,
-     * cập nhật ngay giao diện.
-     */
-
     renderRecentDocuments();
 
     updateStats();
@@ -551,7 +568,8 @@
     }
 
 
-    var date = new Date(value);
+    var date =
+      new Date(value);
 
 
     if (isNaN(date.getTime())) {
@@ -559,7 +577,9 @@
     }
 
 
-    var now = new Date();
+    var now =
+      new Date();
+
 
     var diff =
       now.getTime() -
@@ -569,55 +589,63 @@
     var minute =
       60 * 1000;
 
+
     var hour =
       60 * minute;
+
 
     var day =
       24 * hour;
 
 
     /*
-     * Vừa thực hiện.
+     * Trường hợp thời gian tương lai
+     * do đồng hồ thiết bị lệch.
      */
 
-    if (diff >= 0 && diff < minute) {
+    if (diff < 0) {
+
+      diff = 0;
+
+    }
+
+
+    if (diff < minute) {
 
       return "Vừa xong";
 
     }
 
 
-    /*
-     * Trong vòng 1 giờ.
-     */
-
-    if (diff >= minute && diff < hour) {
+    if (diff < hour) {
 
       var minutes =
-        Math.floor(diff / minute);
+        Math.floor(
+          diff / minute
+        );
 
-      return minutes + " phút trước";
+      return minutes +
+        " phút trước";
 
     }
 
 
-    /*
-     * Trong ngày.
-     */
-
-    if (diff >= hour && diff < day) {
+    if (diff < day) {
 
       var hours =
-        Math.floor(diff / hour);
+        Math.floor(
+          diff / hour
+        );
 
-      return hours + " giờ trước";
+      return hours +
+        " giờ trước";
 
     }
 
 
     /*
-     * Nếu khác ngày,
-     * hiển thị ngày + giờ.
+     * Khác ngày:
+     * DD/MM/YYYY • HH:MM
      */
 
     try {
@@ -649,137 +677,431 @@
 
 
   /* ==========================================
-     RENDER RECENT DOCUMENTS
+     CREATE RECENT ROW
      ========================================== */
 
-  function renderRecentDocuments() {
+  function createRecentRow(item) {
 
-    var container = $("#recentDocuments");
+    var row =
+      document.createElement("button");
+
+
+    row.type =
+      "button";
+
+
+    row.className =
+      "recent-row";
+
+
+    row.setAttribute(
+      "data-template-id",
+      item.id || ""
+    );
+
+
+    row.innerHTML =
+
+      '<span class="recent-row-icon">' +
+
+        escapeHtml(
+          item.icon || "📄"
+        ) +
+
+      '</span>' +
+
+
+      '<span class="recent-row-content">' +
+
+        '<strong>' +
+
+          escapeHtml(
+            item.name ||
+            item.title ||
+            "Văn bản"
+          ) +
+
+        '</strong>' +
+
+
+        '<small>' +
+
+          '<span>' +
+
+            escapeHtml(
+              item.code || ""
+            ) +
+
+          '</span>' +
+
+
+          '<span class="recent-row-separator">' +
+            "•" +
+          '</span>' +
+
+
+          '<span>' +
+
+            escapeHtml(
+              item.action ||
+              "Mở văn bản"
+            ) +
+
+          '</span>' +
+
+
+          '<span class="recent-row-separator">' +
+            "•" +
+          '</span>' +
+
+
+          '<span class="recent-time">' +
+
+            escapeHtml(
+              formatRecentTime(
+                item.createdAt
+              )
+            ) +
+
+          '</span>' +
+
+        '</small>' +
+
+      '</span>' +
+
+
+      '<span class="recent-row-arrow">' +
+        "→" +
+      '</span>';
+
+
+    row.addEventListener(
+      "click",
+      function () {
+
+        if (!item.file) {
+          return;
+        }
+
+
+        /*
+         * Mở lại văn bản không tạo
+         * thêm một dòng lịch sử mới.
+         */
+
+        window.location.href =
+          item.file;
+
+      }
+    );
+
+
+    return row;
+
+  }
+
+
+  /* ==========================================
+     EMPTY STATE
+     ========================================== */
+
+  function renderRecentEmpty(
+    container,
+    historyPage
+  ) {
 
     if (!container) {
       return;
     }
 
 
-    var list = getRecentDocuments();
+    container.innerHTML =
+
+      '<div class="empty-state">' +
+
+        '<div class="empty-icon">' +
+          "◷" +
+        '</div>' +
+
+        '<h3>' +
+          "Chưa có lịch sử" +
+        '</h3>' +
+
+        '<p>' +
+
+          (
+            historyPage
+              ? "Các văn bản được mở và xử lý sẽ xuất hiện tại đây."
+              : "Các văn bản được mở sẽ xuất hiện tại đây."
+          ) +
+
+        '</p>' +
+
+      '</div>';
+
+  }
 
 
-    if (!list.length) {
+  /* ==========================================
+     CLEAR HISTORY BUTTON
+     ========================================== */
 
-      container.innerHTML =
+  function createClearHistoryButton() {
 
-        '<div class="empty-state">' +
+    var button =
+      document.createElement("button");
 
-          '<div class="empty-icon">◷</div>' +
 
-          '<h3>Chưa có lịch sử</h3>' +
+    button.type =
+      "button";
 
-          '<p>' +
-            'Các văn bản được tạo sẽ xuất hiện tại đây.' +
-          '</p>' +
 
-        '</div>';
+    button.className =
+      "secondary-button history-clear-button";
 
+
+    button.textContent =
+      "Xóa lịch sử";
+
+
+    button.addEventListener(
+      "click",
+      function () {
+
+        var list =
+          getRecentDocuments();
+
+
+        if (!list.length) {
+          return;
+        }
+
+
+        var confirmed =
+          window.confirm(
+            "Bạn có chắc muốn xóa toàn bộ lịch sử hoạt động?"
+          );
+
+
+        if (!confirmed) {
+          return;
+        }
+
+
+        try {
+
+          localStorage.removeItem(
+            "GROVA_DOCUMENT_RECENT"
+          );
+
+        } catch (error) {
+
+          console.warn(
+            "Không thể xóa lịch sử.",
+            error
+          );
+
+        }
+
+
+        renderRecentDocuments();
+
+        updateStats();
+
+      }
+    );
+
+
+    return button;
+
+  }
+
+
+  /* ==========================================
+     RENDER RECENT DOCUMENTS
+     ========================================== */
+
+  function renderRecentDocuments() {
+
+    /*
+     * Có thể có 2 vùng:
+     *
+     * 1. Dashboard
+     * 2. Lịch sử
+     *
+     * Vì index.html có hai phần
+     * dùng cùng id recentDocuments,
+     * ta lấy toàn bộ bằng $$().
+     */
+
+    var containers =
+      $$("#recentDocuments");
+
+
+    if (!containers.length) {
       return;
-
     }
 
 
-    container.innerHTML = "";
+    var list =
+      getRecentDocuments();
 
 
-    list.forEach(function (item) {
+    containers.forEach(
+      function (container, index) {
 
-      var row =
-        document.createElement("button");
-
-
-      row.type = "button";
-
-      row.className = "recent-row";
+        var isHistoryPage =
+          index > 0;
 
 
-      row.setAttribute(
-        "data-template-id",
-        item.id || ""
-      );
+        /*
+         * Dashboard chỉ hiện
+         * 4 hoạt động gần nhất.
+         */
+
+        var displayList =
+          isHistoryPage
+            ? list
+            : list.slice(0, 4);
 
 
-      row.innerHTML =
+        if (!displayList.length) {
 
-        '<span class="recent-row-icon">' +
+          renderRecentEmpty(
+            container,
+            isHistoryPage
+          );
 
-          escapeHtml(
-            item.icon || "📄"
-          ) +
-
-        '</span>' +
-
-        '<span class="recent-row-content">' +
-
-          '<strong>' +
-            escapeHtml(
-              item.name || item.title || ""
-            ) +
-          '</strong>' +
-
-          '<small>' +
-
-            '<span>' +
-              escapeHtml(
-                item.code || ""
-              ) +
-            '</span>' +
-
-            '<span class="recent-row-separator">•</span>' +
-
-            '<span>' +
-              escapeHtml(
-                item.action || "Mở văn bản"
-              ) +
-            '</span>' +
-
-            '<span class="recent-row-separator">•</span>' +
-
-            '<span>' +
-              escapeHtml(
-                formatRecentTime(
-                  item.createdAt
-                )
-              ) +
-            '</span>' +
-
-          '</small>' +
-
-        '</span>' +
-
-        '<span class="recent-row-arrow">→</span>';
-
-
-      row.addEventListener(
-        "click",
-        function () {
-
-          if (!item.file) {
-            return;
-          }
-
-
-          /*
-           * Không ghi thêm một hoạt động
-           * khi chỉ mở lại từ lịch sử.
-           */
-
-          window.location.href =
-            item.file;
+          return;
 
         }
-      );
 
 
-      container.appendChild(row);
+        container.innerHTML = "";
 
-    });
+
+        /*
+         * Trang Lịch sử có nút xóa.
+         */
+
+        if (isHistoryPage) {
+
+          var historyToolbar =
+            document.createElement("div");
+
+
+          historyToolbar.className =
+            "history-toolbar";
+
+
+          var historyCount =
+            document.createElement("span");
+
+
+          historyCount.className =
+            "history-count";
+
+
+          historyCount.textContent =
+            list.length +
+            " hoạt động";
+
+
+          historyToolbar.appendChild(
+            historyCount
+          );
+
+
+          historyToolbar.appendChild(
+            createClearHistoryButton()
+          );
+
+
+          container.appendChild(
+            historyToolbar
+          );
+
+        }
+
+
+        displayList.forEach(
+          function (item) {
+
+            container.appendChild(
+              createRecentRow(item)
+            );
+
+          }
+        );
+
+      }
+    );
+
+  }
+
+
+  /* ==========================================
+     UPDATE RELATIVE TIMES
+     ========================================== */
+
+  function refreshRecentTimes() {
+
+    var rows =
+      $$(".recent-row");
+
+
+    if (!rows.length) {
+      return;
+    }
+
+
+    var list =
+      getRecentDocuments();
+
+
+    rows.forEach(
+      function (row) {
+
+        var id =
+          row.getAttribute(
+            "data-template-id"
+          );
+
+
+        var item =
+          list.find(
+            function (entry) {
+
+              return String(
+                entry.id || ""
+              ) === String(id || "");
+
+            }
+          );
+
+
+        if (!item) {
+          return;
+        }
+
+
+        var time =
+          row.querySelector(
+            ".recent-time"
+          );
+
+
+        if (time) {
+
+          time.textContent =
+            formatRecentTime(
+              item.createdAt
+            );
+
+        }
+
+      }
+    );
 
   }
 
@@ -864,14 +1186,19 @@
   function showPage(pageName) {
 
     if (!pageConfig[pageName]) {
-      pageName = "dashboard";
+
+      pageName =
+        "dashboard";
+
     }
 
 
     $$(".page").forEach(
       function (page) {
 
-        page.classList.remove("active");
+        page.classList.remove(
+          "active"
+        );
 
       }
     );
@@ -883,7 +1210,9 @@
 
     if (target) {
 
-      target.classList.add("active");
+      target.classList.add(
+        "active"
+      );
 
     }
 
@@ -893,7 +1222,9 @@
 
         item.classList.toggle(
           "active",
-          item.getAttribute("data-page") === pageName
+          item.getAttribute(
+            "data-page"
+          ) === pageName
         );
 
       }
@@ -929,8 +1260,7 @@
 
 
     /*
-     * Khi mở trang Lịch sử,
-     * luôn lấy dữ liệu mới nhất.
+     * Luôn render lại khi mở Lịch sử.
      */
 
     if (pageName === "history") {
@@ -941,8 +1271,8 @@
 
 
     /*
-     * Khi quay về Dashboard,
-     * cập nhật lại Hoạt động gần đây.
+     * Luôn render lại Dashboard
+     * khi quay về.
      */
 
     if (pageName === "dashboard") {
@@ -969,7 +1299,9 @@
           function () {
 
             showPage(
-              item.getAttribute("data-page")
+              item.getAttribute(
+                "data-page"
+              )
             );
 
           }
@@ -1016,7 +1348,10 @@
     }
 
 
-    sidebar.classList.add("open");
+    sidebar.classList.add(
+      "open"
+    );
+
 
     document.body.classList.add(
       "sidebar-open"
@@ -1036,7 +1371,10 @@
     }
 
 
-    sidebar.classList.remove("open");
+    sidebar.classList.remove(
+      "open"
+    );
+
 
     document.body.classList.remove(
       "sidebar-open"
@@ -1186,26 +1524,49 @@
 
     /*
      * Dashboard có fallback HTML.
-     * JS chỉ nâng cấp nó.
      */
 
     syncDashboardCards();
 
 
+    /*
+     * Trang Văn bản.
+     */
+
     renderDocumentsPage();
 
+
+    /*
+     * Hoạt động gần đây + Lịch sử.
+     */
 
     renderRecentDocuments();
 
 
+    /*
+     * Thống kê.
+     */
+
     updateStats();
 
+
+    /*
+     * Navigation.
+     */
 
     bindNavigation();
 
 
+    /*
+     * Sidebar.
+     */
+
     bindSidebar();
 
+
+    /*
+     * Modal.
+     */
 
     bindModal();
 
@@ -1218,25 +1579,63 @@
 
   window.GROVA_DOCUMENT = {
 
-    data: DATA,
+    data:
+      DATA,
 
-    templates: templates,
+    templates:
+      templates,
 
-    showPage: showPage,
+    showPage:
+      showPage,
 
-    openModal: openModal,
+    openModal:
+      openModal,
 
-    closeModal: closeModal,
+    closeModal:
+      closeModal,
 
-    openTemplate: openTemplate,
+    openTemplate:
+      openTemplate,
 
-    getRecentDocuments: getRecentDocuments,
+    getRecentDocuments:
+      getRecentDocuments,
 
-    saveRecentDocument: saveRecentDocument,
+    saveRecentDocument:
+      saveRecentDocument,
 
-    renderRecentDocuments: renderRecentDocuments,
+    renderRecentDocuments:
+      renderRecentDocuments,
 
-    refresh: init
+    updateStats:
+      updateStats,
+
+    clearHistory:
+      function () {
+
+        try {
+
+          localStorage.removeItem(
+            "GROVA_DOCUMENT_RECENT"
+          );
+
+        } catch (error) {
+
+          console.warn(
+            "Không thể xóa lịch sử.",
+            error
+          );
+
+        }
+
+
+        renderRecentDocuments();
+
+        updateStats();
+
+      },
+
+    refresh:
+      init
 
   };
 
@@ -1259,6 +1658,26 @@
     init();
 
   }
+
+
+  /* ==========================================
+     REFRESH TIME
+     ========================================== */
+
+  /*
+   * Cập nhật "Vừa xong",
+   * "5 phút trước", "1 giờ trước"...
+   * mà không cần tải lại trang.
+   */
+
+  window.setInterval(
+    function () {
+
+      refreshRecentTimes();
+
+    },
+    60 * 1000
+  );
 
 
 })();
