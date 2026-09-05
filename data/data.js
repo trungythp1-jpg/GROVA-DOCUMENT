@@ -1,11 +1,6 @@
 /*
  * GROVA DOCUMENT
- * Central document configuration
- *
- * LƯU Ý:
- * - File này chỉ quản lý cấu hình mẫu văn bản.
- * - Nội dung điều khoản/câu chữ nằm riêng trong thư mục templates/.
- * - Không sửa câu chữ của mẫu gốc tại đây.
+ * DATA
  */
 
 window.GROVA_DATA = {
