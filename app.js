@@ -1,40 +1,33 @@
-(function () {
+/* =========================================================
+   GROVA DOCUMENT
+   APP.JS — VERSION 200
+========================================================= */
 
+(() => {
   "use strict";
 
-  /* =========================================================
-     GROVA DOCUMENT APP
-     ========================================================= */
 
-  var DATA = window.GROVA_DATA || {};
+  /* =======================================================
+     BASIC HELPERS
+  ======================================================= */
 
-  var templates = Array.isArray(DATA.templates)
-    ? DATA.templates
-    : [];
+  const $ = (selector) => document.querySelector(selector);
 
-
-  /* =========================================================
-     DOM
-     ========================================================= */
-
-  function $(selector) {
-    return document.querySelector(selector);
-  }
+  const $$ = (selector) => [
+    ...document.querySelectorAll(selector)
+  ];
 
 
-  function $$(selector) {
-    return Array.prototype.slice.call(
-      document.querySelectorAll(selector)
-    );
-  }
+  const STORAGE = {
+    projects: "GROVA_PROJECTS_V1",
+    customers: "GROVA_CUSTOMERS_V1",
+    employees: "GROVA_EMPLOYEES_V1",
+    history: "GROVA_HISTORY_V1",
+    settings: "GROVA_SETTINGS_V1"
+  };
 
 
-  /* =========================================================
-     PAGE CONFIG
-     ========================================================= */
-
-  var pageConfig = {
-
+  const PAGE_INFO = {
     dashboard: {
       title: "Tổng quan",
       subtitle: "Hệ thống quản lý hồ sơ và văn bản"
@@ -42,12 +35,12 @@
 
     documents: {
       title: "Văn bản",
-      subtitle: "Danh mục mẫu văn bản GROVA"
+      subtitle: "Thư viện mẫu văn bản GROVA"
     },
 
     projects: {
       title: "Công trình",
-      subtitle: "Quản lý dữ liệu công trình"
+      subtitle: "Quản lý công trình và tiến độ"
     },
 
     customers: {
@@ -57,60 +50,243 @@
 
     employees: {
       title: "Nhân sự",
-      subtitle: "Quản lý hồ sơ nhân sự"
+      subtitle: "Quản lý thông tin nhân sự"
     },
 
     history: {
-      title: "Lịch sử",
-      subtitle: "Theo dõi hoạt động hồ sơ"
+      title: "Lịch sử hoạt động",
+      subtitle: "Nhật ký sử dụng hệ thống"
     },
 
     reports: {
       title: "Báo cáo",
-      subtitle: "Tổng hợp dữ liệu hệ thống"
+      subtitle: "Tổng hợp dữ liệu GROVA"
     },
 
     settings: {
       title: "Cài đặt",
-      subtitle: "Cấu hình GROVA DOCUMENT"
-    },
-
-    admin: {
-      title: "Quản trị hệ thống",
-      subtitle: "Quản lý hệ thống GROVA DOCUMENT"
+      subtitle: "Cấu hình hệ thống"
     }
-
   };
 
 
-  /* =========================================================
-     ENABLED TEMPLATES
-     ========================================================= */
+  let currentPage = "dashboard";
 
-  function getTemplates() {
+  let modalMode = "";
 
-    return templates.filter(function (item) {
+  let modalEditId = null;
 
-      return item &&
-        item.enabled !== false &&
-        item.file;
+  let toastTimer = null;
 
-    });
+
+  /* =======================================================
+     DATA
+  ======================================================= */
+
+  const DATA = window.GROVA_DATA || {
+    app: {
+      name: "GROVA DOCUMENT",
+      shortName: "GROVA DOC"
+    },
+
+    company: {
+      name: "",
+      taxCode: "",
+      address: "",
+      representative: "",
+      position: ""
+    },
+
+    templates: []
+  };
+
+
+  /* =======================================================
+     STORAGE HELPERS
+  ======================================================= */
+
+  function readStorage(key, fallback = []) {
+
+    try {
+
+      const raw = localStorage.getItem(key);
+
+      if (!raw) {
+        return fallback;
+      }
+
+      const parsed = JSON.parse(raw);
+
+      return parsed;
+
+    } catch (error) {
+
+      console.error(
+        "GROVA DOCUMENT storage read error:",
+        error
+      );
+
+      return fallback;
+
+    }
 
   }
 
 
-  /* =========================================================
-     ESCAPE HTML
-     ========================================================= */
+  function writeStorage(key, value) {
 
-  function escapeHtml(value) {
+    try {
 
-    var text = String(
-      value == null ? "" : value
+      localStorage.setItem(
+        key,
+        JSON.stringify(value)
+      );
+
+      return true;
+
+    } catch (error) {
+
+      console.error(
+        "GROVA DOCUMENT storage write error:",
+        error
+      );
+
+      showToast(
+        "Không thể lưu dữ liệu trên thiết bị."
+      );
+
+      return false;
+
+    }
+
+  }
+
+
+  function getProjects() {
+    return readStorage(STORAGE.projects, []);
+  }
+
+
+  function getCustomers() {
+    return readStorage(STORAGE.customers, []);
+  }
+
+
+  function getEmployees() {
+    return readStorage(STORAGE.employees, []);
+  }
+
+
+  function getHistory() {
+    return readStorage(STORAGE.history, []);
+  }
+
+
+  function getSettings() {
+
+    const defaults = {
+      companyName: DATA.company?.name || "",
+      taxCode: DATA.company?.taxCode || "",
+      address: DATA.company?.address || "",
+      representative: DATA.company?.representative || "",
+      position: DATA.company?.position || "",
+      userName: "Quản trị viên"
+    };
+
+    const saved = readStorage(
+      STORAGE.settings,
+      {}
     );
 
-    return text
+    return {
+      ...defaults,
+      ...(saved || {})
+    };
+
+  }
+
+
+  /* =======================================================
+     ID / DATE
+  ======================================================= */
+
+  function createId(prefix = "GROVA") {
+
+    return (
+      prefix +
+      "_" +
+      Date.now().toString(36) +
+      "_" +
+      Math.random()
+        .toString(36)
+        .substring(2, 8)
+    );
+
+  }
+
+
+  function nowISO() {
+    return new Date().toISOString();
+  }
+
+
+  function formatDate(value) {
+
+    if (!value) {
+      return "";
+    }
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+      return value;
+    }
+
+    return date.toLocaleDateString(
+      "vi-VN",
+      {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+      }
+    );
+
+  }
+
+
+  function formatDateTime(value) {
+
+    if (!value) {
+      return "";
+    }
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+      return value;
+    }
+
+    return date.toLocaleString(
+      "vi-VN",
+      {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      }
+    );
+
+  }
+
+
+  /* =======================================================
+     ESCAPE HTML
+  ======================================================= */
+
+  function escapeHTML(value) {
+
+    return String(value ?? "")
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
@@ -120,1586 +296,3286 @@
   }
 
 
-  /* =========================================================
-     DOCUMENT CARD
-     ========================================================= */
+  function slugStatus(value) {
 
-  function createCard(template) {
-
-    var card =
-      document.createElement("article");
-
-    card.className =
-      "document-card";
-
-    card.setAttribute(
-      "data-template-id",
-      template.id || ""
-    );
-
-    card.setAttribute(
-      "data-file",
-      template.file || ""
-    );
-
-    card.innerHTML =
-
-      '<div class="document-icon">' +
-
-        escapeHtml(
-          template.icon || "📄"
-        ) +
-
-      '</div>' +
-
-      '<div class="document-content">' +
-
-        '<div class="document-code">' +
-
-          escapeHtml(
-            template.code || ""
-          ) +
-
-        '</div>' +
-
-        '<h3>' +
-
-          escapeHtml(
-            template.name || ""
-          ) +
-
-        '</h3>' +
-
-        '<p>' +
-
-          escapeHtml(
-            template.description || ""
-          ) +
-
-        '</p>' +
-
-        '<span class="document-category">' +
-
-          escapeHtml(
-            template.category || "Văn bản"
-          ) +
-
-        '</span>' +
-
-      '</div>' +
-
-      '<div class="document-arrow">' +
-        "→" +
-      '</div>';
-
-    card.addEventListener(
-      "click",
-      function () {
-
-        openTemplate(template);
-
-      }
-    );
-
-    return card;
+    return String(value || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/\s+/g, "-");
 
   }
 
 
-  /* =========================================================
-     DOCUMENTS PAGE
-     ========================================================= */
+  /* =======================================================
+     TOAST
+  ======================================================= */
 
-  function renderDocumentsPage() {
+  function showToast(message) {
 
-    var grid =
-      $("#documentsPageGrid");
+    let container =
+      document.querySelector(
+        ".toast-container"
+      );
 
-    if (!grid) {
+    if (!container) {
+
+      container =
+        document.createElement("div");
+
+      container.className =
+        "toast-container";
+
+      document.body.appendChild(
+        container
+      );
+
+    }
+
+
+    const toast =
+      document.createElement("div");
+
+    toast.className = "toast";
+
+    toast.textContent = message;
+
+    container.appendChild(toast);
+
+
+    setTimeout(() => {
+
+      toast.style.opacity = "0";
+
+      toast.style.transform =
+        "translateY(8px)";
+
+      setTimeout(() => {
+        toast.remove();
+      }, 200);
+
+    }, 2600);
+
+  }
+
+
+  /* =======================================================
+     NAVIGATION
+  ======================================================= */
+
+  function showPage(page) {
+
+    if (!PAGE_INFO[page]) {
+      page = "dashboard";
+    }
+
+    currentPage = page;
+
+
+    $$(".page").forEach((element) => {
+
+      element.classList.toggle(
+        "active",
+        element.id === `page-${page}`
+      );
+
+    });
+
+
+    $$(".nav-item").forEach((button) => {
+
+      button.classList.toggle(
+        "active",
+        button.dataset.page === page
+      );
+
+    });
+
+
+    const info = PAGE_INFO[page];
+
+    $("#pageTitle").textContent =
+      info.title;
+
+    $("#pageSubtitle").textContent =
+      info.subtitle;
+
+
+    closeSidebar();
+
+
+    if (page === "dashboard") {
+      renderDashboard();
+    }
+
+    if (page === "documents") {
+      renderDocuments();
+    }
+
+    if (page === "projects") {
+      renderProjects();
+    }
+
+    if (page === "customers") {
+      renderCustomers();
+    }
+
+    if (page === "employees") {
+      renderEmployees();
+    }
+
+    if (page === "history") {
+      renderHistory();
+    }
+
+    if (page === "reports") {
+      renderReports();
+    }
+
+    if (page === "settings") {
+      renderSettings();
+    }
+
+  }
+
+
+  function openSidebar() {
+
+    const sidebar = $("#sidebar");
+
+    if (!sidebar) {
       return;
     }
 
-    grid.innerHTML = "";
+    sidebar.classList.add("open");
 
-    getTemplates().forEach(
-      function (template) {
+    ensureSidebarOverlay();
 
-        grid.appendChild(
-          createCard(template)
+  }
+
+
+  function closeSidebar() {
+
+    const sidebar = $("#sidebar");
+
+    if (sidebar) {
+      sidebar.classList.remove("open");
+    }
+
+    const overlay =
+      document.querySelector(
+        ".sidebar-overlay"
+      );
+
+    if (overlay) {
+      overlay.classList.remove("show");
+    }
+
+  }
+
+
+  function ensureSidebarOverlay() {
+
+    let overlay =
+      document.querySelector(
+        ".sidebar-overlay"
+      );
+
+    if (!overlay) {
+
+      overlay =
+        document.createElement("div");
+
+      overlay.className =
+        "sidebar-overlay";
+
+      overlay.addEventListener(
+        "click",
+        closeSidebar
+      );
+
+      document.body.appendChild(
+        overlay
+      );
+
+    }
+
+    overlay.classList.add("show");
+
+  }
+
+
+  /* =======================================================
+     DOCUMENT TEMPLATES
+  ======================================================= */
+
+  function getTemplates() {
+
+    return Array.isArray(DATA.templates)
+      ? DATA.templates.filter(
+          (item) => item && item.enabled !== false
+        )
+      : [];
+
+  }
+
+
+  function renderDocumentCard(template) {
+
+    return `
+      <article class="doc-card">
+
+        <div class="doc-top">
+
+          <div class="doc-icon">
+            ${escapeHTML(template.icon || "📄")}
+          </div>
+
+          <span class="doc-code">
+            ${escapeHTML(template.code || "")}
+          </span>
+
+        </div>
+
+        <h3>
+          ${escapeHTML(template.name || template.title || "")}
+        </h3>
+
+        <p>
+          ${escapeHTML(template.description || "")}
+        </p>
+
+        <div class="doc-meta">
+
+          <span class="category">
+            ${escapeHTML(template.category || "Văn bản")}
+          </span>
+
+          <button
+            class="doc-open"
+            type="button"
+            data-template-id="${escapeHTML(template.id)}"
+          >
+            Mở mẫu →
+          </button>
+
+        </div>
+
+      </article>
+    `;
+
+  }
+
+
+  function renderDocuments() {
+
+    const templates = getTemplates();
+
+    const search =
+      ($("#documentSearch")?.value || "")
+        .trim()
+        .toLowerCase();
+
+    const category =
+      $("#documentCategory")?.value || "";
+
+
+    const filtered =
+      templates.filter((template) => {
+
+        const text = [
+          template.name,
+          template.title,
+          template.description,
+          template.code,
+          template.category
+        ]
+          .join(" ")
+          .toLowerCase();
+
+        const matchSearch =
+          !search ||
+          text.includes(search);
+
+        const matchCategory =
+          !category ||
+          template.category === category;
+
+        return (
+          matchSearch &&
+          matchCategory
+        );
+
+      });
+
+
+    const html =
+      filtered.length
+        ? filtered
+            .map(renderDocumentCard)
+            .join("")
+        : emptyState(
+            "Không tìm thấy mẫu",
+            "Thử thay đổi từ khóa hoặc loại văn bản.",
+            "🔎"
+          );
+
+
+    if ($("#documentGrid")) {
+      $("#documentGrid").innerHTML =
+        templates
+          .slice(0, 6)
+          .map(renderDocumentCard)
+          .join("") ||
+        emptyState(
+          "Chưa có mẫu văn bản",
+          "Danh mục mẫu đang trống.",
+          "📄"
+        );
+    }
+
+
+    if ($("#documentsPageGrid")) {
+      $("#documentsPageGrid").innerHTML =
+        html;
+    }
+
+  }
+
+
+  function initDocumentCategories() {
+
+    const select =
+      $("#documentCategory");
+
+    if (!select) {
+      return;
+    }
+
+
+    const current =
+      select.value;
+
+
+    const categories =
+      [
+        ...new Set(
+          getTemplates()
+            .map(
+              (template) =>
+                template.category
+            )
+            .filter(Boolean)
+        )
+      ]
+        .sort(
+          (a, b) =>
+            a.localeCompare(
+              b,
+              "vi"
+            )
+        );
+
+
+    select.innerHTML = `
+      <option value="">
+        Tất cả loại
+      </option>
+    `;
+
+
+    categories.forEach(
+      (category) => {
+
+        const option =
+          document.createElement(
+            "option"
+          );
+
+        option.value =
+          category;
+
+        option.textContent =
+          category;
+
+        select.appendChild(
+          option
         );
 
       }
     );
 
+
+    select.value =
+      categories.includes(current)
+        ? current
+        : "";
+
   }
 
 
-  /* =========================================================
-     DASHBOARD CARDS
-     ========================================================= */
+  function findTemplate(id) {
 
-  function syncDashboardCards() {
-
-    var grid =
-      $("#documentGrid");
-
-    if (!grid) {
-      return;
-    }
-
-    grid.innerHTML = "";
-
-    getTemplates().forEach(
-      function (template) {
-
-        grid.appendChild(
-          createCard(template)
-        );
-
-      }
+    return getTemplates().find(
+      (template) =>
+        String(template.id) ===
+        String(id)
     );
 
   }
 
 
-  /* =========================================================
+  function openTemplate(id) {
+
+    const template =
+      findTemplate(id);
+
+    if (!template) {
+
+      showToast(
+        "Không tìm thấy mẫu văn bản."
+      );
+
+      return;
+
+    }
+
+
+    addHistory(template);
+
+
+    if (template.file) {
+
+      window.location.href =
+        template.file;
+
+      return;
+
+    }
+
+
+    showToast(
+      "Mẫu văn bản chưa được cấu hình đường dẫn."
+    );
+
+  }
+
+
+  /* =======================================================
+     NEW DOCUMENT MODAL
+  ======================================================= */
+
+  function openTemplatePicker() {
+
+    const templates =
+      getTemplates();
+
+
+    if (!templates.length) {
+
+      showToast(
+        "Chưa có mẫu văn bản."
+      );
+
+      showPage("documents");
+
+      return;
+
+    }
+
+
+    modalMode =
+      "template-picker";
+
+    modalEditId = null;
+
+
+    $("#modalEyebrow").textContent =
+      "GROVA DOCUMENT";
+
+    $("#modalTitle").textContent =
+      "Chọn mẫu văn bản";
+
+
+    $("#modalBody").innerHTML = `
+
+      <div class="template-picker">
+
+        ${templates
+          .map(
+            (template) => `
+
+              <button
+                type="button"
+                class="template-option"
+                data-picker-template-id="${escapeHTML(template.id)}"
+              >
+
+                <span class="template-option-icon">
+                  ${escapeHTML(template.icon || "📄")}
+                </span>
+
+                <span class="template-option-content">
+
+                  <b>
+                    ${escapeHTML(
+                      template.name ||
+                      template.title ||
+                      ""
+                    )}
+                  </b>
+
+                  <span>
+                    ${escapeHTML(
+                      template.description ||
+                      ""
+                    )}
+                  </span>
+
+                </span>
+
+              </button>
+
+            `
+          )
+          .join("")}
+
+      </div>
+    `;
+
+
+    $("#modalSave").style.display =
+      "none";
+
+
+    openModal();
+
+  }
+
+
+  /* =======================================================
      MODAL
-     ========================================================= */
-
-  var selectedTemplate = null;
-
+  ======================================================= */
 
   function openModal() {
 
-    var modal =
-      $("#documentModal");
+    const modal = $("#modal");
 
     if (!modal) {
       return;
     }
 
-    renderTemplateSelector();
-
-    modal.classList.remove(
-      "hidden"
-    );
+    modal.classList.remove("hidden");
 
     modal.setAttribute(
       "aria-hidden",
       "false"
     );
 
-    document.body.classList.add(
-      "modal-open"
-    );
-
-    selectedTemplate = null;
-
-    updateModalButton();
-
   }
 
 
   function closeModal() {
 
-    var modal =
-      $("#documentModal");
+    const modal = $("#modal");
 
     if (!modal) {
       return;
     }
 
-    modal.classList.add(
-      "hidden"
-    );
+    modal.classList.add("hidden");
 
     modal.setAttribute(
       "aria-hidden",
       "true"
     );
 
-    document.body.classList.remove(
-      "modal-open"
-    );
 
-    selectedTemplate = null;
+    modalMode = "";
 
-  }
+    modalEditId = null;
 
 
-  function renderTemplateSelector() {
-
-    var box =
-      $("#templateSelector");
-
-    if (!box) {
-      return;
-    }
-
-    box.innerHTML = "";
-
-    getTemplates().forEach(
-      function (template) {
-
-        var item =
-          document.createElement(
-            "button"
-          );
-
-        item.type =
-          "button";
-
-        item.className =
-          "template-option";
-
-        item.innerHTML =
-
-          '<span class="template-option-icon">' +
-
-            escapeHtml(
-              template.icon || "📄"
-            ) +
-
-          '</span>' +
-
-          '<span class="template-option-content">' +
-
-            '<strong>' +
-
-              escapeHtml(
-                template.name || ""
-              ) +
-
-            '</strong>' +
-
-            '<small>' +
-
-              escapeHtml(
-                template.description || ""
-              ) +
-
-            '</small>' +
-
-          '</span>' +
-
-          '<span class="template-option-check">' +
-            "✓" +
-          '</span>';
-
-        item.addEventListener(
-          "click",
-          function () {
-
-            selectedTemplate =
-              template;
-
-            $$(".template-option")
-              .forEach(
-                function (element) {
-
-                  element.classList.remove(
-                    "selected"
-                  );
-
-                }
-              );
-
-            item.classList.add(
-              "selected"
-            );
-
-            updateModalButton();
-
-          }
-        );
-
-        box.appendChild(
-          item
-        );
-
-      }
-    );
-
-  }
-
-
-  function updateModalButton() {
-
-    var button =
-      $("#openTemplate");
-
-    if (!button) {
-      return;
-    }
-
-    button.disabled =
-      !selectedTemplate;
-
-  }
-
-
-  function openSelectedTemplate() {
-
-    if (!selectedTemplate) {
-      return;
-    }
-
-    openTemplate(
-      selectedTemplate
-    );
-
-  }
-
-
-  /* =========================================================
-     OPEN TEMPLATE
-     ========================================================= */
-
-  function openTemplate(template) {
-
-    if (
-      !template ||
-      !template.file
-    ) {
-      return;
-    }
-
-    saveRecentDocument(
-      template
-    );
-
-    window.location.href =
-      template.file;
-
-  }
-
-
-  /* =========================================================
-     HISTORY STORAGE
-     ========================================================= */
-
-  var HISTORY_KEY =
-    "GROVA_DOCUMENT_RECENT";
-
-
-  function getRecentDocuments() {
-
-    try {
-
-      var raw =
-        localStorage.getItem(
-          HISTORY_KEY
-        );
-
-      if (!raw) {
-        return [];
-      }
-
-      var parsed =
-        JSON.parse(raw);
-
-      if (!Array.isArray(parsed)) {
-        return [];
-      }
-
-      return parsed.filter(
-        function (item) {
-
-          return item &&
-            typeof item === "object";
-
-        }
-      );
-
-    } catch (error) {
-
-      console.warn(
-        "Không thể đọc lịch sử.",
-        error
-      );
-
-      return [];
-
+    if ($("#modalSave")) {
+      $("#modalSave").style.display =
+        "";
     }
 
   }
 
 
-  /* =========================================================
-     SAVE HISTORY
-     ========================================================= */
+  /* =======================================================
+     EMPTY STATE
+  ======================================================= */
 
-  function saveRecentDocument(template) {
+  function emptyState(
+    title,
+    description,
+    icon = "📁"
+  ) {
 
-    if (!template) {
-      return;
-    }
+    return `
+      <div class="empty-state">
 
-    var list =
-      getRecentDocuments();
+        <div class="empty-state-icon">
+          ${icon}
+        </div>
 
-    var activity = {
+        <h3>
+          ${escapeHTML(title)}
+        </h3>
 
-      id:
-        template.id || "",
+        <p>
+          ${escapeHTML(description)}
+        </p>
+
+      </div>
+    `;
+
+  }
+
+
+  /* =======================================================
+     HISTORY
+  ======================================================= */
+
+  function addHistory(template) {
+
+    const history =
+      getHistory();
+
+
+    const item = {
+
+      id: createId("HIS"),
+
+      templateId:
+        template.id,
 
       code:
         template.code || "",
 
       name:
-        template.name || "",
-
-      title:
-        template.title || "",
-
-      description:
-        template.description || "",
-
-      category:
-        template.category || "Văn bản",
+        template.name ||
+        template.title ||
+        "",
 
       icon:
-        template.icon || "📄",
+        template.icon ||
+        "📄",
 
-      file:
-        template.file || "",
-
-      action:
-        "Mở văn bản",
-
-      createdAt:
-        new Date().toISOString()
+      openedAt:
+        nowISO()
 
     };
 
-    list.unshift(
-      activity
+
+    const filtered =
+      history.filter(
+        (oldItem) =>
+          oldItem.templateId !==
+          template.id
+      );
+
+
+    filtered.unshift(item);
+
+
+    writeStorage(
+      STORAGE.history,
+      filtered.slice(0, 100)
     );
 
-    list =
-      list.slice(0, 20);
-
-    try {
-
-      localStorage.setItem(
-        HISTORY_KEY,
-        JSON.stringify(list)
-      );
-
-    } catch (error) {
-
-      console.warn(
-        "Không thể lưu hoạt động gần đây.",
-        error
-      );
-
-    }
-
-    renderRecentDocuments();
-
-    renderHistoryDocuments();
 
     updateStats();
 
   }
 
 
-  /* =========================================================
-     FORMAT TIME
-     ========================================================= */
+  function renderHistory() {
 
-  function formatRecentTime(value) {
-
-    if (!value) {
-      return "";
-    }
-
-    var date =
-      new Date(value);
-
-    if (isNaN(date.getTime())) {
-      return "";
-    }
-
-    var now =
-      new Date();
-
-    var diff =
-      now.getTime() -
-      date.getTime();
-
-    var minute =
-      60 * 1000;
-
-    var hour =
-      60 * minute;
-
-    var day =
-      24 * hour;
-
-    if (diff < 0) {
-      diff = 0;
-    }
-
-    if (diff < minute) {
-      return "Vừa xong";
-    }
-
-    if (diff < hour) {
-
-      return (
-        Math.floor(
-          diff / minute
-        ) +
-        " phút trước"
-      );
-
-    }
-
-    if (diff < day) {
-
-      return (
-        Math.floor(
-          diff / hour
-        ) +
-        " giờ trước"
-      );
-
-    }
-
-    try {
-
-      return date.toLocaleDateString(
-        "vi-VN",
-        {
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric"
-        }
-      ) +
-      " • " +
-      date.toLocaleTimeString(
-        "vi-VN",
-        {
-          hour: "2-digit",
-          minute: "2-digit"
-        }
-      );
-
-    } catch (error) {
-
-      return date.toLocaleString();
-
-    }
-
-  }
-
-
-  /* =========================================================
-     CREATE HISTORY ROW
-     ========================================================= */
-
-  function createHistoryRow(item) {
-
-    var row =
-      document.createElement(
-        "button"
-      );
-
-    row.type =
-      "button";
-
-    row.className =
-      "recent-row";
-
-    row.setAttribute(
-      "data-template-id",
-      item.id || ""
-    );
-
-    row.innerHTML =
-
-      '<span class="recent-row-icon">' +
-
-        escapeHtml(
-          item.icon || "📄"
-        ) +
-
-      '</span>' +
-
-      '<span class="recent-row-content">' +
-
-        '<strong>' +
-
-          escapeHtml(
-            item.name ||
-            item.title ||
-            "Văn bản"
-          ) +
-
-        '</strong>' +
-
-        '<small>' +
-
-          '<span>' +
-
-            escapeHtml(
-              item.code || ""
-            ) +
-
-          '</span>' +
-
-          '<span class="recent-row-separator">' +
-            "•" +
-          '</span>' +
-
-          '<span>' +
-
-            escapeHtml(
-              item.action ||
-              "Mở văn bản"
-            ) +
-
-          '</span>' +
-
-          '<span class="recent-row-separator">' +
-            "•" +
-          '</span>' +
-
-          '<span class="recent-time">' +
-
-            escapeHtml(
-              formatRecentTime(
-                item.createdAt
-              )
-            ) +
-
-          '</span>' +
-
-        '</small>' +
-
-      '</span>' +
-
-      '<span class="recent-row-arrow">' +
-        "→" +
-      '</span>';
-
-    row.addEventListener(
-      "click",
-      function () {
-
-        if (!item.file) {
-          return;
-        }
-
-        window.location.href =
-          item.file;
-
-      }
-    );
-
-    return row;
-
-  }
-
-
-  /* =========================================================
-     EMPTY STATE
-     ========================================================= */
-
-  function renderEmptyState(
-    container,
-    history
-  ) {
+    const container =
+      $("#historyList");
 
     if (!container) {
       return;
     }
 
+
+    const history =
+      getHistory();
+
+
+    if (!history.length) {
+
+      container.innerHTML =
+        emptyState(
+          "Chưa có hoạt động",
+          "Các mẫu văn bản bạn mở sẽ xuất hiện ở đây.",
+          "◷"
+        );
+
+      return;
+
+    }
+
+
     container.innerHTML =
+      history
+        .map(
+          (item) => `
 
-      '<div class="empty-state">' +
+            <div class="history-item">
 
-        '<div class="empty-icon">' +
-          "◷" +
-        '</div>' +
+              <div class="history-icon">
+                ${escapeHTML(item.icon || "📄")}
+              </div>
 
-        '<h3>' +
-          "Chưa có lịch sử" +
-        '</h3>' +
+              <div class="history-content">
 
-        '<p>' +
+                <b>
+                  ${escapeHTML(item.name || "")}
+                </b>
 
-          (
-            history
-              ? "Các văn bản được mở và xử lý sẽ xuất hiện tại đây."
-              : "Các văn bản được mở sẽ xuất hiện tại đây."
-          ) +
+                <span>
+                  ${escapeHTML(item.code || "")}
+                </span>
 
-        '</p>' +
+              </div>
 
-      '</div>';
+              <div class="history-time">
+                ${escapeHTML(
+                  formatDateTime(
+                    item.openedAt
+                  )
+                )}
+              </div>
+
+            </div>
+
+          `
+        )
+        .join("");
 
   }
 
 
-  /* =========================================================
-     HISTORY CONTAINER
-     ========================================================= */
+  function renderRecentDocuments() {
 
-  function ensureHistoryContainer() {
+    const container =
+      $("#recentDocuments");
 
-    var page =
-      $("#page-history");
-
-    if (!page) {
-      return null;
+    if (!container) {
+      return;
     }
 
-    /*
-     * Ưu tiên container riêng.
-     */
 
-    var container =
-      page.querySelector(
-        "#historyDocuments"
-      );
+    const history =
+      getHistory();
 
-    if (container) {
-      return container;
-    }
 
-    /*
-     * Tương thích với index.html
-     * đang dùng #recentDocuments
-     * bên trong trang History.
-     */
+    if (!history.length) {
 
-    container =
-      page.querySelector(
-        "#recentDocuments"
-      );
+      container.innerHTML =
+        emptyState(
+          "Chưa có hoạt động gần đây",
+          "Hãy mở một mẫu văn bản để bắt đầu.",
+          "◷"
+        );
 
-    if (container) {
-
-      container.classList.add(
-        "history-list"
-      );
-
-      return container;
+      return;
 
     }
 
-    /*
-     * Nếu chưa có thì tự tạo.
-     */
 
-    var existingEmpty =
-      page.querySelector(
-        ".empty-state"
+    container.innerHTML =
+      history
+        .slice(0, 5)
+        .map(
+          (item) => `
+
+            <div class="history-item">
+
+              <div class="history-icon">
+                ${escapeHTML(item.icon || "📄")}
+              </div>
+
+              <div class="history-content">
+
+                <b>
+                  ${escapeHTML(item.name || "")}
+                </b>
+
+                <span>
+                  ${escapeHTML(item.code || "")}
+                </span>
+
+              </div>
+
+              <div class="history-time">
+                ${escapeHTML(
+                  formatDateTime(
+                    item.openedAt
+                  )
+                )}
+              </div>
+
+            </div>
+
+          `
+        )
+        .join("");
+
+  }
+
+
+  function clearHistory() {
+
+    const history =
+      getHistory();
+
+
+    if (!history.length) {
+
+      showToast(
+        "Lịch sử đang trống."
       );
 
-    container =
-      document.createElement(
-        "div"
+      return;
+
+    }
+
+
+    const ok =
+      confirm(
+        "Bạn có chắc muốn xóa toàn bộ lịch sử hoạt động?"
       );
 
-    container.id =
-      "historyDocuments";
 
-    container.className =
-      "activity-list history-list recent-box";
+    if (!ok) {
+      return;
+    }
 
-    if (existingEmpty) {
 
-      existingEmpty.parentNode.replaceChild(
-        container,
-        existingEmpty
+    writeStorage(
+      STORAGE.history,
+      []
+    );
+
+
+    renderHistory();
+
+    renderRecentDocuments();
+
+    updateStats();
+
+    showToast(
+      "Đã xóa lịch sử."
+    );
+
+  }
+
+
+  /* =======================================================
+     PROJECTS
+  ======================================================= */
+
+  function renderProjects() {
+
+    const container =
+      $("#projectsList");
+
+    if (!container) {
+      return;
+    }
+
+
+    const search =
+      ($("#projectSearch")?.value || "")
+        .trim()
+        .toLowerCase();
+
+    const status =
+      $("#projectStatus")?.value || "";
+
+
+    const projects =
+      getProjects();
+
+
+    const filtered =
+      projects.filter(
+        (project) => {
+
+          const text = [
+            project.name,
+            project.customer,
+            project.address,
+            project.code,
+            project.note
+          ]
+            .join(" ")
+            .toLowerCase();
+
+          const matchSearch =
+            !search ||
+            text.includes(search);
+
+          const matchStatus =
+            !status ||
+            project.status === status;
+
+          return (
+            matchSearch &&
+            matchStatus
+          );
+
+        }
+      );
+
+
+    if (!filtered.length) {
+
+      container.innerHTML =
+        emptyState(
+          "Chưa có công trình",
+          "Bấm “Công trình mới” để thêm công trình.",
+          "⌂"
+        );
+
+      return;
+
+    }
+
+
+    container.innerHTML =
+      filtered
+        .map(
+          (project) => `
+
+            <div class="data-row">
+
+              <div class="data-main">
+
+                <h3>
+                  ${escapeHTML(
+                    project.name ||
+                    "Công trình chưa đặt tên"
+                  )}
+                </h3>
+
+                <p>
+                  ${escapeHTML(
+                    project.customer
+                      ? "Khách hàng: " +
+                        project.customer
+                      : "Chưa có khách hàng"
+                  )}
+                </p>
+
+                <p class="sub">
+                  ${escapeHTML(
+                    project.address ||
+                    "Chưa có địa chỉ"
+                  )}
+                </p>
+
+              </div>
+
+
+              <div>
+
+                <span class="status ${slugStatus(project.status)}">
+                  ${escapeHTML(
+                    project.status ||
+                    "Chuẩn bị"
+                  )}
+                </span>
+
+              </div>
+
+
+              <div class="data-actions">
+
+                <button
+                  type="button"
+                  class="small-btn"
+                  data-action="edit-project"
+                  data-id="${escapeHTML(project.id)}"
+                >
+                  Sửa
+                </button>
+
+                <button
+                  type="button"
+                  class="small-btn delete"
+                  data-action="delete-project"
+                  data-id="${escapeHTML(project.id)}"
+                >
+                  Xóa
+                </button>
+
+              </div>
+
+            </div>
+
+          `
+        )
+        .join("");
+
+  }
+
+
+  function openProjectModal(id = null) {
+
+    modalMode = "project";
+
+    modalEditId = id;
+
+
+    const project =
+      id
+        ? getProjects().find(
+            (item) =>
+              item.id === id
+          )
+        : null;
+
+
+    $("#modalEyebrow").textContent =
+      "CÔNG TRÌNH";
+
+    $("#modalTitle").textContent =
+      project
+        ? "Sửa công trình"
+        : "Công trình mới";
+
+
+    $("#modalBody").innerHTML = `
+
+      <div class="modal-form">
+
+        <label class="full">
+          Tên công trình
+
+          <input
+            id="modalProjectName"
+            type="text"
+            placeholder="Ví dụ: Công trình nhà anh Nguyễn Văn A"
+            value="${escapeHTML(project?.name || "")}"
+          >
+
+        </label>
+
+
+        <label>
+          Mã công trình
+
+          <input
+            id="modalProjectCode"
+            type="text"
+            placeholder="CT-001"
+            value="${escapeHTML(project?.code || "")}"
+          >
+
+        </label>
+
+
+        <label>
+          Khách hàng
+
+          <input
+            id="modalProjectCustomer"
+            type="text"
+            placeholder="Tên khách hàng"
+            value="${escapeHTML(project?.customer || "")}"
+          >
+
+        </label>
+
+
+        <label class="full">
+          Địa chỉ công trình
+
+          <textarea
+            id="modalProjectAddress"
+            placeholder="Địa chỉ..."
+          >${escapeHTML(project?.address || "")}</textarea>
+
+        </label>
+
+
+        <label>
+          Trạng thái
+
+          <select id="modalProjectStatus">
+
+            <option value="Chuẩn bị">
+              Chuẩn bị
+            </option>
+
+            <option value="Đang thi công">
+              Đang thi công
+            </option>
+
+            <option value="Hoàn thành">
+              Hoàn thành
+            </option>
+
+            <option value="Tạm dừng">
+              Tạm dừng
+            </option>
+
+          </select>
+
+        </label>
+
+
+        <label>
+          Ngày bắt đầu
+
+          <input
+            id="modalProjectStart"
+            type="date"
+            value="${escapeHTML(project?.startDate || "")}"
+          >
+
+        </label>
+
+
+        <label class="full">
+          Ghi chú
+
+          <textarea
+            id="modalProjectNote"
+            placeholder="Ghi chú thêm..."
+          >${escapeHTML(project?.note || "")}</textarea>
+
+        </label>
+
+      </div>
+    `;
+
+
+    $("#modalProjectStatus").value =
+      project?.status ||
+      "Chuẩn bị";
+
+
+    $("#modalSave").style.display =
+      "";
+
+
+    openModal();
+
+  }
+
+
+  function saveProject() {
+
+    const name =
+      $("#modalProjectName")
+        ?.value
+        .trim();
+
+
+    if (!name) {
+
+      showToast(
+        "Vui lòng nhập tên công trình."
+      );
+
+      return;
+
+    }
+
+
+    const projects =
+      getProjects();
+
+
+    const data = {
+
+      name,
+
+      code:
+        $("#modalProjectCode")
+          ?.value
+          .trim() || "",
+
+      customer:
+        $("#modalProjectCustomer")
+          ?.value
+          .trim() || "",
+
+      address:
+        $("#modalProjectAddress")
+          ?.value
+          .trim() || "",
+
+      status:
+        $("#modalProjectStatus")
+          ?.value ||
+        "Chuẩn bị",
+
+      startDate:
+        $("#modalProjectStart")
+          ?.value || "",
+
+      note:
+        $("#modalProjectNote")
+          ?.value
+          .trim() || ""
+
+    };
+
+
+    if (modalEditId) {
+
+      const index =
+        projects.findIndex(
+          (item) =>
+            item.id ===
+            modalEditId
+        );
+
+
+      if (index >= 0) {
+
+        projects[index] = {
+
+          ...projects[index],
+
+          ...data,
+
+          updatedAt:
+            nowISO()
+
+        };
+
+      }
+
+      showToast(
+        "Đã cập nhật công trình."
       );
 
     } else {
 
-      page.appendChild(
-        container
-      );
+      projects.unshift({
 
-    }
+        id:
+          createId("CT"),
 
-    return container;
+        ...data,
 
-  }
+        createdAt:
+          nowISO(),
 
+        updatedAt:
+          nowISO()
 
-  /* =========================================================
-     DASHBOARD RECENT
-     ========================================================= */
+      });
 
-  function renderRecentDocuments() {
-
-    /*
-     * Chỉ lấy recentDocuments của Dashboard.
-     * Tránh nhầm với ID trong trang History.
-     */
-
-    var dashboard =
-      $("#page-dashboard");
-
-    if (!dashboard) {
-      return;
-    }
-
-    var container =
-      dashboard.querySelector(
-        "#recentDocuments"
-      );
-
-    if (!container) {
-      return;
-    }
-
-    var list =
-      getRecentDocuments();
-
-    var recent =
-      list.slice(0, 4);
-
-    if (!recent.length) {
-
-      renderEmptyState(
-        container,
-        false
-      );
-
-      return;
-
-    }
-
-    container.innerHTML = "";
-
-    recent.forEach(
-      function (item) {
-
-        container.appendChild(
-          createHistoryRow(item)
-        );
-
-      }
-    );
-
-  }
-
-
-  /* =========================================================
-     HISTORY PAGE
-     ========================================================= */
-
-  function renderHistoryDocuments() {
-
-    var container =
-      ensureHistoryContainer();
-
-    if (!container) {
-      return;
-    }
-
-    var list =
-      getRecentDocuments();
-
-    if (!list.length) {
-
-      renderEmptyState(
-        container,
-        true
-      );
-
-      return;
-
-    }
-
-    container.innerHTML = "";
-
-    /*
-     * Thanh công cụ.
-     */
-
-    var toolbar =
-      document.createElement(
-        "div"
-      );
-
-    toolbar.className =
-      "history-toolbar";
-
-    var count =
-      document.createElement(
-        "span"
-      );
-
-    count.className =
-      "history-count";
-
-    count.textContent =
-      list.length +
-      " hoạt động";
-
-    toolbar.appendChild(
-      count
-    );
-
-    var clear =
-      document.createElement(
-        "button"
-      );
-
-    clear.type =
-      "button";
-
-    clear.className =
-      "secondary-button history-clear-button";
-
-    clear.textContent =
-      "Xóa lịch sử";
-
-    clear.addEventListener(
-      "click",
-      function () {
-
-        var confirmed =
-          window.confirm(
-            "Bạn có chắc muốn xóa toàn bộ lịch sử hoạt động?"
-          );
-
-        if (!confirmed) {
-          return;
-        }
-
-        try {
-
-          localStorage.removeItem(
-            HISTORY_KEY
-          );
-
-        } catch (error) {
-
-          console.warn(
-            "Không thể xóa lịch sử.",
-            error
-          );
-
-        }
-
-        renderRecentDocuments();
-
-        renderHistoryDocuments();
-
-        updateStats();
-
-      }
-    );
-
-    toolbar.appendChild(
-      clear
-    );
-
-    container.appendChild(
-      toolbar
-    );
-
-    /*
-     * Hiển thị tối đa 20 hoạt động.
-     */
-
-    list.forEach(
-      function (item) {
-
-        container.appendChild(
-          createHistoryRow(item)
-        );
-
-      }
-    );
-
-  }
-
-
-  /* =========================================================
-     REFRESH TIME
-     ========================================================= */
-
-  function refreshRecentTimes() {
-
-    var rows =
-      $$(".recent-row");
-
-    if (!rows.length) {
-      return;
-    }
-
-    var list =
-      getRecentDocuments();
-
-    rows.forEach(
-      function (row) {
-
-        var id =
-          row.getAttribute(
-            "data-template-id"
-          );
-
-        var item =
-          list.find(
-            function (entry) {
-
-              return String(
-                entry.id || ""
-              ) === String(
-                id || ""
-              );
-
-            }
-          );
-
-        if (!item) {
-          return;
-        }
-
-        var time =
-          row.querySelector(
-            ".recent-time"
-          );
-
-        if (time) {
-
-          time.textContent =
-            formatRecentTime(
-              item.createdAt
-            );
-
-        }
-
-      }
-    );
-
-  }
-
-
-  /* =========================================================
-     STATS
-     ========================================================= */
-
-  function updateStats() {
-
-    var documents =
-      $("#statDocuments");
-
-    if (documents) {
-
-      documents.textContent =
-        String(
-          getRecentDocuments().length
-        );
-
-    }
-
-    var projects =
-      $("#statProjects");
-
-    if (projects) {
-
-      projects.textContent =
-        String(
-          DATA.stats &&
-          DATA.stats.projects
-            ? DATA.stats.projects
-            : 0
-        );
-
-    }
-
-    var customers =
-      $("#statCustomers");
-
-    if (customers) {
-
-      customers.textContent =
-        String(
-          DATA.stats &&
-          DATA.stats.customers
-            ? DATA.stats.customers
-            : 0
-        );
-
-    }
-
-    var employees =
-      $("#statEmployees");
-
-    if (employees) {
-
-      employees.textContent =
-        String(
-          DATA.stats &&
-          DATA.stats.employees
-            ? DATA.stats.employees
-            : 0
-        );
-
-    }
-
-  }
-
-
-  /* =========================================================
-     NAVIGATION
-     ========================================================= */
-
-  function showPage(pageName) {
-
-    if (!pageConfig[pageName]) {
-      pageName = "dashboard";
-    }
-
-    /*
-     * Xóa cả 2 class để tương thích
-     * với các phiên bản HTML/CSS.
-     */
-
-    $$(".page").forEach(
-      function (page) {
-
-        page.classList.remove(
-          "active"
-        );
-
-        page.classList.remove(
-          "active-page"
-        );
-
-      }
-    );
-
-    var target =
-      $("#page-" + pageName);
-
-    if (target) {
-
-      /*
-       * CSS hiện tại dùng .page.active.
-       * Đây là class chính.
-       */
-
-      target.classList.add(
-        "active"
-      );
-
-      /*
-       * Giữ active-page để tương thích
-       * với phiên bản trước.
-       */
-
-      target.classList.add(
-        "active-page"
-      );
-
-    }
-
-    $$(".menu-item").forEach(
-      function (item) {
-
-        item.classList.toggle(
-          "active",
-          item.getAttribute(
-            "data-page"
-          ) === pageName
-        );
-
-      }
-    );
-
-    var config =
-      pageConfig[pageName];
-
-    var title =
-      $("#pageTitle");
-
-    var subtitle =
-      $("#pageSubtitle");
-
-    if (title) {
-      title.textContent =
-        config.title;
-    }
-
-    if (subtitle) {
-      subtitle.textContent =
-        config.subtitle;
-    }
-
-    if (pageName === "dashboard") {
-
-      renderRecentDocuments();
-
-      updateStats();
-
-    }
-
-    if (pageName === "documents") {
-
-      renderDocumentsPage();
-
-    }
-
-    if (pageName === "history") {
-
-      renderHistoryDocuments();
-
-    }
-
-    closeSidebarMobile();
-
-  }
-
-
-  function bindNavigation() {
-
-    $$(".menu-item").forEach(
-      function (item) {
-
-        item.addEventListener(
-          "click",
-          function () {
-
-            showPage(
-              item.getAttribute(
-                "data-page"
-              )
-            );
-
-          }
-        );
-
-      }
-    );
-
-
-    $$("[data-page-target]").forEach(
-      function (button) {
-
-        button.addEventListener(
-          "click",
-          function () {
-
-            showPage(
-              button.getAttribute(
-                "data-page-target"
-              )
-            );
-
-          }
-        );
-
-      }
-    );
-
-
-    /*
-     * Nút Xem tất cả / nút chuyển trang.
-     */
-
-    $$(".text-button[data-page]").forEach(
-      function (button) {
-
-        button.addEventListener(
-          "click",
-          function () {
-
-            showPage(
-              button.getAttribute(
-                "data-page"
-              )
-            );
-
-          }
-        );
-
-      }
-    );
-
-  }
-
-
-  /* =========================================================
-     SIDEBAR
-     ========================================================= */
-
-  function openSidebarMobile() {
-
-    var sidebar =
-      $("#sidebar");
-
-    if (!sidebar) {
-      return;
-    }
-
-    sidebar.classList.add(
-      "open"
-    );
-
-    document.body.classList.add(
-      "sidebar-open"
-    );
-
-  }
-
-
-  function closeSidebarMobile() {
-
-    var sidebar =
-      $("#sidebar");
-
-    if (!sidebar) {
-      return;
-    }
-
-    sidebar.classList.remove(
-      "open"
-    );
-
-    document.body.classList.remove(
-      "sidebar-open"
-    );
-
-  }
-
-
-  function bindSidebar() {
-
-    var open =
-      $("#openSidebar");
-
-    var close =
-      $("#closeSidebar");
-
-    if (open) {
-
-      open.addEventListener(
-        "click",
-        openSidebarMobile
-      );
-
-    }
-
-    if (close) {
-
-      close.addEventListener(
-        "click",
-        closeSidebarMobile
-      );
-
-    }
-
-  }
-
-
-  /* =========================================================
-     MODAL EVENTS
-     ========================================================= */
-
-  function bindModal() {
-
-    $$("[data-action='new-document']")
-      .forEach(
-        function (button) {
-
-          button.addEventListener(
-            "click",
-            openModal
-          );
-
-        }
-      );
-
-
-    var close =
-      $("#closeModal");
-
-    if (close) {
-
-      close.addEventListener(
-        "click",
-        closeModal
+      showToast(
+        "Đã thêm công trình."
       );
 
     }
 
 
-    var cancel =
-      $("#cancelModal");
-
-    if (cancel) {
-
-      cancel.addEventListener(
-        "click",
-        closeModal
-      );
-
-    }
-
-
-    var openTemplateButton =
-      $("#openTemplate");
-
-    if (openTemplateButton) {
-
-      openTemplateButton.addEventListener(
-        "click",
-        openSelectedTemplate
-      );
-
-    }
-
-
-    var modal =
-      $("#documentModal");
-
-    if (modal) {
-
-      modal.addEventListener(
-        "click",
-        function (event) {
-
-          if (
-            event.target === modal
-          ) {
-
-            closeModal();
-
-          }
-
-        }
-      );
-
-    }
-
-
-    document.addEventListener(
-      "keydown",
-      function (event) {
-
-        if (event.key === "Escape") {
-
-          closeModal();
-
-        }
-
-      }
+    writeStorage(
+      STORAGE.projects,
+      projects
     );
 
-  }
 
+    closeModal();
 
-  /* =========================================================
-     INIT
-     ========================================================= */
-
-  function init() {
-
-    syncDashboardCards();
-
-    renderDocumentsPage();
-
-    renderRecentDocuments();
-
-    renderHistoryDocuments();
+    renderProjects();
 
     updateStats();
 
-    bindNavigation();
+  }
 
-    bindSidebar();
 
-    bindModal();
+  function deleteProject(id) {
+
+    const projects =
+      getProjects();
+
+    const project =
+      projects.find(
+        (item) =>
+          item.id === id
+      );
+
+
+    if (!project) {
+      return;
+    }
+
+
+    const ok =
+      confirm(
+        `Xóa công trình "${project.name}"?`
+      );
+
+
+    if (!ok) {
+      return;
+    }
+
+
+    writeStorage(
+      STORAGE.projects,
+      projects.filter(
+        (item) =>
+          item.id !== id
+      )
+    );
+
+
+    renderProjects();
+
+    updateStats();
+
+    showToast(
+      "Đã xóa công trình."
+    );
 
   }
 
 
-  /* =========================================================
-     PUBLIC API
-     ========================================================= */
+  /* =======================================================
+     CUSTOMERS
+  ======================================================= */
 
-  window.GROVA_DOCUMENT = {
+  function renderCustomers() {
 
-    data:
-      DATA,
+    const container =
+      $("#customersList");
 
-    templates:
-      templates,
+    if (!container) {
+      return;
+    }
 
-    showPage:
-      showPage,
 
-    openModal:
-      openModal,
+    const search =
+      ($("#customerSearch")?.value || "")
+        .trim()
+        .toLowerCase();
 
-    closeModal:
-      closeModal,
 
-    openTemplate:
-      openTemplate,
+    const customers =
+      getCustomers();
 
-    getRecentDocuments:
-      getRecentDocuments,
 
-    saveRecentDocument:
-      saveRecentDocument,
+    const filtered =
+      customers.filter(
+        (customer) => {
 
-    renderRecentDocuments:
-      renderRecentDocuments,
+          const text = [
+            customer.name,
+            customer.phone,
+            customer.taxCode,
+            customer.address,
+            customer.email,
+            customer.note
+          ]
+            .join(" ")
+            .toLowerCase();
 
-    renderHistoryDocuments:
-      renderHistoryDocuments,
-
-    updateStats:
-      updateStats,
-
-    clearHistory:
-      function () {
-
-        try {
-
-          localStorage.removeItem(
-            HISTORY_KEY
-          );
-
-        } catch (error) {
-
-          console.warn(
-            "Không thể xóa lịch sử.",
-            error
+          return (
+            !search ||
+            text.includes(search)
           );
 
         }
-
-        renderRecentDocuments();
-
-        renderHistoryDocuments();
-
-        updateStats();
-
-      },
-
-    refresh:
-      init
-
-  };
+      );
 
 
-  /* =========================================================
+    if (!filtered.length) {
+
+      container.innerHTML =
+        emptyState(
+          "Chưa có khách hàng",
+          "Bấm “Khách hàng mới” để thêm dữ liệu.",
+          "♙"
+        );
+
+      return;
+
+    }
+
+
+    container.innerHTML =
+      filtered
+        .map(
+          (customer) => `
+
+            <div class="data-row">
+
+              <div class="data-main">
+
+                <h3>
+                  ${escapeHTML(
+                    customer.name ||
+                    "Khách hàng chưa đặt tên"
+                  )}
+                </h3>
+
+                <p>
+                  ${escapeHTML(
+                    customer.phone
+                      ? "Điện thoại: " +
+                        customer.phone
+                      : "Chưa có số điện thoại"
+                  )}
+                </p>
+
+                <p class="sub">
+                  ${escapeHTML(
+                    customer.taxCode
+                      ? "MST: " +
+                        customer.taxCode
+                      : customer.address ||
+                        "Chưa có thông tin"
+                  )}
+                </p>
+
+              </div>
+
+
+              <div class="data-actions">
+
+                <button
+                  type="button"
+                  class="small-btn"
+                  data-action="edit-customer"
+                  data-id="${escapeHTML(customer.id)}"
+                >
+                  Sửa
+                </button>
+
+                <button
+                  type="button"
+                  class="small-btn delete"
+                  data-action="delete-customer"
+                  data-id="${escapeHTML(customer.id)}"
+                >
+                  Xóa
+                </button>
+
+              </div>
+
+            </div>
+
+          `
+        )
+        .join("");
+
+  }
+
+
+  function openCustomerModal(id = null) {
+
+    modalMode = "customer";
+
+    modalEditId = id;
+
+
+    const customer =
+      id
+        ? getCustomers().find(
+            (item) =>
+              item.id === id
+          )
+        : null;
+
+
+    $("#modalEyebrow").textContent =
+      "KHÁCH HÀNG";
+
+    $("#modalTitle").textContent =
+      customer
+        ? "Sửa khách hàng"
+        : "Khách hàng mới";
+
+
+    $("#modalBody").innerHTML = `
+
+      <div class="modal-form">
+
+        <label class="full">
+          Tên khách hàng / đơn vị
+
+          <input
+            id="modalCustomerName"
+            type="text"
+            placeholder="Tên khách hàng hoặc công ty"
+            value="${escapeHTML(customer?.name || "")}"
+          >
+
+        </label>
+
+
+        <label>
+          Số điện thoại
+
+          <input
+            id="modalCustomerPhone"
+            type="tel"
+            placeholder="09..."
+            value="${escapeHTML(customer?.phone || "")}"
+          >
+
+        </label>
+
+
+        <label>
+          Email
+
+          <input
+            id="modalCustomerEmail"
+            type="email"
+            placeholder="email@example.com"
+            value="${escapeHTML(customer?.email || "")}"
+          >
+
+        </label>
+
+
+        <label>
+          Mã số thuế
+
+          <input
+            id="modalCustomerTax"
+            type="text"
+            value="${escapeHTML(customer?.taxCode || "")}"
+          >
+
+        </label>
+
+
+        <label>
+          Người liên hệ
+
+          <input
+            id="modalCustomerContact"
+            type="text"
+            value="${escapeHTML(customer?.contact || "")}"
+          >
+
+        </label>
+
+
+        <label class="full">
+          Địa chỉ
+
+          <textarea
+            id="modalCustomerAddress"
+            placeholder="Địa chỉ..."
+          >${escapeHTML(customer?.address || "")}</textarea>
+
+        </label>
+
+
+        <label class="full">
+          Ghi chú
+
+          <textarea
+            id="modalCustomerNote"
+            placeholder="Ghi chú..."
+          >${escapeHTML(customer?.note || "")}</textarea>
+
+        </label>
+
+      </div>
+    `;
+
+
+    $("#modalSave").style.display =
+      "";
+
+
+    openModal();
+
+  }
+
+
+  function saveCustomer() {
+
+    const name =
+      $("#modalCustomerName")
+        ?.value
+        .trim();
+
+
+    if (!name) {
+
+      showToast(
+        "Vui lòng nhập tên khách hàng."
+      );
+
+      return;
+
+    }
+
+
+    const customers =
+      getCustomers();
+
+
+    const data = {
+
+      name,
+
+      phone:
+        $("#modalCustomerPhone")
+          ?.value
+          .trim() || "",
+
+      email:
+        $("#modalCustomerEmail")
+          ?.value
+          .trim() || "",
+
+      taxCode:
+        $("#modalCustomerTax")
+          ?.value
+          .trim() || "",
+
+      contact:
+        $("#modalCustomerContact")
+          ?.value
+          .trim() || "",
+
+      address:
+        $("#modalCustomerAddress")
+          ?.value
+          .trim() || "",
+
+      note:
+        $("#modalCustomerNote")
+          ?.value
+          .trim() || ""
+
+    };
+
+
+    if (modalEditId) {
+
+      const index =
+        customers.findIndex(
+          (item) =>
+            item.id ===
+            modalEditId
+        );
+
+
+      if (index >= 0) {
+
+        customers[index] = {
+
+          ...customers[index],
+
+          ...data,
+
+          updatedAt:
+            nowISO()
+
+        };
+
+      }
+
+      showToast(
+        "Đã cập nhật khách hàng."
+      );
+
+    } else {
+
+      customers.unshift({
+
+        id:
+          createId("KH"),
+
+        ...data,
+
+        createdAt:
+          nowISO(),
+
+        updatedAt:
+          nowISO()
+
+      });
+
+      showToast(
+        "Đã thêm khách hàng."
+      );
+
+    }
+
+
+    writeStorage(
+      STORAGE.customers,
+      customers
+    );
+
+
+    closeModal();
+
+    renderCustomers();
+
+    updateStats();
+
+  }
+
+
+  function deleteCustomer(id) {
+
+    const customers =
+      getCustomers();
+
+
+    const customer =
+      customers.find(
+        (item) =>
+          item.id === id
+      );
+
+
+    if (!customer) {
+      return;
+    }
+
+
+    const ok =
+      confirm(
+        `Xóa khách hàng "${customer.name}"?`
+      );
+
+
+    if (!ok) {
+      return;
+    }
+
+
+    writeStorage(
+      STORAGE.customers,
+      customers.filter(
+        (item) =>
+          item.id !== id
+      )
+    );
+
+
+    renderCustomers();
+
+    updateStats();
+
+    showToast(
+      "Đã xóa khách hàng."
+    );
+
+  }
+
+
+  /* =======================================================
+     EMPLOYEES
+  ======================================================= */
+
+  function renderEmployees() {
+
+    const container =
+      $("#employeesList");
+
+    if (!container) {
+      return;
+    }
+
+
+    const search =
+      ($("#employeeSearch")?.value || "")
+        .trim()
+        .toLowerCase();
+
+
+    const employees =
+      getEmployees();
+
+
+    const filtered =
+      employees.filter(
+        (employee) => {
+
+          const text = [
+            employee.name,
+            employee.phone,
+            employee.position,
+            employee.department,
+            employee.email,
+            employee.note
+          ]
+            .join(" ")
+            .toLowerCase();
+
+          return (
+            !search ||
+            text.includes(search)
+          );
+
+        }
+      );
+
+
+    if (!filtered.length) {
+
+      container.innerHTML =
+        emptyState(
+          "Chưa có nhân sự",
+          "Bấm “Nhân sự mới” để thêm thông tin.",
+          "👤"
+        );
+
+      return;
+
+    }
+
+
+    container.innerHTML =
+      filtered
+        .map(
+          (employee) => `
+
+            <div class="data-row">
+
+              <div class="data-main">
+
+                <h3>
+                  ${escapeHTML(
+                    employee.name ||
+                    "Nhân sự chưa đặt tên"
+                  )}
+                </h3>
+
+                <p>
+                  ${escapeHTML(
+                    employee.position ||
+                    "Chưa có chức vụ"
+                  )}
+                  ${
+                    employee.department
+                      ? " · " +
+                        escapeHTML(
+                          employee.department
+                        )
+                      : ""
+                  }
+                </p>
+
+                <p class="sub">
+                  ${escapeHTML(
+                    employee.phone ||
+                    employee.email ||
+                    "Chưa có liên hệ"
+                  )}
+                </p>
+
+              </div>
+
+
+              <div class="data-actions">
+
+                <button
+                  type="button"
+                  class="small-btn"
+                  data-action="edit-employee"
+                  data-id="${escapeHTML(employee.id)}"
+                >
+                  Sửa
+                </button>
+
+                <button
+                  type="button"
+                  class="small-btn delete"
+                  data-action="delete-employee"
+                  data-id="${escapeHTML(employee.id)}"
+                >
+                  Xóa
+                </button>
+
+              </div>
+
+            </div>
+
+          `
+        )
+        .join("");
+
+  }
+
+
+  function openEmployeeModal(id = null) {
+
+    modalMode = "employee";
+
+    modalEditId = id;
+
+
+    const employee =
+      id
+        ? getEmployees().find(
+            (item) =>
+              item.id === id
+          )
+        : null;
+
+
+    $("#modalEyebrow").textContent =
+      "NHÂN SỰ";
+
+    $("#modalTitle").textContent =
+      employee
+        ? "Sửa nhân sự"
+        : "Nhân sự mới";
+
+
+    $("#modalBody").innerHTML = `
+
+      <div class="modal-form">
+
+        <label class="full">
+          Họ và tên
+
+          <input
+            id="modalEmployeeName"
+            type="text"
+            placeholder="Họ và tên"
+            value="${escapeHTML(employee?.name || "")}"
+          >
+
+        </label>
+
+
+        <label>
+          Chức vụ
+
+          <input
+            id="modalEmployeePosition"
+            type="text"
+            placeholder="Ví dụ: Kỹ thuật"
+            value="${escapeHTML(employee?.position || "")}"
+          >
+
+        </label>
+
+
+        <label>
+          Phòng / bộ phận
+
+          <input
+            id="modalEmployeeDepartment"
+            type="text"
+            placeholder="Ví dụ: Kỹ thuật"
+            value="${escapeHTML(employee?.department || "")}"
+          >
+
+        </label>
+
+
+        <label>
+          Số điện thoại
+
+          <input
+            id="modalEmployeePhone"
+            type="tel"
+            value="${escapeHTML(employee?.phone || "")}"
+          >
+
+        </label>
+
+
+        <label>
+          Email
+
+          <input
+            id="modalEmployeeEmail"
+            type="email"
+            value="${escapeHTML(employee?.email || "")}"
+          >
+
+        </label>
+
+
+        <label>
+          Ngày vào làm
+
+          <input
+            id="modalEmployeeStart"
+            type="date"
+            value="${escapeHTML(employee?.startDate || "")}"
+          >
+
+        </label>
+
+
+        <label class="full">
+          Ghi chú
+
+          <textarea
+            id="modalEmployeeNote"
+            placeholder="Ghi chú..."
+          >${escapeHTML(employee?.note || "")}</textarea>
+
+        </label>
+
+      </div>
+    `;
+
+
+    $("#modalSave").style.display =
+      "";
+
+
+    openModal();
+
+  }
+
+
+  function saveEmployee() {
+
+    const name =
+      $("#modalEmployeeName")
+        ?.value
+        .trim();
+
+
+    if (!name) {
+
+      showToast(
+        "Vui lòng nhập họ và tên."
+      );
+
+      return;
+
+    }
+
+
+    const employees =
+      getEmployees();
+
+
+    const data = {
+
+      name,
+
+      position:
+        $("#modalEmployeePosition")
+          ?.value
+          .trim() || "",
+
+      department:
+        $("#modalEmployeeDepartment")
+          ?.value
+          .trim() || "",
+
+      phone:
+        $("#modalEmployeePhone")
+          ?.value
+          .trim() || "",
+
+      email:
+        $("#modalEmployeeEmail")
+          ?.value
+          .trim() || "",
+
+      startDate:
+        $("#modalEmployeeStart")
+          ?.value || "",
+
+      note:
+        $("#modalEmployeeNote")
+          ?.value
+          .trim() || ""
+
+    };
+
+
+    if (modalEditId) {
+
+      const index =
+        employees.findIndex(
+          (item) =>
+            item.id ===
+            modalEditId
+        );
+
+
+      if (index >= 0) {
+
+        employees[index] = {
+
+          ...employees[index],
+
+          ...data,
+
+          updatedAt:
+            nowISO()
+
+        };
+
+      }
+
+      showToast(
+        "Đã cập nhật nhân sự."
+      );
+
+    } else {
+
+      employees.unshift({
+
+        id:
+          createId("NS"),
+
+        ...data,
+
+        createdAt:
+          nowISO(),
+
+        updatedAt:
+          nowISO()
+
+      });
+
+      showToast(
+        "Đã thêm nhân sự."
+      );
+
+    }
+
+
+    writeStorage(
+      STORAGE.employees,
+      employees
+    );
+
+
+    closeModal();
+
+    renderEmployees();
+
+    updateStats();
+
+  }
+
+
+  function deleteEmployee(id) {
+
+    const employees =
+      getEmployees();
+
+
+    const employee =
+      employees.find(
+        (item) =>
+          item.id === id
+      );
+
+
+    if (!employee) {
+      return;
+    }
+
+
+    const ok =
+      confirm(
+        `Xóa nhân sự "${employee.name}"?`
+      );
+
+
+    if (!ok) {
+      return;
+    }
+
+
+    writeStorage(
+      STORAGE.employees,
+      employees.filter(
+        (item) =>
+          item.id !== id
+      )
+    );
+
+
+    renderEmployees();
+
+    updateStats();
+
+    showToast(
+      "Đã xóa nhân sự."
+    );
+
+  }
+
+
+  /* =======================================================
+     DASHBOARD
+  ======================================================= */
+
+  function updateStats() {
+
+    const projects =
+      getProjects();
+
+    const customers =
+      getCustomers();
+
+    const employees =
+      getEmployees();
+
+    const history =
+      getHistory();
+
+
+    if ($("#statDocuments")) {
+
+      $("#statDocuments").textContent =
+        history.length;
+
+    }
+
+
+    if ($("#statProjects")) {
+
+      $("#statProjects").textContent =
+        projects.length;
+
+    }
+
+
+    if ($("#statCustomers")) {
+
+      $("#statCustomers").textContent =
+        customers.length;
+
+    }
+
+
+    if ($("#statEmployees")) {
+
+      $("#statEmployees").textContent =
+        employees.length;
+
+    }
+
+  }
+
+
+  function renderDashboard() {
+
+    initDocumentCategories();
+
+    renderDocuments();
+
+    renderRecentDocuments();
+
+    updateStats();
+
+  }
+
+
+  /* =======================================================
+     REPORTS
+  ======================================================= */
+
+  function renderReports() {
+
+    const projects =
+      getProjects();
+
+    const customers =
+      getCustomers();
+
+    const employees =
+      getEmployees();
+
+    const history =
+      getHistory();
+
+
+    const completed =
+      projects.filter(
+        (project) =>
+          project.status ===
+          "Hoàn thành"
+      ).length;
+
+
+    const active =
+      projects.filter(
+        (project) =>
+          project.status ===
+          "Đang thi công"
+      ).length;
+
+
+    if ($("#reportCards")) {
+
+      $("#reportCards").innerHTML = `
+
+        <div class="report-card">
+
+          <small>
+            Công trình
+          </small>
+
+          <strong>
+            ${projects.length}
+          </strong>
+
+        </div>
+
+
+        <div class="report-card">
+
+          <small>
+            Đang thi công
+          </small>
+
+          <strong>
+            ${active}
+          </strong>
+
+        </div>
+
+
+        <div class="report-card">
+
+          <small>
+            Hoàn thành
+          </small>
+
+          <strong>
+            ${completed}
+          </strong>
+
+        </div>
+
+
+        <div class="report-card">
+
+          <small>
+            Khách hàng
+          </small>
+
+          <strong>
+            ${customers.length}
+          </strong>
+
+        </div>
+
+      `;
+
+    }
+
+
+    if ($("#reportProjects")) {
+
+      if (!projects.length) {
+
+        $("#reportProjects").innerHTML =
+          emptyState(
+            "Chưa có dữ liệu công trình",
+            "Thêm công trình để xem báo cáo.",
+            "▥"
+          );
+
+        return;
+
+      }
+
+
+      $("#reportProjects").innerHTML = `
+
+        <h3>
+          Tổng hợp công trình
+        </h3>
+
+        <table class="report-table">
+
+          <thead>
+
+            <tr>
+
+              <th>
+                Công trình
+              </th>
+
+              <th>
+                Khách hàng
+              </th>
+
+              <th>
+                Trạng thái
+              </th>
+
+              <th>
+                Ngày bắt đầu
+              </th>
+
+            </tr>
+
+          </thead>
+
+          <tbody>
+
+            ${projects
+              .map(
+                (project) => `
+
+                  <tr>
+
+                    <td>
+                      ${escapeHTML(
+                        project.name || ""
+                      )}
+                    </td>
+
+                    <td>
+                      ${escapeHTML(
+                        project.customer || "-"
+                      )}
+                    </td>
+
+                    <td>
+                      <span class="status ${slugStatus(project.status)}">
+                        ${escapeHTML(
+                          project.status ||
+                          "Chuẩn bị"
+                        )}
+                      </span>
+                    </td>
+
+                    <td>
+                      ${escapeHTML(
+                        project.startDate
+                          ? formatDate(
+                              project.startDate
+                            )
+                          : "-"
+                      )}
+                    </td>
+
+                  </tr>
+
+                `
+              )
+              .join("")}
+
+          </tbody>
+
+        </table>
+
+      `;
+
+    }
+
+  }
+
+
+  /* =======================================================
+     SETTINGS
+  ======================================================= */
+
+  function renderSettings() {
+
+    const settings =
+      getSettings();
+
+
+    if ($("#setCompanyName")) {
+
+      $("#setCompanyName").value =
+        settings.companyName || "";
+
+    }
+
+
+    if ($("#setTaxCode")) {
+
+      $("#setTaxCode").value =
+        settings.taxCode || "";
+
+    }
+
+
+    if ($("#setAddress")) {
+
+      $("#setAddress").value =
+        settings.address || "";
+
+    }
+
+
+    if ($("#setRepresentative")) {
+
+      $("#setRepresentative").value =
+        settings.representative || "";
+
+    }
+
+
+    if ($("#setPosition")) {
+
+      $("#setPosition").value =
+        settings.position || "";
+
+    }
+
+
+    if ($("#setUserName")) {
+
+      $("#setUserName").value =
+        settings.userName ||
+        "Quản trị viên";
+
+    }
+
+
+    updateUserDisplay();
+
+  }
+
+
+  function saveSettings() {
+
+    const settings = {
+
+      companyName:
+        $("#setCompanyName")
+          ?.value
+          .trim() || "",
+
+      taxCode:
+        $("#setTaxCode")
+          ?.value
+          .trim() || "",
+
+      address:
+        $("#setAddress")
+          ?.value
+          .trim() || "",
+
+      representative:
+        $("#setRepresentative")
+          ?.value
+          .trim() || "",
+
+      position:
+        $("#setPosition")
+          ?.value
+          .trim() || "",
+
+      userName:
+        $("#setUserName")
+          ?.value
+          .trim() ||
+        "Quản trị viên"
+
+    };
+
+
+    writeStorage(
+      STORAGE.settings,
+      settings
+    );
+
+
+    updateUserDisplay();
+
+    showToast(
+      "Đã lưu cài đặt."
+    );
+
+  }
+
+
+  function updateUserDisplay() {
+
+    const settings =
+      getSettings();
+
+
+    if ($("#userName")) {
+
+      $("#userName").textContent =
+        settings.userName ||
+        "Quản trị viên";
+
+    }
+
+
+    const avatar =
+      document.querySelector(
+        ".avatar"
+      );
+
+
+    if (avatar) {
+
+      const name =
+        settings.userName ||
+        "Quản trị viên";
+
+      avatar.textContent =
+        name
+          .trim()
+          .charAt(0)
+          .toUpperCase() ||
+        "A";
+
+    }
+
+  }
+
+
+  /* =======================================================
+     EXPORT DATA
+  ======================================================= */
+
+  function exportData() {
+
+    const payload = {
+
+      exportedAt:
+        nowISO(),
+
+      app:
+        DATA.app || {},
+
+      company:
+        getSettings(),
+
+      projects:
+        getProjects(),
+
+      customers:
+        getCustomers(),
+
+      employees:
+        getEmployees(),
+
+      history:
+        getHistory(),
+
+      templates:
+        getTemplates()
+
+    };
+
+
+    const json =
+      JSON.stringify(
+        payload,
+        null,
+        2
+      );
+
+
+    const blob =
+      new Blob(
+        [json],
+        {
+          type:
+            "application/json;charset=utf-8"
+        }
+      );
+
+
+    const url =
+      URL.createObjectURL(
+        blob
+      );
+
+
+    const link =
+      document.createElement(
+        "a"
+      );
+
+
+    const date =
+      new Date()
+        .toISOString()
+        .slice(0, 10);
+
+
+    link.href =
+      url;
+
+    link.download =
+      `GROVA-DOCUMENT-backup-${date}.json`;
+
+
+    document.body.appendChild(
+      link
+    );
+
+    link.click();
+
+    link.remove();
+
+
+    URL.revokeObjectURL(
+      url
+    );
+
+
+    showToast(
+      "Đã xuất dữ liệu JSON."
+    );
+
+  }
+
+
+  /* =======================================================
+     RESET DATA
+  ======================================================= */
+
+  function resetData() {
+
+    const ok =
+      confirm(
+        "CẢNH BÁO\n\nBạn có chắc muốn xóa toàn bộ dữ liệu cục bộ của GROVA DOCUMENT trên thiết bị này?\n\nCông trình, khách hàng, nhân sự, lịch sử và cài đặt sẽ bị xóa."
+      );
+
+
+    if (!ok) {
+      return;
+    }
+
+
+    Object.values(
+      STORAGE
+    ).forEach(
+      (key) => {
+        localStorage.removeItem(
+          key
+        );
+      }
+    );
+
+
+    renderDashboard();
+
+    showPage(
+      "dashboard"
+    );
+
+    showToast(
+      "Đã xóa dữ liệu cục bộ."
+    );
+
+  }
+
+
+  /* =======================================================
+     EVENT HANDLERS
+  ======================================================= */
+
+  function handleClick(event) {
+
+    const navButton =
+      event.target.closest(
+        ".nav-item[data-page]"
+      );
+
+
+    if (navButton) {
+
+      showPage(
+        navButton.dataset.page
+      );
+
+      return;
+
+    }
+
+
+    const pageTarget =
+      event.target.closest(
+        "[data-page-target]"
+      );
+
+
+    if (pageTarget) {
+
+      showPage(
+        pageTarget.dataset.pageTarget
+      );
+
+      return;
+
+    }
+
+
+    const templateButton =
+      event.target.closest(
+        "[data-template-id]"
+      );
+
+
+    if (templateButton) {
+
+      openTemplate(
+        templateButton.dataset.templateId
+      );
+
+      return;
+
+    }
+
+
+    const pickerButton =
+      event.target.closest(
+        "[data-picker-template-id]"
+      );
+
+
+    if (pickerButton) {
+
+      closeModal();
+
+      openTemplate(
+        pickerButton.dataset.pickerTemplateId
+      );
+
+      return;
+
+    }
+
+
+    const actionButton =
+      event.target.closest(
+        "[data-action]"
+      );
+
+
+    if (!actionButton) {
+      return;
+    }
+
+
+    const action =
+      actionButton.dataset.action;
+
+
+    switch (action) {
+
+      case "new-document":
+
+        openTemplatePicker();
+
+        break;
+
+
+      case "new-project":
+
+        openProjectModal();
+
+        break;
+
+
+      case "edit-project":
+
+        openProjectModal(
+          actionButton.dataset.id
+        );
+
+        break;
+
+
+      case "delete-project":
+
+        deleteProject(
+          actionButton.dataset.id
+        );
+
+        break;
+
+
+      case "new-customer":
+
+        openCustomerModal();
+
+        break;
+
+
+      case "edit-customer":
+
+        openCustomerModal(
+          actionButton.dataset.id
+        );
+
+        break;
+
+
+      case "delete-customer":
+
+        deleteCustomer(
+          actionButton.dataset.id
+        );
+
+        break;
+
+
+      case "new-employee":
+
+        openEmployeeModal();
+
+        break;
+
+
+      case "edit-employee":
+
+        openEmployeeModal(
+          actionButton.dataset.id
+        );
+
+        break;
+
+
+      case "delete-employee":
+
+        deleteEmployee(
+          actionButton.dataset.id
+        );
+
+        break;
+
+
+      case "clear-history":
+
+        clearHistory();
+
+        break;
+
+
+      case "close-modal":
+
+        closeModal();
+
+        break;
+
+
+      case "save-settings":
+
+        saveSettings();
+
+        break;
+
+
+      case "export-data":
+
+        exportData();
+
+        break;
+
+
+      case "reset-data":
+
+        resetData();
+
+        break;
+
+    }
+
+  }
+
+
+  function handleInput(event) {
+
+    const id =
+      event.target.id;
+
+
+    if (
+      id ===
+      "documentSearch" ||
+      id ===
+      "documentCategory"
+    ) {
+
+      renderDocuments();
+
+      return;
+
+    }
+
+
+    if (
+      id ===
+      "projectSearch" ||
+      id ===
+      "projectStatus"
+    ) {
+
+      renderProjects();
+
+      return;
+
+    }
+
+
+    if (
+      id ===
+      "customerSearch"
+    ) {
+
+      renderCustomers();
+
+      return;
+
+    }
+
+
+    if (
+      id ===
+      "employeeSearch"
+    ) {
+
+      renderEmployees();
+
+      return;
+
+    }
+
+  }
+
+
+  function handleModalSave() {
+
+    switch (modalMode) {
+
+      case "project":
+
+        saveProject();
+
+        break;
+
+
+      case "customer":
+
+        saveCustomer();
+
+        break;
+
+
+      case "employee":
+
+        saveEmployee();
+
+        break;
+
+    }
+
+  }
+
+
+  /* =======================================================
+     KEYBOARD / MODAL
+  ======================================================= */
+
+  function handleKeydown(event) {
+
+    if (
+      event.key ===
+      "Escape"
+    ) {
+
+      closeModal();
+
+      closeSidebar();
+
+    }
+
+  }
+
+
+  function handleModalBackdrop(event) {
+
+    if (
+      event.target ===
+      $("#modal")
+    ) {
+
+      closeModal();
+
+    }
+
+  }
+
+
+  /* =======================================================
+     SERVICE WORKER
+  ======================================================= */
+
+  function registerServiceWorker() {
+
+    if (
+      "serviceWorker" in navigator
+    ) {
+
+      window.addEventListener(
+        "load",
+        () => {
+
+          navigator.serviceWorker
+            .register(
+              "./sw.js"
+            )
+            .catch(
+              (error) => {
+
+                console.warn(
+                  "GROVA SW:",
+                  error
+                );
+
+              }
+            );
+
+        }
+      );
+
+    }
+
+  }
+
+
+  /* =======================================================
+     INIT
+  ======================================================= */
+
+  function init() {
+
+    /* Navigation */
+
+    $$(".nav-item").forEach(
+      (button) => {
+
+        button.addEventListener(
+          "click",
+          () => {
+
+            showPage(
+              button.dataset.page
+            );
+
+          }
+        );
+
+      }
+    );
+
+
+    /* Global click */
+
+    document.addEventListener(
+      "click",
+      handleClick
+    );
+
+
+    /* Input / search */
+
+    document.addEventListener(
+      "input",
+      handleInput
+    );
+
+
+    document.addEventListener(
+      "change",
+      handleInput
+    );
+
+
+    /* Modal */
+
+    if ($("#modalSave")) {
+
+      $("#modalSave").addEventListener(
+        "click",
+        handleModalSave
+      );
+
+    }
+
+
+    if ($("#modal")) {
+
+      $("#modal").addEventListener(
+        "click",
+        handleModalBackdrop
+      );
+
+    }
+
+
+    /* Mobile sidebar */
+
+    if ($("#openSidebar")) {
+
+      $("#openSidebar").addEventListener(
+        "click",
+        openSidebar
+      );
+
+    }
+
+
+    if ($("#closeSidebar")) {
+
+      $("#closeSidebar").addEventListener(
+        "click",
+        closeSidebar
+      );
+
+    }
+
+
+    /* Keyboard */
+
+    document.addEventListener(
+      "keydown",
+      handleKeydown
+    );
+
+
+    /* Initial render */
+
+    initDocumentCategories();
+
+    updateUserDisplay();
+
+    renderDashboard();
+
+
+    /* Service worker */
+
+    registerServiceWorker();
+
+  }
+
+
+  /* =======================================================
      START
-     ========================================================= */
+  ======================================================= */
 
   if (
-    document.readyState === "loading"
+    document.readyState ===
+    "loading"
   ) {
 
     document.addEventListener(
@@ -1712,20 +3588,6 @@
     init();
 
   }
-
-
-  /* =========================================================
-     UPDATE TIME
-     ========================================================= */
-
-  window.setInterval(
-    function () {
-
-      refreshRecentTimes();
-
-    },
-    60 * 1000
-  );
 
 
 })();
