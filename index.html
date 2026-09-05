@@ -37,9 +37,14 @@
 
     <title>GROVA DOCUMENT</title>
 
+
+    <!-- =====================================================
+         PWA
+    ====================================================== -->
+
     <link
         rel="manifest"
-        href="./manifest.json?v=4"
+        href="./manifest.json?v=11"
     >
 
     <link
@@ -53,9 +58,14 @@
         href="./data/grova_logo.png"
     >
 
+
+    <!-- =====================================================
+         MAIN CSS
+    ====================================================== -->
+
     <link
         rel="stylesheet"
-        href="./style.css?v=10"
+        href="./style.css?v=11"
     >
 
 </head>
@@ -81,11 +91,14 @@
             <div class="brand">
 
                 <div class="brand-mark">
+
                     <img
                         src="./data/grova_logo.png"
                         alt="GROVA HOLDINGS"
                     >
+
                 </div>
+
 
                 <div class="brand-text">
 
@@ -105,6 +118,7 @@
             <button
                 id="closeSidebar"
                 class="icon-button mobile-only"
+                type="button"
                 aria-label="Đóng menu"
             >
                 ×
@@ -113,91 +127,174 @@
         </div>
 
 
-        <nav class="main-menu">
+        <nav
+            class="main-menu"
+            aria-label="Menu chính"
+        >
+
 
             <button
+                type="button"
                 class="menu-item active"
                 data-page="dashboard"
             >
-                <span class="menu-icon">⌂</span>
-                <span>Tổng quan</span>
+
+                <span class="menu-icon">
+                    ⌂
+                </span>
+
+                <span>
+                    Tổng quan
+                </span>
+
             </button>
 
 
             <button
+                type="button"
                 class="menu-item"
                 data-page="documents"
             >
-                <span class="menu-icon">▤</span>
-                <span>Văn bản</span>
+
+                <span class="menu-icon">
+                    ▤
+                </span>
+
+                <span>
+                    Văn bản
+                </span>
+
             </button>
 
 
             <button
+                type="button"
                 class="menu-item"
                 data-page="projects"
             >
-                <span class="menu-icon">⌂</span>
-                <span>Công trình</span>
+
+                <span class="menu-icon">
+                    ⌂
+                </span>
+
+                <span>
+                    Công trình
+                </span>
+
             </button>
 
 
             <button
+                type="button"
                 class="menu-item"
                 data-page="customers"
             >
-                <span class="menu-icon">♙</span>
-                <span>Khách hàng</span>
+
+                <span class="menu-icon">
+                    ♙
+                </span>
+
+                <span>
+                    Khách hàng
+                </span>
+
             </button>
 
 
             <button
+                type="button"
                 class="menu-item"
                 data-page="employees"
             >
-                <span class="menu-icon">♙</span>
-                <span>Nhân sự</span>
+
+                <span class="menu-icon">
+                    ♙
+                </span>
+
+                <span>
+                    Nhân sự
+                </span>
+
             </button>
 
 
             <button
+                type="button"
                 class="menu-item"
                 data-page="history"
             >
-                <span class="menu-icon">◷</span>
-                <span>Lịch sử</span>
+
+                <span class="menu-icon">
+                    ◷
+                </span>
+
+                <span>
+                    Lịch sử
+                </span>
+
             </button>
 
 
             <button
+                type="button"
                 class="menu-item"
                 data-page="reports"
             >
-                <span class="menu-icon">▥</span>
-                <span>Báo cáo</span>
+
+                <span class="menu-icon">
+                    ▥
+                </span>
+
+                <span>
+                    Báo cáo
+                </span>
+
             </button>
+
 
         </nav>
 
 
+        <!-- =================================================
+             SIDEBAR BOTTOM
+        ================================================== -->
+
         <div class="sidebar-bottom">
 
+
             <button
+                type="button"
                 class="menu-item"
                 data-page="settings"
             >
-                <span class="menu-icon">⚙</span>
-                <span>Cài đặt</span>
+
+                <span class="menu-icon">
+                    ⚙
+                </span>
+
+                <span>
+                    Cài đặt
+                </span>
+
             </button>
 
 
             <button
+                type="button"
                 class="menu-item"
                 data-page="admin"
             >
-                <span class="menu-icon">◆</span>
-                <span>Quản trị</span>
+
+                <span class="menu-icon">
+                    ◆
+                </span>
+
+                <span>
+                    Quản trị
+                </span>
+
             </button>
+
 
         </div>
 
@@ -206,13 +303,15 @@
 
 
     <!-- =====================================================
-         MAIN
+         MAIN CONTENT
     ====================================================== -->
 
     <main class="main-content">
 
 
-        <!-- TOPBAR -->
+        <!-- =================================================
+             TOPBAR
+        ================================================== -->
 
         <header class="topbar">
 
@@ -220,6 +319,7 @@
             <button
                 id="openSidebar"
                 class="icon-button mobile-only"
+                type="button"
                 aria-label="Mở menu"
             >
                 ☰
@@ -235,6 +335,7 @@
                     Tổng quan
                 </div>
 
+
                 <div
                     id="pageSubtitle"
                     class="page-subtitle"
@@ -247,38 +348,54 @@
 
             <div class="topbar-actions">
 
+
                 <button
+                    type="button"
                     class="notification-button"
                     title="Thông báo"
+                    aria-label="Thông báo"
                 >
+
                     ♢
 
-                    <span class="notification-dot"></span>
+                    <span
+                        class="notification-dot"
+                    ></span>
 
                 </button>
 
 
                 <div class="user-mini">
 
+
                     <div class="user-avatar">
                         A
                     </div>
 
+
                     <div class="user-info">
 
-                        <strong id="currentUserName">
+                        <strong
+                            id="currentUserName"
+                        >
                             Quản trị viên
                         </strong>
 
-                        <small id="currentUserRole">
+
+                        <small
+                            id="currentUserRole"
+                        >
                             Administrator
                         </small>
 
                     </div>
 
+
                 </div>
 
+
             </div>
+
 
         </header>
 
@@ -304,6 +421,10 @@
             >
 
 
+                <!-- =============================================
+                     WELCOME
+                ============================================== -->
+
                 <div class="welcome-card">
 
 
@@ -318,6 +439,7 @@
 
 
                         <div class="welcome-copy">
+
 
                             <span class="eyebrow">
                                 GROVA HOLDINGS
@@ -334,23 +456,32 @@
                                 công trình tập trung.
                             </p>
 
+
                         </div>
+
 
                     </div>
 
 
                     <button
+                        type="button"
                         class="primary-button"
                         data-action="new-document"
                     >
                         + Tạo văn bản
                     </button>
 
+
                 </div>
 
 
 
+                <!-- =============================================
+                     DOCUMENT SECTION
+                ============================================== -->
+
                 <div class="section-heading">
+
 
                     <div>
 
@@ -358,11 +489,13 @@
                             Văn bản
                         </h2>
 
+
                         <p>
                             Chọn mẫu để bắt đầu tạo hồ sơ
                         </p>
 
                     </div>
+
 
                 </div>
 
@@ -375,18 +508,29 @@
 
 
 
+                <!-- =============================================
+                     DASHBOARD BOTTOM
+                ============================================== -->
+
                 <div class="dashboard-grid">
 
 
+                    <!-- =========================================
+                         RECENT
+                    ========================================== -->
+
                     <div class="panel">
 
+
                         <div class="panel-header">
+
 
                             <div>
 
                                 <h3>
                                     Hoạt động gần đây
                                 </h3>
+
 
                                 <p>
                                     Các hồ sơ vừa xử lý
@@ -396,11 +540,13 @@
 
 
                             <button
+                                type="button"
                                 class="text-button"
                                 data-page="history"
                             >
                                 Xem tất cả
                             </button>
+
 
                         </div>
 
@@ -411,13 +557,20 @@
                         >
                         </div>
 
+
                     </div>
 
 
 
+                    <!-- =========================================
+                         STATS
+                    ========================================== -->
+
                     <div class="panel">
 
+
                         <div class="panel-header">
+
 
                             <div>
 
@@ -425,11 +578,13 @@
                                     Thống kê
                                 </h3>
 
+
                                 <p>
                                     Tổng quan hệ thống
                                 </p>
 
                             </div>
+
 
                         </div>
 
@@ -443,7 +598,10 @@
                                     Tổng văn bản
                                 </span>
 
-                                <strong id="statDocuments">
+
+                                <strong
+                                    id="statDocuments"
+                                >
                                     0
                                 </strong>
 
@@ -456,7 +614,10 @@
                                     Công trình
                                 </span>
 
-                                <strong id="statProjects">
+
+                                <strong
+                                    id="statProjects"
+                                >
                                     0
                                 </strong>
 
@@ -469,7 +630,10 @@
                                     Khách hàng
                                 </span>
 
-                                <strong id="statCustomers">
+
+                                <strong
+                                    id="statCustomers"
+                                >
                                     0
                                 </strong>
 
@@ -482,7 +646,10 @@
                                     Nhân sự
                                 </span>
 
-                                <strong id="statEmployees">
+
+                                <strong
+                                    id="statEmployees"
+                                >
                                     0
                                 </strong>
 
@@ -491,10 +658,12 @@
 
                         </div>
 
+
                     </div>
 
 
                 </div>
+
 
             </div>
 
@@ -506,16 +675,19 @@
 
             <div
                 id="page-documents"
-                class="page"
+                class="page hidden"
             >
 
+
                 <div class="page-toolbar">
+
 
                     <div>
 
                         <h1>
                             Văn bản
                         </h1>
+
 
                         <p>
                             Quản lý và tạo các mẫu văn bản GROVA
@@ -525,11 +697,13 @@
 
 
                     <button
+                        type="button"
                         class="primary-button"
                         data-action="new-document"
                     >
                         + Tạo văn bản
                     </button>
+
 
                 </div>
 
@@ -539,6 +713,7 @@
                     class="document-grid"
                 >
                 </div>
+
 
             </div>
 
@@ -550,16 +725,19 @@
 
             <div
                 id="page-projects"
-                class="page"
+                class="page hidden"
             >
 
+
                 <div class="page-toolbar">
+
 
                     <div>
 
                         <h1>
                             Công trình
                         </h1>
+
 
                         <p>
                             Dữ liệu công trình được dùng chung
@@ -569,29 +747,38 @@
                     </div>
 
 
-                    <button class="primary-button">
+                    <button
+                        type="button"
+                        class="primary-button"
+                    >
                         + Công trình mới
                     </button>
+
 
                 </div>
 
 
                 <div class="empty-state">
 
+
                     <div class="empty-icon">
                         ⌂
                     </div>
 
+
                     <h3>
                         Chưa có công trình
                     </h3>
+
 
                     <p>
                         Công trình sẽ được quản lý tập trung
                         và liên kết với các văn bản.
                     </p>
 
+
                 </div>
+
 
             </div>
 
@@ -603,16 +790,19 @@
 
             <div
                 id="page-customers"
-                class="page"
+                class="page hidden"
             >
 
+
                 <div class="page-toolbar">
+
 
                     <div>
 
                         <h1>
                             Khách hàng
                         </h1>
+
 
                         <p>
                             Quản lý thông tin khách hàng.
@@ -621,29 +811,38 @@
                     </div>
 
 
-                    <button class="primary-button">
+                    <button
+                        type="button"
+                        class="primary-button"
+                    >
                         + Khách hàng mới
                     </button>
+
 
                 </div>
 
 
                 <div class="empty-state">
 
+
                     <div class="empty-icon">
                         ♙
                     </div>
 
+
                     <h3>
                         Chưa có khách hàng
                     </h3>
+
 
                     <p>
                         Dữ liệu khách hàng sẽ được dùng để
                         tự động điền vào hồ sơ.
                     </p>
 
+
                 </div>
+
 
             </div>
 
@@ -655,16 +854,19 @@
 
             <div
                 id="page-employees"
-                class="page"
+                class="page hidden"
             >
 
+
                 <div class="page-toolbar">
+
 
                     <div>
 
                         <h1>
                             Nhân sự
                         </h1>
+
 
                         <p>
                             Quản lý hồ sơ nhân sự và hợp đồng lao động.
@@ -673,29 +875,38 @@
                     </div>
 
 
-                    <button class="primary-button">
+                    <button
+                        type="button"
+                        class="primary-button"
+                    >
                         + Nhân sự mới
                     </button>
+
 
                 </div>
 
 
                 <div class="empty-state">
 
+
                     <div class="empty-icon">
                         ♙
                     </div>
 
+
                     <h3>
                         Khu vực nhân sự
                     </h3>
+
 
                     <p>
                         Chỉ người dùng được cấp quyền mới
                         có thể xem dữ liệu nhân sự.
                     </p>
 
+
                 </div>
+
 
             </div>
 
@@ -707,10 +918,12 @@
 
             <div
                 id="page-history"
-                class="page"
+                class="page hidden"
             >
 
+
                 <div class="page-toolbar">
+
 
                     <div>
 
@@ -718,30 +931,37 @@
                             Lịch sử
                         </h1>
 
+
                         <p>
                             Theo dõi các văn bản đã tạo và xuất PDF.
                         </p>
 
                     </div>
 
+
                 </div>
 
 
                 <div class="empty-state">
 
+
                     <div class="empty-icon">
                         ◷
                     </div>
+
 
                     <h3>
                         Chưa có lịch sử
                     </h3>
 
+
                     <p>
                         Các văn bản được tạo sẽ xuất hiện tại đây.
                     </p>
 
+
                 </div>
+
 
             </div>
 
@@ -753,10 +973,12 @@
 
             <div
                 id="page-reports"
-                class="page"
+                class="page hidden"
             >
 
+
                 <div class="page-toolbar">
+
 
                     <div>
 
@@ -764,31 +986,38 @@
                             Báo cáo
                         </h1>
 
+
                         <p>
                             Tổng hợp dữ liệu hồ sơ và công trình.
                         </p>
 
                     </div>
 
+
                 </div>
 
 
                 <div class="empty-state">
 
+
                     <div class="empty-icon">
                         ▥
                     </div>
 
+
                     <h3>
                         Báo cáo
                     </h3>
+
 
                     <p>
                         Khu vực báo cáo sẽ được triển khai
                         sau khi có dữ liệu thực.
                     </p>
 
+
                 </div>
+
 
             </div>
 
@@ -800,10 +1029,12 @@
 
             <div
                 id="page-settings"
-                class="page"
+                class="page hidden"
             >
 
+
                 <div class="page-toolbar">
+
 
                     <div>
 
@@ -811,11 +1042,13 @@
                             Cài đặt
                         </h1>
 
+
                         <p>
                             Cấu hình GROVA DOCUMENT.
                         </p>
 
                     </div>
+
 
                 </div>
 
@@ -825,11 +1058,13 @@
 
                     <div class="setting-item">
 
+
                         <div>
 
                             <strong>
                                 Khổ giấy
                             </strong>
+
 
                             <small>
                                 Khổ giấy mặc định khi xuất hồ sơ
@@ -837,14 +1072,17 @@
 
                         </div>
 
+
                         <span class="setting-value">
                             A4
                         </span>
+
 
                     </div>
 
 
                     <div class="setting-item">
+
 
                         <div>
 
@@ -852,20 +1090,24 @@
                                 Định dạng xuất
                             </strong>
 
+
                             <small>
                                 Định dạng tài liệu cuối cùng
                             </small>
 
                         </div>
 
+
                         <span class="setting-value">
                             PDF
                         </span>
+
 
                     </div>
 
 
                 </div>
+
 
             </div>
 
@@ -877,16 +1119,19 @@
 
             <div
                 id="page-admin"
-                class="page"
+                class="page hidden"
             >
 
+
                 <div class="page-toolbar">
+
 
                     <div>
 
                         <h1>
                             Quản trị hệ thống
                         </h1>
+
 
                         <p>
                             Quản lý người dùng, mẫu văn bản
@@ -895,71 +1140,93 @@
 
                     </div>
 
+
                 </div>
 
 
                 <div class="admin-grid">
 
 
-                    <button class="admin-card">
+                    <button
+                        type="button"
+                        class="admin-card"
+                    >
 
                         <span class="admin-card-icon">
                             ♙
                         </span>
 
+
                         <strong>
                             Người dùng
                         </strong>
+
 
                         <small>
                             Tài khoản và phân quyền
                         </small>
 
+
                     </button>
 
 
-                    <button class="admin-card">
+                    <button
+                        type="button"
+                        class="admin-card"
+                    >
 
                         <span class="admin-card-icon">
                             ▤
                         </span>
 
+
                         <strong>
                             Mẫu văn bản
                         </strong>
+
 
                         <small>
                             Thêm, sửa, bật/tắt mẫu
                         </small>
 
+
                     </button>
 
 
-                    <button class="admin-card">
+                    <button
+                        type="button"
+                        class="admin-card"
+                    >
 
                         <span class="admin-card-icon">
                             ⚙
                         </span>
 
+
                         <strong>
                             Dữ liệu hệ thống
                         </strong>
 
+
                         <small>
                             Cấu hình dữ liệu dùng chung
                         </small>
+
 
                     </button>
 
 
                 </div>
 
+
             </div>
 
 
         </section>
 
+
     </main>
+
 
 </div>
 
@@ -975,23 +1242,39 @@
     aria-hidden="true"
 >
 
-    <div class="modal-overlay"></div>
+
+    <div
+        class="modal-overlay"
+    ></div>
 
 
-    <div class="modal-card">
+    <div
+        class="modal-card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modalTitle"
+    >
 
+
+        <!-- ================================================
+             MODAL HEADER
+        ================================================= -->
 
         <div class="modal-header">
 
+
             <div>
+
 
                 <span class="eyebrow">
                     TẠO VĂN BẢN
                 </span>
 
+
                 <h2 id="modalTitle">
                     Chọn mẫu văn bản
                 </h2>
+
 
             </div>
 
@@ -999,13 +1282,20 @@
             <button
                 id="closeModal"
                 class="modal-close"
+                type="button"
                 aria-label="Đóng"
             >
                 ×
             </button>
 
+
         </div>
 
+
+
+        <!-- ================================================
+             TEMPLATE SELECTOR
+        ================================================= -->
 
         <div
             id="templateSelector"
@@ -1014,7 +1304,13 @@
         </div>
 
 
+
+        <!-- ================================================
+             MODAL FOOTER
+        ================================================= -->
+
         <div class="modal-footer">
+
 
             <button
                 type="button"
@@ -1033,39 +1329,69 @@
                 Mở mẫu
             </button>
 
+
         </div>
 
 
     </div>
+
 
 </div>
 
 
 
 <!-- =========================================================
-     SCRIPTS
+     DATA
 ========================================================= -->
 
-<script src="./data/data.js?v=4"></script>
+<script
+    src="./data/data.js?v=11"
+></script>
 
-<script src="./app.js?v=10"></script>
 
+<!-- =========================================================
+     APPLICATION
+========================================================= -->
+
+<script
+    src="./app.js?v=11"
+></script>
+
+
+
+<!-- =========================================================
+     SERVICE WORKER
+========================================================= -->
 
 <script>
 
-if ("serviceWorker" in navigator) {
+if (
+    "serviceWorker" in navigator
+) {
 
     window.addEventListener(
         "load",
         function () {
 
             navigator.serviceWorker
-                .register("./sw.js?v=10")
-                .catch(
+                .register(
+                    "./sw.js?v=11"
+                )
+                .then(
                     function () {
 
                         console.log(
-                            "Service Worker chưa được kích hoạt."
+                            "GROVA DOCUMENT Service Worker đã đăng ký."
+                        );
+
+                    }
+                )
+                .catch(
+                    function (error) {
+
+                        console.warn(
+                            "Service Worker chưa được kích hoạt:",
+                            error
                         );
 
                     }
