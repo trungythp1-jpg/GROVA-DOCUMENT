@@ -1,13 +1,28 @@
 <!DOCTYPE html>
 <html lang="vi">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>GROVA DOCUMENT – Biên bản thanh lý hợp đồng</title>
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>
+    GROVA DOCUMENT – Biên bản thanh lý hợp đồng
+  </title>
 
   <style>
-    * {
+
+    /* =========================================================
+       RESET
+    ========================================================= */
+
+    *,
+    *::before,
+    *::after {
       box-sizing: border-box;
     }
 
@@ -22,6 +37,7 @@
 
     body {
       min-height: 100vh;
+      overflow-x: hidden;
     }
 
     button,
@@ -31,15 +47,22 @@
       font: inherit;
     }
 
+
+    /* =========================================================
+       APP
+    ========================================================= */
+
     .app {
+      width: 100%;
       max-width: 1500px;
       margin: 0 auto;
       padding: 18px;
     }
 
-    /* =========================
+
+    /* =========================================================
        TOP BAR
-    ========================= */
+    ========================================================= */
 
     .topbar {
       display: flex;
@@ -53,6 +76,7 @@
       display: flex;
       align-items: center;
       gap: 12px;
+      min-width: 0;
     }
 
     .brand {
@@ -60,6 +84,7 @@
       font-weight: 800;
       font-size: 20px;
       letter-spacing: .3px;
+      white-space: nowrap;
     }
 
     .subtitle {
@@ -94,24 +119,32 @@
       background: #e5ebe8;
     }
 
-    /* =========================
-       LAYOUT
-    ========================= */
+
+    /* =========================================================
+       WORKSPACE
+    ========================================================= */
 
     .workspace {
       display: grid;
       grid-template-columns: 390px minmax(0, 1fr);
       gap: 20px;
       align-items: start;
+      width: 100%;
     }
 
     .panel {
+      min-width: 0;
       background: #fff;
       border: 1px solid #dce5e1;
       border-radius: 16px;
       box-shadow: 0 5px 22px rgba(24, 54, 43, .07);
       overflow: hidden;
     }
+
+
+    /* =========================================================
+       FORM PANEL
+    ========================================================= */
 
     .panel-header {
       padding: 18px 20px;
@@ -137,6 +170,7 @@
 
     .group {
       margin-bottom: 19px;
+      min-width: 0;
     }
 
     .group-title {
@@ -153,6 +187,7 @@
 
     .group-title::before {
       content: "";
+      flex: 0 0 4px;
       width: 4px;
       height: 16px;
       border-radius: 5px;
@@ -161,6 +196,7 @@
 
     .field {
       margin-bottom: 10px;
+      min-width: 0;
     }
 
     .field:last-child {
@@ -178,7 +214,9 @@
     .field input,
     .field textarea,
     .field select {
+      display: block;
       width: 100%;
+      min-width: 0;
       border: 1px solid #ccd8d3;
       border-radius: 9px;
       padding: 9px 10px;
@@ -201,13 +239,13 @@
 
     .two-col {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       gap: 9px;
     }
 
     .money-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       gap: 9px;
     }
 
@@ -229,6 +267,7 @@
 
     .money-result-row strong {
       color: #0b7a5a;
+      white-space: nowrap;
     }
 
     .notice {
@@ -251,11 +290,13 @@
       flex: 1;
     }
 
-    /* =========================
-       PREVIEW
-    ========================= */
+
+    /* =========================================================
+       PREVIEW PANEL
+    ========================================================= */
 
     .preview-panel {
+      min-width: 0;
       padding: 20px;
       overflow: auto;
     }
@@ -267,77 +308,161 @@
       font-weight: 700;
     }
 
+
+    /* =========================================================
+       A4 PAPER
+    ========================================================= */
+
     .paper {
+      position: relative;
+
       width: 210mm;
+      max-width: 210mm;
       min-height: 297mm;
+
       margin: 0 auto;
-      padding: 17mm 17mm 18mm;
+
+      /*
+       * Giữ vùng nội dung an toàn:
+       * trái/phải 16mm
+       * tránh tràn mép khi in PDF.
+       */
+      padding: 16mm 16mm 18mm;
+
       background: #fff;
+
       box-shadow: 0 8px 30px rgba(20, 38, 31, .12);
+
       color: #111;
+
       font-size: 12.5pt;
       line-height: 1.42;
+
+      /*
+       * Không cho bất kỳ phần tử nào phá chiều rộng A4.
+       */
+      overflow: hidden;
+
+      overflow-wrap: break-word;
+      word-wrap: break-word;
     }
 
-    /* =========================
+    .paper *,
+    .paper *::before,
+    .paper *::after {
+      max-width: 100%;
+    }
+
+    .paper p,
+    .paper div,
+    .paper span,
+    .paper td,
+    .paper th {
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+    }
+
+
+    /* =========================================================
        DOCUMENT HEADER
-    ========================= */
+    ========================================================= */
 
     .doc-header {
       display: grid;
-      grid-template-columns: 43% 57%;
+
+      /*
+       * Không dùng 43/57 vì Quốc hiệu khá dài.
+       * Chia đều hơn để cả hai vùng có đủ không gian.
+       */
+      grid-template-columns: minmax(0, 46%) minmax(0, 54%);
+
       align-items: start;
+
+      width: 100%;
+      min-width: 0;
+
       margin-bottom: 7mm;
     }
 
     .logo-box {
       display: flex;
       align-items: flex-start;
+      justify-content: flex-start;
+      min-width: 0;
     }
 
     .logo {
       display: block;
+
+      width: auto;
       max-width: 39mm;
       max-height: 20mm;
+
       object-fit: contain;
     }
 
     .national {
+      min-width: 0;
+
       text-align: center;
-      font-size: 11.5pt;
+
+      font-size: 11.2pt;
       line-height: 1.35;
+
       font-weight: 700;
+
+      overflow-wrap: normal;
+      word-break: normal;
+    }
+
+    .national > div {
+      max-width: 100%;
     }
 
     .national .motto {
       margin-top: 1.5mm;
       font-weight: 700;
+      white-space: nowrap;
     }
 
     .national .line {
       width: 45mm;
+      max-width: 70%;
+      height: 0;
+
       border-bottom: 1px solid #111;
+
       margin: 1.5mm auto 0;
     }
 
-    /* =========================
+
+    /* =========================================================
        TITLE
-    ========================= */
+    ========================================================= */
 
     .doc-title {
+      width: 100%;
+      min-width: 0;
+
       text-align: center;
+
       margin-bottom: 6mm;
     }
 
     .doc-title h1 {
       margin: 0;
+
       font-size: 16.5pt;
       line-height: 1.25;
+
       font-weight: 800;
+
+      overflow-wrap: normal;
     }
 
     .doc-title .subtitle-document {
       margin-top: 1.5mm;
+
       font-size: 12.5pt;
       font-weight: 700;
     }
@@ -351,25 +476,48 @@
       margin: 4mm 0;
     }
 
+    .intro p {
+      margin: 1.8mm 0;
+    }
+
     .date-line {
+      width: 100%;
+
       text-align: center;
+
       margin: 3mm 0 5mm;
+
       font-style: italic;
     }
 
-    /* =========================
+
+    /* =========================================================
        SECTIONS
-    ========================= */
+    ========================================================= */
 
     .section {
+      width: 100%;
+      min-width: 0;
+
       margin-top: 5mm;
+
+      /*
+       * Cho phép cả section tự xuống trang,
+       * không làm vỡ bảng hoặc đoạn nội dung.
+       */
+      break-inside: auto;
+      page-break-inside: auto;
     }
 
     .section h2 {
       margin: 0 0 2.5mm;
+
       font-size: 12.5pt;
       line-height: 1.3;
+
       font-weight: 800;
+
+      overflow-wrap: normal;
     }
 
     .section p {
@@ -389,22 +537,47 @@
       padding-left: 7mm;
     }
 
-    /* =========================
+
+    /* =========================================================
        TABLE
-    ========================= */
+    ========================================================= */
 
     .doc-table {
+      display: table;
+
       width: 100%;
+      max-width: 100%;
+
       border-collapse: collapse;
+
       margin: 3mm 0 4mm;
+
       table-layout: fixed;
+
+      /*
+       * Quan trọng:
+       * không để bảng vượt vùng nội dung A4.
+       */
+      box-sizing: border-box;
+
+      break-inside: avoid;
+      page-break-inside: avoid;
     }
 
     .doc-table th,
     .doc-table td {
       border: 1px solid #222;
+
       padding: 2.2mm 2mm;
+
       vertical-align: middle;
+
+      min-width: 0;
+
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+
+      word-break: normal;
     }
 
     .doc-table th {
@@ -414,24 +587,43 @@
 
     .doc-table td.number {
       text-align: center;
+      white-space: nowrap;
     }
 
     .doc-table td.money {
       text-align: right;
+
+      /*
+       * Số tiền không bị xuống dòng.
+       */
       white-space: nowrap;
+
+      font-variant-numeric: tabular-nums;
     }
 
-    .doc-table .total-row td {
+    .doc-table .total-row td,
+    .doc-table .total-row th {
       font-weight: 700;
     }
+
+
+    /* =========================================================
+       CONTRACT INFO TABLE
+    ========================================================= */
 
     .contract-info th:first-child {
       width: 37%;
     }
 
     .contract-info td {
+      width: 63%;
       text-align: left;
     }
+
+
+    /* =========================================================
+       VALUE TABLE
+    ========================================================= */
 
     .value-table th:nth-child(1) {
       width: 9%;
@@ -445,6 +637,11 @@
       width: 40%;
     }
 
+
+    /* =========================================================
+       PAYMENT TABLE
+    ========================================================= */
+
     .payment-table th:nth-child(1) {
       width: 60%;
     }
@@ -452,6 +649,11 @@
     .payment-table th:nth-child(2) {
       width: 40%;
     }
+
+
+    /* =========================================================
+       REMAINING TABLE
+    ========================================================= */
 
     .remaining-table th:nth-child(1) {
       width: 8%;
@@ -469,48 +671,78 @@
       width: 25%;
     }
 
-    /* =========================
+    .remaining-table td {
+      overflow-wrap: anywhere;
+    }
+
+
+    /* =========================================================
        CHECKLIST
-    ========================= */
+    ========================================================= */
 
     .confirm-list {
       margin: 3mm 0;
       padding-left: 0;
+
       list-style: none;
+
+      width: 100%;
     }
 
     .confirm-list li {
-      margin: 2.5mm 0;
-      padding-left: 7mm;
       position: relative;
+
+      margin: 2.5mm 0;
+
+      padding-left: 7mm;
+
+      break-inside: avoid;
+      page-break-inside: avoid;
     }
 
     .confirm-list li::before {
       content: "☐";
+
       position: absolute;
+
       left: 0;
       top: 0;
     }
 
-    /* =========================
+
+    /* =========================================================
        SIGNATURE
-    ========================= */
+    ========================================================= */
 
     .signature-table {
       width: 100%;
+      max-width: 100%;
+
       border-collapse: collapse;
+
       margin-top: 10mm;
+
       table-layout: fixed;
+
       break-inside: avoid;
       page-break-inside: avoid;
     }
 
     .signature-table td {
       width: 50%;
+
       text-align: center;
       vertical-align: top;
+
       border: 0;
-      padding: 0 8mm;
+
+      padding: 0 6mm;
+
+      min-width: 0;
+
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+
       break-inside: avoid;
       page-break-inside: avoid;
     }
@@ -521,8 +753,12 @@
 
     .signature-company {
       margin-top: 1mm;
+
       min-height: 10mm;
+
       font-weight: 700;
+
+      overflow-wrap: anywhere;
     }
 
     .signature-space {
@@ -531,11 +767,14 @@
 
     .signature-note {
       font-size: 11.5pt;
+
+      overflow-wrap: anywhere;
     }
 
-    /* =========================
+
+    /* =========================================================
        PRINT
-    ========================= */
+    ========================================================= */
 
     @page {
       size: A4 portrait;
@@ -543,15 +782,27 @@
     }
 
     @media print {
+
       html,
       body {
-        background: #fff;
+        width: 210mm;
         margin: 0;
         padding: 0;
+
+        background: #fff;
+
+        overflow: visible;
+      }
+
+      body {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
       }
 
       .app {
+        width: 210mm;
         max-width: none;
+
         padding: 0;
         margin: 0;
       }
@@ -564,45 +815,124 @@
 
       .workspace {
         display: block;
+
+        width: 210mm;
+
+        margin: 0;
+        padding: 0;
       }
 
       .preview-panel {
-        padding: 0;
-        overflow: visible;
-      }
+        display: block;
 
-      .paper {
         width: 210mm;
-        min-height: 0;
-        height: auto;
+        max-width: 210mm;
+
+        padding: 0;
         margin: 0;
-        padding: 17mm 17mm 18mm;
+
+        overflow: visible;
+
+        border: 0;
+        border-radius: 0;
         box-shadow: none;
       }
 
-      .section,
-      .doc-table,
-      .signature-table {
+      .paper {
+        display: block;
+
+        width: 210mm;
+        max-width: 210mm;
+
+        min-height: 0;
+        height: auto;
+
+        margin: 0;
+        padding: 16mm 16mm 18mm;
+
+        box-shadow: none;
+
+        overflow: visible;
+
+        font-size: 12.5pt;
+        line-height: 1.42;
+      }
+
+      /*
+       * Không để section tự bị cắt giữa nội dung.
+       * Nhưng không ép toàn bộ văn bản vào một trang.
+       */
+      .section {
+        break-inside: auto;
+        page-break-inside: auto;
+      }
+
+      /*
+       * Các bảng không bị tách đôi nếu đủ chỗ.
+       */
+      .doc-table {
         break-inside: avoid;
+        page-break-inside: avoid;
+      }
+
+      .confirm-list li {
+        break-inside: avoid;
+        page-break-inside: avoid;
       }
 
       .signature-table {
-        break-before: auto;
-        page-break-before: auto;
+        break-inside: avoid;
+        page-break-inside: avoid;
+
+        margin-top: 10mm;
+      }
+
+      .signature-table td {
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+
+      /*
+       * Tránh trình duyệt tự thêm khoảng trắng / viền.
+       */
+      .panel {
+        border: 0;
+        box-shadow: none;
+        border-radius: 0;
+      }
+
+      /*
+       * Đảm bảo hình ảnh không làm rộng trang.
+       */
+      img {
+        max-width: 100%;
+      }
+
+      /*
+       * Tránh tiêu đề bị nằm riêng cuối trang.
+       */
+      .section h2 {
+        break-after: avoid;
+        page-break-after: avoid;
       }
     }
 
-    /* =========================
+
+    /* =========================================================
        RESPONSIVE
-    ========================= */
+    ========================================================= */
 
     @media (max-width: 1100px) {
+
       .workspace {
         grid-template-columns: 350px minmax(0, 1fr);
       }
+
     }
 
+
     @media (max-width: 850px) {
+
       .workspace {
         grid-template-columns: 1fr;
       }
@@ -610,9 +940,12 @@
       .preview-panel {
         overflow-x: auto;
       }
+
     }
 
+
     @media (max-width: 600px) {
+
       .app {
         padding: 10px;
       }
@@ -639,44 +972,84 @@
       .paper {
         margin-left: 0;
       }
+
     }
+
   </style>
 </head>
+
 
 <body>
 
 <div class="app">
 
+
+  <!-- =======================================================
+       TOP BAR
+  ======================================================== -->
+
   <div class="topbar">
+
     <div class="topbar-left">
-      <div class="brand">GROVA DOCUMENT</div>
-      <div class="subtitle">Biên bản thanh lý hợp đồng</div>
+
+      <div class="brand">
+        GROVA DOCUMENT
+      </div>
+
+      <div class="subtitle">
+        Biên bản thanh lý hợp đồng
+      </div>
+
     </div>
 
-    <button class="btn btn-secondary" type="button" onclick="goBack()">
+
+    <button
+      class="btn btn-secondary"
+      type="button"
+      onclick="goBack()"
+    >
       ← Quay lại
     </button>
+
   </div>
+
+
+
+  <!-- =======================================================
+       WORKSPACE
+  ======================================================== -->
 
   <div class="workspace">
 
-    <!-- =========================
+
+    <!-- =====================================================
          FORM
-    ========================== -->
+    ====================================================== -->
 
     <div class="panel form-panel">
 
+
       <div class="panel-header">
-        <h1>Tạo biên bản thanh lý</h1>
+
+        <h1>
+          Tạo biên bản thanh lý
+        </h1>
+
         <p>
           Nhập thông tin bên trái. Nội dung văn bản sẽ được cập nhật
           trực tiếp ở bản xem trước.
         </p>
+
       </div>
+
+
 
       <div class="form-body">
 
-        <!-- THÔNG TIN VĂN BẢN -->
+
+        <!-- =================================================
+             THÔNG TIN VĂN BẢN
+        ================================================== -->
 
         <div class="group">
 
@@ -684,35 +1057,85 @@
             Thông tin văn bản
           </div>
 
-          <div class="field">
-            <label>Số biên bản</label>
-            <input id="documentNumber" type="text">
-          </div>
 
           <div class="field">
-            <label>Ngày lập biên bản</label>
-            <input id="documentDate" type="date">
+
+            <label>
+              Số biên bản
+            </label>
+
+            <input
+              id="documentNumber"
+              type="text"
+            >
+
           </div>
 
-          <div class="field">
-            <label>Hợp đồng số</label>
-            <input id="contractNumber" type="text" placeholder="Nhập số hợp đồng">
-          </div>
 
           <div class="field">
-            <label>Ngày ký hợp đồng</label>
-            <input id="contractDate" type="date">
+
+            <label>
+              Ngày lập biên bản
+            </label>
+
+            <input
+              id="documentDate"
+              type="date"
+            >
+
           </div>
 
+
           <div class="field">
-            <label>Phụ lục hợp đồng số</label>
-            <input id="appendixNumber" type="text" placeholder="Nếu có">
+
+            <label>
+              Hợp đồng số
+            </label>
+
+            <input
+              id="contractNumber"
+              type="text"
+              placeholder="Nhập số hợp đồng"
+            >
+
+          </div>
+
+
+          <div class="field">
+
+            <label>
+              Ngày ký hợp đồng
+            </label>
+
+            <input
+              id="contractDate"
+              type="date"
+            >
+
+          </div>
+
+
+          <div class="field">
+
+            <label>
+              Phụ lục hợp đồng số
+            </label>
+
+            <input
+              id="appendixNumber"
+              type="text"
+              placeholder="Nếu có"
+            >
+
           </div>
 
         </div>
 
 
-        <!-- CÔNG TRÌNH -->
+
+        <!-- =================================================
+             CÔNG TRÌNH
+        ================================================== -->
 
         <div class="group">
 
@@ -720,43 +1143,89 @@
             Thông tin công trình
           </div>
 
-          <div class="field">
-            <label>Tên công trình</label>
-            <input id="projectName" type="text">
-          </div>
 
           <div class="field">
-            <label>Địa chỉ công trình</label>
-            <textarea id="projectAddress"></textarea>
+
+            <label>
+              Tên công trình
+            </label>
+
+            <input
+              id="projectName"
+              type="text"
+            >
+
           </div>
 
+
           <div class="field">
-            <label>Nội dung công việc</label>
+
+            <label>
+              Địa chỉ công trình
+            </label>
+
+            <textarea
+              id="projectAddress"
+            ></textarea>
+
+          </div>
+
+
+          <div class="field">
+
+            <label>
+              Nội dung công việc
+            </label>
+
             <input
               id="workContent"
               type="text"
               value="Thi công lắp đặt khung thép thang máy"
             >
+
           </div>
+
 
           <div class="two-col">
 
-            <div class="field">
-              <label>Ngày bắt đầu</label>
-              <input id="startDate" type="date">
-            </div>
 
             <div class="field">
-              <label>Ngày hoàn thành</label>
-              <input id="endDate" type="date">
+
+              <label>
+                Ngày bắt đầu
+              </label>
+
+              <input
+                id="startDate"
+                type="date"
+              >
+
             </div>
+
+
+            <div class="field">
+
+              <label>
+                Ngày hoàn thành
+              </label>
+
+              <input
+                id="endDate"
+                type="date"
+              >
+
+            </div>
+
 
           </div>
 
         </div>
 
 
-        <!-- BÊN B -->
+
+        <!-- =================================================
+             BÊN B
+        ================================================== -->
 
         <div class="group">
 
@@ -764,44 +1233,102 @@
             Thông tin bên B
           </div>
 
-          <div class="field">
-            <label>Tên công ty</label>
-            <input id="partyBName" type="text">
-          </div>
 
           <div class="field">
-            <label>Mã số thuế</label>
-            <input id="partyBTax" type="text">
+
+            <label>
+              Tên công ty
+            </label>
+
+            <input
+              id="partyBName"
+              type="text"
+            >
+
           </div>
 
+
           <div class="field">
-            <label>Địa chỉ</label>
-            <textarea id="partyBAddress"></textarea>
+
+            <label>
+              Mã số thuế
+            </label>
+
+            <input
+              id="partyBTax"
+              type="text"
+            >
+
           </div>
+
+
+          <div class="field">
+
+            <label>
+              Địa chỉ
+            </label>
+
+            <textarea
+              id="partyBAddress"
+            ></textarea>
+
+          </div>
+
 
           <div class="two-col">
 
-            <div class="field">
-              <label>Đại diện</label>
-              <input id="partyBRepresentative" type="text">
-            </div>
 
             <div class="field">
-              <label>Chức vụ</label>
-              <input id="partyBPosition" type="text">
+
+              <label>
+                Đại diện
+              </label>
+
+              <input
+                id="partyBRepresentative"
+                type="text"
+              >
+
             </div>
+
+
+            <div class="field">
+
+              <label>
+                Chức vụ
+              </label>
+
+              <input
+                id="partyBPosition"
+                type="text"
+              >
+
+            </div>
+
 
           </div>
 
+
           <div class="field">
-            <label>Điện thoại</label>
-            <input id="partyBPhone" type="text">
+
+            <label>
+              Điện thoại
+            </label>
+
+            <input
+              id="partyBPhone"
+              type="text"
+            >
+
           </div>
 
         </div>
 
 
-        <!-- GIÁ TRỊ -->
+
+        <!-- =================================================
+             GIÁ TRỊ
+        ================================================== -->
 
         <div class="group">
 
@@ -809,10 +1336,16 @@
             Giá trị hợp đồng
           </div>
 
+
           <div class="money-grid">
 
+
             <div class="field">
-              <label>Giá trị hợp đồng</label>
+
+              <label>
+                Giá trị hợp đồng
+              </label>
+
               <input
                 id="contractValue"
                 type="number"
@@ -820,10 +1353,16 @@
                 step="1"
                 inputmode="numeric"
               >
+
             </div>
 
+
             <div class="field">
-              <label>Giá trị phát sinh</label>
+
+              <label>
+                Giá trị phát sinh
+              </label>
+
               <input
                 id="additionalValue"
                 type="number"
@@ -831,10 +1370,16 @@
                 step="1"
                 inputmode="numeric"
               >
+
             </div>
 
+
             <div class="field">
-              <label>Giá trị giảm trừ</label>
+
+              <label>
+                Giá trị giảm trừ
+              </label>
+
               <input
                 id="deductionValue"
                 type="number"
@@ -842,10 +1387,16 @@
                 step="1"
                 inputmode="numeric"
               >
+
             </div>
 
+
             <div class="field">
-              <label>Đã thanh toán</label>
+
+              <label>
+                Đã thanh toán
+              </label>
+
               <input
                 id="paidValue"
                 type="number"
@@ -853,28 +1404,51 @@
                 step="1"
                 inputmode="numeric"
               >
+
             </div>
+
 
           </div>
 
+
           <div class="money-result">
 
-            <div class="money-result-row">
-              <span>Tổng giá trị thực hiện</span>
-              <strong id="resultTotal">0 đ</strong>
-            </div>
 
             <div class="money-result-row">
-              <span>Còn phải thanh toán</span>
-              <strong id="resultRemaining">0 đ</strong>
+
+              <span>
+                Tổng giá trị thực hiện
+              </span>
+
+              <strong id="resultTotal">
+                0 đ
+              </strong>
+
             </div>
+
+
+            <div class="money-result-row">
+
+              <span>
+                Còn phải thanh toán
+              </span>
+
+              <strong id="resultRemaining">
+                0 đ
+              </strong>
+
+            </div>
+
 
           </div>
 
         </div>
 
 
-        <!-- NGHĨA VỤ CÒN LẠI -->
+
+        <!-- =================================================
+             NGHĨA VỤ CÒN LẠI
+        ================================================== -->
 
         <div class="group">
 
@@ -882,46 +1456,73 @@
             Nghĩa vụ còn lại
           </div>
 
+
           <div class="field">
-            <label>Giá trị còn phải thanh toán</label>
+
+            <label>
+              Giá trị còn phải thanh toán
+            </label>
+
             <input
               id="remainingDescription"
               type="text"
               value="Theo giá trị còn phải thanh toán được xác nhận tại Biên bản này"
             >
+
           </div>
 
+
           <div class="field">
-            <label>Thời hạn thanh toán</label>
+
+            <label>
+              Thời hạn thanh toán
+            </label>
+
             <input
               id="paymentDeadline"
               type="text"
               placeholder="Ví dụ: Trong vòng 03 ngày kể từ ngày ký"
             >
+
           </div>
 
+
           <div class="field">
-            <label>Nghĩa vụ bảo hành</label>
+
+            <label>
+              Nghĩa vụ bảo hành
+            </label>
+
             <input
               id="warrantyObligation"
               type="text"
               value="Thực hiện theo thỏa thuận bảo hành của Hợp đồng"
             >
+
           </div>
 
+
           <div class="field">
-            <label>Nghĩa vụ khác</label>
+
+            <label>
+              Nghĩa vụ khác
+            </label>
+
             <input
               id="otherObligation"
               type="text"
               placeholder="Nếu không có có thể để trống"
             >
+
           </div>
 
         </div>
 
 
-        <!-- GHI CHÚ -->
+
+        <!-- =================================================
+             GHI CHÚ
+        ================================================== -->
 
         <div class="group">
 
@@ -929,21 +1530,32 @@
             Ghi chú
           </div>
 
+
           <div class="field">
+
             <textarea
               id="notes"
               placeholder="Nhập ghi chú nếu có..."
             ></textarea>
+
           </div>
 
         </div>
 
 
+
         <div class="notice">
+
           Các giá trị tiền được tự động tính toán:
-          Giá trị hợp đồng + Phát sinh − Giảm trừ = Tổng giá trị thực hiện.
-          Tổng giá trị thực hiện − Đã thanh toán = Còn phải thanh toán.
+
+          Giá trị hợp đồng + Phát sinh − Giảm trừ
+          = Tổng giá trị thực hiện.
+
+          Tổng giá trị thực hiện − Đã thanh toán
+          = Còn phải thanh toán.
+
         </div>
+
 
 
         <div class="actions">
@@ -956,6 +1568,7 @@
             Lưu nháp
           </button>
 
+
           <button
             class="btn btn-primary"
             type="button"
@@ -966,31 +1579,48 @@
 
         </div>
 
+
       </div>
+
     </div>
 
 
-    <!-- =========================
+
+    <!-- =====================================================
          PREVIEW
-    ========================== -->
+    ====================================================== -->
 
     <div class="panel preview-panel">
+
 
       <div class="preview-label">
         BẢN XEM TRƯỚC A4
       </div>
 
-      <div class="paper" id="paper">
+
+      <div
+        class="paper"
+        id="paper"
+      >
+
+
+        <!-- =================================================
+             HEADER
+        ================================================== -->
 
         <div class="doc-header">
 
+
           <div class="logo-box">
+
             <img
               class="logo"
               src="../data/grova_logo.png"
               alt="GROVA HOLDINGS"
             >
+
           </div>
+
 
           <div class="national">
 
@@ -1006,328 +1636,636 @@
 
           </div>
 
+
         </div>
 
 
+
+        <!-- =================================================
+             TITLE
+        ================================================== -->
+
         <div class="doc-title">
+
 
           <h1>
             BIÊN BẢN THANH LÝ HỢP ĐỒNG
           </h1>
 
+
           <div class="subtitle-document">
             KHUNG THÉP THANG MÁY
           </div>
 
+
           <div class="doc-number">
-            Số: <span id="pvDocumentNumber">01/BBTLHĐ/2026</span>
+
+            Số:
+
+            <span id="pvDocumentNumber">
+              01/BBTLHĐ/2026
+            </span>
+
           </div>
+
 
         </div>
 
+
+
+        <!-- =================================================
+             CĂN CỨ
+        ================================================== -->
 
         <div class="intro">
 
+
           <p>
+
             Căn cứ Hợp đồng nguyên tắc số:
-            <strong id="pvContractNumber">…………………</strong>;
+
+            <strong id="pvContractNumber">
+              …………………
+            </strong>;
+
           </p>
 
+
           <p>
+
             Căn cứ Phụ lục hợp đồng số:
-            <strong id="pvAppendixNumber">…………………</strong>;
+
+            <strong id="pvAppendixNumber">
+              …………………
+            </strong>;
+
           </p>
 
+
           <p>
+
             Căn cứ khối lượng công việc và kết quả thực hiện hợp đồng
             của hai bên.
+
           </p>
 
+
         </div>
 
+
+
+        <!-- =================================================
+             DATE
+        ================================================== -->
 
         <div class="date-line">
+
           Hôm nay, ngày
-          <span id="pvDay">……</span>
+
+          <span id="pvDay">
+            ……
+          </span>
+
           tháng
-          <span id="pvMonth">……</span>
+
+          <span id="pvMonth">
+            ……
+          </span>
+
           năm
-          <span id="pvYear">……</span>,
+
+          <span id="pvYear">
+            ……
+          </span>,
+
           chúng tôi gồm:
+
         </div>
 
 
-        <!-- I -->
+
+        <!-- =================================================
+             I. THÔNG TIN CÁC BÊN
+        ================================================== -->
 
         <div class="section">
+
 
           <h2>
             I. THÔNG TIN CÁC BÊN
           </h2>
 
+
           <p class="party-title">
             BÊN A – ĐƠN VỊ THI CÔNG
           </p>
 
-          <p class="party-line">
-            <strong>CÔNG TY CỔ PHẦN GROVA HOLDINGS</strong>
-          </p>
 
           <p class="party-line">
+
+            <strong>
+              CÔNG TY CỔ PHẦN GROVA HOLDINGS
+            </strong>
+
+          </p>
+
+
+          <p class="party-line">
+
             Mã số thuế:
-            <strong>0202328361</strong>
+
+            <strong>
+              0202328361
+            </strong>
+
           </p>
 
+
           <p class="party-line">
+
             Địa chỉ:
+
             <strong>
               49A/348 Trần Nguyên Hãn, Phường An Biên,
               Thành phố Hải Phòng
             </strong>
+
           </p>
 
+
           <p class="party-line">
+
             Đại diện:
-            <strong>PHẠM VĂN HỌC</strong>
+
+            <strong>
+              PHẠM VĂN HỌC
+            </strong>
+
           </p>
 
+
           <p class="party-line">
+
             Chức vụ:
-            <strong>Giám Đốc</strong>
+
+            <strong>
+              Giám Đốc
+            </strong>
+
           </p>
 
+
           <p class="party-line">
+
             Điện thoại:
-            <span id="pvAPhone">…………………</span>
+
+            <span id="pvAPhone">
+              …………………
+            </span>
+
           </p>
+
 
 
           <p class="party-title">
             BÊN B – ĐƠN VỊ THUÊ THI CÔNG
           </p>
 
+
           <p class="party-line">
+
             Tên công ty:
-            <strong id="pvBName">………………………………</strong>
+
+            <strong id="pvBName">
+              ………………………………
+            </strong>
+
           </p>
 
+
           <p class="party-line">
+
             Mã số thuế:
-            <strong id="pvBTax">………………………………</strong>
+
+            <strong id="pvBTax">
+              ………………………………
+            </strong>
+
           </p>
 
+
           <p class="party-line">
+
             Địa chỉ:
-            <strong id="pvBAddress">………………………………</strong>
+
+            <strong id="pvBAddress">
+              ………………………………
+            </strong>
+
           </p>
 
+
           <p class="party-line">
+
             Đại diện:
-            <strong id="pvBRepresentative">………………………………</strong>
+
+            <strong id="pvBRepresentative">
+              ………………………………
+            </strong>
+
           </p>
 
+
           <p class="party-line">
+
             Chức vụ:
-            <strong id="pvBPosition">………………………………</strong>
+
+            <strong id="pvBPosition">
+              ………………………………
+            </strong>
+
           </p>
 
+
           <p class="party-line">
+
             Điện thoại:
-            <strong id="pvBPhone">………………………………</strong>
+
+            <strong id="pvBPhone">
+              ………………………………
+            </strong>
+
           </p>
+
 
         </div>
 
 
-        <!-- II -->
+
+        <!-- =================================================
+             II. THÔNG TIN HỢP ĐỒNG
+        ================================================== -->
 
         <div class="section">
+
 
           <h2>
             II. THÔNG TIN HỢP ĐỒNG
           </h2>
 
+
           <table class="doc-table contract-info">
 
-            <tr>
-              <th>Tên công trình</th>
-              <td id="pvProjectName">………………………………</td>
-            </tr>
 
             <tr>
-              <th>Địa chỉ công trình</th>
-              <td id="pvProjectAddress">………………………………</td>
+
+              <th>
+                Tên công trình
+              </th>
+
+              <td id="pvProjectName">
+                ………………………………
+              </td>
+
             </tr>
 
-            <tr>
-              <th>Hợp đồng số</th>
-              <td id="pvContractInfo">………………………………</td>
-            </tr>
 
             <tr>
-              <th>Ngày ký hợp đồng</th>
-              <td id="pvContractDate">………………………………</td>
+
+              <th>
+                Địa chỉ công trình
+              </th>
+
+              <td id="pvProjectAddress">
+                ………………………………
+              </td>
+
             </tr>
 
-            <tr>
-              <th>Phụ lục hợp đồng</th>
-              <td id="pvAppendixInfo">………………………………</td>
-            </tr>
 
             <tr>
-              <th>Nội dung công việc</th>
+
+              <th>
+                Hợp đồng số
+              </th>
+
+              <td id="pvContractInfo">
+                ………………………………
+              </td>
+
+            </tr>
+
+
+            <tr>
+
+              <th>
+                Ngày ký hợp đồng
+              </th>
+
+              <td id="pvContractDate">
+                ………………………………
+              </td>
+
+            </tr>
+
+
+            <tr>
+
+              <th>
+                Phụ lục hợp đồng
+              </th>
+
+              <td id="pvAppendixInfo">
+                ………………………………
+              </td>
+
+            </tr>
+
+
+            <tr>
+
+              <th>
+                Nội dung công việc
+              </th>
+
               <td id="pvWorkContent">
                 Thi công lắp đặt khung thép thang máy
               </td>
+
             </tr>
+
 
             <tr>
-              <th>Thời gian thực hiện</th>
-              <td id="pvExecutionTime">………………………………</td>
+
+              <th>
+                Thời gian thực hiện
+              </th>
+
+              <td id="pvExecutionTime">
+                ………………………………
+              </td>
+
             </tr>
 
+
           </table>
+
 
         </div>
 
 
-        <!-- III -->
+
+        <!-- =================================================
+             III. TÌNH HÌNH THỰC HIỆN
+        ================================================== -->
 
         <div class="section">
+
 
           <h2>
             III. TÌNH HÌNH THỰC HIỆN HỢP ĐỒNG
           </h2>
 
+
           <p>
+
             Hai bên xác nhận đã thực hiện các nội dung công việc theo
             Hợp đồng và các Phụ lục đã ký.
+
           </p>
+
 
           <table class="doc-table value-table">
 
+
             <thead>
+
               <tr>
-                <th>STT</th>
-                <th>Nội dung</th>
-                <th>Giá trị</th>
+
+                <th>
+                  STT
+                </th>
+
+                <th>
+                  Nội dung
+                </th>
+
+                <th>
+                  Giá trị
+                </th>
+
               </tr>
+
             </thead>
+
 
             <tbody>
 
-              <tr>
-                <td class="number">1</td>
-                <td>Giá trị hợp đồng</td>
-                <td class="money" id="pvContractValue">
-                  0 đ
-                </td>
-              </tr>
 
               <tr>
-                <td class="number">2</td>
-                <td>Giá trị phát sinh được xác nhận</td>
-                <td class="money" id="pvAdditionalValue">
+
+                <td class="number">
+                  1
+                </td>
+
+                <td>
+                  Giá trị hợp đồng
+                </td>
+
+                <td
+                  class="money"
+                  id="pvContractValue"
+                >
                   0 đ
                 </td>
+
               </tr>
 
+
               <tr>
-                <td class="number">3</td>
-                <td>Giá trị giảm trừ</td>
-                <td class="money" id="pvDeductionValue">
+
+                <td class="number">
+                  2
+                </td>
+
+                <td>
+                  Giá trị phát sinh được xác nhận
+                </td>
+
+                <td
+                  class="money"
+                  id="pvAdditionalValue"
+                >
                   0 đ
                 </td>
+
               </tr>
+
+
+              <tr>
+
+                <td class="number">
+                  3
+                </td>
+
+                <td>
+                  Giá trị giảm trừ
+                </td>
+
+                <td
+                  class="money"
+                  id="pvDeductionValue"
+                >
+                  0 đ
+                </td>
+
+              </tr>
+
 
               <tr class="total-row">
+
                 <td colspan="2">
                   4. TỔNG GIÁ TRỊ THỰC HIỆN
                 </td>
-                <td class="money" id="pvTotalValue">
+
+                <td
+                  class="money"
+                  id="pvTotalValue"
+                >
                   0 đ
                 </td>
+
               </tr>
+
 
             </tbody>
 
           </table>
 
+
         </div>
 
 
-        <!-- IV -->
+
+        <!-- =================================================
+             IV. THANH TOÁN
+        ================================================== -->
 
         <div class="section">
+
 
           <h2>
             IV. TÌNH HÌNH THANH TOÁN
           </h2>
 
+
           <table class="doc-table payment-table">
 
-            <tr>
-              <th>Tổng giá trị phải thanh toán</th>
-              <td class="money" id="pvPaymentTotal">
-                0 đ
-              </td>
-            </tr>
 
             <tr>
-              <th>Đã thanh toán</th>
-              <td class="money" id="pvPaidValue">
+
+              <th>
+                Tổng giá trị phải thanh toán
+              </th>
+
+              <td
+                class="money"
+                id="pvPaymentTotal"
+              >
                 0 đ
               </td>
+
             </tr>
+
+
+            <tr>
+
+              <th>
+                Đã thanh toán
+              </th>
+
+              <td
+                class="money"
+                id="pvPaidValue"
+              >
+                0 đ
+              </td>
+
+            </tr>
+
 
             <tr class="total-row">
-              <th>Còn phải thanh toán</th>
-              <td class="money" id="pvRemainingValue">
+
+              <th>
+                Còn phải thanh toán
+              </th>
+
+              <td
+                class="money"
+                id="pvRemainingValue"
+              >
                 0 đ
               </td>
+
             </tr>
+
 
           </table>
 
+
           <p>
+
             Hai bên xác nhận số tiền nêu trên là giá trị thanh toán
             cuối cùng của Hợp đồng, trừ các nghĩa vụ được quy định
             tại Biên bản này hoặc các thỏa thuận khác bằng văn bản
             giữa hai bên.
+
           </p>
+
 
         </div>
 
 
-        <!-- V -->
+
+        <!-- =================================================
+             V. XÁC NHẬN THANH LÝ
+        ================================================== -->
 
         <div class="section">
+
 
           <h2>
             V. XÁC NHẬN THANH LÝ
           </h2>
 
+
           <p>
             Hai bên thống nhất:
           </p>
 
+
           <ul class="confirm-list">
+
 
             <li>
               Công việc theo Hợp đồng đã được hoàn thành.
             </li>
 
+
             <li>
               Các nội dung phát sinh đã được hai bên xác nhận và thống nhất.
             </li>
+
 
             <li>
               Công trình đã được nghiệm thu và bàn giao theo thỏa thuận.
             </li>
 
+
             <li>
               Các nghĩa vụ thanh toán đã được thực hiện đầy đủ.
             </li>
+
 
             <li>
               Hai bên không còn khiếu nại về khối lượng và chất lượng
@@ -1335,229 +2273,378 @@
               ghi nhận tại Biên bản này.
             </li>
 
+
           </ul>
+
 
         </div>
 
 
-        <!-- VI -->
+
+        <!-- =================================================
+             VI. CÁC KHOẢN CÒN LẠI
+        ================================================== -->
 
         <div class="section">
+
 
           <h2>
             VI. CÁC KHOẢN CÒN LẠI SAU THANH LÝ
           </h2>
 
+
           <p>
+
             Hai bên xác nhận các nghĩa vụ còn lại sau khi thanh lý
             Hợp đồng như sau:
+
           </p>
+
 
           <table class="doc-table remaining-table">
 
+
             <thead>
+
               <tr>
-                <th>STT</th>
-                <th>Nội dung</th>
-                <th>Giá trị/Thời hạn</th>
-                <th>Trách nhiệm</th>
+
+                <th>
+                  STT
+                </th>
+
+                <th>
+                  Nội dung
+                </th>
+
+                <th>
+                  Giá trị/Thời hạn
+                </th>
+
+                <th>
+                  Trách nhiệm
+                </th>
+
               </tr>
+
             </thead>
+
 
             <tbody>
 
+
               <tr>
-                <td class="number">1</td>
+
+                <td class="number">
+                  1
+                </td>
+
                 <td>
+
                   <span id="pvRemainingDescription">
                     Giá trị còn phải thanh toán
                   </span>
+
                 </td>
+
                 <td id="pvPaymentDeadline">
                   Theo thỏa thuận
                 </td>
+
                 <td>
                   Bên B
                 </td>
+
               </tr>
 
+
               <tr>
-                <td class="number">2</td>
+
+                <td class="number">
+                  2
+                </td>
+
                 <td>
                   Nghĩa vụ bảo hành
                 </td>
+
                 <td>
                   Theo Hợp đồng
                 </td>
+
                 <td>
                   Bên A
                 </td>
+
               </tr>
 
+
               <tr id="pvOtherObligationRow">
-                <td class="number">3</td>
+
+                <td class="number">
+                  3
+                </td>
+
                 <td id="pvOtherObligation">
                   Khác
                 </td>
+
                 <td>
                   Theo thỏa thuận
                 </td>
+
                 <td>
                   Hai bên
                 </td>
+
               </tr>
+
 
             </tbody>
 
+
           </table>
+
 
         </div>
 
 
-        <!-- VII -->
+
+        <!-- =================================================
+             VII. CAM KẾT
+        ================================================== -->
 
         <div class="section">
+
 
           <h2>
             VII. CAM KẾT CỦA HAI BÊN
           </h2>
 
-          <p>
-            Hai bên cam kết thực hiện đầy đủ các nghĩa vụ còn lại
-            được ghi nhận tại Biên bản này.
-          </p>
 
           <p>
+
+            Hai bên cam kết thực hiện đầy đủ các nghĩa vụ còn lại
+            được ghi nhận tại Biên bản này.
+
+          </p>
+
+
+          <p>
+
             Sau khi hoàn thành các nghĩa vụ nêu trên, hai bên xác nhận
             Hợp đồng được thanh lý và không bên nào có quyền yêu cầu
             bên còn lại thực hiện thêm nghĩa vụ liên quan đến các nội
             dung đã được thanh lý, trừ các nghĩa vụ vẫn còn hiệu lực
             theo thỏa thuận của hai bên.
+
           </p>
+
 
         </div>
 
 
-        <!-- VIII -->
+
+        <!-- =================================================
+             VIII. HIỆU LỰC
+        ================================================== -->
 
         <div class="section">
+
 
           <h2>
             VIII. HIỆU LỰC BIÊN BẢN
           </h2>
 
+
           <p>
+
             Biên bản thanh lý Hợp đồng có hiệu lực kể từ ngày hai bên
             ký xác nhận.
+
           </p>
+
 
           <p>
-            Biên bản được lập thành <strong>02 bản</strong>, có giá trị
-            pháp lý như nhau, mỗi bên giữ <strong>01 bản</strong>.
+
+            Biên bản được lập thành
+            <strong>02 bản</strong>,
+            có giá trị pháp lý như nhau,
+            mỗi bên giữ
+            <strong>01 bản</strong>.
+
           </p>
 
-          <p id="pvNotesBlock" style="display:none;">
-            <strong>Ghi chú:</strong>
+
+          <p
+            id="pvNotesBlock"
+            style="display:none;"
+          >
+
+            <strong>
+              Ghi chú:
+            </strong>
+
             <span id="pvNotes"></span>
+
           </p>
+
 
         </div>
 
 
-        <!-- SIGNATURE -->
+
+        <!-- =================================================
+             SIGNATURE
+        ================================================== -->
 
         <table class="signature-table">
 
+
           <tr>
 
+
+            <!-- BÊN A -->
+
             <td>
+
 
               <div class="signature-heading">
                 ĐẠI DIỆN BÊN A
               </div>
 
+
               <div class="signature-company">
+
                 CÔNG TY CỔ PHẦN GROVA HOLDINGS
+
               </div>
+
 
               <div class="signature-space"></div>
 
+
               <div>
-                <strong>PHẠM VĂN HỌC</strong>
+
+                <strong>
+                  PHẠM VĂN HỌC
+                </strong>
+
               </div>
 
+
               <div class="signature-note">
+
                 (Ký, ghi rõ họ tên)
+
               </div>
+
 
             </td>
 
 
+
+            <!-- BÊN B -->
+
             <td>
+
 
               <div class="signature-heading">
                 ĐẠI DIỆN BÊN B
               </div>
 
-              <div class="signature-company" id="pvSignatureB">
+
+              <div
+                class="signature-company"
+                id="pvSignatureB"
+              >
                 ………………………………
               </div>
 
+
               <div class="signature-space"></div>
 
+
               <div>
+
                 <strong id="pvSignatureBName">
                   ………………………………
                 </strong>
+
               </div>
 
+
               <div class="signature-note">
+
                 (Ký, ghi rõ họ tên, đóng dấu)
+
               </div>
+
 
             </td>
 
+
           </tr>
+
 
         </table>
 
+
       </div>
+
     </div>
 
   </div>
+
 </div>
 
 
+
 <script>
-  /* =========================================
+
+  /* =========================================================
      STORAGE
-  ========================================= */
+  ========================================================= */
 
-  const STORAGE_KEY = "grova_document_09_thanh_ly_hop_dong";
+  const STORAGE_KEY =
+    "grova_document_09_thanh_ly_hop_dong";
 
 
-  /* =========================================
-     HELPERS
-  ========================================= */
+  /* =========================================================
+     HELPER
+  ========================================================= */
 
   function $(id) {
+
     return document.getElementById(id);
+
   }
 
 
   function value(id) {
+
     return $(id)?.value?.trim() || "";
+
   }
 
 
   function money(id) {
-    const number = Number($(id)?.value || 0);
-    return Number.isFinite(number) ? number : 0;
+
+    const number =
+      Number($(id)?.value || 0);
+
+    return Number.isFinite(number)
+      ? number
+      : 0;
+
   }
 
 
   function formatMoney(number) {
-    return new Intl.NumberFormat("vi-VN").format(number || 0) + " đ";
+
+    return new Intl.NumberFormat("vi-VN")
+      .format(number || 0)
+      + " đ";
+
   }
 
 
@@ -1567,75 +2654,93 @@
       return "…………………";
     }
 
-    const parts = dateString.split("-");
+    const parts =
+      dateString.split("-");
 
     if (parts.length !== 3) {
       return "…………………";
     }
 
     return `${parts[2]}/${parts[1]}/${parts[0]}`;
+
   }
 
 
   function getDateParts(dateString) {
 
     if (!dateString) {
+
       return {
         day: "……",
         month: "……",
         year: "……"
       };
+
     }
 
-    const parts = dateString.split("-");
+    const parts =
+      dateString.split("-");
 
     if (parts.length !== 3) {
+
       return {
         day: "……",
         month: "……",
         year: "……"
       };
+
     }
 
     return {
+
       day: parts[2],
       month: parts[1],
       year: parts[0]
+
     };
+
   }
 
 
   function todayISO() {
 
-    const now = new Date();
+    const now =
+      new Date();
 
-    const year = now.getFullYear();
+    const year =
+      now.getFullYear();
 
-    const month = String(
-      now.getMonth() + 1
-    ).padStart(2, "0");
+    const month =
+      String(
+        now.getMonth() + 1
+      ).padStart(2, "0");
 
-    const day = String(
-      now.getDate()
-    ).padStart(2, "0");
+    const day =
+      String(
+        now.getDate()
+      ).padStart(2, "0");
 
     return `${year}-${month}-${day}`;
+
   }
 
 
-  /* =========================================
+  /* =========================================================
      AUTO NUMBER
-  ========================================= */
+  ========================================================= */
 
   function getNextNumber() {
 
-    const year = new Date().getFullYear();
+    const year =
+      new Date().getFullYear();
 
     const key =
       "grova_document_09_number_" + year;
 
     let current =
-      Number(localStorage.getItem(key) || 0);
+      Number(
+        localStorage.getItem(key) || 0
+      );
 
     current += 1;
 
@@ -1648,18 +2753,25 @@
       .padStart(2, "0")
       + "/BBTLHĐ/"
       + year;
+
   }
 
 
-  /* =========================================
+  /* =========================================================
      UPDATE PREVIEW
-  ========================================= */
+  ========================================================= */
 
   function updatePreview() {
 
+
+    /* -------------------------------------------------------
+       DOCUMENT
+    ------------------------------------------------------- */
+
     $("pvDocumentNumber").textContent =
       value("documentNumber") ||
-      "01/BBTLHĐ/" + new Date().getFullYear();
+      "01/BBTLHĐ/" +
+      new Date().getFullYear();
 
 
     $("pvContractNumber").textContent =
@@ -1672,8 +2784,15 @@
       "…………………";
 
 
+    /* -------------------------------------------------------
+       DATE
+    ------------------------------------------------------- */
+
     const dateParts =
-      getDateParts(value("documentDate"));
+      getDateParts(
+        value("documentDate")
+      );
+
 
     $("pvDay").textContent =
       dateParts.day;
@@ -1685,77 +2804,114 @@
       dateParts.year;
 
 
+    /* -------------------------------------------------------
+       PARTY B
+    ------------------------------------------------------- */
+
     $("pvBName").textContent =
       value("partyBName") ||
       "………………………………";
+
 
     $("pvBTax").textContent =
       value("partyBTax") ||
       "………………………………";
 
+
     $("pvBAddress").textContent =
       value("partyBAddress") ||
       "………………………………";
+
 
     $("pvBRepresentative").textContent =
       value("partyBRepresentative") ||
       "………………………………";
 
+
     $("pvBPosition").textContent =
       value("partyBPosition") ||
       "………………………………";
+
 
     $("pvBPhone").textContent =
       value("partyBPhone") ||
       "………………………………";
 
 
+    /* -------------------------------------------------------
+       PROJECT
+    ------------------------------------------------------- */
+
     $("pvProjectName").textContent =
       value("projectName") ||
       "………………………………";
+
 
     $("pvProjectAddress").textContent =
       value("projectAddress") ||
       "………………………………";
 
+
     $("pvContractInfo").textContent =
       value("contractNumber") ||
       "………………………………";
 
+
     $("pvContractDate").textContent =
-      formatDate(value("contractDate"));
+      formatDate(
+        value("contractDate")
+      );
+
 
     $("pvAppendixInfo").textContent =
       value("appendixNumber") ||
       "………………………………";
+
 
     $("pvWorkContent").textContent =
       value("workContent") ||
       "Thi công lắp đặt khung thép thang máy";
 
 
+    /* -------------------------------------------------------
+       EXECUTION TIME
+    ------------------------------------------------------- */
+
     const start =
-      formatDate(value("startDate"));
+      formatDate(
+        value("startDate")
+      );
 
     const end =
-      formatDate(value("endDate"));
+      formatDate(
+        value("endDate")
+      );
+
 
     let executionTime =
       "………………………………";
+
 
     if (
       value("startDate") ||
       value("endDate")
     ) {
+
       executionTime =
-        start + " đến " + end;
+        start +
+        " đến " +
+        end;
+
     }
+
 
     $("pvExecutionTime").textContent =
       executionTime;
 
 
-    /* MONEY */
+    /* -------------------------------------------------------
+       MONEY
+    ------------------------------------------------------- */
 
     const contractValue =
       money("contractValue");
@@ -1775,6 +2931,7 @@
       additionalValue -
       deductionValue;
 
+
     const remainingValue =
       totalValue -
       paidValue;
@@ -1783,6 +2940,7 @@
     $("resultTotal").textContent =
       formatMoney(totalValue);
 
+
     $("resultRemaining").textContent =
       formatMoney(remainingValue);
 
@@ -1790,26 +2948,34 @@
     $("pvContractValue").textContent =
       formatMoney(contractValue);
 
+
     $("pvAdditionalValue").textContent =
       formatMoney(additionalValue);
+
 
     $("pvDeductionValue").textContent =
       formatMoney(deductionValue);
 
+
     $("pvTotalValue").textContent =
       formatMoney(totalValue);
+
 
     $("pvPaymentTotal").textContent =
       formatMoney(totalValue);
 
+
     $("pvPaidValue").textContent =
       formatMoney(paidValue);
+
 
     $("pvRemainingValue").textContent =
       formatMoney(remainingValue);
 
 
-    /* REMAINING OBLIGATIONS */
+    /* -------------------------------------------------------
+       REMAINING OBLIGATIONS
+    ------------------------------------------------------- */
 
     $("pvRemainingDescription").textContent =
       value("remainingDescription") ||
@@ -1824,27 +2990,34 @@
     const other =
       value("otherObligation");
 
+
     const otherRow =
       $("pvOtherObligationRow");
 
+
     if (other) {
 
-      otherRow.style.display = "";
+      otherRow.style.display =
+        "table-row";
 
       $("pvOtherObligation").textContent =
         other;
 
     } else {
 
-      otherRow.style.display = "none";
+      otherRow.style.display =
+        "none";
 
     }
 
 
-    /* NOTES */
+    /* -------------------------------------------------------
+       NOTES
+    ------------------------------------------------------- */
 
     const notes =
       value("notes");
+
 
     if (notes) {
 
@@ -1865,28 +3038,37 @@
     }
 
 
-    /* SIGNATURE */
+    /* -------------------------------------------------------
+       SIGNATURE
+    ------------------------------------------------------- */
 
     $("pvSignatureB").textContent =
       value("partyBName") ||
       "………………………………";
+
 
     $("pvSignatureBName").textContent =
       value("partyBRepresentative") ||
       "………………………………";
 
 
+    /* -------------------------------------------------------
+       SAVE
+    ------------------------------------------------------- */
+
     saveDraftSilently();
+
   }
 
 
-  /* =========================================
-     SAVE
-  ========================================= */
+  /* =========================================================
+     GET FORM DATA
+  ========================================================= */
 
   function getFormData() {
 
     const data = {};
+
 
     document
       .querySelectorAll(
@@ -1895,14 +3077,23 @@
       .forEach(input => {
 
         if (input.id) {
-          data[input.id] = input.value;
+
+          data[input.id] =
+            input.value;
+
         }
 
       });
 
+
     return data;
+
   }
 
+
+  /* =========================================================
+     SAVE DRAFT SILENTLY
+  ========================================================= */
 
   function saveDraftSilently() {
 
@@ -1910,7 +3101,9 @@
 
       localStorage.setItem(
         STORAGE_KEY,
-        JSON.stringify(getFormData())
+        JSON.stringify(
+          getFormData()
+        )
       );
 
     } catch (error) {
@@ -1921,8 +3114,13 @@
       );
 
     }
+
   }
 
+
+  /* =========================================================
+     SAVE DRAFT
+  ========================================================= */
 
   function saveDraft() {
 
@@ -1931,36 +3129,48 @@
     alert(
       "Đã lưu bản nháp trên thiết bị này."
     );
+
   }
 
 
-  /* =========================================
+  /* =========================================================
      LOAD DRAFT
-  ========================================= */
+  ========================================================= */
 
   function loadDraft() {
 
     try {
 
       const raw =
-        localStorage.getItem(STORAGE_KEY);
+        localStorage.getItem(
+          STORAGE_KEY
+        );
+
 
       if (!raw) {
         return false;
       }
 
+
       const data =
         JSON.parse(raw);
 
+
       Object.keys(data).forEach(id => {
 
-        const input = $(id);
+        const input =
+          $(id);
+
 
         if (input) {
-          input.value = data[id];
+
+          input.value =
+            data[id];
+
         }
 
       });
+
 
       return true;
 
@@ -1972,15 +3182,18 @@
       );
 
       return false;
+
     }
+
   }
 
 
-  /* =========================================
+  /* =========================================================
      INIT
-  ========================================= */
+  ========================================================= */
 
   function init() {
+
 
     const hasDraft =
       loadDraft();
@@ -1990,6 +3203,7 @@
 
       $("documentNumber").value =
         getNextNumber();
+
 
       $("documentDate").value =
         todayISO();
@@ -2003,38 +3217,43 @@
       )
       .forEach(input => {
 
+
         input.addEventListener(
           "input",
           updatePreview
         );
+
 
         input.addEventListener(
           "change",
           updatePreview
         );
 
+
       });
 
 
     updatePreview();
+
   }
 
 
-  /* =========================================
+  /* =========================================================
      PRINT
-  ========================================= */
+  ========================================================= */
 
   function printDocument() {
 
     updatePreview();
 
     window.print();
+
   }
 
 
-  /* =========================================
+  /* =========================================================
      BACK
-  ========================================= */
+  ========================================================= */
 
   function goBack() {
 
@@ -2050,14 +3269,21 @@
         "../index.html";
 
     }
+
   }
 
+
+  /* =========================================================
+     START
+  ========================================================= */
 
   document.addEventListener(
     "DOMContentLoaded",
     init
   );
+
 </script>
+
 
 </body>
 </html>
