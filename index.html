@@ -1,1393 +1,1117 @@
 <!DOCTYPE html>
 <html lang="vi">
-
 <head>
+  <meta charset="UTF-8">
 
-    <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  >
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-    >
+  <meta
+    name="theme-color"
+    content="#0b7a5a"
+  >
 
-    <meta
-        name="theme-color"
-        content="#087a52"
-    >
+  <meta
+    name="apple-mobile-web-app-capable"
+    content="yes"
+  >
 
-    <meta
-        name="apple-mobile-web-app-capable"
-        content="yes"
-    >
+  <meta
+    name="apple-mobile-web-app-status-bar-style"
+    content="default"
+  >
 
-    <meta
-        name="apple-mobile-web-app-status-bar-style"
-        content="default"
-    >
+  <meta
+    name="apple-mobile-web-app-title"
+    content="GROVA DOCUMENT"
+  >
 
-    <meta
-        name="apple-mobile-web-app-title"
-        content="GROVA DOC"
-    >
+  <title>GROVA DOCUMENT</title>
 
-    <meta
-        name="description"
-        content="GROVA DOCUMENT - Hệ thống quản lý hồ sơ và văn bản GROVA HOLDINGS"
-    >
+  <link
+    rel="icon"
+    type="image/png"
+    href="./data/grova_logo.png"
+  >
 
-    <title>GROVA DOCUMENT</title>
+  <link
+    rel="apple-touch-icon"
+    href="./data/grova_logo.png"
+  >
 
-
-    <!-- =====================================================
-         PWA
-    ====================================================== -->
-
-    <link
-        rel="manifest"
-        href="./manifest.json?v=12"
-    >
-
-    <link
-        rel="apple-touch-icon"
-        href="./data/grova_logo.png"
-    >
-
-    <link
-        rel="icon"
-        type="image/png"
-        href="./data/grova_logo.png"
-    >
-
-
-    <!-- =====================================================
-         MAIN CSS
-    ====================================================== -->
-
-    <link
-        rel="stylesheet"
-        href="./style.css?v=12"
-    >
-
+  <link
+    rel="stylesheet"
+    href="./style.css?v=100"
+  >
 </head>
-
 
 <body>
 
+<div class="app-shell">
 
-<div id="app">
+  <!-- SIDEBAR -->
+  <aside id="sidebar" class="sidebar">
 
+    <div class="sidebar-header">
 
-    <!-- =====================================================
-         SIDEBAR
-    ====================================================== -->
+      <div class="brand">
 
-    <aside
-        id="sidebar"
-        class="sidebar"
-    >
+        <img
+          src="./data/grova_logo.png"
+          alt="GROVA HOLDINGS"
+          class="brand-logo"
+        >
 
-        <div class="sidebar-header">
+        <div class="brand-text">
+          <strong>GROVA</strong>
+          <span>DOCUMENT</span>
+        </div>
 
-            <div class="brand">
+      </div>
 
-                <div class="brand-mark">
+      <button
+        id="closeSidebar"
+        class="icon-button sidebar-close"
+        type="button"
+      >
+        ×
+      </button>
 
-                    <img
-                        src="./data/grova_logo.png"
-                        alt="GROVA HOLDINGS"
-                    >
-
-                </div>
-
-
-                <div class="brand-text">
-
-                    <div class="brand-name">
-                        GROVA
-                    </div>
-
-                    <div class="brand-subtitle">
-                        DOCUMENT
-                    </div>
-
-                </div>
-
-            </div>
+    </div>
 
 
-            <button
-                id="closeSidebar"
-                class="icon-button mobile-only"
-                type="button"
-                aria-label="Đóng menu"
-            >
-                ×
-            </button>
+    <nav class="sidebar-menu">
+
+      <button
+        class="menu-item active"
+        data-page="dashboard"
+        type="button"
+      >
+        <span>⌂</span>
+        <span>Tổng quan</span>
+      </button>
+
+      <button
+        class="menu-item"
+        data-page="documents"
+        type="button"
+      >
+        <span>▤</span>
+        <span>Văn bản</span>
+      </button>
+
+      <button
+        class="menu-item"
+        data-page="projects"
+        type="button"
+      >
+        <span>⌂</span>
+        <span>Công trình</span>
+      </button>
+
+      <button
+        class="menu-item"
+        data-page="customers"
+        type="button"
+      >
+        <span>♙</span>
+        <span>Khách hàng</span>
+      </button>
+
+      <button
+        class="menu-item"
+        data-page="employees"
+        type="button"
+      >
+        <span>♙</span>
+        <span>Nhân sự</span>
+      </button>
+
+      <button
+        class="menu-item"
+        data-page="history"
+        type="button"
+      >
+        <span>◷</span>
+        <span>Lịch sử</span>
+      </button>
+
+      <button
+        class="menu-item"
+        data-page="reports"
+        type="button"
+      >
+        <span>▥</span>
+        <span>Báo cáo</span>
+      </button>
+
+      <div class="menu-divider"></div>
+
+      <button
+        class="menu-item"
+        data-page="settings"
+        type="button"
+      >
+        <span>⚙</span>
+        <span>Cài đặt</span>
+      </button>
+
+      <button
+        class="menu-item"
+        data-page="admin"
+        type="button"
+      >
+        <span>◆</span>
+        <span>Quản trị</span>
+      </button>
+
+    </nav>
+
+
+    <div class="sidebar-footer">
+
+      <div class="company-mini">
+
+        <img
+          src="./data/grova_logo.png"
+          alt=""
+        >
+
+        <div>
+          <strong>GROVA HOLDINGS</strong>
+          <small>Document Management</small>
+        </div>
+
+      </div>
+
+    </div>
+
+  </aside>
+
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+
+      <button
+        id="openSidebar"
+        class="icon-button mobile-menu"
+        type="button"
+      >
+        ☰
+      </button>
+
+
+      <div class="topbar-title">
+
+        <h1 id="pageTitle">
+          Tổng quan
+        </h1>
+
+        <p id="pageSubtitle">
+          Hệ thống quản lý hồ sơ và văn bản
+        </p>
+
+      </div>
+
+
+      <div class="topbar-user">
+
+        <div class="user-avatar">
+          A
+        </div>
+
+        <div class="user-info">
+
+          <strong id="currentUserName">
+            Quản trị viên
+          </strong>
+
+          <span id="currentUserRole">
+            Administrator
+          </span>
 
         </div>
 
+      </div>
 
-        <nav
-            class="main-menu"
-            aria-label="Menu chính"
-        >
+    </header>
 
-            <button
-                type="button"
-                class="menu-item active"
-                data-page="dashboard"
-            >
 
-                <span class="menu-icon">
-                    ⌂
-                </span>
+    <!-- CONTENT -->
+    <div class="content">
 
-                <span>
-                    Tổng quan
-                </span>
 
-            </button>
+      <!-- ================= DASHBOARD ================= -->
 
+      <section
+        id="page-dashboard"
+        class="page active"
+      >
 
-            <button
-                type="button"
-                class="menu-item"
-                data-page="documents"
-            >
+        <div class="welcome-card">
 
-                <span class="menu-icon">
-                    ▤
-                </span>
+          <div class="welcome-left">
 
-                <span>
-                    Văn bản
-                </span>
-
-            </button>
-
-
-            <button
-                type="button"
-                class="menu-item"
-                data-page="projects"
-            >
-
-                <span class="menu-icon">
-                    ⌂
-                </span>
-
-                <span>
-                    Công trình
-                </span>
-
-            </button>
-
-
-            <button
-                type="button"
-                class="menu-item"
-                data-page="customers"
-            >
-
-                <span class="menu-icon">
-                    ♙
-                </span>
-
-                <span>
-                    Khách hàng
-                </span>
-
-            </button>
-
-
-            <button
-                type="button"
-                class="menu-item"
-                data-page="employees"
-            >
-
-                <span class="menu-icon">
-                    ♙
-                </span>
-
-                <span>
-                    Nhân sự
-                </span>
-
-            </button>
-
-
-            <button
-                type="button"
-                class="menu-item"
-                data-page="history"
-            >
-
-                <span class="menu-icon">
-                    ◷
-                </span>
-
-                <span>
-                    Lịch sử
-                </span>
-
-            </button>
-
-
-            <button
-                type="button"
-                class="menu-item"
-                data-page="reports"
-            >
-
-                <span class="menu-icon">
-                    ▥
-                </span>
-
-                <span>
-                    Báo cáo
-                </span>
-
-            </button>
-
-        </nav>
-
-
-        <div class="sidebar-bottom">
-
-            <button
-                type="button"
-                class="menu-item"
-                data-page="settings"
-            >
-
-                <span class="menu-icon">
-                    ⚙
-                </span>
-
-                <span>
-                    Cài đặt
-                </span>
-
-            </button>
-
-
-            <button
-                type="button"
-                class="menu-item"
-                data-page="admin"
-            >
-
-                <span class="menu-icon">
-                    ◆
-                </span>
-
-                <span>
-                    Quản trị
-                </span>
-
-            </button>
-
-        </div>
-
-    </aside>
-
-
-
-    <!-- =====================================================
-         MAIN CONTENT
-    ====================================================== -->
-
-    <main class="main-content">
-
-
-        <!-- =================================================
-             TOPBAR
-        ================================================== -->
-
-        <header class="topbar">
-
-            <div class="topbar-left">
-
-                <button
-                    id="openSidebar"
-                    class="icon-button mobile-only"
-                    type="button"
-                    aria-label="Mở menu"
-                >
-                    ☰
-                </button>
-
-
-                <div class="topbar-title">
-
-                    <div
-                        id="pageTitle"
-                        class="page-title"
-                    >
-                        Tổng quan
-                    </div>
-
-
-                    <div
-                        id="pageSubtitle"
-                        class="page-subtitle"
-                    >
-                        Hệ thống quản lý hồ sơ và văn bản
-                    </div>
-
-                </div>
-
+            <div class="welcome-logo">
+              <img
+                src="./data/grova_logo.png"
+                alt="GROVA"
+              >
             </div>
-
-
-            <div class="topbar-actions">
-
-                <button
-                    type="button"
-                    class="notification-button"
-                    title="Thông báo"
-                    aria-label="Thông báo"
-                >
-
-                    ♢
-
-                    <span
-                        class="notification-dot"
-                    ></span>
-
-                </button>
-
-
-                <div class="user-mini">
-
-                    <div class="user-avatar">
-                        A
-                    </div>
-
-
-                    <div class="user-info">
-
-                        <strong id="currentUserName">
-                            Quản trị viên
-                        </strong>
-
-
-                        <small id="currentUserRole">
-                            Administrator
-                        </small>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </header>
-
-
-
-        <!-- =================================================
-             PAGE CONTAINER
-        ================================================== -->
-
-        <section
-            id="pageContainer"
-            class="page-container"
-        >
-
-
-            <!-- =================================================
-                 DASHBOARD
-            ================================================== -->
-
-            <div
-                id="page-dashboard"
-                class="page active-page"
-            >
-
-
-                <!-- =============================================
-                     WELCOME
-                ============================================== -->
-
-                <section class="welcome-card">
-
-                    <div class="welcome-brand">
-
-                        <img
-                            src="./data/grova_logo.png"
-                            alt="GROVA HOLDINGS"
-                            class="welcome-logo"
-                        >
-
-
-                        <div class="welcome-copy">
-
-                            <span class="eyebrow">
-                                GROVA HOLDINGS
-                            </span>
-
-
-                            <h1>
-                                GROVA DOCUMENT
-                            </h1>
-
-
-                            <p>
-                                Quản lý hồ sơ, văn bản và dữ liệu
-                                công trình tập trung.
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <button
-                        type="button"
-                        class="primary-button"
-                        data-action="new-document"
-                    >
-                        <span class="button-plus">+</span>
-                        <span>Tạo văn bản</span>
-                    </button>
-
-                </section>
-
-
-
-                <!-- =============================================
-                     DOCUMENT SECTION
-                ============================================== -->
-
-                <section class="documents-section">
-
-                    <div class="section-heading">
-
-                        <div>
-
-                            <div class="section-kicker">
-                                HỆ THỐNG HỒ SƠ
-                            </div>
-
-                            <h2>
-                                Văn bản
-                            </h2>
-
-
-                            <p>
-                                Chọn mẫu để bắt đầu tạo hồ sơ
-                            </p>
-
-                        </div>
-
-
-                        <button
-                            type="button"
-                            class="section-link"
-                            data-page="documents"
-                        >
-                            Xem tất cả
-                            <span>→</span>
-                        </button>
-
-                    </div>
-
-
-                    <div
-                        id="documentGrid"
-                        class="document-grid"
-                    >
-                    </div>
-
-                </section>
-
-
-
-                <!-- =============================================
-                     DASHBOARD BOTTOM
-                ============================================== -->
-
-                <div class="dashboard-grid">
-
-
-                    <!-- =========================================
-                         RECENT
-                    ========================================== -->
-
-                    <section class="panel recent-panel">
-
-                        <div class="panel-header">
-
-                            <div>
-
-                                <div class="panel-kicker">
-                                    HOẠT ĐỘNG
-                                </div>
-
-                                <h3>
-                                    Hoạt động gần đây
-                                </h3>
-
-
-                                <p>
-                                    Các hồ sơ vừa xử lý
-                                </p>
-
-                            </div>
-
-
-                            <button
-                                type="button"
-                                class="text-button"
-                                data-page="history"
-                            >
-                                Xem tất cả
-                            </button>
-
-                        </div>
-
-
-                        <div
-                            id="recentDocuments"
-                            class="activity-list"
-                        >
-                        </div>
-
-                    </section>
-
-
-
-                    <!-- =========================================
-                         STATS
-                    ========================================== -->
-
-                    <section class="panel stats-panel">
-
-                        <div class="panel-header">
-
-                            <div>
-
-                                <div class="panel-kicker">
-                                    TỔNG QUAN
-                                </div>
-
-                                <h3>
-                                    Thống kê
-                                </h3>
-
-
-                                <p>
-                                    Tổng quan hệ thống
-                                </p>
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="stats-list">
-
-
-                            <div class="stat-card">
-
-                                <div class="stat-icon stat-icon-document">
-                                    ▤
-                                </div>
-
-
-                                <div class="stat-content">
-
-                                    <span>
-                                        Tổng văn bản
-                                    </span>
-
-
-                                    <strong
-                                        id="statDocuments"
-                                    >
-                                        0
-                                    </strong>
-
-                                </div>
-
-                            </div>
-
-
-                            <div class="stat-card">
-
-                                <div class="stat-icon stat-icon-project">
-                                    ⌂
-                                </div>
-
-
-                                <div class="stat-content">
-
-                                    <span>
-                                        Công trình
-                                    </span>
-
-
-                                    <strong
-                                        id="statProjects"
-                                    >
-                                        0
-                                    </strong>
-
-                                </div>
-
-                            </div>
-
-
-                            <div class="stat-card">
-
-                                <div class="stat-icon stat-icon-customer">
-                                    ♙
-                                </div>
-
-
-                                <div class="stat-content">
-
-                                    <span>
-                                        Khách hàng
-                                    </span>
-
-
-                                    <strong
-                                        id="statCustomers"
-                                    >
-                                        0
-                                    </strong>
-
-                                </div>
-
-                            </div>
-
-
-                            <div class="stat-card">
-
-                                <div class="stat-icon stat-icon-employee">
-                                    ♙
-                                </div>
-
-
-                                <div class="stat-content">
-
-                                    <span>
-                                        Nhân sự
-                                    </span>
-
-
-                                    <strong
-                                        id="statEmployees"
-                                    >
-                                        0
-                                    </strong>
-
-                                </div>
-
-                            </div>
-
-
-                        </div>
-
-                    </section>
-
-                </div>
-
-            </div>
-
-
-
-            <!-- =================================================
-                 DOCUMENTS
-            ================================================== -->
-
-            <div
-                id="page-documents"
-                class="page hidden"
-            >
-
-                <div class="page-toolbar">
-
-                    <div>
-
-                        <div class="section-kicker">
-                            HỒ SƠ
-                        </div>
-
-                        <h1>
-                            Văn bản
-                        </h1>
-
-
-                        <p>
-                            Quản lý và tạo các mẫu văn bản GROVA
-                        </p>
-
-                    </div>
-
-
-                    <button
-                        type="button"
-                        class="primary-button"
-                        data-action="new-document"
-                    >
-                        <span class="button-plus">+</span>
-                        <span>Tạo văn bản</span>
-                    </button>
-
-                </div>
-
-
-                <div
-                    id="documentsPageGrid"
-                    class="document-grid"
-                >
-                </div>
-
-            </div>
-
-
-
-            <!-- =================================================
-                 PROJECTS
-            ================================================== -->
-
-            <div
-                id="page-projects"
-                class="page hidden"
-            >
-
-                <div class="page-toolbar">
-
-                    <div>
-
-                        <div class="section-kicker">
-                            DỮ LIỆU
-                        </div>
-
-                        <h1>
-                            Công trình
-                        </h1>
-
-
-                        <p>
-                            Dữ liệu công trình được dùng chung
-                            cho các hồ sơ.
-                        </p>
-
-                    </div>
-
-
-                    <button
-                        type="button"
-                        class="primary-button"
-                    >
-                        + Công trình mới
-                    </button>
-
-                </div>
-
-
-                <div class="empty-state">
-
-                    <div class="empty-icon">
-                        ⌂
-                    </div>
-
-
-                    <h3>
-                        Chưa có công trình
-                    </h3>
-
-
-                    <p>
-                        Công trình sẽ được quản lý tập trung
-                        và liên kết với các văn bản.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-
-            <!-- =================================================
-                 CUSTOMERS
-            ================================================== -->
-
-            <div
-                id="page-customers"
-                class="page hidden"
-            >
-
-                <div class="page-toolbar">
-
-                    <div>
-
-                        <div class="section-kicker">
-                            DỮ LIỆU
-                        </div>
-
-                        <h1>
-                            Khách hàng
-                        </h1>
-
-
-                        <p>
-                            Quản lý thông tin khách hàng.
-                        </p>
-
-                    </div>
-
-
-                    <button
-                        type="button"
-                        class="primary-button"
-                    >
-                        + Khách hàng mới
-                    </button>
-
-                </div>
-
-
-                <div class="empty-state">
-
-                    <div class="empty-icon">
-                        ♙
-                    </div>
-
-
-                    <h3>
-                        Chưa có khách hàng
-                    </h3>
-
-
-                    <p>
-                        Dữ liệu khách hàng sẽ được dùng để
-                        tự động điền vào hồ sơ.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-
-            <!-- =================================================
-                 EMPLOYEES
-            ================================================== -->
-
-            <div
-                id="page-employees"
-                class="page hidden"
-            >
-
-                <div class="page-toolbar">
-
-                    <div>
-
-                        <div class="section-kicker">
-                            DỮ LIỆU
-                        </div>
-
-                        <h1>
-                            Nhân sự
-                        </h1>
-
-
-                        <p>
-                            Quản lý hồ sơ nhân sự và hợp đồng lao động.
-                        </p>
-
-                    </div>
-
-
-                    <button
-                        type="button"
-                        class="primary-button"
-                    >
-                        + Nhân sự mới
-                    </button>
-
-                </div>
-
-
-                <div class="empty-state">
-
-                    <div class="empty-icon">
-                        ♙
-                    </div>
-
-
-                    <h3>
-                        Khu vực nhân sự
-                    </h3>
-
-
-                    <p>
-                        Chỉ người dùng được cấp quyền mới
-                        có thể xem dữ liệu nhân sự.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-
-            <!-- =================================================
-                 HISTORY
-            ================================================== -->
-
-            <div
-                id="page-history"
-                class="page hidden"
-            >
-
-                <div class="page-toolbar">
-
-                    <div>
-
-                        <div class="section-kicker">
-                            NHẬT KÝ
-                        </div>
-
-                        <h1>
-                            Lịch sử
-                        </h1>
-
-
-                        <p>
-                            Theo dõi các văn bản đã tạo và xuất PDF.
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <div class="empty-state">
-
-                    <div class="empty-icon">
-                        ◷
-                    </div>
-
-
-                    <h3>
-                        Chưa có lịch sử
-                    </h3>
-
-
-                    <p>
-                        Các văn bản được tạo sẽ xuất hiện tại đây.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-
-            <!-- =================================================
-                 REPORTS
-            ================================================== -->
-
-            <div
-                id="page-reports"
-                class="page hidden"
-            >
-
-                <div class="page-toolbar">
-
-                    <div>
-
-                        <div class="section-kicker">
-                            PHÂN TÍCH
-                        </div>
-
-                        <h1>
-                            Báo cáo
-                        </h1>
-
-
-                        <p>
-                            Tổng hợp dữ liệu hồ sơ và công trình.
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <div class="empty-state">
-
-                    <div class="empty-icon">
-                        ▥
-                    </div>
-
-
-                    <h3>
-                        Báo cáo
-                    </h3>
-
-
-                    <p>
-                        Khu vực báo cáo sẽ được triển khai
-                        sau khi có dữ liệu thực.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-
-            <!-- =================================================
-                 SETTINGS
-            ================================================== -->
-
-            <div
-                id="page-settings"
-                class="page hidden"
-            >
-
-                <div class="page-toolbar">
-
-                    <div>
-
-                        <div class="section-kicker">
-                            HỆ THỐNG
-                        </div>
-
-                        <h1>
-                            Cài đặt
-                        </h1>
-
-
-                        <p>
-                            Cấu hình GROVA DOCUMENT.
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <div class="settings-card">
-
-                    <div class="setting-item">
-
-                        <div>
-
-                            <strong>
-                                Khổ giấy
-                            </strong>
-
-
-                            <small>
-                                Khổ giấy mặc định khi xuất hồ sơ
-                            </small>
-
-                        </div>
-
-
-                        <span class="setting-value">
-                            A4
-                        </span>
-
-                    </div>
-
-
-                    <div class="setting-item">
-
-                        <div>
-
-                            <strong>
-                                Định dạng xuất
-                            </strong>
-
-
-                            <small>
-                                Định dạng tài liệu cuối cùng
-                            </small>
-
-                        </div>
-
-
-                        <span class="setting-value">
-                            PDF
-                        </span>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-
-            <!-- =================================================
-                 ADMIN
-            ================================================== -->
-
-            <div
-                id="page-admin"
-                class="page hidden"
-            >
-
-                <div class="page-toolbar">
-
-                    <div>
-
-                        <div class="section-kicker">
-                            ADMINISTRATION
-                        </div>
-
-                        <h1>
-                            Quản trị hệ thống
-                        </h1>
-
-
-                        <p>
-                            Quản lý người dùng, mẫu văn bản
-                            và cấu hình hệ thống.
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <div class="admin-grid">
-
-                    <button
-                        type="button"
-                        class="admin-card"
-                    >
-
-                        <span class="admin-card-icon">
-                            ♙
-                        </span>
-
-
-                        <strong>
-                            Người dùng
-                        </strong>
-
-
-                        <small>
-                            Tài khoản và phân quyền
-                        </small>
-
-                    </button>
-
-
-                    <button
-                        type="button"
-                        class="admin-card"
-                    >
-
-                        <span class="admin-card-icon">
-                            ▤
-                        </span>
-
-
-                        <strong>
-                            Mẫu văn bản
-                        </strong>
-
-
-                        <small>
-                            Thêm, sửa, bật/tắt mẫu
-                        </small>
-
-                    </button>
-
-
-                    <button
-                        type="button"
-                        class="admin-card"
-                    >
-
-                        <span class="admin-card-icon">
-                            ⚙
-                        </span>
-
-
-                        <strong>
-                            Dữ liệu hệ thống
-                        </strong>
-
-
-                        <small>
-                            Cấu hình dữ liệu dùng chung
-                        </small>
-
-                    </button>
-
-                </div>
-
-            </div>
-
-
-        </section>
-
-    </main>
-
-</div>
-
-
-
-<!-- =========================================================
-     DOCUMENT MODAL
-========================================================= -->
-
-<div
-    id="documentModal"
-    class="modal hidden"
-    aria-hidden="true"
->
-
-    <div class="modal-overlay"></div>
-
-
-    <div
-        class="modal-card"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="modalTitle"
-    >
-
-        <div class="modal-header">
 
             <div>
 
-                <span class="eyebrow">
-                    TẠO VĂN BẢN
-                </span>
+              <span class="eyebrow">
+                GROVA HOLDINGS
+              </span>
 
+              <h2>
+                GROVA DOCUMENT
+              </h2>
 
-                <h2 id="modalTitle">
-                    Chọn mẫu văn bản
-                </h2>
+              <p>
+                Quản lý hồ sơ, văn bản và dữ liệu công trình tập trung.
+              </p>
 
             </div>
 
+          </div>
 
-            <button
-                id="closeModal"
-                class="modal-close"
-                type="button"
-                aria-label="Đóng"
-            >
-                ×
-            </button>
+
+          <button
+            class="primary-button"
+            data-action="new-document"
+            type="button"
+          >
+            + Tạo văn bản
+          </button>
+
+        </div>
+
+
+        <!-- DOCUMENTS -->
+
+        <div class="section-heading">
+
+          <div>
+            <h2>Văn bản</h2>
+            <p>
+              Chọn mẫu để bắt đầu tạo hồ sơ
+            </p>
+          </div>
+
+          <button
+            class="secondary-button"
+            data-page-target="documents"
+            type="button"
+          >
+            Xem tất cả
+          </button>
 
         </div>
 
 
         <div
-            id="templateSelector"
-            class="template-selector"
+          id="documentGrid"
+          class="document-grid"
         >
+
+          <!--
+            QUAN TRỌNG:
+            Các mẫu được đặt trực tiếp trong HTML.
+            JavaScript không chạy thì card vẫn hiển thị.
+          -->
+
+
+          <article
+            class="document-card"
+            data-template-id="01"
+            data-file="./templates/01-hop-dong-nguyen-tac.html"
+          >
+
+            <div class="document-icon">📄</div>
+
+            <div class="document-content">
+
+              <div class="document-code">
+                HĐNT
+              </div>
+
+              <h3>
+                Hợp đồng nguyên tắc
+              </h3>
+
+              <p>
+                Thi công lắp đặt khung thép thang máy
+              </p>
+
+              <span class="document-category">
+                Hợp đồng
+              </span>
+
+            </div>
+
+            <div class="document-arrow">
+              →
+            </div>
+
+          </article>
+
+
+          <article
+            class="document-card"
+            data-template-id="02"
+            data-file="./templates/02-phu-luc-hop-dong.html"
+          >
+
+            <div class="document-icon">📋</div>
+
+            <div class="document-content">
+
+              <div class="document-code">
+                PLHĐ
+              </div>
+
+              <h3>
+                Phụ lục hợp đồng
+              </h3>
+
+              <p>
+                Phụ lục công trình thi công khung thép thang máy
+              </p>
+
+              <span class="document-category">
+                Hợp đồng
+              </span>
+
+            </div>
+
+            <div class="document-arrow">
+              →
+            </div>
+
+          </article>
+
+
+          <article
+            class="document-card"
+            data-template-id="03"
+            data-file="./templates/03-de-nghi-thi-cong.html"
+          >
+
+            <div class="document-icon">📝</div>
+
+            <div class="document-content">
+
+              <div class="document-code">
+                PĐNTC
+              </div>
+
+              <h3>
+                Phiếu đề nghị thi công
+              </h3>
+
+              <p>
+                Phiếu đề nghị thi công nội bộ công ty
+              </p>
+
+              <span class="document-category">
+                Thi công
+              </span>
+
+            </div>
+
+            <div class="document-arrow">
+              →
+            </div>
+
+          </article>
+
+
+          <article
+            class="document-card"
+            data-template-id="04"
+            data-file="./templates/04-xac-nhan-phat-sinh.html"
+          >
+
+            <div class="document-icon">➕</div>
+
+            <div class="document-content">
+
+              <div class="document-code">
+                BBPS
+              </div>
+
+              <h3>
+                Biên bản xác nhận phát sinh
+              </h3>
+
+              <p>
+                Xác nhận các nội dung phát sinh của công trình
+              </p>
+
+              <span class="document-category">
+                Thi công
+              </span>
+
+            </div>
+
+            <div class="document-arrow">
+              →
+            </div>
+
+          </article>
+
+
+          <article
+            class="document-card"
+            data-template-id="05"
+            data-file="./templates/05-nghiem-thu-ban-giao.html"
+          >
+
+            <div class="document-icon">✅</div>
+
+            <div class="document-content">
+
+              <div class="document-code">
+                BBNTBG
+              </div>
+
+              <h3>
+                Biên bản nghiệm thu và bàn giao
+              </h3>
+
+              <p>
+                Nghiệm thu và bàn giao khung thép thang máy
+              </p>
+
+              <span class="document-category">
+                Nghiệm thu
+              </span>
+
+            </div>
+
+            <div class="document-arrow">
+              →
+            </div>
+
+          </article>
+
+
+          <article
+            class="document-card"
+            data-template-id="06"
+            data-file="./templates/06-de-nghi-thanh-toan.html"
+          >
+
+            <div class="document-icon">💰</div>
+
+            <div class="document-content">
+
+              <div class="document-code">
+                ĐNTT
+              </div>
+
+              <h3>
+                Đề nghị thanh toán
+              </h3>
+
+              <p>
+                Đề nghị thanh toán giá trị thi công lắp khung thép thang máy
+              </p>
+
+              <span class="document-category">
+                Thanh toán
+              </span>
+
+            </div>
+
+            <div class="document-arrow">
+              →
+            </div>
+
+          </article>
+
+
+          <article
+            class="document-card"
+            data-template-id="07"
+            data-file="./templates/07-doi-chieu-cong-no.html"
+          >
+
+            <div class="document-icon">🧾</div>
+
+            <div class="document-content">
+
+              <div class="document-code">
+                ĐCCN
+              </div>
+
+              <h3>
+                Đối chiếu công nợ
+              </h3>
+
+              <p>
+                Đối chiếu và xác nhận công nợ giữa hai bên
+              </p>
+
+              <span class="document-category">
+                Công nợ
+              </span>
+
+            </div>
+
+            <div class="document-arrow">
+              →
+            </div>
+
+          </article>
+
+
+          <article
+            class="document-card"
+            data-template-id="08"
+            data-file="./templates/08-hop-dong-lao-dong.html"
+          >
+
+            <div class="document-icon">👤</div>
+
+            <div class="document-content">
+
+              <div class="document-code">
+                HĐLĐ
+              </div>
+
+              <h3>
+                Hợp đồng lao động
+              </h3>
+
+              <p>
+                Hợp đồng lao động
+              </p>
+
+              <span class="document-category">
+                Nhân sự
+              </span>
+
+            </div>
+
+            <div class="document-arrow">
+              →
+            </div>
+
+          </article>
+
+
+          <article
+            class="document-card"
+            data-template-id="09"
+            data-file="./templates/09-thanh-ly-hop-dong.html"
+          >
+
+            <div class="document-icon">📑</div>
+
+            <div class="document-content">
+
+              <div class="document-code">
+                BBTLHĐ
+              </div>
+
+              <h3>
+                Biên bản thanh lý hợp đồng
+              </h3>
+
+              <p>
+                Thanh lý hợp đồng thi công lắp đặt khung thép thang máy
+              </p>
+
+              <span class="document-category">
+                Hợp đồng
+              </span>
+
+            </div>
+
+            <div class="document-arrow">
+              →
+            </div>
+
+          </article>
+
         </div>
 
 
-        <div class="modal-footer">
+        <!-- RECENT -->
 
-            <button
-                type="button"
-                id="cancelModal"
-                class="btn btn-secondary"
-            >
-                Hủy
-            </button>
+        <div class="section-heading recent-heading">
 
+          <div>
 
-            <button
-                type="button"
-                id="openTemplate"
-                class="btn btn-primary"
-            >
-                Mở mẫu
-            </button>
+            <h2>
+              Hoạt động gần đây
+            </h2>
+
+            <p>
+              Các hồ sơ vừa xử lý
+            </p>
+
+          </div>
 
         </div>
+
+
+        <div
+          id="recentDocuments"
+          class="recent-box"
+        >
+
+          <div class="empty-state">
+
+            <div class="empty-icon">
+              ◷
+            </div>
+
+            <h3>
+              Chưa có lịch sử
+            </h3>
+
+            <p>
+              Các văn bản được tạo sẽ xuất hiện tại đây.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <!-- STATS -->
+
+        <div class="section-heading">
+
+          <div>
+
+            <h2>
+              Thống kê
+            </h2>
+
+            <p>
+              Tổng quan hệ thống
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div class="stats-grid">
+
+          <div class="stat-card">
+
+            <span class="stat-icon">
+              ▤
+            </span>
+
+            <div>
+              <small>Tổng văn bản</small>
+              <strong id="statDocuments">0</strong>
+            </div>
+
+          </div>
+
+
+          <div class="stat-card">
+
+            <span class="stat-icon">
+              ⌂
+            </span>
+
+            <div>
+              <small>Công trình</small>
+              <strong id="statProjects">0</strong>
+            </div>
+
+          </div>
+
+
+          <div class="stat-card">
+
+            <span class="stat-icon">
+              ♙
+            </span>
+
+            <div>
+              <small>Khách hàng</small>
+              <strong id="statCustomers">0</strong>
+            </div>
+
+          </div>
+
+
+          <div class="stat-card">
+
+            <span class="stat-icon">
+              👤
+            </span>
+
+            <div>
+              <small>Nhân sự</small>
+              <strong id="statEmployees">0</strong>
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+
+      <!-- ================= DOCUMENTS ================= -->
+
+      <section
+        id="page-documents"
+        class="page"
+      >
+
+        <div class="page-header">
+
+          <div>
+
+            <h2>
+              Văn bản
+            </h2>
+
+            <p>
+              Danh mục mẫu văn bản GROVA
+            </p>
+
+          </div>
+
+          <button
+            class="primary-button"
+            data-action="new-document"
+            type="button"
+          >
+            + Tạo văn bản
+          </button>
+
+        </div>
+
+
+        <div
+          id="documentsPageGrid"
+          class="document-grid"
+        >
+
+          <!-- app.js sẽ đồng bộ từ dashboard -->
+
+        </div>
+
+      </section>
+
+
+
+      <!-- ================= PROJECTS ================= -->
+
+      <section
+        id="page-projects"
+        class="page"
+      >
+
+        <div class="empty-page">
+
+          <div class="empty-page-icon">⌂</div>
+
+          <h2>
+            Công trình
+          </h2>
+
+          <p>
+            Dữ liệu công trình được dùng chung cho các hồ sơ.
+          </p>
+
+          <button
+            class="primary-button"
+            type="button"
+          >
+            + Công trình mới
+          </button>
+
+        </div>
+
+      </section>
+
+
+
+      <!-- ================= CUSTOMERS ================= -->
+
+      <section
+        id="page-customers"
+        class="page"
+      >
+
+        <div class="empty-page">
+
+          <div class="empty-page-icon">♙</div>
+
+          <h2>
+            Khách hàng
+          </h2>
+
+          <p>
+            Quản lý thông tin khách hàng.
+          </p>
+
+          <button
+            class="primary-button"
+            type="button"
+          >
+            + Khách hàng mới
+          </button>
+
+        </div>
+
+      </section>
+
+
+
+      <!-- ================= EMPLOYEES ================= -->
+
+      <section
+        id="page-employees"
+        class="page"
+      >
+
+        <div class="empty-page">
+
+          <div class="empty-page-icon">👤</div>
+
+          <h2>
+            Nhân sự
+          </h2>
+
+          <p>
+            Quản lý hồ sơ nhân sự và hợp đồng lao động.
+          </p>
+
+        </div>
+
+      </section>
+
+
+
+      <!-- ================= HISTORY ================= -->
+
+      <section
+        id="page-history"
+        class="page"
+      >
+
+        <div class="empty-page">
+
+          <div class="empty-page-icon">◷</div>
+
+          <h2>
+            Lịch sử
+          </h2>
+
+          <p>
+            Theo dõi các văn bản đã tạo và xuất PDF.
+          </p>
+
+        </div>
+
+      </section>
+
+
+
+      <!-- ================= REPORTS ================= -->
+
+      <section
+        id="page-reports"
+        class="page"
+      >
+
+        <div class="empty-page">
+
+          <div class="empty-page-icon">▥</div>
+
+          <h2>
+            Báo cáo
+          </h2>
+
+          <p>
+            Tổng hợp dữ liệu hồ sơ và công trình.
+          </p>
+
+        </div>
+
+      </section>
+
+
+
+      <!-- ================= SETTINGS ================= -->
+
+      <section
+        id="page-settings"
+        class="page"
+      >
+
+        <div class="empty-page">
+
+          <div class="empty-page-icon">⚙</div>
+
+          <h2>
+            Cài đặt
+          </h2>
+
+          <p>
+            Cấu hình GROVA DOCUMENT.
+          </p>
+
+          <div class="settings-box">
+
+            <div>
+              <span>Khổ giấy</span>
+              <strong>A4</strong>
+            </div>
+
+            <div>
+              <span>Định dạng xuất</span>
+              <strong>PDF</strong>
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+
+      <!-- ================= ADMIN ================= -->
+
+      <section
+        id="page-admin"
+        class="page"
+      >
+
+        <div class="empty-page">
+
+          <div class="empty-page-icon">◆</div>
+
+          <h2>
+            Quản trị hệ thống
+          </h2>
+
+          <p>
+            Quản lý người dùng, mẫu văn bản và cấu hình hệ thống.
+          </p>
+
+        </div>
+
+      </section>
 
     </div>
+
+  </main>
 
 </div>
 
 
 
-<!-- =========================================================
-     DATA
-========================================================= -->
+<!-- ================= MODAL ================= -->
+
+<div
+  id="documentModal"
+  class="modal-overlay hidden"
+>
+
+  <div class="modal">
+
+    <div class="modal-header">
+
+      <div>
+
+        <span class="eyebrow">
+          GROVA DOCUMENT
+        </span>
+
+        <h2>
+          Tạo văn bản
+        </h2>
+
+      </div>
+
+      <button
+        id="closeModal"
+        class="icon-button"
+        type="button"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <div class="modal-body">
+
+      <p class="modal-description">
+        Chọn mẫu văn bản bạn muốn sử dụng.
+      </p>
+
+      <div
+        id="templateSelector"
+        class="template-selector"
+      ></div>
+
+    </div>
+
+
+    <div class="modal-footer">
+
+      <button
+        id="cancelModal"
+        class="secondary-button"
+        type="button"
+      >
+        Hủy
+      </button>
+
+      <button
+        id="openTemplate"
+        class="primary-button"
+        type="button"
+        disabled
+      >
+        Mở mẫu
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<!-- DATA -->
 
 <script
-    src="./data/data.js?v=20"
+  src="./data/data.js?v=100"
 ></script>
 
 
-<!-- =========================================================
-     APPLICATION
-========================================================= -->
+<!-- APP -->
 
 <script
-    src="./app.js?v=20"
+  src="./app.js?v=100"
 ></script>
-
-
-
-<!-- =========================================================
-     SERVICE WORKER
-========================================================= -->
-
-<script>
-
-if (
-    "serviceWorker" in navigator
-) {
-
-    window.addEventListener(
-        "load",
-        function () {
-
-            navigator.serviceWorker
-                .register(
-                    "./sw.js?v=12"
-                )
-                .then(
-                    function () {
-
-                        console.log(
-                            "GROVA DOCUMENT Service Worker đã đăng ký."
-                        );
-
-                    }
-                )
-                .catch(
-                    function (error) {
-
-                        console.warn(
-                            "Service Worker chưa được kích hoạt:",
-                            error
-                        );
-
-                    }
-                );
-
-        }
-    );
-
-}
-
-</script>
 
 
 </body>
-
 </html>
