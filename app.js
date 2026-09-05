@@ -1,1226 +1,1201 @@
 /* =========================================================
    GROVA DOCUMENT
-   Main Application
+   APP.JS
    Version: 2.0
    ========================================================= */
 
-(() => {
-  "use strict";
+(function () {
+    "use strict";
 
-  /* =========================================================
-     STATE
-     ========================================================= */
+    /* =====================================================
+       STATE
+    ===================================================== */
 
-  const state = {
-    initialized: false,
-    currentPage: "dashboard",
-    currentTemplate: null,
-    selectedTemplateId: null,
-    templates: [],
-    data: null,
-    currentUser: {
-      name: "Người dùng GROVA",
-      role: "Nhân viên",
-      initials: "NG"
-    }
-  };
-
-
-  /* =========================================================
-     HELPERS
-     ========================================================= */
-
-  const $ = (selector, root = document) => {
-    return root.querySelector(selector);
-  };
-
-  const $$ = (selector, root = document) => {
-    return Array.from(root.querySelectorAll(selector));
-  };
-
-  const escapeHTML = (value) => {
-    return String(value ?? "")
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
-  };
-
-  const getAppData = () => {
-    return (
-      window.GROVA_DATA ||
-      window.grovaData ||
-      window.GROVA ||
-      {}
-    );
-  };
-
-
-  /* =========================================================
-     TEMPLATE DATA
-     ========================================================= */
-
-  function normalizeTemplate(template) {
-    if (!template) return null;
-
-    return {
-      id: String(template.id ?? ""),
-      code: template.code || "",
-      name: template.name || template.title || "Mẫu văn bản",
-      title: template.title || template.name || "Mẫu văn bản",
-      description: template.description || "",
-      category: template.category || "Khác",
-      icon: template.icon || "📄",
-      file: template.file || "",
-      enabled: template.enabled !== false
+    const state = {
+        currentPage: "dashboard",
+        selectedTemplate: null,
+        initialized: false,
+        currentUser: {
+            name: "Người dùng GROVA",
+            role: "Nhân viên"
+        }
     };
-  }
 
 
-  function getTemplates() {
-    const data = getAppData();
+    /* =====================================================
+       HELPERS
+    ===================================================== */
 
-    if (!data || !Array.isArray(data.templates)) {
-      return [];
+    function $(selector, parent) {
+        return (parent || document).querySelector(selector);
     }
 
-    return data.templates
-      .map(normalizeTemplate)
-      .filter(Boolean)
-      .filter(template => template.enabled);
-  }
-
-
-  /*
-   * Nếu trình duyệt đang giữ data.js cũ trong cache,
-   * tự tải lại data.js với query mới.
-   */
-  function ensureFreshData(callback) {
-
-    const currentTemplates = getTemplates();
-
-    if (currentTemplates.length > 0) {
-      callback();
-      return;
+    function $$(selector, parent) {
+        return Array.from(
+            (parent || document).querySelectorAll(selector)
+        );
     }
 
-    const script = document.createElement("script");
-
-    script.src = "./data/data.js?v=" + Date.now();
-
-    script.onload = () => {
-      callback();
-    };
-
-    script.onerror = () => {
-      callback();
-    };
-
-    document.head.appendChild(script);
-  }
-
-
-  /* =========================================================
-     USER
-     ========================================================= */
-
-  function renderCurrentUser() {
-
-    const data = getAppData();
-
-    const user = data.currentUser || state.currentUser;
-
-    state.currentUser = {
-      name: user.name || "Người dùng GROVA",
-      role: user.role || "Nhân viên",
-      initials:
-        user.initials ||
-        getInitials(user.name || "Người dùng GROVA")
-    };
-
-    const nameElements = $$(
-      "[data-user-name], #currentUserName, .current-user-name"
-    );
-
-    nameElements.forEach(element => {
-      element.textContent = state.currentUser.name;
-    });
-
-    const roleElements = $$(
-      "[data-user-role], #currentUserRole, .current-user-role"
-    );
-
-    roleElements.forEach(element => {
-      element.textContent = state.currentUser.role;
-    });
-
-    const initialsElements = $$(
-      "[data-user-initials], #currentUserInitials, .user-avatar"
-    );
-
-    initialsElements.forEach(element => {
-
-      /*
-       * Không ghi đè nếu element là ảnh/logo.
-       */
-      if (
-        element.tagName !== "IMG" &&
-        element.classList.contains("user-avatar")
-      ) {
-        element.textContent = state.currentUser.initials;
-      }
-    });
-  }
-
-
-  function getInitials(name) {
-
-    const words = String(name)
-      .trim()
-      .split(/\s+/)
-      .filter(Boolean);
-
-    if (!words.length) return "NG";
-
-    if (words.length === 1) {
-      return words[0].slice(0, 2).toUpperCase();
+    function escapeHtml(value) {
+        return String(value ?? "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
     }
 
-    return (
-      words[0].charAt(0) +
-      words[words.length - 1].charAt(0)
-    ).toUpperCase();
-  }
+
+    /* =====================================================
+       DATA
+    ===================================================== */
+
+    function getAppData() {
+        return (
+            window.GROVA_DATA ||
+            window.grovaData ||
+            window.GROVA ||
+            {}
+        );
+    }
 
 
-  /* =========================================================
-     STATISTICS
-     ========================================================= */
+    function normalizeTemplate(template, index) {
+        if (!template) {
+            return null;
+        }
 
-  function renderStats() {
+        return {
+            id: String(
+                template.id ??
+                String(index + 1).padStart(2, "0")
+            ),
 
-    const data = getAppData();
+            code:
+                template.code ||
+                `VB${String(index + 1).padStart(2, "0")}`,
 
-    const stats = {
-      documents: Number(data.stats?.documents || 0),
-      projects: Number(data.stats?.projects || 0),
-      customers: Number(data.stats?.customers || 0),
-      employees: Number(data.stats?.employees || 0)
-    };
+            name:
+                template.name ||
+                template.title ||
+                "Mẫu văn bản",
 
-    const mapping = {
-      documents: [
-        "#statDocuments",
-        "[data-stat='documents']"
-      ],
-      projects: [
-        "#statProjects",
-        "[data-stat='projects']"
-      ],
-      customers: [
-        "#statCustomers",
-        "[data-stat='customers']"
-      ],
-      employees: [
-        "#statEmployees",
-        "[data-stat='employees']"
-      ]
-    };
+            title:
+                template.title ||
+                template.name ||
+                "Mẫu văn bản",
 
-    Object.keys(mapping).forEach(key => {
+            description:
+                template.description ||
+                "",
 
-      mapping[key].forEach(selector => {
+            category:
+                template.category ||
+                "Văn bản",
 
-        $$(selector).forEach(element => {
-          element.textContent = stats[key];
+            icon:
+                template.icon ||
+                "📄",
+
+            file:
+                template.file ||
+                "",
+
+            enabled:
+                template.enabled !== false
+        };
+    }
+
+
+    function getTemplates() {
+        const data = getAppData();
+
+        if (!data || !Array.isArray(data.templates)) {
+            return [];
+        }
+
+        return data.templates
+            .map(normalizeTemplate)
+            .filter(Boolean)
+            .filter(template => template.enabled !== false);
+    }
+
+
+    /*
+     * Trường hợp Safari/iOS còn giữ data.js cũ.
+     * Nếu chưa có mẫu, tải lại data.js bằng URL mới.
+     */
+    function ensureFreshData(callback) {
+        const templates = getTemplates();
+
+        if (templates.length > 0) {
+            callback();
+            return;
+        }
+
+        const oldScript = document.querySelector(
+            'script[data-grova-refresh="true"]'
+        );
+
+        if (oldScript) {
+            callback();
+            return;
+        }
+
+        const script = document.createElement("script");
+
+        script.src =
+            "./data/data.js?v=" +
+            Date.now();
+
+        script.dataset.grovaRefresh = "true";
+
+        script.onload = function () {
+            callback();
+        };
+
+        script.onerror = function () {
+            callback();
+        };
+
+        document.head.appendChild(script);
+    }
+
+
+    /* =====================================================
+       USER
+    ===================================================== */
+
+    function renderCurrentUser() {
+        const nameElement = $("#currentUserName");
+        const roleElement = $("#currentUserRole");
+        const avatarElement = $(".user-avatar");
+
+        if (nameElement) {
+            nameElement.textContent =
+                state.currentUser.name;
+        }
+
+        if (roleElement) {
+            roleElement.textContent =
+                state.currentUser.role;
+        }
+
+        if (avatarElement) {
+            avatarElement.textContent =
+                getInitials(state.currentUser.name);
+        }
+    }
+
+
+    function getInitials(name) {
+        const parts = String(name || "")
+            .trim()
+            .split(/\s+/)
+            .filter(Boolean);
+
+        if (!parts.length) {
+            return "G";
+        }
+
+        if (parts.length === 1) {
+            return parts[0]
+                .substring(0, 2)
+                .toUpperCase();
+        }
+
+        return (
+            parts[0].charAt(0) +
+            parts[parts.length - 1].charAt(0)
+        ).toUpperCase();
+    }
+
+
+    /* =====================================================
+       STATISTICS
+    ===================================================== */
+
+    function getStats() {
+        const data = getAppData();
+
+        return {
+            documents:
+                Number(data?.stats?.documents || 0),
+
+            projects:
+                Number(data?.stats?.projects || 0),
+
+            customers:
+                Number(data?.stats?.customers || 0),
+
+            employees:
+                Number(data?.stats?.employees || 0)
+        };
+    }
+
+
+    function renderStats() {
+        const stats = getStats();
+
+        const documents = $("#statDocuments");
+        const projects = $("#statProjects");
+        const customers = $("#statCustomers");
+        const employees = $("#statEmployees");
+
+        if (documents) {
+            documents.textContent = stats.documents;
+        }
+
+        if (projects) {
+            projects.textContent = stats.projects;
+        }
+
+        if (customers) {
+            customers.textContent = stats.customers;
+        }
+
+        if (employees) {
+            employees.textContent = stats.employees;
+        }
+    }
+
+
+    /* =====================================================
+       DOCUMENT CARDS
+    ===================================================== */
+
+    function renderDocumentCards() {
+        const templates = getTemplates();
+
+        const grids = [
+            $("#documentGrid"),
+            $("#documentsPageGrid")
+        ].filter(Boolean);
+
+        grids.forEach(grid => {
+            grid.innerHTML = "";
+
+            if (!templates.length) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📄</div>
+
+                        <div class="empty-title">
+                            Chưa có mẫu văn bản
+                        </div>
+
+                        <div class="empty-text">
+                            Các mẫu văn bản sẽ được khai báo trong
+                            data/data.js
+                        </div>
+                    </div>
+                `;
+
+                return;
+            }
+
+            templates.forEach(template => {
+                const card =
+                    document.createElement("article");
+
+                card.className = "document-card";
+
+                card.dataset.templateId =
+                    template.id;
+
+                card.innerHTML = `
+                    <div class="document-card-top">
+
+                        <div class="document-icon">
+                            ${escapeHtml(template.icon)}
+                        </div>
+
+                        <span class="document-code">
+                            ${escapeHtml(template.code)}
+                        </span>
+
+                    </div>
+
+                    <div class="document-name">
+                        ${escapeHtml(template.name)}
+                    </div>
+
+                    <div class="document-description">
+                        ${escapeHtml(template.description)}
+                    </div>
+
+                    <div class="document-meta">
+
+                        <span class="document-tag">
+                            ${escapeHtml(template.category)}
+                        </span>
+
+                        <span class="document-tag">
+                            Tạo văn bản
+                        </span>
+
+                    </div>
+                `;
+
+                card.addEventListener(
+                    "click",
+                    function () {
+                        openDocumentModal(
+                            template.id
+                        );
+                    }
+                );
+
+                grid.appendChild(card);
+            });
         });
-
-      });
-
-    });
-  }
+    }
 
 
-  /* =========================================================
-     DOCUMENT CARDS
-     ========================================================= */
+    /* =====================================================
+       RECENT DOCUMENTS
+    ===================================================== */
 
-  function renderDocumentCards() {
+    function getRecentDocuments() {
+        const data = getAppData();
 
-    state.templates = getTemplates();
+        if (
+            data &&
+            Array.isArray(data.recentDocuments)
+        ) {
+            return data.recentDocuments;
+        }
 
-    const containers = [
-      $("#documentGrid"),
-      $("#documentsPageGrid")
-    ].filter(Boolean);
-
-    if (!containers.length) return;
-
-    containers.forEach(container => {
-
-      if (!state.templates.length) {
-
-        container.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-state-icon">📄</div>
-
-            <h3>Chưa có mẫu văn bản</h3>
-
-            <p>
-              Các mẫu văn bản sẽ được khai báo trong data/data.js
-            </p>
-          </div>
-        `;
-
-        return;
-      }
-
-      container.innerHTML = state.templates
-        .map(template => createDocumentCard(template))
-        .join("");
-
-    });
-  }
+        return [];
+    }
 
 
-  function createDocumentCard(template) {
+    function renderRecentDocuments() {
+        const container =
+            $("#recentDocuments");
 
-    return `
-      <article
-        class="document-card"
-        data-template-id="${escapeHTML(template.id)}"
-      >
+        if (!container) {
+            return;
+        }
 
-        <div class="document-card-top">
+        const recent =
+            getRecentDocuments();
 
-          <div class="document-icon">
-            ${escapeHTML(template.icon)}
-          </div>
+        if (!recent.length) {
+            container.innerHTML = `
+                <div class="empty-state">
 
-          <span class="document-code">
-            ${escapeHTML(template.code)}
-          </span>
+                    <div class="empty-icon">
+                        🗂️
+                    </div>
 
-        </div>
+                    <div class="empty-title">
+                        Chưa có văn bản gần đây
+                    </div>
 
-        <div class="document-card-content">
+                    <div class="empty-text">
+                        Văn bản sau khi được tạo sẽ xuất hiện tại đây.
+                    </div>
 
-          <h3>
-            ${escapeHTML(template.name)}
-          </h3>
+                </div>
+            `;
 
-          <p>
-            ${escapeHTML(template.description)}
-          </p>
-
-        </div>
-
-        <div class="document-card-bottom">
-
-          <span class="document-category">
-            ${escapeHTML(template.category)}
-          </span>
-
-          <button
-            type="button"
-            class="create-document-button"
-            data-create-template="${escapeHTML(template.id)}"
-          >
-            Tạo văn bản
-          </button>
-
-        </div>
-
-      </article>
-    `;
-  }
-
-
-  /* =========================================================
-     RECENT DOCUMENTS
-     ========================================================= */
-
-  function renderRecentDocuments() {
-
-    const data = getAppData();
-
-    const recent = Array.isArray(data.recentDocuments)
-      ? data.recentDocuments
-      : [];
-
-    const containers = [
-      $("#recentDocuments"),
-      $("#recentDocumentsList"),
-      $("#activityList")
-    ].filter(Boolean);
-
-    containers.forEach(container => {
-
-      if (!recent.length) {
+            return;
+        }
 
         container.innerHTML = `
-          <div class="empty-state compact">
-            <div class="empty-state-icon">📂</div>
+            <div class="recent-list">
 
-            <h3>Chưa có văn bản gần đây</h3>
+                ${recent
+                    .slice(0, 8)
+                    .map(item => `
+                        <div class="recent-item">
 
-            <p>
-              Văn bản sau khi được tạo sẽ xuất hiện tại đây.
-            </p>
-          </div>
-        `;
+                            <div class="recent-icon">
+                                📄
+                            </div>
 
-        return;
-      }
+                            <div class="recent-content">
 
-      container.innerHTML = recent
-        .map(item => {
+                                <div class="recent-title">
+                                    ${escapeHtml(
+                                        item.name ||
+                                        item.title ||
+                                        "Văn bản"
+                                    )}
+                                </div>
 
-          return `
-            <div class="recent-document-item">
+                                <div class="recent-meta">
+                                    ${escapeHtml(
+                                        item.date ||
+                                        item.createdAt ||
+                                        ""
+                                    )}
+                                </div>
 
-              <div class="recent-document-icon">
-                📄
-              </div>
+                            </div>
 
-              <div class="recent-document-info">
+                            <span class="recent-status">
+                                ${escapeHtml(
+                                    item.status ||
+                                    "Đã tạo"
+                                )}
+                            </span>
 
-                <strong>
-                  ${escapeHTML(item.name || "Văn bản")}
-                </strong>
-
-                <span>
-                  ${escapeHTML(item.date || "")}
-                </span>
-
-              </div>
+                        </div>
+                    `)
+                    .join("")}
 
             </div>
-          `;
-
-        })
-        .join("");
-    });
-  }
-
-
-  /* =========================================================
-     DOCUMENT SELECTOR MODAL
-     ========================================================= */
-
-  function renderTemplateSelector() {
-
-    const container = $("#templateSelector");
-
-    if (!container) return;
-
-    if (!state.templates.length) {
-
-      container.innerHTML = `
-        <div class="empty-state">
-          <div class="empty-state-icon">📄</div>
-          <h3>Chưa có mẫu văn bản</h3>
-        </div>
-      `;
-
-      return;
-    }
-
-    container.innerHTML = state.templates
-      .map(template => {
-
-        const selected =
-          state.selectedTemplateId === template.id
-            ? "selected"
-            : "";
-
-        return `
-          <button
-            type="button"
-            class="template-option ${selected}"
-            data-template-select="${escapeHTML(template.id)}"
-          >
-
-            <strong>
-              ${escapeHTML(template.name)}
-            </strong>
-
-            <span>
-              ${escapeHTML(template.description)}
-            </span>
-
-          </button>
         `;
-
-      })
-      .join("");
-
-    /*
-     * Nút mở mẫu
-     */
-    const modalBody =
-      container.closest(".modal-content") ||
-      container.parentElement;
-
-    if (
-      modalBody &&
-      !$(".template-open-button", modalBody)
-    ) {
-
-      const footer = document.createElement("div");
-
-      footer.className = "template-modal-footer";
-
-      footer.innerHTML = `
-        <button
-          type="button"
-          class="secondary-button"
-          data-close-modal
-        >
-          Hủy
-        </button>
-
-        <button
-          type="button"
-          class="primary-button template-open-button"
-        >
-          Mở mẫu
-        </button>
-      `;
-
-      modalBody.appendChild(footer);
-    }
-  }
-
-
-  function openDocumentModal(templateId = null) {
-
-    state.selectedTemplateId =
-      templateId ||
-      state.templates[0]?.id ||
-      null;
-
-    renderTemplateSelector();
-
-    const modal =
-      $("#documentModal") ||
-      $("#templateModal") ||
-      $(".modal-overlay");
-
-    if (!modal) return;
-
-    modal.classList.add("active");
-    modal.classList.remove("hidden");
-
-    document.body.classList.add("modal-open");
-
-    renderTemplateSelector();
-  }
-
-
-  function closeDocumentModal() {
-
-    const modals = [
-      $("#documentModal"),
-      $("#templateModal"),
-      $(".modal-overlay")
-    ].filter(Boolean);
-
-    modals.forEach(modal => {
-
-      modal.classList.remove("active");
-      modal.classList.add("hidden");
-
-    });
-
-    document.body.classList.remove("modal-open");
-  }
-
-
-  /* =========================================================
-     OPEN TEMPLATE
-     ========================================================= */
-
-  function startSelectedDocument() {
-
-    const template = state.templates.find(
-      item => item.id === state.selectedTemplateId
-    );
-
-    if (!template) {
-      alert("Vui lòng chọn mẫu văn bản.");
-      return;
-    }
-
-    if (!template.file) {
-      alert("Mẫu văn bản chưa được khai báo đường dẫn.");
-      return;
-    }
-
-    closeDocumentModal();
-
-    state.currentTemplate = template;
-
-    /*
-     * Mở template HTML.
-     */
-    window.location.href = template.file;
-  }
-
-
-  /* =========================================================
-     NAVIGATION
-     ========================================================= */
-
-  function switchPage(pageName) {
-
-    if (!pageName) return;
-
-    const pages = $$(
-      ".page, [data-page-container]"
-    );
-
-    if (!pages.length) return;
-
-    state.currentPage = pageName;
-
-    pages.forEach(page => {
-
-      const pageId =
-        page.dataset.pageContainer ||
-        page.id ||
-        "";
-
-      const normalized =
-        pageId
-          .replace(/Page$/i, "")
-          .toLowerCase();
-
-      const target =
-        pageName.toLowerCase();
-
-      const active =
-        normalized === target ||
-        pageId.toLowerCase() === `${target}page`;
-
-      page.classList.toggle("active", active);
-      page.classList.toggle("hidden", !active);
-    });
-
-
-    /*
-     * Navigation active state
-     */
-    $$(
-      ".menu-item, .nav-item, [data-page]"
-    ).forEach(item => {
-
-      const target = item.dataset.page;
-
-      if (!target) return;
-
-      item.classList.toggle(
-        "active",
-        target === pageName
-      );
-    });
-
-
-    /*
-     * Trang văn bản
-     */
-    if (pageName === "documents") {
-      renderDocumentsPage();
     }
 
 
-    /*
-     * Trang dashboard
-     */
-    if (pageName === "dashboard") {
-      renderDocumentCards();
-      renderRecentDocuments();
-      renderStats();
+    /* =====================================================
+       DOCUMENTS PAGE
+    ===================================================== */
+
+    function renderDocumentsPage() {
+        renderDocumentCards();
     }
 
 
-    /*
-     * Đóng menu mobile
-     */
-    document.body.classList.remove("menu-open");
-  }
+    /* =====================================================
+       PAGE NAVIGATION
+    ===================================================== */
 
+    const PAGE_CONFIG = {
 
-  /*
-   * Quan trọng:
-   * Hàm này trước đây bị thiếu trong app.js cũ.
-   */
-  function renderDocumentsPage() {
-    renderDocumentCards();
-  }
+        dashboard: {
+            title: "Tổng quan",
+            subtitle:
+                "Quản lý hồ sơ và văn bản GROVA"
+        },
 
+        documents: {
+            title: "Văn bản",
+            subtitle:
+                "Quản lý và tạo các mẫu văn bản GROVA"
+        },
 
-  function bindNavigation() {
+        projects: {
+            title: "Công trình",
+            subtitle:
+                "Quản lý dữ liệu công trình"
+        },
 
-    /*
-     * HTML hiện tại dùng .menu-item,
-     * code cũ lại chỉ tìm .nav-item.
-     *
-     * Vì vậy dùng [data-page] làm chuẩn.
-     */
-    $$(
-      ".menu-item[data-page], " +
-      ".nav-item[data-page], " +
-      "[data-page]"
-    ).forEach(item => {
+        customers: {
+            title: "Khách hàng",
+            subtitle:
+                "Quản lý thông tin khách hàng"
+        },
 
-      if (item.dataset.navigationBound === "1") {
-        return;
-      }
+        employees: {
+            title: "Nhân sự",
+            subtitle:
+                "Quản lý hồ sơ nhân sự"
+        },
 
-      item.dataset.navigationBound = "1";
+        history: {
+            title: "Lịch sử",
+            subtitle:
+                "Theo dõi các hồ sơ đã tạo"
+        },
 
-      item.addEventListener("click", event => {
+        reports: {
+            title: "Báo cáo",
+            subtitle:
+                "Tổng hợp dữ liệu hệ thống"
+        },
 
-        event.preventDefault();
+        settings: {
+            title: "Cài đặt",
+            subtitle:
+                "Cấu hình GROVA DOCUMENT"
+        },
 
-        const pageName =
-          item.dataset.page;
-
-        if (pageName) {
-          switchPage(pageName);
+        admin: {
+            title: "Quản trị hệ thống",
+            subtitle:
+                "Quản lý người dùng, mẫu và dữ liệu"
         }
 
-      });
-
-    });
-  }
+    };
 
 
-  /* =========================================================
-     NEW DOCUMENT BUTTONS
-     ========================================================= */
+    function switchPage(pageName) {
+        const page =
+            $("#page-" + pageName);
 
-  function bindNewDocumentButtons() {
+        if (!page) {
+            return;
+        }
 
-    document.addEventListener("click", event => {
-
-      const button =
-        event.target.closest(
-          "[data-create-template]"
-        );
-
-      if (!button) return;
-
-      event.preventDefault();
-
-      const templateId =
-        button.dataset.createTemplate;
-
-      openDocumentModal(templateId);
-    });
-  }
-
-
-  /* =========================================================
-     MODAL EVENTS
-     ========================================================= */
-
-  function bindModal() {
-
-    document.addEventListener("click", event => {
-
-      /*
-       * Chọn template
-       */
-      const option =
-        event.target.closest(
-          "[data-template-select]"
-        );
-
-      if (option) {
-
-        event.preventDefault();
-
-        state.selectedTemplateId =
-          option.dataset.templateSelect;
-
-        $$(".template-option").forEach(item => {
-          item.classList.toggle(
-            "selected",
-            item.dataset.templateSelect ===
-            state.selectedTemplateId
-          );
+        $$(".page").forEach(item => {
+            item.classList.add("hidden");
+            item.classList.remove("active-page");
         });
 
-        return;
-      }
+        page.classList.remove("hidden");
+        page.classList.add("active-page");
 
+        state.currentPage =
+            pageName;
 
-      /*
-       * Mở mẫu
-       */
-      const openButton =
-        event.target.closest(
-          ".template-open-button"
+        $$(".menu-item[data-page]").forEach(
+            item => {
+                item.classList.toggle(
+                    "active",
+                    item.dataset.page === pageName
+                );
+            }
         );
 
-      if (openButton) {
+        const config =
+            PAGE_CONFIG[pageName];
 
-        event.preventDefault();
+        if (config) {
 
-        startSelectedDocument();
+            const title =
+                $("#pageTitle");
 
-        return;
-      }
+            const subtitle =
+                $("#pageSubtitle");
 
+            if (title) {
+                title.textContent =
+                    config.title;
+            }
 
-      /*
-       * Đóng modal
-       */
-      const closeButton =
-        event.target.closest(
-          "[data-close-modal], " +
-          ".modal-close, " +
-          ".close-modal"
-        );
-
-      if (closeButton) {
-
-        event.preventDefault();
-
-        closeDocumentModal();
-
-        return;
-      }
-
-
-      /*
-       * Click nền modal
-       */
-      if (
-        event.target.classList.contains(
-          "modal-overlay"
-        )
-      ) {
-        closeDocumentModal();
-      }
-
-    });
-
-
-    /*
-     * ESC
-     */
-    document.addEventListener(
-      "keydown",
-      event => {
-
-        if (event.key === "Escape") {
-          closeDocumentModal();
+            if (subtitle) {
+                subtitle.textContent =
+                    config.subtitle;
+            }
         }
 
-      }
-    );
-  }
-
-
-  /* =========================================================
-     TEMPLATE LINKS
-     ========================================================= */
-
-  function bindTemplateLinks() {
-
-    document.addEventListener("click", event => {
-
-      const card =
-        event.target.closest(
-          ".document-card"
-        );
-
-      if (!card) return;
-
-      /*
-       * Nếu click vào nút Tạo văn bản,
-       * handler phía trên sẽ xử lý.
-       */
-      if (
-        event.target.closest(
-          "[data-create-template]"
-        )
-      ) {
-        return;
-      }
-
-      const templateId =
-        card.dataset.templateId;
-
-      if (templateId) {
-        openDocumentModal(templateId);
-      }
-    });
-  }
-
-
-  /* =========================================================
-     MOBILE MENU
-     ========================================================= */
-
-  function bindMobileMenu() {
-
-    const menuButtons = $$(
-      ".menu-toggle, " +
-      ".mobile-menu-button, " +
-      "[data-menu-toggle]"
-    );
-
-    menuButtons.forEach(button => {
-
-      button.addEventListener(
-        "click",
-        event => {
-
-          event.preventDefault();
-
-          document.body.classList.toggle(
-            "menu-open"
-          );
-
+        if (pageName === "documents") {
+            renderDocumentsPage();
         }
-      );
-    });
-  }
+
+        if (pageName === "dashboard") {
+            renderDocumentCards();
+            renderRecentDocuments();
+            renderStats();
+        }
+
+        closeMobileSidebar();
+    }
 
 
-  /* =========================================================
-     KEYBOARD
-     ========================================================= */
+    /* =====================================================
+       NAVIGATION BINDING
+    ===================================================== */
 
-  function bindKeyboard() {
-
-    document.addEventListener(
-      "keydown",
-      event => {
+    function bindNavigation() {
 
         /*
-         * Ctrl/Cmd + K:
-         * mở danh sách tạo văn bản.
+         * Quan trọng:
+         * index.html dùng .menu-item,
+         * không phải .nav-item.
          */
-        if (
-          (event.ctrlKey || event.metaKey) &&
-          event.key.toLowerCase() === "k"
-        ) {
+        $$("[data-page]").forEach(item => {
 
-          event.preventDefault();
+            item.addEventListener(
+                "click",
+                function (event) {
 
-          openDocumentModal();
+                    event.preventDefault();
+
+                    const page =
+                        item.dataset.page;
+
+                    if (!page) {
+                        return;
+                    }
+
+                    switchPage(page);
+                }
+            );
+
+        });
+    }
+
+
+    /* =====================================================
+       NEW DOCUMENT BUTTONS
+    ===================================================== */
+
+    function bindNewDocumentButtons() {
+
+        $$(
+            '[data-action="new-document"]'
+        ).forEach(button => {
+
+            button.addEventListener(
+                "click",
+                function () {
+                    openDocumentModal();
+                }
+            );
+
+        });
+    }
+
+
+    /* =====================================================
+       DOCUMENT MODAL
+    ===================================================== */
+
+    function getTemplateById(id) {
+
+        return getTemplates().find(
+            template =>
+                String(template.id) ===
+                String(id)
+        );
+    }
+
+
+    function openDocumentModal(templateId) {
+
+        const modal =
+            $("#documentModal");
+
+        if (!modal) {
+            return;
         }
 
-      }
-    );
-  }
+        const title =
+            $("#modalTitle");
+
+        if (title) {
+            title.textContent =
+                "Chọn mẫu văn bản";
+        }
+
+        state.selectedTemplate =
+            templateId
+                ? getTemplateById(templateId)
+                : null;
+
+        renderTemplateSelector();
+
+        modal.classList.add("show");
+
+        document.body.style.overflow =
+            "hidden";
+    }
 
 
-  /* =========================================================
-     LOCAL DATA
-     ========================================================= */
+    function closeDocumentModal() {
 
-  function loadLocalData() {
+        const modal =
+            $("#documentModal");
 
-    try {
+        if (!modal) {
+            return;
+        }
 
-      const saved =
-        localStorage.getItem(
-          "grova_document_data"
+        modal.classList.remove("show");
+
+        document.body.style.overflow =
+            "";
+
+        state.selectedTemplate =
+            null;
+    }
+
+
+    function renderTemplateSelector() {
+
+        const container =
+            $("#templateSelector");
+
+        if (!container) {
+            return;
+        }
+
+        const templates =
+            getTemplates();
+
+        if (!templates.length) {
+
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        📄
+                    </div>
+
+                    <div class="empty-title">
+                        Chưa có mẫu văn bản
+                    </div>
+
+                    <div class="empty-text">
+                        Kiểm tra file data/data.js
+                    </div>
+                </div>
+            `;
+
+            return;
+        }
+
+        container.innerHTML = templates
+            .map(template => {
+
+                const selected =
+                    state.selectedTemplate &&
+                    String(
+                        state.selectedTemplate.id
+                    ) ===
+                    String(template.id);
+
+                return `
+                    <button
+                        type="button"
+                        class="template-option ${
+                            selected
+                                ? "selected"
+                                : ""
+                        }"
+                        data-template-id="${
+                            escapeHtml(template.id)
+                        }"
+                    >
+
+                        <div class="template-option-title">
+                            ${escapeHtml(
+                                template.name
+                            )}
+                        </div>
+
+                        <div class="template-option-description">
+                            ${escapeHtml(
+                                template.description
+                            )}
+                        </div>
+
+                    </button>
+                `;
+            })
+            .join("");
+
+        /*
+         * Footer được tạo bằng JS để không cần
+         * sửa index.html.
+         */
+        const footer =
+            document.createElement("div");
+
+        footer.className =
+            "modal-footer";
+
+        footer.innerHTML = `
+            <button
+                type="button"
+                class="btn btn-secondary"
+                data-modal-cancel
+            >
+                Hủy
+            </button>
+
+            <button
+                type="button"
+                class="btn btn-primary"
+                data-modal-open
+            >
+                Mở mẫu
+            </button>
+        `;
+
+        container.parentNode.appendChild(
+            footer
         );
 
-      if (!saved) return;
+        $$(".template-option", container)
+            .forEach(option => {
 
-      const localData =
-        JSON.parse(saved);
+                option.addEventListener(
+                    "click",
+                    function () {
 
-      if (!localData) return;
+                        const id =
+                            option.dataset.templateId;
 
-      /*
-       * Không ghi đè data.js.
-       * Chỉ bổ sung dữ liệu động.
-       */
-      window.GROVA_LOCAL_DATA =
-        localData;
+                        state.selectedTemplate =
+                            getTemplateById(id);
 
-    } catch (error) {
+                        $$(".template-option", container)
+                            .forEach(item => {
+                                item.classList.remove(
+                                    "selected"
+                                );
+                            });
 
-      console.warn(
-        "Không thể đọc dữ liệu local:",
-        error
-      );
-    }
-  }
+                        option.classList.add(
+                            "selected"
+                        );
+                    }
+                );
 
+            });
 
-  /* =========================================================
-     SAVE LOCAL DATA
-     ========================================================= */
+        const cancelButton =
+            footer.querySelector(
+                "[data-modal-cancel]"
+            );
 
-  function saveLocalData(data) {
-
-    try {
-
-      localStorage.setItem(
-        "grova_document_data",
-        JSON.stringify(data)
-      );
-
-    } catch (error) {
-
-      console.warn(
-        "Không thể lưu dữ liệu local:",
-        error
-      );
-    }
-  }
-
-
-  /* =========================================================
-     GENERIC TABLE / PAGE SUPPORT
-     ========================================================= */
-
-  function renderSimpleEmptyState(
-    selector,
-    title,
-    description,
-    icon = "📄"
-  ) {
-
-    const container = $(selector);
-
-    if (!container) return;
-
-    container.innerHTML = `
-      <div class="empty-state">
-
-        <div class="empty-state-icon">
-          ${icon}
-        </div>
-
-        <h3>
-          ${escapeHTML(title)}
-        </h3>
-
-        <p>
-          ${escapeHTML(description)}
-        </p>
-
-      </div>
-    `;
-  }
-
-
-  function renderGenericPages() {
-
-    /*
-     * Các module này sẽ được phát triển
-     * sau khi hệ thống mẫu văn bản ổn định.
-     *
-     * Không tự tạo dữ liệu giả.
-     */
-
-    renderSimpleEmptyState(
-      "#projectsList",
-      "Chưa có công trình",
-      "Công trình sẽ xuất hiện sau khi được tạo.",
-      "🏗️"
-    );
-
-    renderSimpleEmptyState(
-      "#customersList",
-      "Chưa có khách hàng",
-      "Khách hàng sẽ xuất hiện sau khi được khai báo.",
-      "🏢"
-    );
-
-    renderSimpleEmptyState(
-      "#employeesList",
-      "Chưa có nhân sự",
-      "Nhân sự sẽ xuất hiện sau khi được khai báo.",
-      "👤"
-    );
-
-  }
-
-
-  /* =========================================================
-     PRINT / PDF
-     ========================================================= */
-
-  function bindPrintButtons() {
-
-    document.addEventListener(
-      "click",
-      event => {
-
-        const button =
-          event.target.closest(
-            "[data-print], " +
-            ".print-button, " +
-            ".pdf-button"
-          );
-
-        if (!button) return;
-
-        event.preventDefault();
-
-        window.print();
-      }
-    );
-  }
-
-
-  /* =========================================================
-     BACK BUTTON
-     ========================================================= */
-
-  function bindBackButtons() {
-
-    document.addEventListener(
-      "click",
-      event => {
-
-        const button =
-          event.target.closest(
-            "[data-back], " +
-            ".back-button"
-          );
-
-        if (!button) return;
-
-        event.preventDefault();
-
-        if (document.referrer) {
-          history.back();
-        } else {
-          window.location.href =
-            "./index.html";
+        if (cancelButton) {
+            cancelButton.addEventListener(
+                "click",
+                closeDocumentModal
+            );
         }
 
-      }
-    );
-  }
+        const openButton =
+            footer.querySelector(
+                "[data-modal-open]"
+            );
 
-
-  /* =========================================================
-     INITIALIZE
-     ========================================================= */
-
-  function initialize() {
-
-    if (state.initialized) {
-      return;
+        if (openButton) {
+            openButton.addEventListener(
+                "click",
+                startSelectedDocument
+            );
+        }
     }
 
-    /*
-     * Đảm bảo data.js mới nhất được tải.
-     */
-    ensureFreshData(() => {
 
-      state.data = getAppData();
+    /* =====================================================
+       OPEN SELECTED TEMPLATE
+    ===================================================== */
 
-      state.templates = getTemplates();
+    function startSelectedDocument() {
 
-      loadLocalData();
+        const template =
+            state.selectedTemplate;
 
-      renderCurrentUser();
+        if (!template) {
 
-      renderStats();
+            alert(
+                "Vui lòng chọn mẫu văn bản."
+            );
 
-      renderDocumentCards();
-
-      renderRecentDocuments();
-
-      renderGenericPages();
-
-      bindNavigation();
-
-      bindNewDocumentButtons();
-
-      bindModal();
-
-      bindMobileMenu();
-
-      bindKeyboard();
-
-      bindTemplateLinks();
-
-      bindPrintButtons();
-
-      bindBackButtons();
-
-      state.initialized = true;
-
-      /*
-       * Dashboard mặc định.
-       */
-      switchPage("dashboard");
-
-      console.log(
-        "GROVA DOCUMENT initialized:",
-        {
-          templates: state.templates.length,
-          data: state.data
+            return;
         }
-      );
 
-    });
-  }
+        if (!template.file) {
 
+            alert(
+                "Mẫu văn bản chưa được khai báo file."
+            );
 
-  /* =========================================================
-     PUBLIC API
-     ========================================================= */
+            return;
+        }
 
-  window.GROVA_DOCUMENT = {
+        /*
+         * Đóng modal trước khi chuyển trang.
+         */
+        closeDocumentModal();
 
-    getData: getAppData,
-
-    getTemplates,
-
-    openDocumentModal,
-
-    closeDocumentModal,
-
-    startSelectedDocument,
-
-    switchPage,
-
-    renderDocumentCards,
-
-    renderDocumentsPage,
-
-    saveLocalData
-
-  };
+        /*
+         * Mở template HTML.
+         */
+        window.location.href =
+            template.file;
+    }
 
 
-  /* =========================================================
-     START
-     ========================================================= */
+    /* =====================================================
+       MODAL EVENTS
+    ===================================================== */
 
-  if (
-    document.readyState ===
-    "loading"
-  ) {
+    function bindModal() {
 
-    document.addEventListener(
-      "DOMContentLoaded",
-      initialize,
-      { once: true }
-    );
+        const modal =
+            $("#documentModal");
 
-  } else {
+        if (!modal) {
+            return;
+        }
 
-    initialize();
+        const closeButton =
+            $("#closeModal");
 
-  }
+        if (closeButton) {
+            closeButton.addEventListener(
+                "click",
+                closeDocumentModal
+            );
+        }
+
+        const overlay =
+            $(".modal-overlay", modal);
+
+        if (overlay) {
+            overlay.addEventListener(
+                "click",
+                closeDocumentModal
+            );
+        }
+    }
+
+
+    /* =====================================================
+       MOBILE SIDEBAR
+    ===================================================== */
+
+    function openMobileSidebar() {
+
+        const sidebar =
+            $("#sidebar");
+
+        if (!sidebar) {
+            return;
+        }
+
+        sidebar.classList.add("open");
+    }
+
+
+    function closeMobileSidebar() {
+
+        const sidebar =
+            $("#sidebar");
+
+        if (!sidebar) {
+            return;
+        }
+
+        sidebar.classList.remove("open");
+    }
+
+
+    function bindMobileMenu() {
+
+        const openButton =
+            $("#openSidebar");
+
+        const closeButton =
+            $("#closeSidebar");
+
+        if (openButton) {
+            openButton.addEventListener(
+                "click",
+                openMobileSidebar
+            );
+        }
+
+        if (closeButton) {
+            closeButton.addEventListener(
+                "click",
+                closeMobileSidebar
+            );
+        }
+    }
+
+
+    /* =====================================================
+       KEYBOARD
+    ===================================================== */
+
+    function bindKeyboard() {
+
+        document.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (
+                    event.key === "Escape"
+                ) {
+                    closeDocumentModal();
+                    closeMobileSidebar();
+                }
+
+            }
+        );
+    }
+
+
+    /* =====================================================
+       STORAGE
+    ===================================================== */
+
+    function loadLocalData() {
+
+        /*
+         * Chừa sẵn kiến trúc để sau này kết nối
+         * database / authentication.
+         *
+         * Không tự ghi đè data.js.
+         */
+        try {
+
+            const savedUser =
+                localStorage.getItem(
+                    "grova_current_user"
+                );
+
+            if (savedUser) {
+
+                const user =
+                    JSON.parse(savedUser);
+
+                if (user && user.name) {
+                    state.currentUser =
+                        user;
+                }
+            }
+
+        } catch (error) {
+
+            console.warn(
+                "Không thể đọc dữ liệu local.",
+                error
+            );
+
+        }
+    }
+
+
+    /* =====================================================
+       TEMPLATE LINKS
+    ===================================================== */
+
+    function bindTemplateLinks() {
+
+        /*
+         * Cho phép các phần tử khác trong giao diện
+         * gọi trực tiếp bằng data-template-id.
+         */
+        $$("[data-template-id]")
+            .forEach(element => {
+
+                if (
+                    element.classList.contains(
+                        "template-option"
+                    )
+                ) {
+                    return;
+                }
+
+                element.addEventListener(
+                    "click",
+                    function () {
+
+                        const id =
+                            element.dataset.templateId;
+
+                        const template =
+                            getTemplateById(id);
+
+                        if (template) {
+                            openDocumentModal(
+                                template.id
+                            );
+                        }
+                    }
+                );
+            });
+    }
+
+
+    /* =====================================================
+       INITIALIZE
+    ===================================================== */
+
+    function initializeApp() {
+
+        if (state.initialized) {
+            return;
+        }
+
+        ensureFreshData(function () {
+
+            state.initialized = true;
+
+            loadLocalData();
+
+            renderCurrentUser();
+
+            renderStats();
+
+            renderDocumentCards();
+
+            renderRecentDocuments();
+
+            bindNavigation();
+
+            bindNewDocumentButtons();
+
+            bindModal();
+
+            bindMobileMenu();
+
+            bindKeyboard();
+
+            bindTemplateLinks();
+
+            switchPage("dashboard");
+
+            console.log(
+                "GROVA DOCUMENT đã khởi tạo."
+            );
+
+            console.log(
+                "Số mẫu:",
+                getTemplates().length
+            );
+
+        });
+    }
+
+
+    /* =====================================================
+       START
+    ===================================================== */
+
+    if (
+        document.readyState ===
+        "loading"
+    ) {
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            initializeApp
+        );
+
+    } else {
+
+        initializeApp();
+
+    }
+
+
+    /* =====================================================
+       GLOBAL API
+       Dành cho các template HTML sau này
+    ===================================================== */
+
+    window.GROVA_DOCUMENT = {
+
+        getData: getAppData,
+
+        getTemplates: getTemplates,
+
+        getTemplateById: getTemplateById,
+
+        openDocumentModal:
+            openDocumentModal,
+
+        closeDocumentModal:
+            closeDocumentModal,
+
+        startSelectedDocument:
+            startSelectedDocument,
+
+        switchPage:
+            switchPage
+
+    };
 
 })();
