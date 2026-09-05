@@ -19,7 +19,6 @@
       --muted:#68736f;
       --paper:#ffffff;
       --bg:#eef3f1;
-      --danger:#b42318;
     }
 
     *{
@@ -34,10 +33,7 @@
       margin:0;
       background:var(--bg);
       color:var(--text);
-      font-family:
-        Arial,
-        "Helvetica Neue",
-        sans-serif;
+      font-family:Arial,"Helvetica Neue",sans-serif;
       font-size:15px;
       line-height:1.55;
     }
@@ -67,7 +63,7 @@
     }
 
     .app-header-inner{
-      width:min(1500px, calc(100% - 32px));
+      width:min(1500px,calc(100% - 32px));
       margin:auto;
       min-height:64px;
       display:flex;
@@ -162,7 +158,7 @@
     ========================================================= */
 
     .workspace{
-      width:min(1500px, calc(100% - 32px));
+      width:min(1500px,calc(100% - 32px));
       margin:22px auto 40px;
       display:grid;
       grid-template-columns:360px minmax(0,1fr);
@@ -325,8 +321,7 @@
       min-height:297mm;
       margin:0 auto;
       background:var(--paper);
-      box-shadow:
-        0 8px 35px rgba(20,42,35,.13);
+      box-shadow:0 8px 35px rgba(20,42,35,.13);
       padding:16mm 17mm 17mm;
       position:relative;
     }
@@ -411,14 +406,12 @@
 
     /* =========================================================
        DOCUMENT BODY
+       GIẢM 0,5pt: 11.5pt → 11pt
     ========================================================= */
 
     .doc{
-      font-family:
-        Arial,
-        "Helvetica Neue",
-        sans-serif;
-      font-size:11.5pt;
+      font-family:Arial,"Helvetica Neue",sans-serif;
+      font-size:11pt;
       line-height:1.5;
     }
 
@@ -515,16 +508,6 @@
       font-weight:700;
     }
 
-    .number-list{
-      margin:3px 0 5px 21px;
-      padding:0;
-    }
-
-    .number-list li{
-      margin:2px 0;
-      padding-left:2px;
-    }
-
     .indent{
       margin-left:18px !important;
     }
@@ -603,7 +586,7 @@
 
       .app-header-inner,
       .workspace{
-        width:min(100% - 20px, 1500px);
+        width:min(100% - 20px,1500px);
       }
 
       .app-header-inner{
@@ -659,7 +642,7 @@
       }
 
       body{
-        font-size:11.5pt;
+        font-size:11pt;
       }
 
       .app-header,
@@ -721,1610 +704,1572 @@
 
 <body>
 
-  <!-- =========================================================
-       APP HEADER
-  ========================================================== -->
+<header class="app-header">
+  <div class="app-header-inner">
 
-  <header class="app-header">
-    <div class="app-header-inner">
+    <div class="brand">
+      <img
+        src="../data/grova_logo.png"
+        alt="GROVA HOLDINGS"
+      >
 
-      <div class="brand">
-        <img
-          src="../data/grova_logo.png"
-          alt="GROVA HOLDINGS"
-        >
+      <div class="brand-text">
+        <div class="brand-title">
+          GROVA DOCUMENT
+        </div>
 
-        <div class="brand-text">
-          <div class="brand-title">
-            GROVA DOCUMENT
-          </div>
-
-          <div class="brand-subtitle">
-            Hệ thống quản lý văn bản và hồ sơ
-          </div>
+        <div class="brand-subtitle">
+          Hệ thống quản lý văn bản và hồ sơ
         </div>
       </div>
+    </div>
 
-      <div class="header-actions">
+    <div class="header-actions">
+
+      <button
+        class="btn btn-secondary"
+        type="button"
+        onclick="window.history.back()"
+      >
+        ← Quay lại
+      </button>
+
+      <button
+        class="btn btn-print"
+        type="button"
+        onclick="window.print()"
+      >
+        🖨 In hợp đồng
+      </button>
+
+    </div>
+
+  </div>
+</header>
+
+
+<main class="workspace">
+
+  <!-- =======================================================
+       FORM
+  ======================================================== -->
+
+  <aside class="panel form-panel">
+
+    <div class="panel-header">
+      <h2>Thông tin hợp đồng</h2>
+      <p>
+        Nhập thông tin người lao động để cập nhật bản xem trước.
+      </p>
+    </div>
+
+    <div class="form-body">
+
+      <div class="section-title">
+        Thông tin chung
+      </div>
+
+      <div class="field">
+        <label for="contractDate">
+          Ngày ký hợp đồng
+        </label>
+
+        <input
+          id="contractDate"
+          type="date"
+        >
+      </div>
+
+
+      <div class="section-title">
+        Bên A – Người sử dụng lao động
+      </div>
+
+      <div class="field">
+        <label for="companyName">
+          Công ty
+        </label>
+
+        <input
+          id="companyName"
+          value="CÔNG TY CỔ PHẦN GROVAHOLDINGS SJC"
+        >
+      </div>
+
+      <div class="field">
+        <label for="companyAddress">
+          Địa chỉ
+        </label>
+
+        <input
+          id="companyAddress"
+          value="Số 49A/348 Trần Nguyên Hãn , Phường An Biên, Thành phố Hải Phòng, Việt Nam"
+        >
+      </div>
+
+      <div class="field">
+        <label for="companyTax">
+          Mã số thuế
+        </label>
+
+        <input
+          id="companyTax"
+          value="0202328361"
+        >
+      </div>
+
+      <div class="grid-2">
+
+        <div class="field">
+          <label for="companyRepresentative">
+            Đại diện
+          </label>
+
+          <input
+            id="companyRepresentative"
+            value="Phạm Văn Học"
+          >
+        </div>
+
+        <div class="field">
+          <label for="companyPosition">
+            Chức vụ
+          </label>
+
+          <input
+            id="companyPosition"
+            value="Giám đốc"
+          >
+        </div>
+
+      </div>
+
+      <div class="field">
+        <label for="companyNationality">
+          Quốc tịch
+        </label>
+
+        <input
+          id="companyNationality"
+          value="Việt Nam"
+        >
+      </div>
+
+
+      <div class="section-title">
+        Bên B – Người lao động
+      </div>
+
+      <div class="field">
+        <label for="employeeName">
+          ÔNG / BÀ
+        </label>
+
+        <input
+          id="employeeName"
+          placeholder="Nhập họ và tên"
+        >
+      </div>
+
+      <div class="field">
+        <label for="employeeNationality">
+          Quốc tịch
+        </label>
+
+        <input
+          id="employeeNationality"
+          value="Việt Nam"
+        >
+      </div>
+
+      <div class="grid-2">
+
+        <div class="field">
+          <label for="employeeBirth">
+            Ngày sinh
+          </label>
+
+          <input
+            id="employeeBirth"
+            type="text"
+            placeholder="dd/mm/yyyy"
+          >
+        </div>
+
+        <div class="field">
+          <label for="employeeBirthPlace">
+            Tại
+          </label>
+
+          <input
+            id="employeeBirthPlace"
+            placeholder="Nơi sinh"
+          >
+        </div>
+
+      </div>
+
+      <div class="grid-2">
+
+        <div class="field">
+          <label for="employeeJob">
+            Nghề nghiệp
+          </label>
+
+          <input
+            id="employeeJob"
+            value="Nhân viên"
+          >
+        </div>
+
+        <div class="field">
+          <label for="employeeGender">
+            Giới tính
+          </label>
+
+          <input
+            id="employeeGender"
+            placeholder="Nam / Nữ"
+          >
+        </div>
+
+      </div>
+
+      <div class="field">
+        <label for="employeeAddress">
+          Địa chỉ
+        </label>
+
+        <textarea
+          id="employeeAddress"
+          placeholder="Địa chỉ thường trú / nơi ở"
+        ></textarea>
+      </div>
+
+      <div class="field">
+        <label for="employeeCCCD">
+          Số CCCD
+        </label>
+
+        <input
+          id="employeeCCCD"
+        >
+      </div>
+
+      <div class="grid-2">
+
+        <div class="field">
+          <label for="cccdDate">
+            Cấp ngày
+          </label>
+
+          <input
+            id="cccdDate"
+            type="text"
+            placeholder="dd/mm/yyyy"
+          >
+        </div>
+
+        <div class="field">
+          <label for="cccdPlace">
+            Tại
+          </label>
+
+          <input
+            id="cccdPlace"
+            placeholder="Nơi cấp"
+          >
+        </div>
+
+      </div>
+
+
+      <div class="section-title">
+        Điều 1
+      </div>
+
+      <div class="field">
+        <label for="contractType">
+          Loại hợp đồng
+        </label>
+
+        <input
+          id="contractType"
+          value="Ký lần thứ 01"
+        >
+      </div>
+
+      <div class="grid-2">
+
+        <div class="field">
+          <label for="startDate">
+            Từ ngày
+          </label>
+
+          <input
+            id="startDate"
+            type="text"
+            placeholder="dd/mm/yyyy"
+          >
+        </div>
+
+        <div class="field">
+          <label for="endDate">
+            Đến ngày
+          </label>
+
+          <input
+            id="endDate"
+            type="text"
+            placeholder="dd/mm/yyyy"
+          >
+        </div>
+
+      </div>
+
+      <div class="field">
+        <label for="workLocation">
+          Địa điểm làm việc
+        </label>
+
+        <input
+          id="workLocation"
+          value="theo yêu cầu thực tế của doanh nghiệp"
+        >
+      </div>
+
+      <div class="field">
+        <label for="position">
+          Chức vụ công tác
+        </label>
+
+        <input
+          id="position"
+          value="Nhân viên"
+        >
+      </div>
+
+      <div class="field">
+        <label for="professionalTitle">
+          Chức danh chuyên môn (vị trí công tác)
+        </label>
+
+        <input
+          id="professionalTitle"
+          value="Nhân viên"
+        >
+      </div>
+
+      <div class="field">
+        <label for="jobDescription">
+          Nhiệm vụ công việc
+        </label>
+
+        <textarea
+          id="jobDescription"
+          placeholder="Có thể ghi thêm nếu cần"
+        ></textarea>
+      </div>
+
+
+      <div class="section-title">
+        Điều 2 – Lương
+      </div>
+
+      <div class="field">
+        <label for="salary">
+          Lương căn bản, mức đóng BHXH
+        </label>
+
+        <input
+          id="salary"
+          value="6.000.000đồng/tháng"
+        >
+      </div>
+
+      <div class="field">
+        <label for="salaryForm">
+          Hình thức trả lương
+        </label>
+
+        <input
+          id="salaryForm"
+          value="Tiền mặt hoặc chuyển khoản."
+        >
+      </div>
+
+      <div class="field">
+        <label for="effectiveSalary">
+          Lương hiệu quả
+        </label>
+
+        <textarea
+          id="effectiveSalary"
+        >hưởng lợi theo tình hình kinh doanh thực tế trong tháng và do Giám đốc quyết định .</textarea>
+      </div>
+
+      <div class="field">
+        <label for="salaryPayment">
+          Thời hạn trả lương
+        </label>
+
+        <textarea
+          id="salaryPayment"
+        >Được trả linh hoạt theo tình hình tài chính của doanh nghiệp, có thể thanh toán 01 lần bằng hình thức chuyển khoản hoặc thanh toán tối đa 03 lần bằng hình thức tiền mặt.</textarea>
+      </div>
+
+
+      <div class="form-actions">
+
         <button
           class="btn btn-secondary"
           type="button"
-          onclick="window.history.back()"
+          onclick="clearDraft()"
         >
-          ← Quay lại
+          Xóa nháp
         </button>
-
-        <button
-          class="btn btn-print"
-          type="button"
-          onclick="window.print()"
-        >
-          🖨 In hợp đồng
-        </button>
-      </div>
-
-    </div>
-  </header>
-
-
-  <!-- =========================================================
-       WORKSPACE
-  ========================================================== -->
-
-  <main class="workspace">
-
-    <!-- =======================================================
-         FORM
-    ======================================================== -->
-
-    <aside class="panel form-panel">
-
-      <div class="panel-header">
-        <h2>Thông tin hợp đồng</h2>
-        <p>
-          Nhập thông tin người lao động để cập nhật bản xem trước.
-        </p>
-      </div>
-
-      <div class="form-body">
-
-        <!-- DATE -->
-
-        <div class="section-title">
-          Thông tin chung
-        </div>
-
-        <div class="field">
-          <label for="contractDate">
-            Ngày ký hợp đồng
-          </label>
-
-          <input
-            id="contractDate"
-            type="date"
-          >
-        </div>
-
-
-        <!-- BÊN A -->
-
-        <div class="section-title">
-          Bên A – Người sử dụng lao động
-        </div>
-
-        <div class="field">
-          <label for="companyName">
-            Công ty
-          </label>
-
-          <input
-            id="companyName"
-            value="CÔNG TY CỔ PHẦN GROVAHOLDINGS SJC"
-          >
-        </div>
-
-        <div class="field">
-          <label for="companyAddress">
-            Địa chỉ
-          </label>
-
-          <input
-            id="companyAddress"
-            value="Số 49A/348 Trần Nguyên Hãn , Phường An Biên, Thành phố Hải Phòng, Việt Nam"
-          >
-        </div>
-
-        <div class="field">
-          <label for="companyTax">
-            Mã số thuế
-          </label>
-
-          <input
-            id="companyTax"
-            value="0202328361"
-          >
-        </div>
-
-        <div class="grid-2">
-
-          <div class="field">
-            <label for="companyRepresentative">
-              Đại diện
-            </label>
-
-            <input
-              id="companyRepresentative"
-              value="Phạm Văn Học"
-            >
-          </div>
-
-          <div class="field">
-            <label for="companyPosition">
-              Chức vụ
-            </label>
-
-            <input
-              id="companyPosition"
-              value="Giám đốc"
-            >
-          </div>
-
-        </div>
-
-        <div class="field">
-          <label for="companyNationality">
-            Quốc tịch
-          </label>
-
-          <input
-            id="companyNationality"
-            value="Việt Nam"
-          >
-        </div>
-
-
-        <!-- BÊN B -->
-
-        <div class="section-title">
-          Bên B – Người lao động
-        </div>
-
-        <div class="field">
-          <label for="employeeName">
-            ÔNG / BÀ
-          </label>
-
-          <input
-            id="employeeName"
-            placeholder="Nhập họ và tên"
-          >
-        </div>
-
-        <div class="field">
-          <label for="employeeNationality">
-            Quốc tịch
-          </label>
-
-          <input
-            id="employeeNationality"
-            value="Việt Nam"
-          >
-        </div>
-
-        <div class="grid-2">
-
-          <div class="field">
-            <label for="employeeBirth">
-              Ngày sinh
-            </label>
-
-            <input
-              id="employeeBirth"
-              type="text"
-              placeholder="dd/mm/yyyy"
-            >
-          </div>
-
-          <div class="field">
-            <label for="employeeBirthPlace">
-              Tại
-            </label>
-
-            <input
-              id="employeeBirthPlace"
-              placeholder="Nơi sinh"
-            >
-          </div>
-
-        </div>
-
-        <div class="grid-2">
-
-          <div class="field">
-            <label for="employeeJob">
-              Nghề nghiệp
-            </label>
-
-            <input
-              id="employeeJob"
-              value="Nhân viên"
-            >
-          </div>
-
-          <div class="field">
-            <label for="employeeGender">
-              Giới tính
-            </label>
-
-            <input
-              id="employeeGender"
-              placeholder="Nam / Nữ"
-            >
-          </div>
-
-        </div>
-
-        <div class="field">
-          <label for="employeeAddress">
-            Địa chỉ
-          </label>
-
-          <textarea
-            id="employeeAddress"
-            placeholder="Địa chỉ thường trú / nơi ở"
-          ></textarea>
-        </div>
-
-        <div class="field">
-          <label for="employeeCCCD">
-            Số CCCD
-          </label>
-
-          <input
-            id="employeeCCCD"
-          >
-        </div>
-
-        <div class="grid-2">
-
-          <div class="field">
-            <label for="cccdDate">
-              Cấp ngày
-            </label>
-
-            <input
-              id="cccdDate"
-              type="text"
-              placeholder="dd/mm/yyyy"
-            >
-          </div>
-
-          <div class="field">
-            <label for="cccdPlace">
-              Tại
-            </label>
-
-            <input
-              id="cccdPlace"
-              placeholder="Nơi cấp"
-            >
-          </div>
-
-        </div>
-
-
-        <!-- ĐIỀU 1 -->
-
-        <div class="section-title">
-          Điều 1
-        </div>
-
-        <div class="field">
-          <label for="contractType">
-            Loại hợp đồng
-          </label>
-
-          <input
-            id="contractType"
-            value="Ký lần thứ 01"
-          >
-        </div>
-
-        <div class="grid-2">
-
-          <div class="field">
-            <label for="startDate">
-              Từ ngày
-            </label>
-
-            <input
-              id="startDate"
-              type="text"
-              placeholder="dd/mm/yyyy"
-            >
-          </div>
-
-          <div class="field">
-            <label for="endDate">
-              Đến ngày
-            </label>
-
-            <input
-              id="endDate"
-              type="text"
-              placeholder="dd/mm/yyyy"
-            >
-          </div>
-
-        </div>
-
-        <div class="field">
-          <label for="workLocation">
-            Địa điểm làm việc
-          </label>
-
-          <input
-            id="workLocation"
-            value="theo yêu cầu thực tế của doanh nghiệp"
-          >
-        </div>
-
-        <div class="field">
-          <label for="position">
-            Chức vụ công tác
-          </label>
-
-          <input
-            id="position"
-            value="Nhân viên"
-          >
-        </div>
-
-        <div class="field">
-          <label for="professionalTitle">
-            Chức danh chuyên môn (vị trí công tác)
-          </label>
-
-          <input
-            id="professionalTitle"
-            value="Nhân viên"
-          >
-        </div>
-
-        <div class="field">
-          <label for="jobDescription">
-            Nhiệm vụ công việc
-          </label>
-
-          <textarea
-            id="jobDescription"
-            placeholder="Có thể ghi thêm nếu cần"
-          ></textarea>
-        </div>
-
-
-        <!-- ĐIỀU 2 -->
-
-        <div class="section-title">
-          Điều 2 – Lương
-        </div>
-
-        <div class="field">
-          <label for="salary">
-            Lương căn bản, mức đóng BHXH
-          </label>
-
-          <input
-            id="salary"
-            value="6.000.000đồng/tháng"
-          >
-        </div>
-
-        <div class="field">
-          <label for="salaryForm">
-            Hình thức trả lương
-          </label>
-
-          <input
-            id="salaryForm"
-            value="Tiền mặt hoặc chuyển khoản."
-          >
-        </div>
-
-        <div class="field">
-          <label for="effectiveSalary">
-            Lương hiệu quả
-          </label>
-
-          <textarea
-            id="effectiveSalary"
-            value="hưởng lợi theo tình hình kinh doanh thực tế trong tháng và do Giám đốc quyết định."
-          ></textarea>
-        </div>
-
-        <div class="field">
-          <label for="salaryPayment">
-            Thời hạn trả lương
-          </label>
-
-          <textarea
-            id="salaryPayment"
-            value="Được trả linh hoạt theo tình hình tài chính của doanh nghiệp, có thể thanh toán 01 lần bằng hình thức chuyển khoản hoặc thanh toán tối đa 03 lần bằng hình thức tiền mặt."
-          ></textarea>
-        </div>
-
-
-        <!-- ACTION -->
-
-        <div class="form-actions">
-
-          <button
-            class="btn btn-secondary"
-            type="button"
-            onclick="clearDraft()"
-          >
-            Xóa nháp
-          </button>
-
-          <button
-            class="btn btn-primary"
-            type="button"
-            onclick="window.print()"
-          >
-            🖨 In
-          </button>
-
-        </div>
-
-        <div
-          id="saveStatus"
-          class="save-status"
-        >
-          Dữ liệu được lưu tự động trên thiết bị.
-        </div>
-
-      </div>
-
-    </aside>
-
-
-    <!-- =======================================================
-         PREVIEW
-    ======================================================== -->
-
-    <section class="preview-panel">
-
-      <div class="preview-toolbar">
-
-        <div class="preview-info">
-          <strong>Xem trước hợp đồng</strong>
-          &nbsp;·&nbsp;
-          Nội dung tự cập nhật khi nhập dữ liệu
-        </div>
 
         <button
           class="btn btn-primary"
           type="button"
           onclick="window.print()"
         >
-          🖨 In hợp đồng
+          🖨 In
         </button>
 
       </div>
 
-
-      <div class="paper-wrap">
-
-        <article
-          class="paper"
-          id="documentPreview"
-        >
-
-          <!-- =================================================
-               HEADER
-          ================================================== -->
-
-          <header class="doc-header">
-
-            <div class="doc-logo">
-              <img
-                src="../data/grova_logo.png"
-                alt="GROVA HOLDINGS"
-              >
-            </div>
-
-            <div class="national-header">
-
-              <div class="country">
-                CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM
-              </div>
-
-              <div class="motto">
-                Độc lập - Tự do - Hạnh phúc
-              </div>
-
-              <div class="national-line"></div>
-
-            </div>
-
-          </header>
-
-
-          <!-- =================================================
-               TITLE
-          ================================================== -->
-
-          <div class="contract-heading">
-
-            <h1>
-              HỢP ĐỒNG LAO ĐỘNG
-            </h1>
-
-            <div class="subtitle">
-              (Ban hành theo Bộ luật lao động ngày 20 tháng 11 năm 2019)
-            </div>
-
-            <div class="contract-no">
-              Số: <span id="previewContractNo">01.HĐLĐ</span>
-            </div>
-
-          </div>
-
-
-          <!-- =================================================
-               BODY
-          ================================================== -->
-
-          <div class="doc">
-
-            <p class="intro">
-              Hôm nay, ngày
-              <strong id="previewContractDate">......</strong>,
-              tại Công ty cổ phần Grovaholdings , chúng tôi gồm:
-            </p>
-
-
-            <!-- BÊN A -->
-
-            <section class="party">
-
-              <div class="party-title">
-                Bên A : Người sử dụng lao động
-              </div>
-
-              <div class="party-grid">
-
-                <div class="party-line full">
-                  <span class="party-label">Công ty:</span>
-                  <span id="previewCompany">
-                    CÔNG TY CỔ PHẦN GROVAHOLDINGS SJC
-                  </span>
-                </div>
-
-                <div class="party-line full">
-                  <span class="party-label">Địa chỉ:</span>
-                  <span id="previewCompanyAddress">
-                    Số 49A/348 Trần Nguyên Hãn , Phường An Biên, Thành phố Hải Phòng, Việt Nam
-                  </span>
-                </div>
-
-                <div class="party-line">
-                  <span class="party-label">Mã số thuế :</span>
-                  <span id="previewCompanyTax">
-                    0202328361
-                  </span>
-                </div>
-
-                <div class="party-line">
-                  <span class="party-label">Đại diện:</span>
-                  <span id="previewCompanyRepresentative">
-                    Phạm Văn Học
-                  </span>
-                </div>
-
-                <div class="party-line">
-                  <span class="party-label">Chức vụ:</span>
-                  <span id="previewCompanyPosition">
-                    Giám đốc
-                  </span>
-                </div>
-
-                <div class="party-line">
-                  <span class="party-label">Quốc tịch:</span>
-                  <span id="previewCompanyNationality">
-                    Việt Nam
-                  </span>
-                </div>
-
-              </div>
-
-            </section>
-
-
-            <!-- BÊN B -->
-
-            <section class="party">
-
-              <div class="party-title">
-                Bên B : Người lao động
-              </div>
-
-              <div class="party-grid">
-
-                <div class="party-line">
-                  <span class="party-label">ÔNG / BÀ :</span>
-                  <span id="previewEmployeeName">
-                    ................................................
-                  </span>
-                </div>
-
-                <div class="party-line">
-                  <span class="party-label">Quốc tịch:</span>
-                  <span id="previewEmployeeNationality">
-                    Việt Nam
-                  </span>
-                </div>
-
-                <div class="party-line">
-                  <span class="party-label">Ngày sinh:</span>
-                  <span id="previewEmployeeBirth">
-                    ................................
-                  </span>
-                </div>
-
-                <div class="party-line">
-                  <span class="party-label">Tại :</span>
-                  <span id="previewEmployeeBirthPlace">
-                    ................................
-                  </span>
-                </div>
-
-                <div class="party-line">
-                  <span class="party-label">Nghề nghiệp :</span>
-                  <span id="previewEmployeeJob">
-                    Nhân viên
-                  </span>
-                </div>
-
-                <div class="party-line">
-                  <span class="party-label">Giới tính:</span>
-                  <span id="previewEmployeeGender">
-                    ................................
-                  </span>
-                </div>
-
-                <div class="party-line full">
-                  <span class="party-label">Điạ chỉ</span>
-                  <span id="previewEmployeeAddress">
-                    ............................................................
-                  </span>
-                </div>
-
-                <div class="party-line">
-                  <span class="party-label">Số CCCD :</span>
-                  <span id="previewEmployeeCCCD">
-                    ................................
-                  </span>
-                </div>
-
-                <div class="party-line">
-                  <span class="party-label">Cấp ngày:</span>
-                  <span id="previewCCCDDate">
-                    ................................
-                  </span>
-                </div>
-
-                <div class="party-line">
-                  <span class="party-label">Tại :</span>
-                  <span id="previewCCCDPlace">
-                    ................................
-                  </span>
-                </div>
-
-              </div>
-
-            </section>
-
-
-            <p class="agreement-intro">
-              Cùng thoả thuận ký kết hợp đồng lao động và cam kết làm đúng những điều khoản sau đây:
-            </p>
-
-
-            <!-- =================================================
-                 ĐIỀU 1
-            ================================================== -->
-
-            <section class="article">
-
-              <p class="article-title">
-                Điều 1: Công việc, địa điểm làm việc và thời hạn của Hợp đồng
-              </p>
-
-              <div class="article-content">
-
-                <p>
-                  Loại hợp đồng :
-                  <span id="previewContractType">
-                    Ký lần thứ 01
-                  </span>
-                </p>
-
-                <p>
-                  Từ ngày :
-                  <span id="previewStartDate">
-                    ................................
-                  </span>
-                  Đến ngày :
-                  <span id="previewEndDate">
-                    ................................
-                  </span>
-                </p>
-
-                <p>
-                  - Địa điểm làm việc:
-                  <span id="previewWorkLocation">
-                    theo yêu cầu thực tế của doanh nghiệp
-                  </span>
-                </p>
-
-                <p>
-                  - Chức vụ công tác:
-                  <span id="previewPosition">
-                    Nhân viên
-                  </span>
-                </p>
-
-                <p>
-                  + Chức danh chuyên môn (vị trí công tác):
-                  <span id="previewProfessionalTitle">
-                    Nhân viên
-                  </span>
-                </p>
-
-                <p>
-                  - Nhiệm vụ công việc như sau:
-                </p>
-
-                <ul class="plus-list">
-
-                  <li>
-                    Thực hiện công việc theo đúng chức danh chuyên môn của mình dưới sự quản lý, điều hành của Ban Giám đốc (và các cá nhân được bổ nhiệm hoặc ủy quyền phụ trách).
-                  </li>
-
-                  <li>
-                    Bắt buộc phải có dụng cụ an toàn lao động ( dây treo hãm rơi , dây dai cố định , dày bảo hộ , mũ , găng tay và một số dụng cụ tuỳ theo điều kiện thi công )
-                  </li>
-
-                  <li>
-                    Phối hợp cùng với các bộ phận, phòng ban khác trong Người sử dụng lao động để phát huy tối đa hiệu quả công việc.
-                  </li>
-
-                  <li>
-                    Hoàn thành những công việc khác tùy thuộc theo yêu cầu kinh doanh của Người sử dụng lao động và theo quyết định của Ban Giám đốc (và các cá nhân được bổ nhiệm hoặc ủy quyền phụ trách).
-                  </li>
-
-                </ul>
-
-              </div>
-
-            </section>
-
-
-            <!-- =================================================
-                 ĐIỀU 2
-            ================================================== -->
-
-            <section class="article">
-
-              <p class="article-title">
-                Điều 2: Lương, phụ cấp, các khoản bổ sung khác
-              </p>
-
-              <div class="article-content">
-
-                <p>
-                  Lương căn bản, mức đóng BHXH
-                  <span id="previewSalary">
-                    6.000.000đồng/tháng
-                  </span>
-                </p>
-
-                <p>
-                  - Hình thức trả lương:
-                  <span id="previewSalaryForm">
-                    Tiền mặt hoặc chuyển khoản.
-                  </span>
-                </p>
-
-                <p>
-                  - Lương hiệu quả :
-                  <span id="previewEffectiveSalary">
-                    hưởng lợi theo tình hình kinh doanh thực tế trong tháng và do Giám đốc quyết định .
-                  </span>
-                </p>
-
-                <p>
-                  - Thời hạn trả lương:
-                  <span id="previewSalaryPayment">
-                    Được trả linh hoạt theo tình hình tài chính của doanh nghiệp, có thể thanh toán 01 lần bằng hình thức chuyển khoản hoặc thanh toán tối đa 03 lần bằng hình thức tiền mặt.
-                  </span>
-                </p>
-
-                <p>
-                  - Chế độ nâng bậc, nâng lương: Người lao động được xét nâng bậc, nâng lương theo kết quả làm việc và theo quy định của Người sử dụng lao động.
-                </p>
-
-              </div>
-
-            </section>
-
-
-            <!-- =================================================
-                 ĐIỀU 3
-            ================================================== -->
-
-            <section class="article">
-
-              <p class="article-title">
-                Điều 3: Thời giờ làm việc, nghỉ ngơi, bảo hộ lao động, BHXH, BHYT, BHTN
-              </p>
-
-              <div class="article-content">
-
-                <p>
-                  - Thời giờ làm việc: 8 giờ/ngày, 40 giờ/tuần, Nghỉ hàng tuần: ngày Chủ nhật.
-                </p>
-
-                <p>
-                  - Từ ngày Thứ 2 đến ngày Thứ 7 hàng tuần :
-                </p>
-
-                <p class="indent">
-                  + Buổi sáng : 8h00 - 12h00.
-                </p>
-
-                <p class="indent">
-                  + Buổi chiều: 13h00 - 17h00.
-                </p>
-
-                <p>
-                  - Chế độ nghỉ ngơi các ngày lễ, tết, phép năm:
-                </p>
-
-                <ul class="plus-list">
-
-                  <li>
-                    Người lao động được nghỉ lễ, tết theo luật định; các ngày nghỉ lễ nếu trùng với ngày Chủ nhật thì sẽ được nghỉ bù vào ngày trước hoặc ngày kế tiếp tùy theo tình hình cụ thể mà Ban lãnh đạo Công ty sẽ chỉ đạo trực tiếp.
-                  </li>
-
-                  <li>
-                    Người lao động đã ký HĐLĐ chính thức và có thâm niên công tác 12 tháng thì sẽ được nghỉ phép năm có hưởng lương (01 ngày phép/01 tháng, 12 ngày phép/01 năm); trường hợp có thâm niên làm việc dưới 12 tháng thì thời gian nghỉ hằng năm được tính theo tỷ lệ tương ứng với số thời gian làm việc.
-                  </li>
-
-                </ul>
-
-                <p>
-                  - Thiết bị và công cụ làm việc sẽ được Công ty cấp phát tùy theo nhu cầu của công việc.
-                </p>
-
-                <p>
-                  - Điều kiện an toàn và vệ sinh lao động tại nơi làm việc theo quy định của pháp luật hiện hành.
-                </p>
-
-                <p>
-                  - Bảo hiểm xã hội, bảo hiểm y tế và bảo hiểm thất nghiệp: Người lao động được hưởng quyền lợi theo quy định .
-                </p>
-
-              </div>
-
-            </section>
-
-
-            <!-- =================================================
-                 ĐIỀU 4
-            ================================================== -->
-
-            <section class="article">
-
-              <p class="article-title">
-                Điều 4: Đào tạo, bồi dưỡng, các quyền lợi và nghĩa vụ liên quan của người lao động
-              </p>
-
-              <div class="article-content">
-
-                <p>
-                  - Đào tạo, bồi dưỡng: Người lao động được đào tạo, bồi dưỡng, huấn luyện tại nơi làm việc hoặc được gửi đi đào tạo theo quy định của Công ty và yêu cầu công việc.
-                </p>
-
-                <p>
-                  - Khen thưởng: Người lao động được khuyến khích bằng vật chất và tinh thần khi có thành tích trong công tác hoặc theo quy định của Công ty.
-                </p>
-
-                <p>
-                  - Các khoản thỏa thuận khác gồm: tiền cơm trưa, thưởng mặc định, hỗ trợ xăng xe, điện thoại, nhà ở, trang phục…, theo quy định của Công ty.
-                </p>
-
-                <p>
-                  - Nghĩa vụ liên quan của người lao động:
-                </p>
-
-                <ul class="plus-list">
-
-                  <li>
-                    Tuân thủ hợp đồng lao động.
-                  </li>
-
-                  <li>
-                    Thực hiện công việc với sự tận tâm, tận lực và mẫn cán, đảm bảo hoàn thành công việc với hiệu quả cao nhất theo sự phân công, điều hành (bằng văn bản hoặc bằng miệng) của Ban Giám đốc (và các cá nhân được Ban Giám đốc bổ nhiệm hoặc ủy quyền phụ trách).
-                  </li>
-
-                  <li>
-                    Hoàn thành công việc được giao và sẵn sàng chấp nhận mọi sự điều động khi có yêu cầu.
-                  </li>
-
-                  <li>
-                    Nắm rõ và chấp hành nghiêm túc kỷ luật lao động, an toàn lao động, vệ sinh lao động, phòng cháy chữa cháy, văn hóa Công ty, nội quy lao động và các chủ trương, chính sách của Công ty.
-                  </li>
-
-                  <li>
-                    Trong trường hợp được cử đi đào tạo thì nhân viên phải hoàn thành khoá học đúng thời hạn, phải cam kết sẽ phục vụ lâu dài cho Công ty sau khi kết thúc khoá học và được hưởng nguyên lương, các quyền lợi khác được hưởng như người đi làm.
-                  </li>
-
-                </ul>
-
-                <p class="indent">
-                  Nếu sau khi kết thúc khóa đào tạo mà nhân viên không tiếp tục hợp tác với Công ty thì nhân viên phải hoàn trả lại 100% phí đào tạo và các khoản chế độ đã được nhận trong thời gian đào tạo..
-                </p>
-
-                <p>
-                  + Bồi thường vi phạm vật chất: Theo quy định nội bộ cuả Công ty và quy định cuả pháp luật hiện hành;
-                </p>
-
-                <p>
-                  + Có trách nhiệm đề xuất các giải pháp nâng cao hiệu quả công việc, giảm thiểu các rủi ro.
-                </p>
-
-                <p class="indent">
-                  Khuyến khích các đóng góp này được thực hiện bằng văn bản.
-                </p>
-
-                <p>
-                  + Thuế TNCN, nếu có: do người lao động đóng. Công ty sẽ tạm khấu trừ trước khi chi trả cho người lao động theo quy định.
-                </p>
-
-              </div>
-
-            </section>
-
-
-            <!-- =================================================
-                 ĐIỀU 5
-            ================================================== -->
-
-            <section class="article">
-
-              <p class="article-title">
-                Điều 5: Nghĩa vụ và quyền lợi của Người sử dụng lao động
-              </p>
-
-              <div class="article-content">
-
-                <p>
-                  1. Nghĩa vụ :
-                </p>
-
-                <ul class="dash-list">
-
-                  <li>
-                    Thực hiện đầy đủ những điều kiện cần thiết đã cam kết trong HĐLĐ để Người lao động đạt hiệu quả công việc cao. Bảo đảm việc làm cho Người lao động theo HĐLĐ đã ký.
-                  </li>
-
-                  <li>
-                    Thanh toán đầy đủ, đúng hạn các chế độ và quyền lợi cho người lao động theo hợp đồng lao động, thỏa ước lao động tập thể (nếu có);
-                  </li>
-
-                </ul>
-
-                <p>
-                  2. Quyền lợi:
-                </p>
-
-                <ul class="dash-list">
-
-                  <li>
-                    Điều hành Người lao động hoàn thành công việc theo HĐLĐ (bố trí, điều chuyển công việc cho Người lao động theo đúng chức năng chuyên môn).
-                  </li>
-
-                  <li>
-                    Có quyền chuyển tạm thời lao động, ngừng việc, thay đổi, tạm hoãn, chấm dứt HĐLĐ và áp dụng các biện pháp kỷ luật theo quy định của Pháp luật hiện hành và theo nội quy của Công ty trong thời gian HĐLĐ còn giá trị.
-                  </li>
-
-                  <li>
-                    Có quyền đòi bồi thường, khiếu nại với cơ quan liên đới để bảo vệ quyền lợi của mình nếu Người lao động vi phạm Pháp luật hay các điều khoản của HĐLĐ.
-                  </li>
-
-                  <li>
-                    Người lao động khi đơn phương chấm dứt hợp đồng phải báo trước bằng văn bản ít nhất 30 ngày. Trường hợp không thực hiện đúng thời gian báo trước, phải bồi thường cho Công ty 03 tháng tiền lương theo hợp đồng
-                  </li>
-
-                  <li>
-                    Trường hợp người lao động tự ý nghỉ việc không thông báo hoặc không bàn giao công việc, Công ty có quyền tạm giữ các khoản thanh toán cho đến khi hoàn tất nghĩa vụ và yêu cầu bồi thường thiệt hại phát sinh
-                  </li>
-
-                </ul>
-
-              </div>
-
-            </section>
-
-
-            <!-- =================================================
-                 ĐIỀU 6
-            ================================================== -->
-
-            <section class="article">
-
-              <p class="article-title">
-                Điều 6: Những thỏa thuận khác
-              </p>
-
-              <div class="article-content">
-
-                <p>
-                  -Bảo đảm việc làm và thực hiện đầy đủ những điều đã cam kết trong Hợp đồng lao động.
-                </p>
-
-              </div>
-
-            </section>
-
-
-            <!-- =================================================
-                 ĐIỀU 7
-            ================================================== -->
-
-            <section class="article">
-
-              <p class="article-title">
-                Điều 7: Điều khoản thi hành
-              </p>
-
-              <div class="article-content">
-
-                <p>
-                  - Những vấn đề về lao động không ghi trong hợp đồng lao động này thì áp dụng quy định cuả thỏa ước tập thể, trường hợp chưa có thỏa ước thì áp dụng quy định của pháp luật lao động.
-                </p>
-
-                <p>
-                  - Hợp đồng này được lập thành 2 bản có giá trị pháp lý như nhau, mỗi bên giữ 1 bản và có hiệu lực kể từ ngày ký.
-                </p>
-
-                <p>
-                  - Khi ký kết các phụ lục hợp đồng lao động thì nội dung của phụ lục cũng có giá trị như các nội dung cuả bản hợp đồng này.
-                </p>
-
-              </div>
-
-            </section>
-
-
-            <!-- =================================================
-                 SIGNATURE
-            ================================================== -->
-
-            <div class="signature">
-
-              <div>
-
-                <div class="signature-title">
-                  NGƯỜI LAO ĐỘNG
-                </div>
-
-                <div class="signature-company">
-                  &nbsp;
-                </div>
-
-                <div class="signature-space"></div>
-
-                <div class="signature-note">
-                  (Ký, ghi rõ họ tên)
-                </div>
-
-              </div>
-
-
-              <div>
-
-                <div class="signature-title">
-                  NGƯỜI SỬ DỤNG LAO ĐỘNG
-                </div>
-
-                <div class="signature-company">
-                  &nbsp;
-                </div>
-
-                <div class="signature-space"></div>
-
-                <div class="signature-note">
-                  (Ký, ghi rõ họ tên)
-                </div>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        </article>
-
+      <div
+        id="saveStatus"
+        class="save-status"
+      >
+        Dữ liệu được lưu tự động trên thiết bị.
       </div>
 
-    </section>
+    </div>
 
-  </main>
-
-
-  <!-- =========================================================
-       SCRIPT
-  ========================================================== -->
-
-  <script>
-
-    const STORAGE_KEY =
-      "grova_document_template_08_hop_dong_lao_dong";
-
-    const fields = [
-
-      "contractDate",
-
-      "companyName",
-      "companyAddress",
-      "companyTax",
-      "companyRepresentative",
-      "companyPosition",
-      "companyNationality",
-
-      "employeeName",
-      "employeeNationality",
-      "employeeBirth",
-      "employeeBirthPlace",
-      "employeeJob",
-      "employeeGender",
-      "employeeAddress",
-      "employeeCCCD",
-      "cccdDate",
-      "cccdPlace",
-
-      "contractType",
-      "startDate",
-      "endDate",
-      "workLocation",
-      "position",
-      "professionalTitle",
-      "jobDescription",
-
-      "salary",
-      "salaryForm",
-      "effectiveSalary",
-      "salaryPayment"
-    ];
+  </aside>
 
 
-    function $(id){
-      return document.getElementById(id);
+  <!-- =======================================================
+       PREVIEW
+  ======================================================== -->
+
+  <section class="preview-panel">
+
+    <div class="preview-toolbar">
+
+      <div class="preview-info">
+        <strong>Xem trước hợp đồng</strong>
+        &nbsp;·&nbsp;
+        Nội dung tự cập nhật khi nhập dữ liệu
+      </div>
+
+      <button
+        class="btn btn-primary"
+        type="button"
+        onclick="window.print()"
+      >
+        🖨 In hợp đồng
+      </button>
+
+    </div>
+
+
+    <div class="paper-wrap">
+
+      <article
+        class="paper"
+        id="documentPreview"
+      >
+
+        <header class="doc-header">
+
+          <div class="doc-logo">
+            <img
+              src="../data/grova_logo.png"
+              alt="GROVA HOLDINGS"
+            >
+          </div>
+
+          <div class="national-header">
+
+            <div class="country">
+              CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM
+            </div>
+
+            <div class="motto">
+              Độc lập - Tự do - Hạnh phúc
+            </div>
+
+            <div class="national-line"></div>
+
+          </div>
+
+        </header>
+
+
+        <div class="contract-heading">
+
+          <h1>
+            HỢP ĐỒNG LAO ĐỘNG
+          </h1>
+
+          <div class="subtitle">
+            (Ban hành theo Bộ luật lao động ngày 20 tháng 11 năm 2019)
+          </div>
+
+          <div class="contract-no">
+            Số: <span id="previewContractNo">01.HĐLĐ</span>
+          </div>
+
+        </div>
+
+
+        <div class="doc">
+
+          <p class="intro">
+            Hôm nay, ngày
+            <strong id="previewContractDate">......</strong>,
+            tại Công ty cổ phần Grovaholdings , chúng tôi gồm:
+          </p>
+
+
+          <!-- BÊN A -->
+
+          <section class="party">
+
+            <div class="party-title">
+              Bên A : Người sử dụng lao động
+            </div>
+
+            <div class="party-grid">
+
+              <div class="party-line full">
+                <span class="party-label">Công ty:</span>
+                <span id="previewCompany">
+                  CÔNG TY CỔ PHẦN GROVAHOLDINGS SJC
+                </span>
+              </div>
+
+              <div class="party-line full">
+                <span class="party-label">Địa chỉ:</span>
+                <span id="previewCompanyAddress">
+                  Số 49A/348 Trần Nguyên Hãn , Phường An Biên, Thành phố Hải Phòng, Việt Nam
+                </span>
+              </div>
+
+              <div class="party-line">
+                <span class="party-label">Mã số thuế :</span>
+                <span id="previewCompanyTax">
+                  0202328361
+                </span>
+              </div>
+
+              <div class="party-line">
+                <span class="party-label">Đại diện:</span>
+                <span id="previewCompanyRepresentative">
+                  Phạm Văn Học
+                </span>
+              </div>
+
+              <div class="party-line">
+                <span class="party-label">Chức vụ:</span>
+                <span id="previewCompanyPosition">
+                  Giám đốc
+                </span>
+              </div>
+
+              <div class="party-line">
+                <span class="party-label">Quốc tịch:</span>
+                <span id="previewCompanyNationality">
+                  Việt Nam
+                </span>
+              </div>
+
+            </div>
+
+          </section>
+
+
+          <!-- BÊN B -->
+
+          <section class="party">
+
+            <div class="party-title">
+              Bên B : Người lao động
+            </div>
+
+            <div class="party-grid">
+
+              <div class="party-line">
+                <span class="party-label">ÔNG / BÀ :</span>
+                <span id="previewEmployeeName">
+                  ................................................
+                </span>
+              </div>
+
+              <div class="party-line">
+                <span class="party-label">Quốc tịch:</span>
+                <span id="previewEmployeeNationality">
+                  Việt Nam
+                </span>
+              </div>
+
+              <div class="party-line">
+                <span class="party-label">Ngày sinh:</span>
+                <span id="previewEmployeeBirth">
+                  ................................
+                </span>
+              </div>
+
+              <div class="party-line">
+                <span class="party-label">Tại :</span>
+                <span id="previewEmployeeBirthPlace">
+                  ................................
+                </span>
+              </div>
+
+              <div class="party-line">
+                <span class="party-label">Nghề nghiệp :</span>
+                <span id="previewEmployeeJob">
+                  Nhân viên
+                </span>
+              </div>
+
+              <div class="party-line">
+                <span class="party-label">Giới tính:</span>
+                <span id="previewEmployeeGender">
+                  ................................
+                </span>
+              </div>
+
+              <div class="party-line full">
+                <span class="party-label">Điạ chỉ</span>
+                <span id="previewEmployeeAddress">
+                  ............................................................
+                </span>
+              </div>
+
+              <div class="party-line">
+                <span class="party-label">Số CCCD :</span>
+                <span id="previewEmployeeCCCD">
+                  ................................
+                </span>
+              </div>
+
+              <div class="party-line">
+                <span class="party-label">Cấp ngày:</span>
+                <span id="previewCCCDDate">
+                  ................................
+                </span>
+              </div>
+
+              <div class="party-line">
+                <span class="party-label">Tại :</span>
+                <span id="previewCCCDPlace">
+                  ................................
+                </span>
+              </div>
+
+            </div>
+
+          </section>
+
+
+          <p class="agreement-intro">
+            Cùng thoả thuận ký kết hợp đồng lao động và cam kết làm đúng những điều khoản sau đây:
+          </p>
+
+
+          <!-- ĐIỀU 1 -->
+
+          <section class="article">
+
+            <p class="article-title">
+              Điều 1: Công việc, địa điểm làm việc và thời hạn của Hợp đồng
+            </p>
+
+            <div class="article-content">
+
+              <p>
+                Loại hợp đồng :
+                <span id="previewContractType">
+                  Ký lần thứ 01
+                </span>
+              </p>
+
+              <p>
+                Từ ngày :
+                <span id="previewStartDate">
+                  ................................
+                </span>
+                Đến ngày :
+                <span id="previewEndDate">
+                  ................................
+                </span>
+              </p>
+
+              <p>
+                - Địa điểm làm việc:
+                <span id="previewWorkLocation">
+                  theo yêu cầu thực tế của doanh nghiệp
+                </span>
+              </p>
+
+              <p>
+                - Chức vụ công tác:
+                <span id="previewPosition">
+                  Nhân viên
+                </span>
+              </p>
+
+              <p>
+                + Chức danh chuyên môn (vị trí công tác):
+                <span id="previewProfessionalTitle">
+                  Nhân viên
+                </span>
+              </p>
+
+              <p>
+                - Nhiệm vụ công việc như sau:
+              </p>
+
+              <ul class="plus-list">
+
+                <li>
+                  Thực hiện công việc theo đúng chức danh chuyên môn của mình dưới sự quản lý, điều hành của Ban Giám đốc (và các cá nhân được bổ nhiệm hoặc ủy quyền phụ trách).
+                </li>
+
+                <li>
+                  Bắt buộc phải có dụng cụ an toàn lao động ( dây treo hãm rơi , dây dai cố định , dày bảo hộ , mũ , găng tay và một số dụng cụ tuỳ theo điều kiện thi công )
+                </li>
+
+                <li>
+                  Phối hợp cùng với các bộ phận, phòng ban khác trong Người sử dụng lao động để phát huy tối đa hiệu quả công việc.
+                </li>
+
+                <li>
+                  Hoàn thành những công việc khác tùy thuộc theo yêu cầu kinh doanh của Người sử dụng lao động và theo quyết định của Ban Giám đốc (và các cá nhân được bổ nhiệm hoặc ủy quyền phụ trách).
+                </li>
+
+              </ul>
+
+            </div>
+
+          </section>
+
+
+          <!-- ĐIỀU 2 -->
+
+          <section class="article">
+
+            <p class="article-title">
+              Điều 2: Lương, phụ cấp, các khoản bổ sung khác
+            </p>
+
+            <div class="article-content">
+
+              <p>
+                Lương căn bản, mức đóng BHXH
+                <span id="previewSalary">
+                  6.000.000đồng/tháng
+                </span>
+              </p>
+
+              <p>
+                - Hình thức trả lương:
+                <span id="previewSalaryForm">
+                  Tiền mặt hoặc chuyển khoản.
+                </span>
+              </p>
+
+              <p>
+                - Lương hiệu quả :
+                <span id="previewEffectiveSalary">
+                  hưởng lợi theo tình hình kinh doanh thực tế trong tháng và do Giám đốc quyết định .
+                </span>
+              </p>
+
+              <p>
+                - Thời hạn trả lương:
+                <span id="previewSalaryPayment">
+                  Được trả linh hoạt theo tình hình tài chính của doanh nghiệp, có thể thanh toán 01 lần bằng hình thức chuyển khoản hoặc thanh toán tối đa 03 lần bằng hình thức tiền mặt.
+                </span>
+              </p>
+
+              <p>
+                - Chế độ nâng bậc, nâng lương: Người lao động được xét nâng bậc, nâng lương theo kết quả làm việc và theo quy định của Người sử dụng lao động.
+              </p>
+
+            </div>
+
+          </section>
+
+
+          <!-- ĐIỀU 3 -->
+
+          <section class="article">
+
+            <p class="article-title">
+              Điều 3: Thời giờ làm việc, nghỉ ngơi, bảo hộ lao động, BHXH, BHYT, BHTN
+            </p>
+
+            <div class="article-content">
+
+              <p>
+                - Thời giờ làm việc: 8 giờ/ngày, 40 giờ/tuần, Nghỉ hàng tuần: ngày Chủ nhật.
+              </p>
+
+              <p>
+                - Từ ngày Thứ 2 đến ngày Thứ 7 hàng tuần :
+              </p>
+
+              <p class="indent">
+                + Buổi sáng : 8h00 - 12h00.
+              </p>
+
+              <p class="indent">
+                + Buổi chiều: 13h00 - 17h00.
+              </p>
+
+              <p>
+                - Chế độ nghỉ ngơi các ngày lễ, tết, phép năm:
+              </p>
+
+              <ul class="plus-list">
+
+                <li>
+                  Người lao động được nghỉ lễ, tết theo luật định; các ngày nghỉ lễ nếu trùng với ngày Chủ nhật thì sẽ được nghỉ bù vào ngày trước hoặc ngày kế tiếp tùy theo tình hình cụ thể mà Ban lãnh đạo Công ty sẽ chỉ đạo trực tiếp.
+                </li>
+
+                <li>
+                  Người lao động đã ký HĐLĐ chính thức và có thâm niên công tác 12 tháng thì sẽ được nghỉ phép năm có hưởng lương (01 ngày phép/01 tháng, 12 ngày phép/01 năm); trường hợp có thâm niên làm việc dưới 12 tháng thì thời gian nghỉ hằng năm được tính theo tỷ lệ tương ứng với số thời gian làm việc.
+                </li>
+
+              </ul>
+
+              <p>
+                - Thiết bị và công cụ làm việc sẽ được Công ty cấp phát tùy theo nhu cầu của công việc.
+              </p>
+
+              <p>
+                - Điều kiện an toàn và vệ sinh lao động tại nơi làm việc theo quy định của pháp luật hiện hành.
+              </p>
+
+              <p>
+                - Bảo hiểm xã hội, bảo hiểm y tế và bảo hiểm thất nghiệp: Người lao động được hưởng quyền lợi theo quy định .
+              </p>
+
+            </div>
+
+          </section>
+
+
+          <!-- ĐIỀU 4 -->
+
+          <section class="article">
+
+            <p class="article-title">
+              Điều 4: Đào tạo, bồi dưỡng, các quyền lợi và nghĩa vụ liên quan của người lao động
+            </p>
+
+            <div class="article-content">
+
+              <p>
+                - Đào tạo, bồi dưỡng: Người lao động được đào tạo, bồi dưỡng, huấn luyện tại nơi làm việc hoặc được gửi đi đào tạo theo quy định của Công ty và yêu cầu công việc.
+              </p>
+
+              <p>
+                - Khen thưởng: Người lao động được khuyến khích bằng vật chất và tinh thần khi có thành tích trong công tác hoặc theo quy định của Công ty.
+              </p>
+
+              <p>
+                - Các khoản thỏa thuận khác gồm: tiền cơm trưa, thưởng mặc định, hỗ trợ xăng xe, điện thoại, nhà ở, trang phục…, theo quy định của Công ty.
+              </p>
+
+              <p>
+                - Nghĩa vụ liên quan của người lao động:
+              </p>
+
+              <ul class="plus-list">
+
+                <li>
+                  Tuân thủ hợp đồng lao động.
+                </li>
+
+                <li>
+                  Thực hiện công việc với sự tận tâm, tận lực và mẫn cán, đảm bảo hoàn thành công việc với hiệu quả cao nhất theo sự phân công, điều hành (bằng văn bản hoặc bằng miệng) của Ban Giám đốc (và các cá nhân được Ban Giám đốc bổ nhiệm hoặc ủy quyền phụ trách).
+                </li>
+
+                <li>
+                  Hoàn thành công việc được giao và sẵn sàng chấp nhận mọi sự điều động khi có yêu cầu.
+                </li>
+
+                <li>
+                  Nắm rõ và chấp hành nghiêm túc kỷ luật lao động, an toàn lao động, vệ sinh lao động, phòng cháy chữa cháy, văn hóa Công ty, nội quy lao động và các chủ trương, chính sách của Công ty.
+                </li>
+
+                <li>
+                  Trong trường hợp được cử đi đào tạo thì nhân viên phải hoàn thành khoá học đúng thời hạn, phải cam kết sẽ phục vụ lâu dài cho Công ty sau khi kết thúc khoá học và được hưởng nguyên lương, các quyền lợi khác được hưởng như người đi làm.
+                </li>
+
+              </ul>
+
+              <p class="indent">
+                Nếu sau khi kết thúc khóa đào tạo mà nhân viên không tiếp tục hợp tác với Công ty thì nhân viên phải hoàn trả lại 100% phí đào tạo và các khoản chế độ đã được nhận trong thời gian đào tạo..
+              </p>
+
+              <p>
+                + Bồi thường vi phạm vật chất: Theo quy định nội bộ cuả Công ty và quy định cuả pháp luật hiện hành;
+              </p>
+
+              <p>
+                + Có trách nhiệm đề xuất các giải pháp nâng cao hiệu quả công việc, giảm thiểu các rủi ro.
+              </p>
+
+              <p class="indent">
+                Khuyến khích các đóng góp này được thực hiện bằng văn bản.
+              </p>
+
+              <p>
+                + Thuế TNCN, nếu có: do người lao động đóng. Công ty sẽ tạm khấu trừ trước khi chi trả cho người lao động theo quy định.
+              </p>
+
+            </div>
+
+          </section>
+
+
+          <!-- ĐIỀU 5 -->
+
+          <section class="article">
+
+            <p class="article-title">
+              Điều 5: Nghĩa vụ và quyền lợi của Người sử dụng lao động
+            </p>
+
+            <div class="article-content">
+
+              <p>
+                1. Nghĩa vụ :
+              </p>
+
+              <ul class="dash-list">
+
+                <li>
+                  Thực hiện đầy đủ những điều kiện cần thiết đã cam kết trong HĐLĐ để Người lao động đạt hiệu quả công việc cao. Bảo đảm việc làm cho Người lao động theo HĐLĐ đã ký.
+                </li>
+
+                <li>
+                  Thanh toán đầy đủ, đúng hạn các chế độ và quyền lợi cho người lao động theo hợp đồng lao động, thỏa ước lao động tập thể (nếu có);
+                </li>
+
+              </ul>
+
+              <p>
+                2. Quyền lợi:
+              </p>
+
+              <ul class="dash-list">
+
+                <li>
+                  Điều hành Người lao động hoàn thành công việc theo HĐLĐ (bố trí, điều chuyển công việc cho Người lao động theo đúng chức năng chuyên môn).
+                </li>
+
+                <li>
+                  Có quyền chuyển tạm thời lao động, ngừng việc, thay đổi, tạm hoãn, chấm dứt HĐLĐ và áp dụng các biện pháp kỷ luật theo quy định của Pháp luật hiện hành và theo nội quy của Công ty trong thời gian HĐLĐ còn giá trị.
+                </li>
+
+                <li>
+                  Có quyền đòi bồi thường, khiếu nại với cơ quan liên đới để bảo vệ quyền lợi của mình nếu Người lao động vi phạm Pháp luật hay các điều khoản của HĐLĐ.
+                </li>
+
+                <li>
+                  Người lao động khi đơn phương chấm dứt hợp đồng phải báo trước bằng văn bản ít nhất 30 ngày. Trường hợp không thực hiện đúng thời gian báo trước, phải bồi thường cho Công ty 03 tháng tiền lương theo hợp đồng
+                </li>
+
+                <li>
+                  Trường hợp người lao động tự ý nghỉ việc không thông báo hoặc không bàn giao công việc, Công ty có quyền tạm giữ các khoản thanh toán cho đến khi hoàn tất nghĩa vụ và yêu cầu bồi thường thiệt hại phát sinh
+                </li>
+
+              </ul>
+
+            </div>
+
+          </section>
+
+
+          <!-- ĐIỀU 6 -->
+
+          <section class="article">
+
+            <p class="article-title">
+              Điều 6: Những thỏa thuận khác
+            </p>
+
+            <div class="article-content">
+
+              <p>
+                -Bảo đảm việc làm và thực hiện đầy đủ những điều đã cam kết trong Hợp đồng lao động.
+              </p>
+
+            </div>
+
+          </section>
+
+
+          <!-- ĐIỀU 7 -->
+
+          <section class="article">
+
+            <p class="article-title">
+              Điều 7: Điều khoản thi hành
+            </p>
+
+            <div class="article-content">
+
+              <p>
+                - Những vấn đề về lao động không ghi trong hợp đồng lao động này thì áp dụng quy định cuả thỏa ước tập thể, trường hợp chưa có thỏa ước thì áp dụng quy định của pháp luật lao động.
+              </p>
+
+              <p>
+                - Hợp đồng này được lập thành 2 bản có giá trị pháp lý như nhau, mỗi bên giữ 1 bản và có hiệu lực kể từ ngày ký.
+              </p>
+
+              <p>
+                - Khi ký kết các phụ lục hợp đồng lao động thì nội dung của phụ lục cũng có giá trị như các nội dung cuả bản hợp đồng này.
+              </p>
+
+            </div>
+
+          </section>
+
+
+          <!-- SIGNATURE -->
+
+          <div class="signature">
+
+            <div>
+
+              <div class="signature-title">
+                NGƯỜI LAO ĐỘNG
+              </div>
+
+              <div class="signature-company">
+                &nbsp;
+              </div>
+
+              <div class="signature-space"></div>
+
+              <div class="signature-note">
+                (Ký, ghi rõ họ tên)
+              </div>
+
+            </div>
+
+
+            <div>
+
+              <div class="signature-title">
+                NGƯỜI SỬ DỤNG LAO ĐỘNG
+              </div>
+
+              <div class="signature-company">
+                &nbsp;
+              </div>
+
+              <div class="signature-space"></div>
+
+              <div class="signature-note">
+                (Ký, ghi rõ họ tên)
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </article>
+
+    </div>
+
+  </section>
+
+</main>
+
+
+<script>
+
+  const STORAGE_KEY =
+    "grova_document_template_08_hop_dong_lao_dong";
+
+
+  const fields = [
+
+    "contractDate",
+
+    "companyName",
+    "companyAddress",
+    "companyTax",
+    "companyRepresentative",
+    "companyPosition",
+    "companyNationality",
+
+    "employeeName",
+    "employeeNationality",
+    "employeeBirth",
+    "employeeBirthPlace",
+    "employeeJob",
+    "employeeGender",
+    "employeeAddress",
+    "employeeCCCD",
+    "cccdDate",
+    "cccdPlace",
+
+    "contractType",
+    "startDate",
+    "endDate",
+    "workLocation",
+    "position",
+    "professionalTitle",
+    "jobDescription",
+
+    "salary",
+    "salaryForm",
+    "effectiveSalary",
+    "salaryPayment"
+
+  ];
+
+
+  function $(id){
+    return document.getElementById(id);
+  }
+
+
+  function getValue(id){
+
+    const element = $(id);
+
+    if(!element){
+      return "";
     }
 
+    return element.value.trim();
 
-    function getValue(id){
+  }
+
+
+  function setPreview(id,value,fallback){
+
+    const element = $(id);
+
+    if(!element){
+      return;
+    }
+
+    element.textContent =
+      value || fallback || "................................";
+
+  }
+
+
+  function formatDateVN(value){
+
+    if(!value){
+      return "......";
+    }
+
+    const parts =
+      value.split("-");
+
+    if(parts.length !== 3){
+      return value;
+    }
+
+    return `${parts[2]}/${parts[1]}/${parts[0]}`;
+
+  }
+
+
+  function updatePreview(){
+
+    setPreview(
+      "previewContractDate",
+      formatDateVN(
+        getValue("contractDate")
+      ),
+      "......"
+    );
+
+
+    setPreview(
+      "previewCompany",
+      getValue("companyName"),
+      "CÔNG TY CỔ PHẦN GROVAHOLDINGS SJC"
+    );
+
+    setPreview(
+      "previewCompanyAddress",
+      getValue("companyAddress"),
+      "Số 49A/348 Trần Nguyên Hãn , Phường An Biên, Thành phố Hải Phòng, Việt Nam"
+    );
+
+    setPreview(
+      "previewCompanyTax",
+      getValue("companyTax"),
+      "0202328361"
+    );
+
+    setPreview(
+      "previewCompanyRepresentative",
+      getValue("companyRepresentative"),
+      "Phạm Văn Học"
+    );
+
+    setPreview(
+      "previewCompanyPosition",
+      getValue("companyPosition"),
+      "Giám đốc"
+    );
+
+    setPreview(
+      "previewCompanyNationality",
+      getValue("companyNationality"),
+      "Việt Nam"
+    );
+
+
+    setPreview(
+      "previewEmployeeName",
+      getValue("employeeName"),
+      "................................................"
+    );
+
+    setPreview(
+      "previewEmployeeNationality",
+      getValue("employeeNationality"),
+      "Việt Nam"
+    );
+
+    setPreview(
+      "previewEmployeeBirth",
+      getValue("employeeBirth"),
+      "................................"
+    );
+
+    setPreview(
+      "previewEmployeeBirthPlace",
+      getValue("employeeBirthPlace"),
+      "................................"
+    );
+
+    setPreview(
+      "previewEmployeeJob",
+      getValue("employeeJob"),
+      "Nhân viên"
+    );
+
+    setPreview(
+      "previewEmployeeGender",
+      getValue("employeeGender"),
+      "................................"
+    );
+
+    setPreview(
+      "previewEmployeeAddress",
+      getValue("employeeAddress"),
+      "............................................................"
+    );
+
+    setPreview(
+      "previewEmployeeCCCD",
+      getValue("employeeCCCD"),
+      "................................"
+    );
+
+    setPreview(
+      "previewCCCDDate",
+      getValue("cccdDate"),
+      "................................"
+    );
+
+    setPreview(
+      "previewCCCDPlace",
+      getValue("cccdPlace"),
+      "................................"
+    );
+
+
+    setPreview(
+      "previewContractType",
+      getValue("contractType"),
+      "Ký lần thứ 01"
+    );
+
+    setPreview(
+      "previewStartDate",
+      getValue("startDate"),
+      "................................"
+    );
+
+    setPreview(
+      "previewEndDate",
+      getValue("endDate"),
+      "................................"
+    );
+
+    setPreview(
+      "previewWorkLocation",
+      getValue("workLocation"),
+      "theo yêu cầu thực tế của doanh nghiệp"
+    );
+
+    setPreview(
+      "previewPosition",
+      getValue("position"),
+      "Nhân viên"
+    );
+
+    setPreview(
+      "previewProfessionalTitle",
+      getValue("professionalTitle"),
+      "Nhân viên"
+    );
+
+
+    setPreview(
+      "previewSalary",
+      getValue("salary"),
+      "6.000.000đồng/tháng"
+    );
+
+    setPreview(
+      "previewSalaryForm",
+      getValue("salaryForm"),
+      "Tiền mặt hoặc chuyển khoản."
+    );
+
+    setPreview(
+      "previewEffectiveSalary",
+      getValue("effectiveSalary"),
+      "hưởng lợi theo tình hình kinh doanh thực tế trong tháng và do Giám đốc quyết định ."
+    );
+
+    setPreview(
+      "previewSalaryPayment",
+      getValue("salaryPayment"),
+      "Được trả linh hoạt theo tình hình tài chính của doanh nghiệp, có thể thanh toán 01 lần bằng hình thức chuyển khoản hoặc thanh toán tối đa 03 lần bằng hình thức tiền mặt."
+    );
+
+
+    saveDraft();
+
+  }
+
+
+  function saveDraft(){
+
+    const data = {};
+
+    fields.forEach(id => {
+
       const element = $(id);
 
-      if(!element){
-        return "";
+      if(element){
+        data[id] =
+          element.value;
       }
 
-      return element.value.trim();
+    });
+
+
+    try{
+
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(data)
+      );
+
+
+      const status =
+        $("saveStatus");
+
+      if(status){
+
+        status.textContent =
+          "✓ Đã lưu nháp tự động";
+
+      }
+
+    }catch(error){
+
+      console.warn(
+        "Không thể lưu dữ liệu:",
+        error
+      );
+
     }
 
+  }
 
-    function setPreview(id, value, fallback){
-      const element = $(id);
 
-      if(!element){
+  function loadDraft(){
+
+    try{
+
+      const raw =
+        localStorage.getItem(
+          STORAGE_KEY
+        );
+
+      if(!raw){
         return;
       }
 
-      element.textContent =
-        value || fallback || "................................";
-    }
+      const data =
+        JSON.parse(raw);
 
-
-    function formatDateVN(value){
-
-      if(!value){
-        return "......";
-      }
-
-      const parts = value.split("-");
-
-      if(parts.length !== 3){
-        return value;
-      }
-
-      return `${parts[2]}/${parts[1]}/${parts[0]}`;
-    }
-
-
-    function updatePreview(){
-
-      /* ==============================
-         GENERAL
-      ============================== */
-
-      setPreview(
-        "previewContractDate",
-        formatDateVN(getValue("contractDate")),
-        "......"
-      );
-
-
-      /* ==============================
-         COMPANY
-      ============================== */
-
-      setPreview(
-        "previewCompany",
-        getValue("companyName"),
-        "CÔNG TY CỔ PHẦN GROVAHOLDINGS SJC"
-      );
-
-      setPreview(
-        "previewCompanyAddress",
-        getValue("companyAddress"),
-        "Số 49A/348 Trần Nguyên Hãn , Phường An Biên, Thành phố Hải Phòng, Việt Nam"
-      );
-
-      setPreview(
-        "previewCompanyTax",
-        getValue("companyTax"),
-        "0202328361"
-      );
-
-      setPreview(
-        "previewCompanyRepresentative",
-        getValue("companyRepresentative"),
-        "Phạm Văn Học"
-      );
-
-      setPreview(
-        "previewCompanyPosition",
-        getValue("companyPosition"),
-        "Giám đốc"
-      );
-
-      setPreview(
-        "previewCompanyNationality",
-        getValue("companyNationality"),
-        "Việt Nam"
-      );
-
-
-      /* ==============================
-         EMPLOYEE
-      ============================== */
-
-      setPreview(
-        "previewEmployeeName",
-        getValue("employeeName"),
-        "................................................"
-      );
-
-      setPreview(
-        "previewEmployeeNationality",
-        getValue("employeeNationality"),
-        "Việt Nam"
-      );
-
-      setPreview(
-        "previewEmployeeBirth",
-        getValue("employeeBirth"),
-        "................................"
-      );
-
-      setPreview(
-        "previewEmployeeBirthPlace",
-        getValue("employeeBirthPlace"),
-        "................................"
-      );
-
-      setPreview(
-        "previewEmployeeJob",
-        getValue("employeeJob"),
-        "Nhân viên"
-      );
-
-      setPreview(
-        "previewEmployeeGender",
-        getValue("employeeGender"),
-        "................................"
-      );
-
-      setPreview(
-        "previewEmployeeAddress",
-        getValue("employeeAddress"),
-        "............................................................"
-      );
-
-      setPreview(
-        "previewEmployeeCCCD",
-        getValue("employeeCCCD"),
-        "................................"
-      );
-
-      setPreview(
-        "previewCCCDDate",
-        getValue("cccdDate"),
-        "................................"
-      );
-
-      setPreview(
-        "previewCCCDPlace",
-        getValue("cccdPlace"),
-        "................................"
-      );
-
-
-      /* ==============================
-         ARTICLE 1
-      ============================== */
-
-      setPreview(
-        "previewContractType",
-        getValue("contractType"),
-        "Ký lần thứ 01"
-      );
-
-      setPreview(
-        "previewStartDate",
-        getValue("startDate"),
-        "................................"
-      );
-
-      setPreview(
-        "previewEndDate",
-        getValue("endDate"),
-        "................................"
-      );
-
-      setPreview(
-        "previewWorkLocation",
-        getValue("workLocation"),
-        "theo yêu cầu thực tế của doanh nghiệp"
-      );
-
-      setPreview(
-        "previewPosition",
-        getValue("position"),
-        "Nhân viên"
-      );
-
-      setPreview(
-        "previewProfessionalTitle",
-        getValue("professionalTitle"),
-        "Nhân viên"
-      );
-
-
-      /* ==============================
-         ARTICLE 2
-      ============================== */
-
-      setPreview(
-        "previewSalary",
-        getValue("salary"),
-        "6.000.000đồng/tháng"
-      );
-
-      setPreview(
-        "previewSalaryForm",
-        getValue("salaryForm"),
-        "Tiền mặt hoặc chuyển khoản."
-      );
-
-      setPreview(
-        "previewEffectiveSalary",
-        getValue("effectiveSalary"),
-        "hưởng lợi theo tình hình kinh doanh thực tế trong tháng và do Giám đốc quyết định ."
-      );
-
-      setPreview(
-        "previewSalaryPayment",
-        getValue("salaryPayment"),
-        "Được trả linh hoạt theo tình hình tài chính của doanh nghiệp, có thể thanh toán 01 lần bằng hình thức chuyển khoản hoặc thanh toán tối đa 03 lần bằng hình thức tiền mặt."
-      );
-
-
-      saveDraft();
-    }
-
-
-    function saveDraft(){
-
-      const data = {};
 
       fields.forEach(id => {
 
-        const element = $(id);
+        const element =
+          $(id);
 
-        if(element){
-          data[id] = element.value;
+        if(
+          element &&
+          Object.prototype.hasOwnProperty.call(
+            data,
+            id
+          )
+        ){
+
+          element.value =
+            data[id] ?? "";
+
         }
 
       });
 
-      try{
+    }catch(error){
 
-        localStorage.setItem(
-          STORAGE_KEY,
-          JSON.stringify(data)
-        );
+      console.warn(
+        "Không thể đọc bản nháp:",
+        error
+      );
 
-        const status = $("saveStatus");
+    }
 
-        if(status){
-          status.textContent =
-            "✓ Đã lưu nháp tự động";
-        }
+  }
 
-      }catch(error){
 
-        console.warn(
-          "Không thể lưu dữ liệu:",
-          error
-        );
+  function clearDraft(){
 
-      }
+    const confirmed =
+      window.confirm(
+        "Bạn có chắc muốn xóa toàn bộ dữ liệu đang nhập?"
+      );
+
+    if(!confirmed){
+      return;
     }
 
 
-    function loadDraft(){
+    try{
 
-      try{
+      localStorage.removeItem(
+        STORAGE_KEY
+      );
 
-        const raw =
-          localStorage.getItem(STORAGE_KEY);
+    }catch(error){
 
-        if(!raw){
+      console.warn(error);
+
+    }
+
+
+    window.location.reload();
+
+  }
+
+
+  function setDefaultDate(){
+
+    const dateField =
+      $("contractDate");
+
+    if(!dateField){
+      return;
+    }
+
+    if(dateField.value){
+      return;
+    }
+
+
+    const now =
+      new Date();
+
+    const yyyy =
+      now.getFullYear();
+
+    const mm =
+      String(
+        now.getMonth()+1
+      ).padStart(2,"0");
+
+    const dd =
+      String(
+        now.getDate()
+      ).padStart(2,"0");
+
+
+    dateField.value =
+      `${yyyy}-${mm}-${dd}`;
+
+  }
+
+
+  document.addEventListener(
+    "DOMContentLoaded",
+    function(){
+
+      loadDraft();
+
+      setDefaultDate();
+
+
+      fields.forEach(id => {
+
+        const element =
+          $(id);
+
+        if(!element){
           return;
         }
 
-        const data =
-          JSON.parse(raw);
 
-        fields.forEach(id => {
-
-          const element = $(id);
-
-          if(
-            element &&
-            Object.prototype.hasOwnProperty.call(data,id)
-          ){
-
-            element.value =
-              data[id] ?? "";
-
-          }
-
-        });
-
-      }catch(error){
-
-        console.warn(
-          "Không thể đọc bản nháp:",
-          error
+        element.addEventListener(
+          "input",
+          updatePreview
         );
 
-      }
-    }
-
-
-    function clearDraft(){
-
-      const confirmed =
-        window.confirm(
-          "Bạn có chắc muốn xóa toàn bộ dữ liệu đang nhập?"
+        element.addEventListener(
+          "change",
+          updatePreview
         );
 
-      if(!confirmed){
-        return;
-      }
+      });
 
-      try{
 
-        localStorage.removeItem(
-          STORAGE_KEY
-        );
+      updatePreview();
 
-      }catch(error){
-
-        console.warn(error);
-
-      }
-
-      window.location.reload();
     }
+  );
 
-
-    function setDefaultDate(){
-
-      const dateField =
-        $("contractDate");
-
-      if(!dateField){
-        return;
-      }
-
-      if(dateField.value){
-        return;
-      }
-
-      const now =
-        new Date();
-
-      const yyyy =
-        now.getFullYear();
-
-      const mm =
-        String(now.getMonth()+1)
-          .padStart(2,"0");
-
-      const dd =
-        String(now.getDate())
-          .padStart(2,"0");
-
-      dateField.value =
-        `${yyyy}-${mm}-${dd}`;
-    }
-
-
-    /* =========================================================
-       INIT
-    ========================================================== */
-
-    document.addEventListener(
-      "DOMContentLoaded",
-      function(){
-
-        loadDraft();
-
-        setDefaultDate();
-
-        fields.forEach(id => {
-
-          const element = $(id);
-
-          if(!element){
-            return;
-          }
-
-          element.addEventListener(
-            "input",
-            updatePreview
-          );
-
-          element.addEventListener(
-            "change",
-            updatePreview
-          );
-
-        });
-
-        updatePreview();
-
-      }
-    );
-
-  </script>
+</script>
 
 </body>
 </html>
