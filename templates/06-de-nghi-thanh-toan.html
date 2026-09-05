@@ -1,0 +1,1463 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Đề nghị thanh toán – GROVA HOLDINGS</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #eef3f1;
+      color: #111;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    .app {
+      min-height: 100vh;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 12px 18px;
+      background: #0b7a5a;
+      color: #fff;
+      box-shadow: 0 2px 12px rgba(0,0,0,.12);
+    }
+
+    .topbar-title {
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    .topbar-subtitle {
+      margin-top: 3px;
+      font-size: 12px;
+      opacity: .82;
+    }
+
+    .topbar-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 8px;
+      padding: 10px 15px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .btn-light {
+      background: #fff;
+      color: #0b7a5a;
+    }
+
+    .btn-primary {
+      background: #0b7a5a;
+      color: #fff;
+    }
+
+    .btn-secondary {
+      background: #e8eeec;
+      color: #24433a;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(300px, 390px) minmax(0, 1fr);
+      gap: 20px;
+      max-width: 1500px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .panel {
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 5px 22px rgba(0,0,0,.07);
+      overflow: hidden;
+    }
+
+    .form-panel {
+      align-self: start;
+      position: sticky;
+      top: 76px;
+    }
+
+    .panel-header {
+      padding: 18px 20px;
+      border-bottom: 1px solid #e5ebe8;
+    }
+
+    .panel-header h2 {
+      margin: 0;
+      font-size: 18px;
+      color: #123f31;
+    }
+
+    .panel-header p {
+      margin: 5px 0 0;
+      color: #6d7d77;
+      font-size: 13px;
+    }
+
+    .form-body {
+      padding: 18px 20px 22px;
+      max-height: calc(100vh - 110px);
+      overflow-y: auto;
+    }
+
+    .section-title {
+      margin: 20px 0 11px;
+      padding-bottom: 7px;
+      border-bottom: 1px solid #dce7e2;
+      color: #0b7a5a;
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .section-title:first-child {
+      margin-top: 0;
+    }
+
+    .field {
+      margin-bottom: 12px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 5px;
+      color: #344b43;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .field input,
+    .field textarea {
+      width: 100%;
+      border: 1px solid #cfdad5;
+      border-radius: 8px;
+      padding: 9px 10px;
+      outline: none;
+      background: #fff;
+      color: #18221f;
+    }
+
+    .field input:focus,
+    .field textarea:focus {
+      border-color: #0b7a5a;
+      box-shadow: 0 0 0 3px rgba(11,122,90,.10);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .money-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .money-box {
+      padding: 10px;
+      border: 1px solid #dbe5e1;
+      border-radius: 9px;
+      background: #f8faf9;
+    }
+
+    .money-box label {
+      display: block;
+      margin-bottom: 5px;
+      color: #52655e;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .money-box input {
+      width: 100%;
+      border: 1px solid #ccd9d4;
+      border-radius: 7px;
+      padding: 8px;
+      background: #fff;
+    }
+
+    .readonly {
+      background: #f0f5f3 !important;
+    }
+
+    .check-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .check-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 12px;
+      color: #3d5049;
+    }
+
+    .check-row input {
+      margin-top: 2px;
+      accent-color: #0b7a5a;
+    }
+
+    .preview-panel {
+      min-width: 0;
+      padding: 20px;
+      overflow: auto;
+    }
+
+    .preview-title {
+      margin: 0 0 14px;
+      color: #123f31;
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .paper-wrap {
+      display: flex;
+      justify-content: center;
+      min-width: max-content;
+    }
+
+    .paper {
+      width: 210mm;
+      min-height: 297mm;
+      height: auto;
+      padding: 17mm 17mm 18mm;
+      background: #fff;
+      box-shadow: 0 5px 28px rgba(0,0,0,.12);
+      font-family: "Times New Roman", Times, serif;
+      font-size: 13pt;
+      line-height: 1.42;
+      color: #000;
+    }
+
+    .doc-header {
+      display: grid;
+      grid-template-columns: 43% 57%;
+      align-items: start;
+      margin-bottom: 7mm;
+    }
+
+    .brand {
+      text-align: left;
+    }
+
+    .brand img {
+      width: 39mm;
+      max-height: 20mm;
+      object-fit: contain;
+      object-position: left center;
+    }
+
+    .national {
+      text-align: center;
+      font-weight: 700;
+      font-size: 12pt;
+      line-height: 1.35;
+    }
+
+    .national .sub {
+      margin-top: 1mm;
+      font-weight: 700;
+    }
+
+    .doc-title {
+      margin-top: 7mm;
+      text-align: center;
+    }
+
+    .doc-title h1 {
+      margin: 0;
+      font-size: 17pt;
+      font-weight: 700;
+    }
+
+    .doc-title .subtitle {
+      margin-top: 2mm;
+      font-size: 13pt;
+      font-weight: 700;
+    }
+
+    .doc-number {
+      margin-top: 4mm;
+      text-align: center;
+    }
+
+    .doc-meta {
+      margin-top: 5mm;
+    }
+
+    .doc-meta p {
+      margin: 2mm 0;
+    }
+
+    .section {
+      margin-top: 5mm;
+    }
+
+    .section h2 {
+      margin: 0 0 2.5mm;
+      font-size: 13pt;
+      font-weight: 700;
+    }
+
+    .line-field {
+      margin: 1.5mm 0;
+    }
+
+    .payment-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 2mm;
+      table-layout: fixed;
+    }
+
+    .payment-table th,
+    .payment-table td {
+      border: 1px solid #000;
+      padding: 2.5mm 2.5mm;
+      vertical-align: middle;
+    }
+
+    .payment-table th {
+      text-align: center;
+      font-weight: 700;
+    }
+
+    .payment-table th:first-child {
+      width: 68%;
+    }
+
+    .payment-table th:last-child {
+      width: 32%;
+    }
+
+    .payment-table td:last-child {
+      text-align: right;
+    }
+
+    .total-row td {
+      font-weight: 700;
+    }
+
+    .request-money {
+      margin-top: 4mm;
+      font-weight: 700;
+    }
+
+    .amount-words {
+      margin-top: 2mm;
+    }
+
+    .deadline {
+      margin-top: 2mm;
+    }
+
+    .deadline-line {
+      margin: 2mm 0;
+    }
+
+    .bank-info {
+      margin-top: 2mm;
+    }
+
+    .bank-row {
+      display: grid;
+      grid-template-columns: 42mm 1fr;
+      gap: 2mm;
+      margin: 1.5mm 0;
+    }
+
+    .attachments {
+      margin-top: 2mm;
+    }
+
+    .attachment {
+      margin: 1.5mm 0;
+    }
+
+    .closing {
+      margin-top: 6mm;
+    }
+
+    .closing p {
+      margin: 2mm 0;
+    }
+
+    .signature-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12mm;
+      table-layout: fixed;
+    }
+
+    .signature-table td {
+      width: 33.333%;
+      text-align: center;
+      vertical-align: top;
+      border: 0;
+      padding: 0 3mm;
+    }
+
+    .signature-company {
+      font-weight: 700;
+      min-height: 13mm;
+    }
+
+    .signature-space {
+      height: 24mm;
+    }
+
+    .signature-name {
+      font-weight: 700;
+    }
+
+    .muted-print {
+      color: #000;
+    }
+
+    .toolbar-note {
+      margin-top: 10px;
+      color: #71817b;
+      font-size: 11px;
+      line-height: 1.4;
+    }
+
+    @media (max-width: 1050px) {
+      .workspace {
+        grid-template-columns: 340px minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 850px) {
+      .topbar {
+        position: static;
+      }
+
+      .workspace {
+        grid-template-columns: 1fr;
+        padding: 12px;
+      }
+
+      .form-panel {
+        position: static;
+      }
+
+      .form-body {
+        max-height: none;
+      }
+
+      .preview-panel {
+        padding: 12px;
+      }
+    }
+
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 0;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: #fff;
+      }
+
+      .topbar,
+      .form-panel,
+      .preview-title,
+      .toolbar-note {
+        display: none !important;
+      }
+
+      .workspace {
+        display: block;
+        margin: 0;
+        padding: 0;
+      }
+
+      .panel,
+      .preview-panel {
+        display: block;
+        padding: 0;
+        margin: 0;
+        box-shadow: none;
+        overflow: visible;
+        border-radius: 0;
+      }
+
+      .paper-wrap {
+        display: block;
+        min-width: 0;
+      }
+
+      .paper {
+        width: 210mm;
+        min-height: 0;
+        height: auto;
+        margin: 0;
+        padding: 17mm 17mm 18mm;
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <header class="topbar">
+    <div>
+      <div class="topbar-title">GROVA DOCUMENT</div>
+      <div class="topbar-subtitle">Đề nghị thanh toán</div>
+    </div>
+
+    <div class="topbar-actions">
+      <button class="btn btn-light" type="button" onclick="window.print()">
+        In / Xuất PDF
+      </button>
+    </div>
+  </header>
+
+  <main class="workspace">
+
+    <!-- FORM -->
+    <section class="panel form-panel">
+
+      <div class="panel-header">
+        <h2>Thông tin đề nghị</h2>
+        <p>Nhập thông tin bên dưới, văn bản sẽ tự cập nhật.</p>
+      </div>
+
+      <div class="form-body">
+
+        <div class="section-title">Thông tin văn bản</div>
+
+        <div class="grid-2">
+
+          <div class="field">
+            <label>Số đề nghị</label>
+            <input id="documentNo" type="text">
+          </div>
+
+          <div class="field">
+            <label>Ngày đề nghị</label>
+            <input id="documentDate" type="date">
+          </div>
+
+        </div>
+
+        <div class="field">
+          <label>Kính gửi</label>
+          <input id="recipient" type="text"
+                 placeholder="Tên công ty / đơn vị">
+        </div>
+
+        <div class="field">
+          <label>Số hợp đồng nguyên tắc</label>
+          <input id="contractNo" type="text"
+                 value="01/2026/HĐNT">
+        </div>
+
+        <div class="field">
+          <label>Số phụ lục công trình</label>
+          <input id="appendixNo" type="text"
+                 placeholder="......../PLHĐ/20......">
+        </div>
+
+        <div class="field">
+          <label>Số biên bản nghiệm thu và bàn giao</label>
+          <input id="acceptanceNo" type="text"
+                 placeholder="......../BBNTBG/20......">
+        </div>
+
+
+        <div class="section-title">Thông tin công trình</div>
+
+        <div class="field">
+          <label>Tên công trình</label>
+          <input id="projectName" type="text">
+        </div>
+
+        <div class="field">
+          <label>Địa chỉ công trình</label>
+          <input id="projectAddress" type="text">
+        </div>
+
+
+        <div class="section-title">Giá trị thanh toán</div>
+
+        <div class="money-grid">
+
+          <div class="money-box">
+            <label>Giá trị theo phụ lục</label>
+            <input id="appendixValue"
+                   type="number"
+                   min="0"
+                   step="1000"
+                   value="0">
+          </div>
+
+          <div class="money-box">
+            <label>Giá trị phát sinh</label>
+            <input id="extraValue"
+                   type="number"
+                   min="0"
+                   step="1000"
+                   value="0">
+          </div>
+
+          <div class="money-box">
+            <label>Đã thanh toán</label>
+            <input id="paidValue"
+                   type="number"
+                   min="0"
+                   step="1000"
+                   value="0">
+          </div>
+
+          <div class="money-box">
+            <label>Đề nghị kỳ này</label>
+            <input id="requestValue"
+                   type="number"
+                   min="0"
+                   step="1000"
+                   value="0">
+          </div>
+
+        </div>
+
+        <div class="field" style="margin-top:10px;">
+          <label>Tổng giá trị thực hiện</label>
+          <input id="totalValue"
+                 class="readonly"
+                 type="text"
+                 readonly>
+        </div>
+
+        <div class="field">
+          <label>Số tiền đề nghị thanh toán</label>
+          <input id="requestValueDisplay"
+                 class="readonly"
+                 type="text"
+                 readonly>
+        </div>
+
+        <div class="field">
+          <label>Bằng chữ</label>
+          <input id="amountWords"
+                 type="text"
+                 placeholder="Nhập số tiền bằng chữ">
+        </div>
+
+
+        <div class="section-title">Thời hạn thanh toán</div>
+
+        <div class="check-list">
+
+          <label class="check-row">
+            <input id="deadline3" type="checkbox" checked>
+            <span>03 ngày</span>
+          </label>
+
+        </div>
+
+
+        <div class="section-title">Thông tin thanh toán</div>
+
+        <div class="field">
+          <label>Số tài khoản</label>
+          <input id="accountNo" type="text">
+        </div>
+
+        <div class="field">
+          <label>Ngân hàng</label>
+          <input id="bankName" type="text">
+        </div>
+
+        <div class="field">
+          <label>Nội dung chuyển khoản</label>
+          <input id="transferContent" type="text">
+        </div>
+
+
+        <div class="section-title">Hồ sơ kèm theo</div>
+
+        <div class="check-list">
+
+          <label class="check-row">
+            <input id="attachAppendix" type="checkbox" checked>
+            <span>Phụ lục công trình</span>
+          </label>
+
+          <label class="check-row">
+            <input id="attachAcceptance" type="checkbox" checked>
+            <span>Biên bản nghiệm thu và bàn giao</span>
+          </label>
+
+          <label class="check-row">
+            <input id="attachExtra" type="checkbox" checked>
+            <span>Biên bản phát sinh (nếu có)</span>
+          </label>
+
+          <label class="check-row">
+            <input id="attachInvoice" type="checkbox" checked>
+            <span>Hóa đơn GTGT (nếu có)</span>
+          </label>
+
+          <label class="check-row">
+            <input id="attachOther" type="checkbox" checked>
+            <span>Hồ sơ khác (nếu có)</span>
+          </label>
+
+        </div>
+
+        <div class="toolbar-note">
+          Bản nháp được lưu tự động trên thiết bị này.
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- PREVIEW -->
+    <section class="panel preview-panel">
+
+      <h2 class="preview-title">Bản xem trước</h2>
+
+      <div class="paper-wrap">
+
+        <article class="paper" id="paper">
+
+          <div class="doc-header">
+
+            <div class="brand">
+              <img src="../data/grova_logo.png"
+                   alt="GROVA HOLDINGS">
+            </div>
+
+            <div class="national">
+              <div>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div>
+              <div class="sub">Độc lập – Tự do – Hạnh phúc</div>
+            </div>
+
+          </div>
+
+
+          <div class="doc-title">
+
+            <h1>ĐỀ NGHỊ THANH TOÁN</h1>
+
+            <div class="doc-number">
+              Số:
+              <span id="previewDocumentNo"></span>
+            </div>
+
+            <div class="subtitle">
+              V/v: Thanh toán giá trị thi công lắp khung thép thang máy
+            </div>
+
+          </div>
+
+
+          <div class="doc-meta">
+
+            <p id="previewDate"></p>
+
+            <p>
+              Kính gửi:
+              <span id="previewRecipient">.............................................................................</span>
+            </p>
+
+            <p>
+              Căn cứ Hợp đồng nguyên tắc số:
+              <span id="previewContractNo">01/2026/HĐNT</span>
+            </p>
+
+            <p>
+              Căn cứ Phụ lục công trình số:
+              <span id="previewAppendixNo">......../PLHĐ/20......</span>
+            </p>
+
+            <p>
+              Căn cứ Biên bản nghiệm thu và bàn giao số:
+              <span id="previewAcceptanceNo">......../BBNTBG/20......</span>
+            </p>
+
+            <p>
+              Công ty Cổ phần Grova Holdings kính đề nghị Quý Công ty
+              thực hiện thanh toán giá trị công việc đã hoàn thành như sau:
+            </p>
+
+          </div>
+
+
+          <div class="section">
+
+            <h2>I. THÔNG TIN CÔNG TRÌNH</h2>
+
+            <div class="line-field">
+              Tên công trình:
+              <span id="previewProjectName">....................................................................</span>
+            </div>
+
+            <div class="line-field">
+              Địa chỉ công trình:
+              <span id="previewProjectAddress">....................................................................</span>
+            </div>
+
+          </div>
+
+
+          <div class="section">
+
+            <h2>II. GIÁ TRỊ THANH TOÁN</h2>
+
+            <table class="payment-table">
+
+              <thead>
+                <tr>
+                  <th>Nội dung</th>
+                  <th>Giá trị (VNĐ)</th>
+                </tr>
+              </thead>
+
+              <tbody>
+
+                <tr>
+                  <td>Giá trị theo phụ lục công trình</td>
+                  <td id="previewAppendixValue">0</td>
+                </tr>
+
+                <tr>
+                  <td>Giá trị phát sinh được xác nhận (nếu có)</td>
+                  <td id="previewExtraValue">0</td>
+                </tr>
+
+                <tr class="total-row">
+                  <td>Tổng giá trị thực hiện</td>
+                  <td id="previewTotalValue">0</td>
+                </tr>
+
+                <tr>
+                  <td>Giá trị đã thanh toán</td>
+                  <td id="previewPaidValue">0</td>
+                </tr>
+
+                <tr>
+                  <td>Giá trị đề nghị thanh toán kỳ này</td>
+                  <td id="previewRequestValue">0</td>
+                </tr>
+
+              </tbody>
+
+            </table>
+
+
+            <div class="request-money">
+              SỐ TIỀN ĐỀ NGHỊ THANH TOÁN:
+              <span id="previewRequestValue2">0</span> VNĐ
+            </div>
+
+            <div class="amount-words">
+              (Bằng chữ:
+              <span id="previewAmountWords">.....................................................................................</span>)
+            </div>
+
+          </div>
+
+
+          <div class="section">
+
+            <h2>III. THỜI HẠN THANH TOÁN</h2>
+
+            <div class="deadline">
+              Kính đề nghị Quý Công ty thực hiện thanh toán trong vòng:
+            </div>
+
+            <div class="deadline-line">
+              <span id="previewDeadline">
+                ☒ 03 ngày
+              </span>
+            </div>
+
+            <div>
+              Kể từ ngày nhận được Đề nghị thanh toán này.
+            </div>
+
+          </div>
+
+
+          <div class="section">
+
+            <h2>IV. THÔNG TIN THANH TOÁN</h2>
+
+            <div class="bank-info">
+
+              <div class="bank-row">
+                <strong>Tên đơn vị thụ hưởng:</strong>
+                <span>CÔNG TY CỔ PHẦN GROVA HOLDINGS</span>
+              </div>
+
+              <div class="bank-row">
+                <strong>Số tài khoản:</strong>
+                <span id="previewAccountNo">....................................................</span>
+              </div>
+
+              <div class="bank-row">
+                <strong>Ngân hàng:</strong>
+                <span id="previewBankName">....................................................</span>
+              </div>
+
+              <div class="bank-row">
+                <strong>Nội dung chuyển khoản:</strong>
+                <span id="previewTransferContent">
+                  Thanh toán công trình ....................................
+                </span>
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <div class="section">
+
+            <h2>V. HỒ SƠ KÈM THEO</h2>
+
+            <div class="attachments">
+
+              <div class="attachment" id="previewAttachAppendix">
+                ☑ Phụ lục công trình
+              </div>
+
+              <div class="attachment" id="previewAttachAcceptance">
+                ☑ Biên bản nghiệm thu và bàn giao
+              </div>
+
+              <div class="attachment" id="previewAttachExtra">
+                ☑ Biên bản phát sinh (nếu có)
+              </div>
+
+              <div class="attachment" id="previewAttachInvoice">
+                ☑ Hóa đơn GTGT (nếu có)
+              </div>
+
+              <div class="attachment" id="previewAttachOther">
+                ☑ Hồ sơ khác (nếu có)
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <div class="closing">
+
+            <p>
+              Kính mong Quý Công ty quan tâm và thực hiện thanh toán
+              theo đúng thời hạn đã thỏa thuận.
+            </p>
+
+            <p>Xin trân trọng cảm ơn!</p>
+
+          </div>
+
+
+          <table class="signature-table">
+
+            <tr>
+
+              <td>
+                <div class="signature-company">
+                  CÔNG TY CỔ PHẦN<br>
+                  GROVA HOLDINGS
+                </div>
+
+                <div>Người lập</div>
+
+                <div class="signature-space"></div>
+
+                <div>
+                  (Ký và ghi rõ họ tên)
+                </div>
+              </td>
+
+
+              <td>
+
+                <div class="signature-company">
+                  &nbsp;
+                </div>
+
+                <div>Kế toán</div>
+
+                <div class="signature-space"></div>
+
+                <div>
+                  (Ký và ghi rõ họ tên)
+                </div>
+
+              </td>
+
+
+              <td>
+
+                <div class="signature-company">
+                  ĐẠI DIỆN THEO PHÁP<br>
+                  LUẬT
+                </div>
+
+                <div class="signature-space"></div>
+
+                <div>
+                  (Ký, đóng dấu, ghi rõ họ tên)
+                </div>
+
+              </td>
+
+            </tr>
+
+          </table>
+
+        </article>
+
+      </div>
+
+    </section>
+
+  </main>
+
+</div>
+
+
+<script>
+  const STORAGE_KEY = "grova_document_template_06";
+
+  const fields = [
+    "documentNo",
+    "documentDate",
+    "recipient",
+    "contractNo",
+    "appendixNo",
+    "acceptanceNo",
+    "projectName",
+    "projectAddress",
+    "appendixValue",
+    "extraValue",
+    "paidValue",
+    "requestValue",
+    "amountWords",
+    "deadline3",
+    "accountNo",
+    "bankName",
+    "transferContent",
+    "attachAppendix",
+    "attachAcceptance",
+    "attachExtra",
+    "attachInvoice",
+    "attachOther"
+  ];
+
+
+  function getTodayISO() {
+    const d = new Date();
+
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+  }
+
+
+  function formatDateVN(value) {
+
+    if (!value) {
+      return "Hải Phòng, ngày ...... tháng ...... năm 20......";
+    }
+
+    const d = new Date(value + "T00:00:00");
+
+    if (Number.isNaN(d.getTime())) {
+      return "Hải Phòng, ngày ...... tháng ...... năm 20......";
+    }
+
+    return `Hải Phòng, ngày ${String(d.getDate()).padStart(2, "0")} tháng ${String(d.getMonth() + 1).padStart(2, "0")} năm ${d.getFullYear()}`;
+  }
+
+
+  function escapeHTML(value) {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+
+  function formatMoney(value) {
+    const number = Number(value || 0);
+
+    return new Intl.NumberFormat("vi-VN", {
+      maximumFractionDigits: 0
+    }).format(number);
+  }
+
+
+  function getYear() {
+    return new Date().getFullYear();
+  }
+
+
+  function getNextDocumentNumber() {
+
+    const year = getYear();
+    const counterKey = `grova_dntt_counter_${year}`;
+
+    let counter = Number(localStorage.getItem(counterKey) || 0);
+
+    counter += 1;
+
+    localStorage.setItem(counterKey, String(counter));
+
+    return `${String(counter).padStart(2, "0")}/ĐNTT/${year}`;
+  }
+
+
+  function setText(id, value, fallback = "") {
+    const el = document.getElementById(id);
+
+    if (!el) return;
+
+    el.textContent = value || fallback;
+  }
+
+
+  function updateMoney() {
+
+    const appendix = Number(
+      document.getElementById("appendixValue").value || 0
+    );
+
+    const extra = Number(
+      document.getElementById("extraValue").value || 0
+    );
+
+    const paid = Number(
+      document.getElementById("paidValue").value || 0
+    );
+
+    const request = Number(
+      document.getElementById("requestValue").value || 0
+    );
+
+    const total = appendix + extra;
+
+    document.getElementById("totalValue").value =
+      formatMoney(total);
+
+    document.getElementById("requestValueDisplay").value =
+      formatMoney(request);
+
+    setText("previewAppendixValue", formatMoney(appendix));
+    setText("previewExtraValue", formatMoney(extra));
+    setText("previewTotalValue", formatMoney(total));
+    setText("previewPaidValue", formatMoney(paid));
+    setText("previewRequestValue", formatMoney(request));
+    setText("previewRequestValue2", formatMoney(request));
+  }
+
+
+  function updatePreview() {
+
+    setText(
+      "previewDocumentNo",
+      document.getElementById("documentNo").value,
+      "......../ĐNTT/20......"
+    );
+
+    setText(
+      "previewDate",
+      formatDateVN(
+        document.getElementById("documentDate").value
+      )
+    );
+
+    setText(
+      "previewRecipient",
+      document.getElementById("recipient").value,
+      "............................................................................."
+    );
+
+    setText(
+      "previewContractNo",
+      document.getElementById("contractNo").value,
+      "01/2026/HĐNT"
+    );
+
+    setText(
+      "previewAppendixNo",
+      document.getElementById("appendixNo").value,
+      "......../PLHĐ/20......"
+    );
+
+    setText(
+      "previewAcceptanceNo",
+      document.getElementById("acceptanceNo").value,
+      "......../BBNTBG/20......"
+    );
+
+    setText(
+      "previewProjectName",
+      document.getElementById("projectName").value,
+      "...................................................................."
+    );
+
+    setText(
+      "previewProjectAddress",
+      document.getElementById("projectAddress").value,
+      "...................................................................."
+    );
+
+    setText(
+      "previewAmountWords",
+      document.getElementById("amountWords").value,
+      "....................................................................................."
+    );
+
+    setText(
+      "previewAccountNo",
+      document.getElementById("accountNo").value,
+      "...................................................."
+    );
+
+    setText(
+      "previewBankName",
+      document.getElementById("bankName").value,
+      "...................................................."
+    );
+
+    const projectName =
+      document.getElementById("projectName").value.trim();
+
+    setText(
+      "previewTransferContent",
+      document.getElementById("transferContent").value,
+      projectName
+        ? `Thanh toán công trình ${projectName}`
+        : "Thanh toán công trình ...................................."
+    );
+
+
+    const deadlineChecked =
+      document.getElementById("deadline3").checked;
+
+    setText(
+      "previewDeadline",
+      deadlineChecked ? "☒ 03 ngày" : "☐ 03 ngày"
+    );
+
+
+    updateAttachment(
+      "previewAttachAppendix",
+      "☑ Phụ lục công trình",
+      "Phụ lục công trình",
+      document.getElementById("attachAppendix").checked
+    );
+
+    updateAttachment(
+      "previewAttachAcceptance",
+      "☑ Biên bản nghiệm thu và bàn giao",
+      "Biên bản nghiệm thu và bàn giao",
+      document.getElementById("attachAcceptance").checked
+    );
+
+    updateAttachment(
+      "previewAttachExtra",
+      "☑ Biên bản phát sinh (nếu có)",
+      "Biên bản phát sinh (nếu có)",
+      document.getElementById("attachExtra").checked
+    );
+
+    updateAttachment(
+      "previewAttachInvoice",
+      "☑ Hóa đơn GTGT (nếu có)",
+      "Hóa đơn GTGT (nếu có)",
+      document.getElementById("attachInvoice").checked
+    );
+
+    updateAttachment(
+      "previewAttachOther",
+      "☑ Hồ sơ khác (nếu có)",
+      "Hồ sơ khác (nếu có)",
+      document.getElementById("attachOther").checked
+    );
+
+    updateMoney();
+
+    saveDraft();
+  }
+
+
+  function updateAttachment(id, checkedText, uncheckedText, checked) {
+
+    const el = document.getElementById(id);
+
+    if (!el) return;
+
+    el.textContent =
+      checked
+        ? checkedText
+        : checkedText.replace("☑", "☐");
+  }
+
+
+  function collectData() {
+
+    const data = {};
+
+    fields.forEach(id => {
+
+      const el = document.getElementById(id);
+
+      if (!el) return;
+
+      if (el.type === "checkbox") {
+        data[id] = el.checked;
+      } else {
+        data[id] = el.value;
+      }
+
+    });
+
+    return data;
+  }
+
+
+  function saveDraft() {
+
+    try {
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(collectData())
+      );
+    } catch (error) {
+      console.warn("Không thể lưu bản nháp:", error);
+    }
+  }
+
+
+  function loadDraft() {
+
+    try {
+
+      const raw = localStorage.getItem(STORAGE_KEY);
+
+      if (!raw) return;
+
+      const data = JSON.parse(raw);
+
+      fields.forEach(id => {
+
+        const el = document.getElementById(id);
+
+        if (!el || data[id] === undefined) {
+          return;
+        }
+
+        if (el.type === "checkbox") {
+          el.checked = Boolean(data[id]);
+        } else {
+          el.value = data[id];
+        }
+
+      });
+
+    } catch (error) {
+      console.warn("Không thể đọc bản nháp:", error);
+    }
+  }
+
+
+  function initDefaults() {
+
+    const documentNo =
+      document.getElementById("documentNo");
+
+    if (!documentNo.value.trim()) {
+      documentNo.value = getNextDocumentNumber();
+    }
+
+    const date =
+      document.getElementById("documentDate");
+
+    if (!date.value) {
+      date.value = getTodayISO();
+    }
+
+    const transfer =
+      document.getElementById("transferContent");
+
+    if (!transfer.value) {
+      transfer.value = "";
+    }
+  }
+
+
+  function bindEvents() {
+
+    fields.forEach(id => {
+
+      const el = document.getElementById(id);
+
+      if (!el) return;
+
+      el.addEventListener("input", updatePreview);
+      el.addEventListener("change", updatePreview);
+
+    });
+
+  }
+
+
+  loadDraft();
+  initDefaults();
+  bindEvents();
+  updatePreview();
+</script>
+
+</body>
+</html>
