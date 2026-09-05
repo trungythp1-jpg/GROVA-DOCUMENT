@@ -1,897 +1,1006 @@
-/*
-============================================================
-GROVA DOCUMENT
-APP.JS
-============================================================
-*/
-
 (function () {
 
-    "use strict";
-
-    console.log("GROVA DOCUMENT - APP START");
+  "use strict";
 
 
-    /* ======================================================
-       DATA
-    ====================================================== */
+  /* ==========================================
+     GROVA DOCUMENT APP
+     ========================================== */
 
-    var DATA = window.GROVA_DATA;
 
-    if (!DATA) {
+  var DATA = window.GROVA_DATA || {};
 
-        console.error(
-            "GROVA DOCUMENT: Không tìm thấy window.GROVA_DATA"
-        );
+  var templates = Array.isArray(DATA.templates)
+    ? DATA.templates
+    : [];
 
-        return;
+
+  /* ==========================================
+     DOM
+     ========================================== */
+
+  function $(selector) {
+    return document.querySelector(selector);
+  }
+
+
+  function $$(selector) {
+    return Array.prototype.slice.call(
+      document.querySelectorAll(selector)
+    );
+  }
+
+
+  /* ==========================================
+     PAGE CONFIG
+     ========================================== */
+
+  var pageConfig = {
+
+    dashboard: {
+      title: "Tổng quan",
+      subtitle: "Hệ thống quản lý hồ sơ và văn bản"
+    },
+
+    documents: {
+      title: "Văn bản",
+      subtitle: "Danh mục mẫu văn bản GROVA"
+    },
+
+    projects: {
+      title: "Công trình",
+      subtitle: "Quản lý dữ liệu công trình"
+    },
+
+    customers: {
+      title: "Khách hàng",
+      subtitle: "Quản lý thông tin khách hàng"
+    },
+
+    employees: {
+      title: "Nhân sự",
+      subtitle: "Quản lý hồ sơ nhân sự"
+    },
+
+    history: {
+      title: "Lịch sử",
+      subtitle: "Theo dõi hoạt động hồ sơ"
+    },
+
+    reports: {
+      title: "Báo cáo",
+      subtitle: "Tổng hợp dữ liệu hệ thống"
+    },
+
+    settings: {
+      title: "Cài đặt",
+      subtitle: "Cấu hình GROVA DOCUMENT"
+    },
+
+    admin: {
+      title: "Quản trị hệ thống",
+      subtitle: "Quản lý hệ thống GROVA DOCUMENT"
     }
 
-
-    if (!Array.isArray(DATA.templates)) {
-
-        console.error(
-            "GROVA DOCUMENT: DATA.templates không phải Array"
-        );
-
-        return;
-    }
+  };
 
 
-    console.log(
-        "GROVA DOCUMENT: Số mẫu:",
-        DATA.templates.length
+  /* ==========================================
+     ENABLED TEMPLATES
+     ========================================== */
+
+  function getTemplates() {
+
+    return templates.filter(function (item) {
+
+      return item &&
+             item.enabled !== false &&
+             item.file;
+
+    });
+
+  }
+
+
+  /* ==========================================
+     CARD
+     ========================================== */
+
+  function createCard(template) {
+
+    var card = document.createElement("article");
+
+    card.className = "document-card";
+
+    card.setAttribute(
+      "data-template-id",
+      template.id
+    );
+
+    card.setAttribute(
+      "data-file",
+      template.file
     );
 
 
-    /* ======================================================
-       HELPERS
-    ====================================================== */
+    card.innerHTML =
 
-    function $(id) {
-        return document.getElementById(id);
+      '<div class="document-icon">' +
+        escapeHtml(template.icon || "📄") +
+      '</div>' +
+
+      '<div class="document-content">' +
+
+        '<div class="document-code">' +
+          escapeHtml(template.code || "") +
+        '</div>' +
+
+        '<h3>' +
+          escapeHtml(template.name || "") +
+        '</h3>' +
+
+        '<p>' +
+          escapeHtml(template.description || "") +
+        '</p>' +
+
+        '<span class="document-category">' +
+          escapeHtml(template.category || "Văn bản") +
+        '</span>' +
+
+      '</div>' +
+
+      '<div class="document-arrow">→</div>';
+
+
+    card.addEventListener(
+      "click",
+      function () {
+
+        openTemplate(template);
+
+      }
+    );
+
+
+    return card;
+  }
+
+
+  /* ==========================================
+     ESCAPE HTML
+     ========================================== */
+
+  function escapeHtml(value) {
+
+    var text = String(value == null ? "" : value);
+
+    return text
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+
+  }
+
+
+  /* ==========================================
+     RENDER DOCUMENTS PAGE
+     ========================================== */
+
+  function renderDocumentsPage() {
+
+    var grid = $("#documentsPageGrid");
+
+    if (!grid) {
+      return;
     }
 
 
-    function escapeHTML(value) {
+    grid.innerHTML = "";
 
-        return String(
-            value == null ? "" : value
-        )
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
 
+    getTemplates().forEach(function (template) {
+
+      grid.appendChild(
+        createCard(template)
+      );
+
+    });
+
+  }
+
+
+  /* ==========================================
+     SYNC DASHBOARD
+     ========================================== */
+
+  function syncDashboardCards() {
+
+    var grid = $("#documentGrid");
+
+    if (!grid) {
+      return;
     }
 
 
-    function getTemplates() {
+    /*
+     * Dashboard đã có HTML fallback.
+     * Không xoá nếu JS/data không có.
+     *
+     * Nếu data có đủ 9 mẫu thì đồng bộ lại.
+     */
 
-        return DATA.templates.filter(
-            function (item) {
+    if (getTemplates().length === 0) {
+      return;
+    }
 
-                return (
-                    item &&
-                    item.enabled !== false
-                );
+
+    grid.innerHTML = "";
+
+
+    getTemplates().forEach(function (template) {
+
+      grid.appendChild(
+        createCard(template)
+      );
+
+    });
+
+  }
+
+
+  /* ==========================================
+     MODAL
+     ========================================== */
+
+  var selectedTemplate = null;
+
+
+  function openModal() {
+
+    var modal = $("#documentModal");
+
+    if (!modal) {
+      return;
+    }
+
+
+    renderTemplateSelector();
+
+
+    modal.classList.remove("hidden");
+
+    document.body.classList.add("modal-open");
+
+
+    selectedTemplate = null;
+
+    updateModalButton();
+
+  }
+
+
+  function closeModal() {
+
+    var modal = $("#documentModal");
+
+    if (!modal) {
+      return;
+    }
+
+
+    modal.classList.add("hidden");
+
+    document.body.classList.remove("modal-open");
+
+    selectedTemplate = null;
+
+  }
+
+
+  function renderTemplateSelector() {
+
+    var box = $("#templateSelector");
+
+    if (!box) {
+      return;
+    }
+
+
+    box.innerHTML = "";
+
+
+    getTemplates().forEach(function (template) {
+
+      var item = document.createElement("button");
+
+      item.type = "button";
+
+      item.className = "template-option";
+
+
+      item.innerHTML =
+
+        '<span class="template-option-icon">' +
+          escapeHtml(template.icon || "📄") +
+        '</span>' +
+
+        '<span class="template-option-content">' +
+
+          '<strong>' +
+            escapeHtml(template.name || "") +
+          '</strong>' +
+
+          '<small>' +
+            escapeHtml(template.description || "") +
+          '</small>' +
+
+        '</span>' +
+
+        '<span class="template-option-check">✓</span>';
+
+
+      item.addEventListener(
+        "click",
+        function () {
+
+          selectedTemplate = template;
+
+
+          $$(".template-option").forEach(
+            function (element) {
+
+              element.classList.remove("selected");
 
             }
+          );
+
+
+          item.classList.add("selected");
+
+          updateModalButton();
+
+        }
+      );
+
+
+      box.appendChild(item);
+
+    });
+
+  }
+
+
+  function updateModalButton() {
+
+    var button = $("#openTemplate");
+
+    if (!button) {
+      return;
+    }
+
+
+    button.disabled = !selectedTemplate;
+
+  }
+
+
+  function openSelectedTemplate() {
+
+    if (!selectedTemplate) {
+      return;
+    }
+
+
+    openTemplate(selectedTemplate);
+
+  }
+
+
+  /* ==========================================
+     OPEN TEMPLATE
+     ========================================== */
+
+  function openTemplate(template) {
+
+    if (!template || !template.file) {
+      return;
+    }
+
+
+    saveRecentDocument(template);
+
+
+    window.location.href = template.file;
+
+  }
+
+
+  /* ==========================================
+     RECENT DOCUMENTS
+     ========================================== */
+
+  function getRecentDocuments() {
+
+    try {
+
+      var raw =
+        localStorage.getItem(
+          "GROVA_DOCUMENT_RECENT"
+        );
+
+
+      if (!raw) {
+        return [];
+      }
+
+
+      var parsed = JSON.parse(raw);
+
+
+      return Array.isArray(parsed)
+        ? parsed
+        : [];
+
+    } catch (error) {
+
+      return [];
+
+    }
+
+  }
+
+
+  function saveRecentDocument(template) {
+
+    if (!template) {
+      return;
+    }
+
+
+    var list = getRecentDocuments();
+
+
+    list.unshift({
+
+      id: template.id,
+
+      code: template.code,
+
+      name: template.name,
+
+      file: template.file,
+
+      createdAt: new Date().toISOString()
+
+    });
+
+
+    list = list.slice(0, 20);
+
+
+    try {
+
+      localStorage.setItem(
+        "GROVA_DOCUMENT_RECENT",
+        JSON.stringify(list)
+      );
+
+    } catch (error) {
+
+      console.warn(
+        "Không thể lưu lịch sử.",
+        error
+      );
+
+    }
+
+  }
+
+
+  function renderRecentDocuments() {
+
+    var container = $("#recentDocuments");
+
+    if (!container) {
+      return;
+    }
+
+
+    var list = getRecentDocuments();
+
+
+    if (!list.length) {
+
+      container.innerHTML =
+
+        '<div class="empty-state">' +
+
+          '<div class="empty-icon">◷</div>' +
+
+          '<h3>Chưa có lịch sử</h3>' +
+
+          '<p>' +
+            'Các văn bản được tạo sẽ xuất hiện tại đây.' +
+          '</p>' +
+
+        '</div>';
+
+      return;
+
+    }
+
+
+    container.innerHTML = "";
+
+
+    list.forEach(function (item) {
+
+      var row = document.createElement("button");
+
+      row.type = "button";
+
+      row.className = "recent-row";
+
+
+      row.innerHTML =
+
+        '<span class="recent-row-icon">📄</span>' +
+
+        '<span class="recent-row-content">' +
+
+          '<strong>' +
+            escapeHtml(item.name || "") +
+          '</strong>' +
+
+          '<small>' +
+            escapeHtml(item.code || "") +
+          '</small>' +
+
+        '</span>' +
+
+        '<span class="recent-row-arrow">→</span>';
+
+
+      row.addEventListener(
+        "click",
+        function () {
+
+          window.location.href = item.file;
+
+        }
+      );
+
+
+      container.appendChild(row);
+
+    });
+
+  }
+
+
+  /* ==========================================
+     STATS
+     ========================================== */
+
+  function updateStats() {
+
+    var documents =
+      $("#statDocuments");
+
+    if (documents) {
+
+      documents.textContent =
+        String(getRecentDocuments().length);
+
+    }
+
+
+    var projects =
+      $("#statProjects");
+
+    if (projects) {
+
+      projects.textContent =
+        String(
+          DATA.stats &&
+          DATA.stats.projects
+            ? DATA.stats.projects
+            : 0
         );
 
     }
 
 
-    /* ======================================================
-       DOCUMENT CARD
-    ====================================================== */
+    var customers =
+      $("#statCustomers");
 
-    function documentCard(template) {
+    if (customers) {
 
-        return `
-            <article
-                class="document-card"
-                data-template-id="${escapeHTML(template.id)}"
-            >
-
-                <div class="document-card-top">
-
-                    <div class="document-icon">
-                        ${escapeHTML(template.icon || "📄")}
-                    </div>
-
-                    <span class="document-category">
-                        ${escapeHTML(template.category || "Văn bản")}
-                    </span>
-
-                </div>
-
-
-                <div class="document-card-body">
-
-                    <h3 class="document-name">
-                        ${escapeHTML(template.name)}
-                    </h3>
-
-                    <p class="document-description">
-                        ${escapeHTML(template.description || "")}
-                    </p>
-
-                </div>
-
-
-                <div class="document-card-footer">
-
-                    <span class="document-code">
-                        ${escapeHTML(template.code || template.id)}
-                    </span>
-
-                    <span class="document-open">
-                        Mở mẫu →
-                    </span>
-
-                </div>
-
-            </article>
-        `;
-
-    }
-
-
-    /* ======================================================
-       RENDER DOCUMENTS
-    ====================================================== */
-
-    function renderDocuments() {
-
-        var templates =
-            getTemplates();
-
-
-        var grid =
-            $("documentGrid");
-
-
-        var pageGrid =
-            $("documentsPageGrid");
-
-
-        var html =
-            templates
-                .map(documentCard)
-                .join("");
-
-
-        if (grid) {
-
-            grid.innerHTML = html;
-
-        }
-
-
-        if (pageGrid) {
-
-            pageGrid.innerHTML = html;
-
-        }
-
-
-        console.log(
-            "GROVA DOCUMENT: Đã render",
-            templates.length,
-            "mẫu"
+      customers.textContent =
+        String(
+          DATA.stats &&
+          DATA.stats.customers
+            ? DATA.stats.customers
+            : 0
         );
 
     }
 
 
-    /* ======================================================
-       OPEN TEMPLATE
-    ====================================================== */
+    var employees =
+      $("#statEmployees");
 
-    function openTemplateById(id) {
+    if (employees) {
 
-        var templates =
-            getTemplates();
-
-
-        var template =
-            templates.find(
-                function (item) {
-
-                    return String(item.id) ===
-                           String(id);
-
-                }
-            );
-
-
-        if (!template) {
-
-            console.error(
-                "Không tìm thấy template:",
-                id
-            );
-
-            return;
-        }
-
-
-        if (!template.file) {
-
-            alert(
-                "Mẫu văn bản chưa có đường dẫn."
-            );
-
-            return;
-        }
-
-
-        console.log(
-            "GROVA DOCUMENT: Mở",
-            template.file
-        );
-
-
-        window.location.href =
-            template.file;
-
-    }
-
-
-    /* ======================================================
-       CARD CLICK
-    ====================================================== */
-
-    function bindDocumentCards() {
-
-        var cards =
-            document.querySelectorAll(
-                ".document-card"
-            );
-
-
-        cards.forEach(
-            function (card) {
-
-                card.addEventListener(
-                    "click",
-                    function () {
-
-                        var id =
-                            card.dataset.templateId;
-
-
-                        openTemplateById(
-                            id
-                        );
-
-                    }
-                );
-
-            }
+      employees.textContent =
+        String(
+          DATA.stats &&
+          DATA.stats.employees
+            ? DATA.stats.employees
+            : 0
         );
 
     }
 
-
-    /* ======================================================
-       MODAL
-    ====================================================== */
-
-    var selectedTemplateId = null;
+  }
 
 
-    function openModal() {
+  /* ==========================================
+     NAVIGATION
+     ========================================== */
 
-        var modal =
-            $("documentModal");
+  function showPage(pageName) {
 
-
-        var selector =
-            $("templateSelector");
-
-
-        if (!modal || !selector) {
-            return;
-        }
+    if (!pageConfig[pageName]) {
+      pageName = "dashboard";
+    }
 
 
-        var templates =
-            getTemplates();
+    $$(".page").forEach(
+      function (page) {
+
+        page.classList.remove("active");
+
+      }
+    );
 
 
-        if (!templates.length) {
-
-            selector.innerHTML = `
-                <div class="empty-state">
-
-                    <h3>
-                        Chưa có mẫu văn bản
-                    </h3>
-
-                </div>
-            `;
-
-            return;
-        }
+    var target =
+      $("#page-" + pageName);
 
 
-        selectedTemplateId =
-            templates[0].id;
+    if (target) {
 
-
-        selector.innerHTML =
-            templates
-                .map(
-                    function (template) {
-
-                        return `
-                            <button
-                                type="button"
-                                class="template-option"
-                                data-template-id="${escapeHTML(template.id)}"
-                            >
-
-                                <span class="template-option-icon">
-                                    ${escapeHTML(template.icon || "📄")}
-                                </span>
-
-                                <span class="template-option-content">
-
-                                    <strong>
-                                        ${escapeHTML(template.name)}
-                                    </strong>
-
-                                    <small>
-                                        ${escapeHTML(template.description || "")}
-                                    </small>
-
-                                </span>
-
-                                <span class="template-option-category">
-                                    ${escapeHTML(template.category || "")}
-                                </span>
-
-                            </button>
-                        `;
-
-                    }
-                )
-                .join("");
-
-
-        var options =
-            selector.querySelectorAll(
-                ".template-option"
-            );
-
-
-        options.forEach(
-            function (option) {
-
-                option.addEventListener(
-                    "click",
-                    function () {
-
-                        selectedTemplateId =
-                            option.dataset.templateId;
-
-
-                        options.forEach(
-                            function (item) {
-
-                                item.classList.remove(
-                                    "selected"
-                                );
-
-                            }
-                        );
-
-
-                        option.classList.add(
-                            "selected"
-                        );
-
-                    }
-                );
-
-            }
-        );
-
-
-        if (options.length) {
-
-            options[0].classList.add(
-                "selected"
-            );
-
-        }
-
-
-        modal.classList.remove(
-            "hidden"
-        );
-
-
-        modal.setAttribute(
-            "aria-hidden",
-            "false"
-        );
+      target.classList.add("active");
 
     }
 
 
-    function closeModal() {
+    $$(".menu-item").forEach(
+      function (item) {
 
-        var modal =
-            $("documentModal");
-
-
-        if (!modal) {
-            return;
-        }
-
-
-        modal.classList.add(
-            "hidden"
+        item.classList.toggle(
+          "active",
+          item.getAttribute("data-page") === pageName
         );
 
+      }
+    );
 
-        modal.setAttribute(
-            "aria-hidden",
-            "true"
+
+    var config =
+      pageConfig[pageName];
+
+
+    var title =
+      $("#pageTitle");
+
+
+    var subtitle =
+      $("#pageSubtitle");
+
+
+    if (title) {
+      title.textContent =
+        config.title;
+    }
+
+
+    if (subtitle) {
+      subtitle.textContent =
+        config.subtitle;
+    }
+
+
+    closeSidebarMobile();
+
+  }
+
+
+  function bindNavigation() {
+
+    $$(".menu-item").forEach(
+      function (item) {
+
+        item.addEventListener(
+          "click",
+          function () {
+
+            showPage(
+              item.getAttribute("data-page")
+            );
+
+          }
         );
+
+      }
+    );
+
+
+    $$("[data-page-target]").forEach(
+      function (button) {
+
+        button.addEventListener(
+          "click",
+          function () {
+
+            showPage(
+              button.getAttribute(
+                "data-page-target"
+              )
+            );
+
+          }
+        );
+
+      }
+    );
+
+  }
+
+
+  /* ==========================================
+     SIDEBAR
+     ========================================== */
+
+  function openSidebarMobile() {
+
+    var sidebar =
+      $("#sidebar");
+
+    if (!sidebar) {
+      return;
+    }
+
+
+    sidebar.classList.add("open");
+
+    document.body.classList.add("sidebar-open");
+
+  }
+
+
+  function closeSidebarMobile() {
+
+    var sidebar =
+      $("#sidebar");
+
+    if (!sidebar) {
+      return;
+    }
+
+
+    sidebar.classList.remove("open");
+
+    document.body.classList.remove("sidebar-open");
+
+  }
+
+
+  function bindSidebar() {
+
+    var open =
+      $("#openSidebar");
+
+
+    var close =
+      $("#closeSidebar");
+
+
+    if (open) {
+
+      open.addEventListener(
+        "click",
+        openSidebarMobile
+      );
 
     }
 
 
-    function openSelectedTemplate() {
+    if (close) {
 
-        if (!selectedTemplateId) {
-            return;
+      close.addEventListener(
+        "click",
+        closeSidebarMobile
+      );
+
+    }
+
+  }
+
+
+  /* ==========================================
+     MODAL EVENTS
+     ========================================== */
+
+  function bindModal() {
+
+    $$("[data-action='new-document']")
+      .forEach(
+        function (button) {
+
+          button.addEventListener(
+            "click",
+            openModal
+          );
+
         }
+      );
 
 
-        openTemplateById(
-            selectedTemplateId
-        );
+    var close =
+      $("#closeModal");
+
+
+    if (close) {
+
+      close.addEventListener(
+        "click",
+        closeModal
+      );
 
     }
 
 
-    /* ======================================================
-       NAVIGATION
-    ====================================================== */
-
-    var pageInfo = {
-
-        dashboard: [
-            "Tổng quan",
-            "Hệ thống quản lý hồ sơ và văn bản"
-        ],
-
-        documents: [
-            "Văn bản",
-            "Quản lý và tạo các mẫu văn bản GROVA"
-        ],
-
-        projects: [
-            "Công trình",
-            "Quản lý dữ liệu công trình"
-        ],
-
-        customers: [
-            "Khách hàng",
-            "Quản lý thông tin khách hàng"
-        ],
-
-        employees: [
-            "Nhân sự",
-            "Quản lý hồ sơ nhân sự"
-        ],
-
-        history: [
-            "Lịch sử",
-            "Theo dõi các văn bản đã tạo"
-        ],
-
-        reports: [
-            "Báo cáo",
-            "Tổng hợp dữ liệu hệ thống"
-        ],
-
-        settings: [
-            "Cài đặt",
-            "Cấu hình GROVA DOCUMENT"
-        ],
-
-        admin: [
-            "Quản trị hệ thống",
-            "Quản lý người dùng, mẫu văn bản và dữ liệu"
-        ]
-
-    };
+    var cancel =
+      $("#cancelModal");
 
 
-    function showPage(page) {
+    if (cancel) {
 
-        var pages =
-            document.querySelectorAll(
-                ".page"
-            );
-
-
-        pages.forEach(
-            function (item) {
-
-                item.classList.add(
-                    "hidden"
-                );
-
-                item.classList.remove(
-                    "active-page"
-                );
-
-            }
-        );
-
-
-        var target =
-            $("page-" + page);
-
-
-        if (!target) {
-
-            page = "dashboard";
-
-            target =
-                $("page-dashboard");
-
-        }
-
-
-        if (target) {
-
-            target.classList.remove(
-                "hidden"
-            );
-
-            target.classList.add(
-                "active-page"
-            );
-
-        }
-
-
-        var menus =
-            document.querySelectorAll(
-                ".menu-item[data-page]"
-            );
-
-
-        menus.forEach(
-            function (menu) {
-
-                menu.classList.toggle(
-                    "active",
-                    menu.dataset.page === page
-                );
-
-            }
-        );
-
-
-        if (pageInfo[page]) {
-
-            $("pageTitle").textContent =
-                pageInfo[page][0];
-
-            $("pageSubtitle").textContent =
-                pageInfo[page][1];
-
-        }
+      cancel.addEventListener(
+        "click",
+        closeModal
+      );
 
     }
 
 
-    /* ======================================================
-       STATISTICS
-    ====================================================== */
-
-    function renderStats() {
-
-        var templates =
-            getTemplates();
+    var openTemplateButton =
+      $("#openTemplate");
 
 
-        if ($("statDocuments")) {
+    if (openTemplateButton) {
 
-            $("statDocuments").textContent =
-                templates.length;
-
-        }
-
-
-        if ($("statProjects")) {
-
-            $("statProjects").textContent =
-                DATA.stats &&
-                DATA.stats.projects != null
-                    ? DATA.stats.projects
-                    : 0;
-
-        }
-
-
-        if ($("statCustomers")) {
-
-            $("statCustomers").textContent =
-                DATA.stats &&
-                DATA.stats.customers != null
-                    ? DATA.stats.customers
-                    : 0;
-
-        }
-
-
-        if ($("statEmployees")) {
-
-            $("statEmployees").textContent =
-                DATA.stats &&
-                DATA.stats.employees != null
-                    ? DATA.stats.employees
-                    : 0;
-
-        }
+      openTemplateButton.addEventListener(
+        "click",
+        openSelectedTemplate
+      );
 
     }
 
 
-    /* ======================================================
-       INIT
-    ====================================================== */
-
-    function init() {
-
-        console.log(
-            "GROVA DOCUMENT: INIT"
-        );
+    var modal =
+      $("#documentModal");
 
 
-        /*
-         * 1. Văn bản
-         */
+    if (modal) {
 
-        renderDocuments();
+      modal.addEventListener(
+        "click",
+        function (event) {
 
+          if (
+            event.target === modal
+          ) {
 
-        /*
-         * 2. Card click
-         */
+            closeModal();
 
-        bindDocumentCards();
-
-
-        /*
-         * 3. Thống kê
-         */
-
-        renderStats();
-
-
-        /*
-         * 4. Menu
-         */
-
-        document
-            .querySelectorAll(
-                ".menu-item[data-page]"
-            )
-            .forEach(
-                function (button) {
-
-                    button.addEventListener(
-                        "click",
-                        function () {
-
-                            showPage(
-                                button.dataset.page
-                            );
-
-                        }
-                    );
-
-                }
-            );
-
-
-        /*
-         * 5. Các nút data-page
-         */
-
-        document
-            .querySelectorAll(
-                "[data-page]:not(.menu-item)"
-            )
-            .forEach(
-                function (button) {
-
-                    button.addEventListener(
-                        "click",
-                        function () {
-
-                            showPage(
-                                button.dataset.page
-                            );
-
-                        }
-                    );
-
-                }
-            );
-
-
-        /*
-         * 6. Tạo văn bản
-         */
-
-        document
-            .querySelectorAll(
-                '[data-action="new-document"]'
-            )
-            .forEach(
-                function (button) {
-
-                    button.addEventListener(
-                        "click",
-                        openModal
-                    );
-
-                }
-            );
-
-
-        /*
-         * 7. Modal
-         */
-
-        if ($("closeModal")) {
-
-            $("closeModal")
-                .addEventListener(
-                    "click",
-                    closeModal
-                );
+          }
 
         }
-
-
-        if ($("cancelModal")) {
-
-            $("cancelModal")
-                .addEventListener(
-                    "click",
-                    closeModal
-                );
-
-        }
-
-
-        if ($("openTemplate")) {
-
-            $("openTemplate")
-                .addEventListener(
-                    "click",
-                    openSelectedTemplate
-                );
-
-        }
-
-
-        var overlay =
-            document.querySelector(
-                ".modal-overlay"
-            );
-
-
-        if (overlay) {
-
-            overlay.addEventListener(
-                "click",
-                closeModal
-            );
-
-        }
-
-
-        /*
-         * 8. Sidebar mobile
-         */
-
-        if ($("openSidebar")) {
-
-            $("openSidebar")
-                .addEventListener(
-                    "click",
-                    function () {
-
-                        $("sidebar")
-                            .classList.add(
-                                "sidebar-open"
-                            );
-
-                    }
-                );
-
-        }
-
-
-        if ($("closeSidebar")) {
-
-            $("closeSidebar")
-                .addEventListener(
-                    "click",
-                    function () {
-
-                        $("sidebar")
-                            .classList.remove(
-                                "sidebar-open"
-                            );
-
-                    }
-                );
-
-        }
-
-
-        /*
-         * 9. Escape đóng modal
-         */
-
-        document.addEventListener(
-            "keydown",
-            function (event) {
-
-                if (
-                    event.key === "Escape"
-                ) {
-
-                    closeModal();
-
-                }
-
-            }
-        );
-
-
-        console.log(
-            "GROVA DOCUMENT: INIT COMPLETE"
-        );
+      );
 
     }
 
 
-    /* ======================================================
-       START
-    ====================================================== */
+    document.addEventListener(
+      "keydown",
+      function (event) {
 
-    if (
-        document.readyState ===
-        "loading"
-    ) {
+        if (event.key === "Escape") {
 
-        document.addEventListener(
-            "DOMContentLoaded",
-            init
-        );
+          closeModal();
 
-    } else {
+        }
 
-        init();
+      }
+    );
 
-    }
+  }
+
+
+  /* ==========================================
+     INIT
+     ========================================== */
+
+  function init() {
+
+    /*
+     * Dashboard có fallback HTML.
+     * JS chỉ nâng cấp nó.
+     */
+
+    syncDashboardCards();
+
+    renderDocumentsPage();
+
+    renderRecentDocuments();
+
+    updateStats();
+
+    bindNavigation();
+
+    bindSidebar();
+
+    bindModal();
+
+  }
+
+
+  /* ==========================================
+     PUBLIC API
+     ========================================== */
+
+  window.GROVA_DOCUMENT = {
+
+    data: DATA,
+
+    templates: templates,
+
+    showPage: showPage,
+
+    openModal: openModal,
+
+    closeModal: closeModal,
+
+    openTemplate: openTemplate,
+
+    refresh: init
+
+  };
+
+
+  /* ==========================================
+     START
+     ========================================== */
+
+  if (
+    document.readyState === "loading"
+  ) {
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      init
+    );
+
+  } else {
+
+    init();
+
+  }
 
 
 })();
