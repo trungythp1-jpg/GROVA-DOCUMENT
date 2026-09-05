@@ -11,6 +11,11 @@
       box-sizing: border-box;
     }
 
+    html {
+      margin: 0;
+      padding: 0;
+    }
+
     body {
       margin: 0;
       background: #eef3f1;
@@ -27,6 +32,8 @@
     .app {
       min-height: 100vh;
     }
+
+    /* ================= TOPBAR ================= */
 
     .topbar {
       position: sticky;
@@ -71,6 +78,8 @@
       background: #fff;
       color: #0b7a5a;
     }
+
+    /* ================= WORKSPACE ================= */
 
     .workspace {
       display: grid;
@@ -158,6 +167,11 @@
       box-shadow: 0 0 0 3px rgba(11,122,90,.10);
     }
 
+    .field input.readonly {
+      background: #f3f6f5;
+      color: #53635d;
+    }
+
     .grid-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -183,6 +197,8 @@
       accent-color: #0b7a5a;
     }
 
+    /* ================= PROJECT EDITOR ================= */
+
     .project-editor {
       border: 1px solid #dce6e2;
       border-radius: 10px;
@@ -201,6 +217,8 @@
     .project-editor .grid-2 {
       margin-top: 8px;
     }
+
+    /* ================= PREVIEW ================= */
 
     .preview-panel {
       min-width: 0;
@@ -228,11 +246,17 @@
       padding: 17mm 17mm 18mm;
       background: #fff;
       box-shadow: 0 5px 28px rgba(0,0,0,.12);
+
       font-family: "Times New Roman", Times, serif;
       font-size: 12.5pt;
       line-height: 1.42;
       color: #000;
+
+      orphans: 3;
+      widows: 3;
     }
+
+    /* ================= DOCUMENT HEADER ================= */
 
     .doc-header {
       display: grid;
@@ -292,31 +316,64 @@
       margin: 2mm 0;
     }
 
+    /* ================= DOCUMENT SECTIONS ================= */
+
     .section {
       margin-top: 5mm;
+
+      break-inside: auto;
+      page-break-inside: auto;
     }
 
     .section h2 {
       margin: 0 0 2.5mm;
       font-size: 12.5pt;
       font-weight: 700;
+
+      /*
+       * Không để tiêu đề mục nằm cuối trang
+       * mà nội dung đầu tiên lại sang trang sau.
+       */
+      break-after: avoid-page;
+      page-break-after: avoid;
+      break-inside: avoid;
+      page-break-inside: avoid;
     }
 
     .party p {
       margin: 1.4mm 0;
+      break-inside: avoid;
+      page-break-inside: avoid;
     }
 
     .debt-date {
       margin-top: 4mm;
+      break-inside: avoid;
+      page-break-inside: avoid;
     }
+
+    /* ================= DEBT TABLE ================= */
 
     .debt-table {
       width: 100%;
       border-collapse: collapse;
       table-layout: fixed;
       margin-top: 3mm;
+
       font-size: 11pt;
       line-height: 1.25;
+
+      break-inside: auto;
+      page-break-inside: auto;
+    }
+
+    .debt-table thead {
+      display: table-header-group;
+    }
+
+    .debt-table tr {
+      break-inside: avoid;
+      page-break-inside: avoid;
     }
 
     .debt-table th,
@@ -360,19 +417,29 @@
       text-align: center;
     }
 
+    /* ================= TOTALS ================= */
+
     .totals {
       margin-top: 5mm;
+      break-inside: avoid;
+      page-break-inside: avoid;
     }
 
     .total-line {
       margin: 2mm 0;
       font-weight: 700;
+      break-inside: avoid;
+      page-break-inside: avoid;
     }
 
     .amount-words {
       margin-top: 2mm;
       font-weight: normal;
+      break-inside: avoid;
+      page-break-inside: avoid;
     }
+
+    /* ================= CONFIRMATION ================= */
 
     .confirmation {
       margin-top: 3mm;
@@ -380,7 +447,12 @@
 
     .confirmation-line {
       margin: 2mm 0;
+
+      break-inside: avoid;
+      page-break-inside: avoid;
     }
+
+    /* ================= COMMITMENTS ================= */
 
     .commitments {
       margin-top: 3mm;
@@ -388,7 +460,12 @@
 
     .commitment {
       margin: 2mm 0;
+
+      break-inside: avoid;
+      page-break-inside: avoid;
     }
+
+    /* ================= NOTES ================= */
 
     .notes {
       margin-top: 3mm;
@@ -396,7 +473,12 @@
 
     .note-line {
       margin: 2mm 0;
+
+      break-inside: avoid;
+      page-break-inside: avoid;
     }
+
+    /* ================= CONCLUSION ================= */
 
     .conclusion {
       margin-top: 5mm;
@@ -404,21 +486,43 @@
 
     .conclusion p {
       margin: 2mm 0;
+
+      break-inside: avoid;
+      page-break-inside: avoid;
     }
 
     .bullet {
       margin: 1.5mm 0 1.5mm 7mm;
+
+      break-inside: avoid;
+      page-break-inside: avoid;
     }
 
     .closing {
       margin-top: 4mm;
     }
 
+    /* ================= SIGNATURE ================= */
+
+    /*
+     * Toàn bộ khu vực chữ ký được giữ thành một khối.
+     * Không cho phép tiêu đề chữ ký nằm ở trang trước
+     * còn dòng ký tên rơi sang trang sau.
+     */
     .signature-table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 12mm;
+      margin-top: 7mm;
+
       table-layout: fixed;
+
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .signature-table tr {
+      break-inside: avoid;
+      page-break-inside: avoid;
     }
 
     .signature-table td {
@@ -427,6 +531,9 @@
       vertical-align: top;
       border: 0;
       padding: 0 8mm;
+
+      break-inside: avoid;
+      page-break-inside: avoid;
     }
 
     .signature-heading {
@@ -439,13 +546,21 @@
       font-weight: 700;
     }
 
+    /*
+     * Vẫn giữ khoảng trống để ký tay,
+     * nhưng không để quá lớn khiến dòng ký tên
+     * bị đẩy sang trang tiếp theo.
+     */
     .signature-space {
-      height: 28mm;
+      height: 18mm;
     }
 
     .signature-note {
       font-size: 11.5pt;
+      white-space: nowrap;
     }
+
+    /* ================= OTHER ================= */
 
     .toolbar-note {
       margin-top: 10px;
@@ -454,6 +569,8 @@
       line-height: 1.4;
     }
 
+    /* ================= RESPONSIVE ================= */
+
     @media (max-width: 1050px) {
       .workspace {
         grid-template-columns: 340px minmax(0, 1fr);
@@ -461,6 +578,7 @@
     }
 
     @media (max-width: 850px) {
+
       .topbar {
         position: static;
       }
@@ -483,7 +601,10 @@
       }
     }
 
+    /* ================= PRINT ================= */
+
     @media print {
+
       @page {
         size: A4 portrait;
         margin: 0;
@@ -514,6 +635,7 @@
         display: block;
         padding: 0;
         margin: 0;
+
         box-shadow: none;
         overflow: visible;
         border-radius: 0;
@@ -526,13 +648,65 @@
 
       .paper {
         width: 210mm;
+
         min-height: 0;
         height: auto;
+
         margin: 0;
         padding: 17mm 17mm 18mm;
+
         box-shadow: none;
+
+        /*
+         * Cho phép văn bản tự phân trang.
+         * Không ép toàn bộ văn bản vào số trang cố định.
+         */
+        break-after: auto;
+        page-break-after: auto;
+      }
+
+      .section h2 {
+        break-after: avoid-page;
+        page-break-after: avoid;
+      }
+
+      .confirmation-line,
+      .commitment,
+      .bullet,
+      .conclusion p,
+      .party p,
+      .total-line,
+      .amount-words,
+      .note-line,
+      .debt-date {
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+
+      /*
+       * Đây là phần quan trọng nhất:
+       * bảng chữ ký không được chia giữa hai trang.
+       */
+      .signature-table,
+      .signature-table tr,
+      .signature-table td {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+      }
+
+      /*
+       * Giữ bảng công nợ không bị cắt ngang từng dòng.
+       */
+      .debt-table tr {
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+
+      .debt-table thead {
+        display: table-header-group;
       }
     }
+
   </style>
 </head>
 
@@ -540,19 +714,29 @@
 
 <div class="app">
 
+  <!-- ================= TOPBAR ================= -->
+
   <header class="topbar">
 
     <div>
-      <div class="topbar-title">GROVA DOCUMENT</div>
-      <div class="topbar-subtitle">Đối chiếu và xác nhận công nợ</div>
+      <div class="topbar-title">
+        GROVA DOCUMENT
+      </div>
+
+      <div class="topbar-subtitle">
+        Đối chiếu và xác nhận công nợ
+      </div>
     </div>
 
     <div class="topbar-actions">
-      <button class="btn btn-light"
-              type="button"
-              onclick="window.print()">
+
+      <button
+        class="btn btn-light"
+        type="button"
+        onclick="window.print()">
         In / Xuất PDF
       </button>
+
     </div>
 
   </header>
@@ -565,73 +749,149 @@
     <section class="panel form-panel">
 
       <div class="panel-header">
-        <h2>Thông tin công nợ</h2>
-        <p>Nhập dữ liệu, văn bản sẽ tự cập nhật.</p>
+
+        <h2>
+          Thông tin công nợ
+        </h2>
+
+        <p>
+          Nhập dữ liệu, văn bản sẽ tự cập nhật.
+        </p>
+
       </div>
 
 
       <div class="form-body">
 
-        <div class="section-title">Thông tin văn bản</div>
+        <!-- THÔNG TIN VĂN BẢN -->
+
+        <div class="section-title">
+          Thông tin văn bản
+        </div>
 
         <div class="grid-2">
 
           <div class="field">
-            <label>Số biên bản</label>
-            <input id="documentNo" type="text">
+
+            <label>
+              Số biên bản
+            </label>
+
+            <input
+              id="documentNo"
+              type="text">
+
           </div>
 
+
           <div class="field">
-            <label>Ngày lập</label>
-            <input id="documentDate" type="date">
+
+            <label>
+              Ngày lập
+            </label>
+
+            <input
+              id="documentDate"
+              type="date">
+
           </div>
 
         </div>
 
 
-        <div class="section-title">Kỳ đối chiếu</div>
+        <!-- KỲ ĐỐI CHIẾU -->
+
+        <div class="section-title">
+          Kỳ đối chiếu
+        </div>
 
         <div class="check-list">
 
           <label class="check-row">
-            <input id="periodMonthCheck" type="checkbox">
-            <span>Tháng</span>
+
+            <input
+              id="periodMonthCheck"
+              type="checkbox">
+
+            <span>
+              Tháng
+            </span>
+
           </label>
+
 
           <div class="grid-2">
 
             <div class="field">
-              <label>Tháng</label>
-              <input id="periodMonth" type="text"
-                     placeholder="......">
+
+              <label>
+                Tháng
+              </label>
+
+              <input
+                id="periodMonth"
+                type="text"
+                placeholder="......">
+
             </div>
 
+
             <div class="field">
-              <label>Năm</label>
-              <input id="periodMonthYear" type="text"
-                     placeholder="........">
+
+              <label>
+                Năm
+              </label>
+
+              <input
+                id="periodMonthYear"
+                type="text"
+                placeholder="........">
+
             </div>
 
           </div>
 
 
           <label class="check-row">
-            <input id="periodQuarterCheck" type="checkbox">
-            <span>Quý</span>
+
+            <input
+              id="periodQuarterCheck"
+              type="checkbox">
+
+            <span>
+              Quý
+            </span>
+
           </label>
+
 
           <div class="grid-2">
 
             <div class="field">
-              <label>Quý</label>
-              <input id="periodQuarter" type="text"
-                     placeholder="......">
+
+              <label>
+                Quý
+              </label>
+
+              <input
+                id="periodQuarter"
+                type="text"
+                placeholder="......">
+
             </div>
 
+
             <div class="field">
-              <label>Năm</label>
-              <input id="periodQuarterYear" type="text"
-                     placeholder="........">
+
+              <label>
+                Năm
+              </label>
+
+              <input
+                id="periodQuarterYear"
+                type="text"
+                placeholder="........">
+
             </div>
 
           </div>
@@ -639,153 +899,345 @@
         </div>
 
 
-        <div class="section-title">Bên A</div>
+        <!-- BÊN A -->
 
-        <div class="field">
-          <label>Đại diện</label>
-          <input id="partyARepresentative" type="text">
+        <div class="section-title">
+          Bên A
         </div>
 
         <div class="field">
-          <label>Chức vụ</label>
-          <input id="partyAPosition" type="text">
+
+          <label>
+            Đại diện
+          </label>
+
+          <input
+            id="partyARepresentative"
+            type="text">
+
         </div>
 
-
-        <div class="section-title">Bên B</div>
 
         <div class="field">
-          <label>Tên công ty</label>
-          <input id="partyBCompany" type="text">
+
+          <label>
+            Chức vụ
+          </label>
+
+          <input
+            id="partyAPosition"
+            type="text">
+
+        </div>
+
+
+        <!-- BÊN B -->
+
+        <div class="section-title">
+          Bên B
         </div>
 
         <div class="field">
-          <label>MST</label>
-          <input id="partyBTax" type="text">
+
+          <label>
+            Tên công ty
+          </label>
+
+          <input
+            id="partyBCompany"
+            type="text">
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            MST
+          </label>
+
+          <input
+            id="partyBTax"
+            type="text">
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Địa chỉ
+          </label>
+
+          <input
+            id="partyBAddress"
+            type="text">
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Đại diện
+          </label>
+
+          <input
+            id="partyBRepresentative"
+            type="text">
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Chức vụ
+          </label>
+
+          <input
+            id="partyBPosition"
+            type="text">
+
+        </div>
+
+
+        <!-- NGÀY ĐỐI CHIẾU -->
+
+        <div class="section-title">
+          Ngày đối chiếu
         </div>
 
         <div class="field">
-          <label>Địa chỉ</label>
-          <input id="partyBAddress" type="text">
-        </div>
 
-        <div class="field">
-          <label>Đại diện</label>
-          <input id="partyBRepresentative" type="text">
-        </div>
+          <label>
+            Đối chiếu công nợ đến hết ngày
+          </label>
 
-        <div class="field">
-          <label>Chức vụ</label>
-          <input id="partyBPosition" type="text">
+          <input
+            id="debtUntilDate"
+            type="date">
+
         </div>
 
 
-        <div class="section-title">Ngày đối chiếu</div>
+        <!-- CHI TIẾT -->
 
-        <div class="field">
-          <label>Đối chiếu công nợ đến hết ngày</label>
-          <input id="debtUntilDate" type="date">
+        <div class="section-title">
+          Chi tiết công nợ
         </div>
-
-
-        <div class="section-title">Chi tiết công nợ</div>
 
         <div id="projectEditors"></div>
 
 
-        <div class="section-title">Tổng công nợ</div>
+        <!-- TỔNG -->
 
-        <div class="field">
-          <label>Tổng giá trị đã thực hiện</label>
-          <input id="totalPerformed"
-                 class="readonly"
-                 type="text"
-                 readonly>
+        <div class="section-title">
+          Tổng công nợ
         </div>
 
         <div class="field">
-          <label>Tổng giá trị đã thanh toán</label>
-          <input id="totalPaid"
-                 class="readonly"
-                 type="text"
-                 readonly>
+
+          <label>
+            Tổng giá trị đã thực hiện
+          </label>
+
+          <input
+            id="totalPerformed"
+            class="readonly"
+            type="text"
+            readonly>
+
         </div>
+
 
         <div class="field">
-          <label>Tổng công nợ còn phải thanh toán</label>
-          <input id="totalDebt"
-                 class="readonly"
-                 type="text"
-                 readonly>
+
+          <label>
+            Tổng giá trị đã thanh toán
+          </label>
+
+          <input
+            id="totalPaid"
+            class="readonly"
+            type="text"
+            readonly>
+
         </div>
+
 
         <div class="field">
-          <label>Bằng chữ</label>
-          <input id="debtWords"
-                 type="text"
-                 placeholder="Nhập số tiền bằng chữ">
+
+          <label>
+            Tổng công nợ còn phải thanh toán
+          </label>
+
+          <input
+            id="totalDebt"
+            class="readonly"
+            type="text"
+            readonly>
+
         </div>
 
 
-        <div class="section-title">Xác nhận công nợ</div>
+        <div class="field">
+
+          <label>
+            Bằng chữ
+          </label>
+
+          <input
+            id="debtWords"
+            type="text"
+            placeholder="Nhập số tiền bằng chữ">
+
+        </div>
+
+
+        <!-- XÁC NHẬN -->
+
+        <div class="section-title">
+          Xác nhận công nợ
+        </div>
 
         <div class="check-list">
 
           <label class="check-row">
-            <input id="confirm1" type="checkbox">
-            <span>Các số liệu công nợ nêu trên là đúng và đầy đủ.</span>
+
+            <input
+              id="confirm1"
+              type="checkbox">
+
+            <span>
+              Các số liệu công nợ nêu trên là đúng và đầy đủ.
+            </span>
+
           </label>
+
 
           <label class="check-row">
-            <input id="confirm2" type="checkbox">
-            <span>Không có tranh chấp về khối lượng công việc đã thực hiện.</span>
+
+            <input
+              id="confirm2"
+              type="checkbox">
+
+            <span>
+              Không có tranh chấp về khối lượng công việc đã thực hiện.
+            </span>
+
           </label>
+
 
           <label class="check-row">
-            <input id="confirm3" type="checkbox">
-            <span>Không có tranh chấp về giá trị đã nghiệm thu.</span>
+
+            <input
+              id="confirm3"
+              type="checkbox">
+
+            <span>
+              Không có tranh chấp về giá trị đã nghiệm thu.
+            </span>
+
           </label>
+
 
           <label class="check-row">
-            <input id="confirm4" type="checkbox">
-            <span>Đồng ý thanh toán toàn bộ số công nợ còn lại cho Bên A.</span>
+
+            <input
+              id="confirm4"
+              type="checkbox">
+
+            <span>
+              Đồng ý thanh toán toàn bộ số công nợ còn lại cho Bên A.
+            </span>
+
           </label>
 
         </div>
 
 
-        <div class="section-title">Cam kết thanh toán</div>
+        <!-- CAM KẾT -->
 
-        <div class="field">
-          <label>Ngày cam kết thanh toán</label>
-          <input id="paymentDeadline" type="date">
-        </div>
-
-
-        <div class="section-title">Ghi chú</div>
-
-        <div class="field">
-          <label>Dòng ghi chú 1</label>
-          <input id="note1" type="text">
+        <div class="section-title">
+          Cam kết thanh toán
         </div>
 
         <div class="field">
-          <label>Dòng ghi chú 2</label>
-          <input id="note2" type="text">
+
+          <label>
+            Ngày cam kết thanh toán
+          </label>
+
+          <input
+            id="paymentDeadline"
+            type="date">
+
         </div>
 
 
-        <div class="section-title">Kết luận</div>
+        <!-- GHI CHÚ -->
 
-        <div class="field">
-          <label>Ngày xác nhận công nợ</label>
-          <input id="conclusionDate" type="date">
+        <div class="section-title">
+          Ghi chú
         </div>
 
         <div class="field">
-          <label>Bằng chữ</label>
-          <input id="conclusionWords" type="text"
-                 placeholder="Nhập số tiền bằng chữ">
+
+          <label>
+            Dòng ghi chú 1
+          </label>
+
+          <input
+            id="note1"
+            type="text">
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Dòng ghi chú 2
+          </label>
+
+          <input
+            id="note2"
+            type="text">
+
+        </div>
+
+
+        <!-- KẾT LUẬN -->
+
+        <div class="section-title">
+          Kết luận
+        </div>
+
+        <div class="field">
+
+          <label>
+            Ngày xác nhận công nợ
+          </label>
+
+          <input
+            id="conclusionDate"
+            type="date">
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Bằng chữ
+          </label>
+
+          <input
+            id="conclusionWords"
+            type="text"
+            placeholder="Nhập số tiền bằng chữ">
+
         </div>
 
 
@@ -802,28 +1254,44 @@
 
     <section class="panel preview-panel">
 
-      <h2 class="preview-title">Bản xem trước</h2>
+      <h2 class="preview-title">
+        Bản xem trước
+      </h2>
+
 
       <div class="paper-wrap">
 
         <article class="paper">
 
+          <!-- HEADER -->
+
           <div class="doc-header">
 
             <div class="brand">
-              <img src="../data/grova_logo.png"
-                   alt="GROVA HOLDINGS">
+
+              <img
+                src="../data/grova_logo.png"
+                alt="GROVA HOLDINGS">
+
             </div>
 
+
             <div class="national">
-              <div>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div>
+
+              <div>
+                CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM
+              </div>
+
               <div class="sub">
                 Độc lập – Tự do – Hạnh phúc
               </div>
+
             </div>
 
           </div>
 
+
+          <!-- TITLE -->
 
           <div class="doc-title">
 
@@ -831,25 +1299,35 @@
               BIÊN BẢN ĐỐI CHIẾU VÀ XÁC NHẬN CÔNG NỢ
             </h1>
 
+
             <div class="doc-number">
+
               Số:
               <span id="previewDocumentNo">
                 ....../BBĐCCN/20......
               </span>
+
             </div>
 
           </div>
 
 
+          <!-- PERIOD -->
+
           <div class="period">
 
-            <strong>Kỳ đối chiếu:</strong>
+            <strong>
+              Kỳ đối chiếu:
+            </strong>
+
 
             <span id="previewMonth">
               ☐ Tháng ...... năm ........
             </span>
 
+
             &nbsp;&nbsp;
+
 
             <span id="previewQuarter">
               ☐ Quý ...... năm ........
@@ -857,6 +1335,8 @@
 
           </div>
 
+
+          <!-- INTRO -->
 
           <div class="intro">
 
@@ -868,78 +1348,118 @@
           </div>
 
 
+          <!-- BÊN A -->
+
           <div class="section party">
 
-            <h2>I. BÊN A</h2>
+            <h2>
+              I. BÊN A
+            </h2>
+
 
             <p>
               CÔNG TY CỔ PHẦN GROVA HOLDINGS
             </p>
 
+
             <p>
               MST: 0202328361
             </p>
+
 
             <p>
               Địa chỉ: 49A/348 Trần Nguyên Hãn,
               Phường An Biên, Thành phố Hải Phòng
             </p>
 
+
             <p>
+
               Đại diện:
+
               <span id="previewARepresentative">
                 ......................................................
               </span>
+
             </p>
 
+
             <p>
+
               Chức vụ:
+
               <span id="previewAPosition">
                 ......................................................
               </span>
+
             </p>
 
           </div>
 
 
+          <!-- BÊN B -->
+
           <div class="section party">
 
-            <h2>II. BÊN B</h2>
+            <h2>
+              II. BÊN B
+            </h2>
+
 
             <p>
+
               Tên công ty:
+
               <span id="previewBCompany">
                 ......................................................
               </span>
+
             </p>
 
+
             <p>
+
               MST:
+
               <span id="previewBTax">
                 ..............................................................
               </span>
+
             </p>
 
+
             <p>
+
               Địa chỉ:
+
               <span id="previewBAddress">
                 ..........................................................
               </span>
+
             </p>
 
+
             <p>
+
               Đại diện:
+
               <span id="previewBRepresentative">
                 ......................................................
               </span>
+
             </p>
 
+
             <p>
+
               Chức vụ:
+
               <span id="previewBPosition">
                 ......................................................
               </span>
+
             </p>
+
 
             <div class="debt-date">
 
@@ -954,9 +1474,14 @@
           </div>
 
 
+          <!-- III -->
+
           <div class="section">
 
-            <h2>III. CHI TIẾT CÔNG NỢ</h2>
+            <h2>
+              III. CHI TIẾT CÔNG NỢ
+            </h2>
+
 
             <table class="debt-table">
 
@@ -964,23 +1489,41 @@
 
                 <tr>
 
-                  <th class="stt">STT</th>
+                  <th class="stt">
+                    STT
+                  </th>
 
-                  <th class="project">Công trình</th>
+                  <th class="project">
+                    Công trình
+                  </th>
 
-                  <th class="appendix">Số PLHĐ</th>
+                  <th class="appendix">
+                    Số PLHĐ
+                  </th>
 
-                  <th class="date">Ngày nghiệm thu</th>
+                  <th class="date">
+                    Ngày nghiệm thu
+                  </th>
 
-                  <th class="money">Giá trị<br>(VNĐ)</th>
+                  <th class="money">
+                    Giá trị<br>
+                    (VNĐ)
+                  </th>
 
-                  <th class="money">Đã thanh toán<br>(VNĐ)</th>
+                  <th class="money">
+                    Đã thanh toán<br>
+                    (VNĐ)
+                  </th>
 
-                  <th class="money">Còn phải thanh toán<br>(VNĐ)</th>
+                  <th class="money">
+                    Còn phải thanh toán<br>
+                    (VNĐ)
+                  </th>
 
                 </tr>
 
               </thead>
+
 
               <tbody id="previewDebtRows"></tbody>
 
@@ -990,34 +1533,52 @@
             <div class="totals">
 
               <div class="total-line">
+
                 TỔNG GIÁ TRỊ ĐÃ THỰC HIỆN:
+
                 <span id="previewTotalPerformed">
                   ........................................
                 </span>
+
                 VNĐ
+
               </div>
 
+
               <div class="total-line">
+
                 TỔNG GIÁ TRỊ ĐÃ THANH TOÁN:
+
                 <span id="previewTotalPaid">
                   ........................................
                 </span>
+
                 VNĐ
+
               </div>
 
+
               <div class="total-line">
+
                 TỔNG CÔNG NỢ CÒN PHẢI THANH TOÁN:
+
                 <span id="previewTotalDebt">
                   ........................................
                 </span>
+
                 VNĐ
+
               </div>
 
+
               <div class="amount-words">
+
                 (Bằng chữ:
+
                 <span id="previewDebtWords">
                   ...........................................................................
                 </span>)
+
               </div>
 
             </div>
@@ -1025,32 +1586,55 @@
           </div>
 
 
+          <!-- IV -->
+
           <div class="section">
 
-            <h2>IV. XÁC NHẬN CÔNG NỢ</h2>
+            <h2>
+              IV. XÁC NHẬN CÔNG NỢ
+            </h2>
+
 
             <div class="confirmation">
 
-              <div>Bên B xác nhận:</div>
+              <div>
+                Bên B xác nhận:
+              </div>
 
-              <div class="confirmation-line"
-                   id="previewConfirm1">
+
+              <div
+                class="confirmation-line"
+                id="previewConfirm1">
+
                 ☐ Các số liệu công nợ nêu trên là đúng và đầy đủ.
+
               </div>
 
-              <div class="confirmation-line"
-                   id="previewConfirm2">
+
+              <div
+                class="confirmation-line"
+                id="previewConfirm2">
+
                 ☐ Không có tranh chấp về khối lượng công việc đã thực hiện.
+
               </div>
 
-              <div class="confirmation-line"
-                   id="previewConfirm3">
+
+              <div
+                class="confirmation-line"
+                id="previewConfirm3">
+
                 ☐ Không có tranh chấp về giá trị đã nghiệm thu.
+
               </div>
 
-              <div class="confirmation-line"
-                   id="previewConfirm4">
+
+              <div
+                class="confirmation-line"
+                id="previewConfirm4">
+
                 ☐ Đồng ý thanh toán toàn bộ số công nợ còn lại cho Bên A.
+
               </div>
 
             </div>
@@ -1058,41 +1642,57 @@
           </div>
 
 
+          <!-- V -->
+
           <div class="section">
 
-            <h2>V. CAM KẾT THANH TOÁN</h2>
+            <h2>
+              V. CAM KẾT THANH TOÁN
+            </h2>
+
 
             <div class="commitments">
 
               <div>
+
                 Bên B cam kết thanh toán số tiền còn nợ nêu trên
                 chậm nhất vào ngày:
+
                 <span id="previewPaymentDeadline">
                   ...... / ...... / 20......
                 </span>
+
               </div>
 
+
               <div style="margin-top:3mm;">
+
                 Sau thời hạn nêu trên, nếu Bên B chưa hoàn thành
                 nghĩa vụ thanh toán thì Bên A có quyền:
+
               </div>
+
 
               <div class="commitment">
                  Tạm dừng thi công các công trình đang thực hiện;
               </div>
 
+
               <div class="commitment">
                  Tạm ngừng hỗ trợ kỹ thuật;
               </div>
+
 
               <div class="commitment">
                  Không tiếp nhận công trình mới;
               </div>
 
+
               <div class="commitment">
                  Yêu cầu thực hiện nghĩa vụ thanh toán theo Hợp đồng
                 nguyên tắc đã ký;
               </div>
+
 
               <div class="commitment">
                  Áp dụng các biện pháp pháp lý theo quy định của pháp luật.
@@ -1103,20 +1703,32 @@
           </div>
 
 
+          <!-- VI -->
+
           <div class="section">
 
-            <h2>VI. GHI CHÚ</h2>
+            <h2>
+              VI. GHI CHÚ
+            </h2>
+
 
             <div class="notes">
 
-              <div class="note-line"
-                   id="previewNote1">
+              <div
+                class="note-line"
+                id="previewNote1">
+
                 ....................................................................
+
               </div>
 
-              <div class="note-line"
-                   id="previewNote2">
+
+              <div
+                class="note-line"
+                id="previewNote2">
+
                 ....................................................................
+
               </div>
 
             </div>
@@ -1124,66 +1736,97 @@
           </div>
 
 
+          <!-- VII -->
+
           <div class="section">
 
-            <h2>VII. KẾT LUẬN</h2>
+            <h2>
+              VII. KẾT LUẬN
+            </h2>
+
 
             <div class="conclusion">
 
               <p>
+
                 Hai bên thống nhất xác nhận công nợ đến hết ngày
+
                 <span id="previewConclusionDate">
                   ...... / ...... / 20......
                 </span>
+
                 là:
+
               </p>
 
+
               <p>
+
                 <strong>
+
                   <span id="previewConclusionAmount">
                     ........................................
                   </span>
+
                   VNĐ
+
                 </strong>
+
               </p>
 
+
               <p>
+
                 (Bằng chữ:
+
                 <span id="previewConclusionWords">
                   ...........................................................................
                 </span>)
+
               </p>
 
+
               <p>
+
                 Biên bản này là căn cứ xác nhận công nợ giữa hai bên
                 và là một phần không tách rời của:
+
               </p>
+
 
               <div class="bullet">
                  Hợp đồng nguyên tắc;
               </div>
 
+
               <div class="bullet">
                  Phụ lục công trình;
               </div>
+
 
               <div class="bullet">
                  Biên bản nghiệm thu và bàn giao;
               </div>
 
+
               <div class="bullet">
                  Đề nghị thanh toán.
               </div>
 
+
               <p class="closing">
+
                 Biên bản được lập thành 02 bản có giá trị pháp lý
                 như nhau, mỗi bên giữ 01 bản.
+
               </p>
 
             </div>
 
           </div>
 
+
+          <!-- ================= SIGNATURE ================= -->
 
           <table class="signature-table">
 
@@ -1195,12 +1838,17 @@
                   ĐẠI DIỆN BÊN A
                 </div>
 
+
                 <div class="signature-company">
+
                   CÔNG TY CỔ PHẦN GROVA<br>
                   HOLDINGS
+
                 </div>
 
+
                 <div class="signature-space"></div>
+
 
                 <div class="signature-note">
                   (Ký, ghi rõ họ tên, đóng dấu)
@@ -1215,11 +1863,14 @@
                   ĐẠI DIỆN BÊN B
                 </div>
 
+
                 <div class="signature-company">
                   &nbsp;
                 </div>
 
+
                 <div class="signature-space"></div>
+
 
                 <div class="signature-note">
                   (Ký, ghi rõ họ tên, đóng dấu)
@@ -1244,12 +1895,19 @@
 
 <script>
 
+  /* =========================================================
+     CẤU HÌNH
+  ========================================================= */
+
   const STORAGE_KEY =
     "grova_document_template_07";
 
-
   const PROJECT_COUNT = 5;
 
+
+  /* =========================================================
+     NGÀY
+  ========================================================= */
 
   function getTodayISO() {
 
@@ -1270,20 +1928,30 @@
       return "...... / ...... / 20......";
     }
 
-    const d = new Date(value + "T00:00:00");
+    const d =
+      new Date(value + "T00:00:00");
 
     if (Number.isNaN(d.getTime())) {
       return "...... / ...... / 20......";
     }
 
-    return `${String(d.getDate()).padStart(2, "0")} / ${String(d.getMonth() + 1).padStart(2, "0")} / ${d.getFullYear()}`;
+    return [
+      String(d.getDate()).padStart(2, "0"),
+      String(d.getMonth() + 1).padStart(2, "0"),
+      d.getFullYear()
+    ].join(" / ");
 
   }
 
 
+  /* =========================================================
+     TIỀN
+  ========================================================= */
+
   function formatMoney(value) {
 
-    const number = Number(value || 0);
+    const number =
+      Number(value || 0);
 
     return new Intl.NumberFormat("vi-VN", {
       maximumFractionDigits: 0
@@ -1292,15 +1960,22 @@
   }
 
 
+  /* =========================================================
+     TỰ ĐÁNH SỐ BIÊN BẢN
+  ========================================================= */
+
   function getNextDocumentNumber() {
 
-    const year = new Date().getFullYear();
+    const year =
+      new Date().getFullYear();
 
     const key =
       `grova_bbdocn_counter_${year}`;
 
     let counter =
-      Number(localStorage.getItem(key) || 0);
+      Number(
+        localStorage.getItem(key) || 0
+      );
 
     counter += 1;
 
@@ -1314,7 +1989,15 @@
   }
 
 
-  function setText(id, value, fallback = "") {
+  /* =========================================================
+     TEXT
+  ========================================================= */
+
+  function setText(
+    id,
+    value,
+    fallback = ""
+  ) {
 
     const el =
       document.getElementById(id);
@@ -1327,19 +2010,32 @@
   }
 
 
+  /* =========================================================
+     TẠO FORM 5 CÔNG TRÌNH
+  ========================================================= */
+
   function createProjectEditors() {
 
     const container =
-      document.getElementById("projectEditors");
+      document.getElementById(
+        "projectEditors"
+      );
 
     container.innerHTML = "";
 
-    for (let i = 1; i <= PROJECT_COUNT; i++) {
+
+    for (
+      let i = 1;
+      i <= PROJECT_COUNT;
+      i++
+    ) {
 
       const box =
         document.createElement("div");
 
-      box.className = "project-editor";
+      box.className =
+        "project-editor";
+
 
       box.innerHTML = `
 
@@ -1347,67 +2043,98 @@
           Công trình ${i}
         </div>
 
+
         <div class="field">
-          <label>Công trình</label>
+
+          <label>
+            Công trình
+          </label>
+
           <input
             id="project${i}Name"
-            type="text"
-          >
+            type="text">
+
         </div>
+
 
         <div class="grid-2">
 
           <div class="field">
-            <label>Số PLHĐ</label>
+
+            <label>
+              Số PLHĐ
+            </label>
+
             <input
               id="project${i}Appendix"
-              type="text"
-            >
+              type="text">
+
           </div>
 
+
           <div class="field">
-            <label>Ngày nghiệm thu</label>
+
+            <label>
+              Ngày nghiệm thu
+            </label>
+
             <input
               id="project${i}Date"
-              type="date"
-            >
+              type="date">
+
           </div>
 
         </div>
 
+
         <div class="grid-2">
 
           <div class="field">
-            <label>Giá trị (VNĐ)</label>
+
+            <label>
+              Giá trị (VNĐ)
+            </label>
+
             <input
               id="project${i}Value"
               type="number"
               min="0"
               step="1000"
-              value="0"
-            >
+              value="0">
+
           </div>
 
+
           <div class="field">
-            <label>Đã thanh toán (VNĐ)</label>
+
+            <label>
+              Đã thanh toán (VNĐ)
+            </label>
+
             <input
               id="project${i}Paid"
               type="number"
               min="0"
               step="1000"
-              value="0"
-            >
+              value="0">
+
           </div>
 
         </div>
 
       `;
 
+
       container.appendChild(box);
 
     }
 
-    for (let i = 1; i <= PROJECT_COUNT; i++) {
+
+    for (
+      let i = 1;
+      i <= PROJECT_COUNT;
+      i++
+    ) {
 
       [
         `project${i}Name`,
@@ -1420,17 +2147,17 @@
         const el =
           document.getElementById(id);
 
-        if (el) {
-          el.addEventListener(
-            "input",
-            updatePreview
-          );
+        if (!el) return;
 
-          el.addEventListener(
-            "change",
-            updatePreview
-          );
-        }
+        el.addEventListener(
+          "input",
+          updatePreview
+        );
+
+        el.addEventListener(
+          "change",
+          updatePreview
+        );
 
       });
 
@@ -1439,11 +2166,20 @@
   }
 
 
+  /* =========================================================
+     LẤY DỮ LIỆU CÔNG TRÌNH
+  ========================================================= */
+
   function getProjectData() {
 
     const projects = [];
 
-    for (let i = 1; i <= PROJECT_COUNT; i++) {
+
+    for (
+      let i = 1;
+      i <= PROJECT_COUNT;
+      i++
+    ) {
 
       projects.push({
 
@@ -1480,10 +2216,15 @@
 
     }
 
+
     return projects;
 
   }
 
+
+  /* =========================================================
+     BẢNG CÔNG NỢ
+  ========================================================= */
 
   function updateDebtTable() {
 
@@ -1494,151 +2235,215 @@
 
     tbody.innerHTML = "";
 
+
     const projects =
       getProjectData();
 
-    projects.forEach((project, index) => {
 
-      const debt =
-        project.value - project.paid;
+    projects.forEach(
+      (project, index) => {
 
-      const tr =
-        document.createElement("tr");
+        const debt =
+          project.value -
+          project.paid;
 
-      tr.innerHTML = `
 
-        <td class="center">
-          ${index + 1}
-        </td>
+        const tr =
+          document.createElement("tr");
 
-        <td>
-          ${escapeHTML(
-            project.name ||
-            ""
-          )}
-        </td>
 
-        <td class="center">
-          ${escapeHTML(
-            project.appendix ||
-            ""
-          )}
-        </td>
+        tr.innerHTML = `
 
-        <td class="center">
-          ${
-            project.date
-              ? formatDateVN(project.date)
-              : ""
-          }
-        </td>
+          <td class="center">
+            ${index + 1}
+          </td>
 
-        <td class="money-cell">
-          ${formatMoney(project.value)}
-        </td>
 
-        <td class="money-cell">
-          ${formatMoney(project.paid)}
-        </td>
+          <td>
+            ${escapeHTML(
+              project.name || ""
+            )}
+          </td>
 
-        <td class="money-cell">
-          ${formatMoney(debt)}
-        </td>
 
-      `;
+          <td class="center">
+            ${escapeHTML(
+              project.appendix || ""
+            )}
+          </td>
 
-      tbody.appendChild(tr);
 
-    });
+          <td class="center">
+            ${
+              project.date
+                ? formatDateVN(
+                    project.date
+                  )
+                : ""
+            }
+          </td>
+
+
+          <td class="money-cell">
+            ${formatMoney(
+              project.value
+            )}
+          </td>
+
+
+          <td class="money-cell">
+            ${formatMoney(
+              project.paid
+            )}
+          </td>
+
+
+          <td class="money-cell">
+            ${formatMoney(
+              debt
+            )}
+          </td>
+
+        `;
+
+
+        tbody.appendChild(tr);
+
+      }
+    );
 
   }
 
+
+  /* =========================================================
+     TỔNG TIỀN
+  ========================================================= */
 
   function updateTotals() {
 
     const projects =
       getProjectData();
 
+
     let totalPerformed = 0;
     let totalPaid = 0;
     let totalDebt = 0;
 
-    projects.forEach(project => {
 
-      totalPerformed +=
-        project.value;
+    projects.forEach(
+      project => {
 
-      totalPaid +=
-        project.paid;
+        totalPerformed +=
+          project.value;
 
-      totalDebt +=
-        project.value -
-        project.paid;
+        totalPaid +=
+          project.paid;
 
-    });
+        totalDebt +=
+          project.value -
+          project.paid;
+
+      }
+    );
 
 
     document.getElementById(
       "totalPerformed"
     ).value =
-      formatMoney(totalPerformed);
+      formatMoney(
+        totalPerformed
+      );
+
 
     document.getElementById(
       "totalPaid"
     ).value =
-      formatMoney(totalPaid);
+      formatMoney(
+        totalPaid
+      );
+
 
     document.getElementById(
       "totalDebt"
     ).value =
-      formatMoney(totalDebt);
+      formatMoney(
+        totalDebt
+      );
 
 
     setText(
       "previewTotalPerformed",
-      formatMoney(totalPerformed)
+      formatMoney(
+        totalPerformed
+      )
     );
+
 
     setText(
       "previewTotalPaid",
-      formatMoney(totalPaid)
+      formatMoney(
+        totalPaid
+      )
     );
+
 
     setText(
       "previewTotalDebt",
-      formatMoney(totalDebt)
+      formatMoney(
+        totalDebt
+      )
     );
+
 
     setText(
       "previewConclusionAmount",
-      formatMoney(totalDebt)
+      formatMoney(
+        totalDebt
+      )
     );
 
   }
 
 
-  function updateCheck(id, label) {
+  /* =========================================================
+     CHECKBOX
+  ========================================================= */
+
+  function updateCheck(
+    id,
+    label
+  ) {
 
     const el =
       document.getElementById(id);
 
     if (!el) return;
 
-    const checked =
-      el.checked;
 
-    document.getElementById(
-      "preview" +
-      id.charAt(0).toUpperCase() +
-      id.slice(1)
-    ).textContent =
-      (checked ? "☑ " : "☐ ") +
+    const preview =
+      document.getElementById(
+        "preview" +
+        id.charAt(0).toUpperCase() +
+        id.slice(1)
+      );
+
+    if (!preview) return;
+
+
+    preview.textContent =
+      (el.checked ? "☑ " : "☐ ") +
       label;
 
   }
 
 
+  /* =========================================================
+     CẬP NHẬT PREVIEW
+  ========================================================= */
+
   function updatePreview() {
+
+    /* ---------- SỐ BIÊN BẢN ---------- */
 
     setText(
       "previewDocumentNo",
@@ -1649,39 +2454,54 @@
     );
 
 
+    /* ---------- NGÀY LẬP ---------- */
+
     const date =
       document.getElementById(
         "documentDate"
       ).value;
 
-    setText(
-      "previewDate",
-      date
-        ? `Hôm nay, ngày ${formatDateVN(date).replaceAll(" / ", " tháng ").replace(/^(\d+) tháng (\d+) tháng /, "$1 tháng ")} , chúng tôi gồm:`
-        : "Hôm nay, ngày ...... tháng ...... năm 20......, chúng tôi gồm:"
-    );
 
     if (date) {
 
       const d =
-        new Date(date + "T00:00:00");
+        new Date(
+          date + "T00:00:00"
+        );
+
 
       setText(
         "previewDate",
-        `Hôm nay, ngày ${String(d.getDate()).padStart(2, "0")} tháng ${String(d.getMonth() + 1).padStart(2, "0")} năm ${d.getFullYear()}, chúng tôi gồm:`
+
+        `Hôm nay, ngày ${
+          String(
+            d.getDate()
+          ).padStart(2, "0")
+        } tháng ${
+          String(
+            d.getMonth() + 1
+          ).padStart(2, "0")
+        } năm ${
+          d.getFullYear()
+        }, chúng tôi gồm:`
+
+      );
+
+    } else {
+
+      setText(
+        "previewDate",
+        "Hôm nay, ngày ...... tháng ...... năm 20......, chúng tôi gồm:"
       );
 
     }
 
 
+    /* ---------- KỲ THÁNG ---------- */
+
     const monthChecked =
       document.getElementById(
         "periodMonthCheck"
-      ).checked;
-
-    const quarterChecked =
-      document.getElementById(
-        "periodQuarterCheck"
       ).checked;
 
 
@@ -1690,15 +2510,34 @@
         "periodMonth"
       ).value || "......";
 
+
     const monthYear =
       document.getElementById(
         "periodMonthYear"
       ).value || "........";
 
+
+    setText(
+      "previewMonth",
+
+      `${monthChecked ? "☒" : "☐"} Tháng ${month} năm ${monthYear}`
+
+    );
+
+
+    /* ---------- KỲ QUÝ ---------- */
+
+    const quarterChecked =
+      document.getElementById(
+        "periodQuarterCheck"
+      ).checked;
+
+
     const quarter =
       document.getElementById(
         "periodQuarter"
       ).value || "......";
+
 
     const quarterYear =
       document.getElementById(
@@ -1707,111 +2546,145 @@
 
 
     setText(
-      "previewMonth",
-      `${monthChecked ? "☒" : "☐"} Tháng ${month} năm ${monthYear}`
-    );
-
-    setText(
       "previewQuarter",
+
       `${quarterChecked ? "☒" : "☐"} Quý ${quarter} năm ${quarterYear}`
+
     );
 
+
+    /* ---------- BÊN A ---------- */
 
     setText(
       "previewARepresentative",
+
       document.getElementById(
         "partyARepresentative"
       ).value,
+
       "......................................................"
     );
+
 
     setText(
       "previewAPosition",
+
       document.getElementById(
         "partyAPosition"
       ).value,
+
       "......................................................"
     );
 
+
+    /* ---------- BÊN B ---------- */
 
     setText(
       "previewBCompany",
+
       document.getElementById(
         "partyBCompany"
       ).value,
+
       "......................................................"
     );
+
 
     setText(
       "previewBTax",
+
       document.getElementById(
         "partyBTax"
       ).value,
+
       ".............................................................."
     );
 
+
     setText(
       "previewBAddress",
+
       document.getElementById(
         "partyBAddress"
       ).value,
+
       ".........................................................."
     );
 
+
     setText(
       "previewBRepresentative",
+
       document.getElementById(
         "partyBRepresentative"
       ).value,
+
       "......................................................"
     );
 
+
     setText(
       "previewBPosition",
+
       document.getElementById(
         "partyBPosition"
       ).value,
+
       "......................................................"
     );
+
+
+    /* ---------- NGÀY ĐỐI CHIẾU ---------- */
+
+    const debtUntilDate =
+      document.getElementById(
+        "debtUntilDate"
+      ).value;
 
 
     setText(
       "previewDebtUntil",
-      document.getElementById(
-        "debtUntilDate"
-      ).value
+
+      debtUntilDate
         ? formatDateVN(
-            document.getElementById(
-              "debtUntilDate"
-            ).value
+            debtUntilDate
           )
         : "...... / ...... / 20......"
     );
 
 
+    /* ---------- BẰNG CHỮ ---------- */
+
     setText(
       "previewDebtWords",
+
       document.getElementById(
         "debtWords"
       ).value,
+
       "..........................................................................."
     );
 
+
+    /* ---------- XÁC NHẬN ---------- */
 
     updateCheck(
       "confirm1",
       "Các số liệu công nợ nêu trên là đúng và đầy đủ."
     );
 
+
     updateCheck(
       "confirm2",
       "Không có tranh chấp về khối lượng công việc đã thực hiện."
     );
 
+
     updateCheck(
       "confirm3",
       "Không có tranh chấp về giá trị đã nghiệm thu."
     );
+
 
     updateCheck(
       "confirm4",
@@ -1819,81 +2692,134 @@
     );
 
 
+    /* ---------- HẠN THANH TOÁN ---------- */
+
     const paymentDeadline =
       document.getElementById(
         "paymentDeadline"
       ).value;
 
+
     setText(
       "previewPaymentDeadline",
+
       paymentDeadline
-        ? formatDateVN(paymentDeadline)
+        ? formatDateVN(
+            paymentDeadline
+          )
         : "...... / ...... / 20......"
     );
 
 
+    /* ---------- GHI CHÚ ---------- */
+
     setText(
       "previewNote1",
+
       document.getElementById(
         "note1"
       ).value,
+
       "...................................................................."
     );
+
 
     setText(
       "previewNote2",
+
       document.getElementById(
         "note2"
       ).value,
+
       "...................................................................."
     );
 
+
+    /* ---------- KẾT LUẬN ---------- */
 
     const conclusionDate =
       document.getElementById(
         "conclusionDate"
       ).value;
 
+
     setText(
       "previewConclusionDate",
+
       conclusionDate
-        ? formatDateVN(conclusionDate)
+        ? formatDateVN(
+            conclusionDate
+          )
         : "...... / ...... / 20......"
     );
 
 
     setText(
       "previewConclusionWords",
+
       document.getElementById(
         "conclusionWords"
       ).value,
+
       "..........................................................................."
     );
 
 
+    /* ---------- BẢNG + TỔNG ---------- */
+
     updateDebtTable();
+
     updateTotals();
+
+
+    /* ---------- LƯU ---------- */
 
     saveDraft();
 
   }
 
 
+  /* =========================================================
+     ESCAPE HTML
+  ========================================================= */
+
   function escapeHTML(value) {
 
-    return String(value ?? "")
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
+    return String(
+      value ?? ""
+    )
+      .replaceAll(
+        "&",
+        "&amp;"
+      )
+      .replaceAll(
+        "<",
+        "&lt;"
+      )
+      .replaceAll(
+        ">",
+        "&gt;"
+      )
+      .replaceAll(
+        '"',
+        "&quot;"
+      )
+      .replaceAll(
+        "'",
+        "&#039;"
+      );
 
   }
 
 
+  /* =========================================================
+     THU THẬP FORM
+  ========================================================= */
+
   function collectData() {
 
     const data = {};
+
 
     document
       .querySelectorAll(
@@ -1903,6 +2829,7 @@
 
         if (!el.id) return;
 
+
         data[el.id] =
           el.type === "checkbox"
             ? el.checked
@@ -1910,10 +2837,15 @@
 
       });
 
+
     return data;
 
   }
 
+
+  /* =========================================================
+     LƯU NHÁP
+  ========================================================= */
 
   function saveDraft() {
 
@@ -1938,6 +2870,10 @@
   }
 
 
+  /* =========================================================
+     LOAD NHÁP
+  ========================================================= */
+
   function loadDraft() {
 
     try {
@@ -1947,26 +2883,41 @@
           STORAGE_KEY
         );
 
+
       if (!raw) return;
+
 
       const data =
         JSON.parse(raw);
 
+
       Object.entries(data)
-        .forEach(([id, value]) => {
+        .forEach(
+          ([id, value]) => {
 
-          const el =
-            document.getElementById(id);
+            const el =
+              document.getElementById(id);
 
-          if (!el) return;
 
-          if (el.type === "checkbox") {
-            el.checked = Boolean(value);
-          } else {
-            el.value = value;
+            if (!el) return;
+
+
+            if (
+              el.type === "checkbox"
+            ) {
+
+              el.checked =
+                Boolean(value);
+
+            } else {
+
+              el.value =
+                value;
+
+            }
+
           }
-
-        });
+        );
 
     } catch (error) {
 
@@ -1980,6 +2931,10 @@
   }
 
 
+  /* =========================================================
+     KHỞI TẠO
+  ========================================================= */
+
   function init() {
 
     createProjectEditors();
@@ -1987,53 +2942,73 @@
     loadDraft();
 
 
+    /* ---------- SỐ BIÊN BẢN ---------- */
+
     const documentNo =
       document.getElementById(
         "documentNo"
       );
 
-    if (!documentNo.value.trim()) {
+
+    if (
+      !documentNo.value.trim()
+    ) {
+
       documentNo.value =
         getNextDocumentNumber();
+
     }
 
+
+    /* ---------- NGÀY ---------- */
 
     const today =
       getTodayISO();
 
 
-    if (!document.getElementById(
-      "documentDate"
-    ).value) {
-
+    const documentDate =
       document.getElementById(
         "documentDate"
-      ).value = today;
+      );
+
+
+    if (!documentDate.value) {
+
+      documentDate.value =
+        today;
 
     }
 
 
-    if (!document.getElementById(
-      "debtUntilDate"
-    ).value) {
-
+    const debtUntilDate =
       document.getElementById(
         "debtUntilDate"
-      ).value = today;
+      );
+
+
+    if (!debtUntilDate.value) {
+
+      debtUntilDate.value =
+        today;
 
     }
 
 
-    if (!document.getElementById(
-      "conclusionDate"
-    ).value) {
-
+    const conclusionDate =
       document.getElementById(
         "conclusionDate"
-      ).value = today;
+      );
+
+
+    if (!conclusionDate.value) {
+
+      conclusionDate.value =
+        today;
 
     }
 
+
+    /* ---------- BIND FORM ---------- */
 
     document
       .querySelectorAll(
@@ -2046,6 +3021,7 @@
           updatePreview
         );
 
+
         el.addEventListener(
           "change",
           updatePreview
@@ -2054,10 +3030,16 @@
       });
 
 
+    /* ---------- PREVIEW ---------- */
+
     updatePreview();
 
   }
 
+
+  /* =========================================================
+     START
+  ========================================================= */
 
   init();
 
