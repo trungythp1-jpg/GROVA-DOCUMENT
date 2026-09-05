@@ -1,1074 +1,1755 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
+<title>Hợp đồng nguyên tắc - GROVA DOCUMENT</title>
 
-  <title>Hợp đồng nguyên tắc - GROVA DOCUMENT</title>
+<style>
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #eef3f1;
+    color: #20252b;
+}
+
+body {
+    min-height: 100vh;
+}
+
+
+/* =====================================================
+   TOP BAR
+===================================================== */
+
+.topbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+
+    height: 64px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 22px;
+
+    background: #ffffff;
+    border-bottom: 1px solid #dce5e1;
+
+    box-shadow: 0 2px 12px rgba(0,0,0,.05);
+}
+
+.topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.back-button {
+    border: 0;
+    background: #eef7f3;
+    color: #147b5d;
+
+    width: 40px;
+    height: 40px;
+
+    border-radius: 10px;
+
+    font-size: 21px;
+
+    cursor: pointer;
+}
+
+.topbar-title {
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.topbar-subtitle {
+    margin-top: 2px;
+    font-size: 12px;
+    color: #7a858d;
+}
+
+
+/* =====================================================
+   LAYOUT
+===================================================== */
+
+.workspace {
+    display: grid;
+    grid-template-columns: 360px minmax(0, 1fr);
+
+    min-height: calc(100vh - 64px);
+}
+
+
+/* =====================================================
+   FORM PANEL
+===================================================== */
+
+.form-panel {
+    background: #ffffff;
+
+    border-right: 1px solid #dce5e1;
+
+    padding: 24px;
+
+    overflow-y: auto;
+}
+
+.form-header {
+    margin-bottom: 22px;
+}
+
+.form-header h1 {
+    margin: 0;
+
+    font-size: 22px;
+    line-height: 1.3;
+}
+
+.form-header p {
+    margin: 7px 0 0;
+
+    color: #758089;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+
+.section {
+    margin-bottom: 22px;
+
+    padding-bottom: 20px;
+
+    border-bottom: 1px solid #e8eeeb;
+}
+
+.section:last-child {
+    border-bottom: 0;
+}
+
+.section-title {
+    margin-bottom: 14px;
+
+    font-size: 14px;
+    font-weight: 800;
+
+    color: #147b5d;
+
+    text-transform: uppercase;
+    letter-spacing: .3px;
+}
+
+
+.field {
+    margin-bottom: 13px;
+}
+
+.field label {
+    display: block;
+
+    margin-bottom: 6px;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    color: #4d5860;
+}
+
+.field input {
+    width: 100%;
+
+    min-height: 42px;
+
+    padding: 9px 11px;
+
+    border: 1px solid #d6dfdb;
+    border-radius: 9px;
+
+    background: #ffffff;
+
+    color: #20252b;
+
+    font-size: 14px;
+
+    outline: none;
+}
+
+.field input:focus {
+    border-color: #29946f;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(41,148,111,.10);
+}
+
+.grid-2 {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 10px;
+}
+
+
+/* =====================================================
+   BUTTONS
+===================================================== */
+
+.button {
+    width: 100%;
+
+    min-height: 44px;
+
+    border-radius: 10px;
+
+    border: 1px solid transparent;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+.button-primary {
+    background: #147b5d;
+    color: white;
+}
+
+.button-primary:hover {
+    background: #0e694e;
+}
+
+.button-secondary {
+    margin-top: 9px;
+
+    background: #f2f6f4;
+
+    border-color: #dce5e1;
+
+    color: #3c474e;
+}
+
+
+/* =====================================================
+   PREVIEW
+===================================================== */
+
+.preview-area {
+    padding: 28px;
+
+    overflow: auto;
+
+    background:
+        linear-gradient(
+            90deg,
+            #edf2f0 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            #edf2f0 1px,
+            transparent 1px
+        );
+
+    background-size: 24px 24px;
+}
+
+.preview-label {
+    width: 210mm;
+
+    max-width: 100%;
+
+    margin: 0 auto 12px;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    color: #66727a;
+}
+
+
+/* =====================================================
+   A4
+===================================================== */
+
+.document {
+    width: 210mm;
+
+    min-height: 297mm;
+
+    margin: 0 auto 25px;
+
+    padding: 18mm 18mm 18mm;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 5px 28px
+        rgba(0,0,0,.13);
+
+    color: #111111;
+
+    font-family:
+        "Times New Roman",
+        Times,
+        serif;
+
+    font-size: 13.5pt;
+
+    line-height: 1.42;
+}
+
+.document.page {
+    page-break-after: always;
+}
+
+.document.page:last-child {
+    page-break-after: auto;
+}
+
+
+/* =====================================================
+   DOCUMENT HEADER
+===================================================== */
+
+.doc-header {
+    position: relative;
+
+    min-height: 35mm;
+
+    border-bottom: 1px solid #777;
+
+    margin-bottom: 8mm;
+}
+
+.doc-logo {
+    position: absolute;
+
+    left: 0;
+    top: 0;
+
+    width: 34mm;
+    max-height: 18mm;
+
+    object-fit: contain;
+}
+
+.national {
+    text-align: center;
+
+    font-weight: 700;
+
+    font-size: 14pt;
+}
+
+.motto {
+    margin-top: 2px;
+
+    text-align: center;
+
+    font-weight: 700;
+
+    font-size: 13pt;
+}
+
+.doc-title {
+    margin-top: 10mm;
+
+    text-align: center;
+
+    font-size: 17pt;
+
+    font-weight: 700;
+}
+
+.doc-subtitle {
+    margin-top: 3mm;
+
+    text-align: center;
+
+    font-size: 15pt;
+
+    font-weight: 700;
+}
+
+.doc-number {
+    margin-top: 4mm;
+
+    text-align: center;
+
+    font-style: italic;
+
+    font-size: 13pt;
+}
+
+
+/* =====================================================
+   DOCUMENT CONTENT
+===================================================== */
+
+.doc p {
+    margin: 0 0 4mm;
+}
+
+.doc .center {
+    text-align: center;
+}
+
+.doc .bold {
+    font-weight: 700;
+}
+
+.doc .italic {
+    font-style: italic;
+}
+
+.doc .section-heading {
+    margin-top: 5mm;
+    margin-bottom: 3mm;
+
+    font-weight: 700;
+}
+
+.doc ul {
+    margin-top: 1mm;
+    margin-bottom: 4mm;
+
+    padding-left: 9mm;
+}
+
+.doc li {
+    margin-bottom: 1.5mm;
+}
+
+.party-title {
+    font-weight: 700;
+
+    margin-top: 4mm;
+}
+
+.variable {
+    display: inline-block;
+
+    min-width: 45mm;
+
+    border-bottom: 1px dotted #333;
+
+    padding: 0 2px;
+
+    white-space: nowrap;
+}
+
+.variable.long {
+    min-width: 120mm;
+}
+
+.variable.medium {
+    min-width: 70mm;
+}
+
+.variable.short {
+    min-width: 25mm;
+}
+
+
+/* =====================================================
+   SIGNATURE
+===================================================== */
+
+.signatures {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 20mm;
+
+    margin-top: 14mm;
+
+    text-align: center;
+}
+
+.signature-title {
+    font-weight: 700;
+}
+
+.signature-company {
+    margin-top: 2mm;
+
+    font-weight: 700;
+}
+
+.signature-note {
+    margin-top: 30mm;
+
+    font-style: italic;
+}
+
+
+/* =====================================================
+   PRINT
+===================================================== */
+
+@page {
+    size: A4;
+    margin: 0;
+}
+
+@media print {
 
     html,
     body {
-      margin: 0;
-      padding: 0;
-      background: #eef2f1;
-      color: #111;
-      font-family: "Times New Roman", Times, serif;
+        background: white;
     }
 
-    body {
-      padding: 24px 0 60px;
+    .topbar,
+    .form-panel,
+    .preview-label {
+        display: none !important;
     }
 
-    .toolbar {
-      width: 210mm;
-      max-width: calc(100% - 24px);
-      margin: 0 auto 16px;
-      padding: 14px 18px;
-      background: #ffffff;
-      border-radius: 14px;
-      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
-
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-
-      font-family: Arial, Helvetica, sans-serif;
+    .workspace {
+        display: block;
     }
 
-    .toolbar-title {
-      font-weight: 700;
-      color: #0b7a5a;
-      font-size: 16px;
-    }
+    .preview-area {
+        padding: 0;
 
-    .toolbar-subtitle {
-      margin-top: 3px;
-      color: #69736f;
-      font-size: 12px;
-    }
+        background: white;
 
-    .toolbar-actions {
-      display: flex;
-      gap: 8px;
-    }
-
-    button {
-      border: 0;
-      border-radius: 9px;
-      padding: 10px 15px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 13px;
-    }
-
-    .btn-back {
-      background: #eef3f1;
-      color: #24584a;
-    }
-
-    .btn-print {
-      background: #0b7a5a;
-      color: #fff;
+        overflow: visible;
     }
 
     .document {
-      width: 210mm;
-      margin: 0 auto;
-    }
-
-    .page {
-      width: 210mm;
-      min-height: 297mm;
-      padding: 20mm 20mm 18mm 25mm;
-      margin-bottom: 12px;
-
-      background: #fff;
-
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.10);
-
-      position: relative;
-      overflow: hidden;
-    }
-
-    .header {
-      text-align: center;
-    }
-
-    .country {
-      font-weight: 700;
-      font-size: 14pt;
-      text-transform: uppercase;
-    }
-
-    .motto {
-      font-weight: 700;
-      font-size: 13pt;
-      margin-top: 2px;
-    }
-
-    .title {
-      margin-top: 18px;
-      text-align: center;
-      font-weight: 700;
-      font-size: 16pt;
-      text-transform: uppercase;
-      line-height: 1.35;
-    }
-
-    .contract-number {
-      text-align: center;
-      margin-top: 7px;
-      font-size: 13pt;
-    }
-
-    .intro {
-      margin-top: 14px;
-      font-size: 13pt;
-      line-height: 1.45;
-      text-align: justify;
-    }
-
-    .basis {
-      margin-top: 10px;
-      font-size: 13pt;
-      line-height: 1.45;
-    }
-
-    .basis div {
-      margin: 2px 0;
-    }
-
-    .party-title {
-      font-weight: 700;
-      font-size: 13pt;
-      margin-top: 12px;
-    }
-
-    .line {
-      margin: 3px 0;
-      font-size: 13pt;
-      line-height: 1.4;
-    }
-
-    .editable {
-      display: inline-block;
-      min-width: 180px;
-      border: 0;
-      border-bottom: 1px dotted #555;
-      outline: none;
-      background: transparent;
-      font-family: "Times New Roman", Times, serif;
-      font-size: 13pt;
-      color: #111;
-      padding: 0 3px;
-    }
-
-    .editable:focus {
-      background: #f4faf7;
-      border-bottom-color: #0b7a5a;
-    }
-
-    .editable.wide {
-      min-width: 430px;
-    }
-
-    .editable.medium {
-      min-width: 280px;
-    }
-
-    .editable.short {
-      min-width: 150px;
-    }
-
-    .section-title {
-      font-weight: 700;
-      font-size: 13.5pt;
-      margin-top: 14px;
-      margin-bottom: 6px;
-      text-transform: uppercase;
-    }
-
-    .paragraph {
-      font-size: 13pt;
-      line-height: 1.48;
-      text-align: justify;
-      margin: 5px 0;
-    }
-
-    .bullet {
-      font-size: 13pt;
-      line-height: 1.45;
-      margin: 3px 0 3px 18px;
-      text-align: justify;
-    }
-
-    .signature-area {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 30mm;
-      margin-top: 32px;
-      text-align: center;
-    }
-
-    .signature-title {
-      font-weight: 700;
-      font-size: 13pt;
-    }
-
-    .signature-company {
-      margin-top: 5px;
-      font-weight: 700;
-      font-size: 13pt;
-      line-height: 1.4;
-    }
-
-    .signature-note {
-      margin-top: 55px;
-      font-size: 12.5pt;
-      font-style: italic;
-    }
-
-    .page-number {
-      position: absolute;
-      bottom: 8mm;
-      left: 0;
-      right: 0;
-      text-align: center;
-      font-size: 10.5pt;
-      color: #555;
-    }
-
-    @media (max-width: 900px) {
-      body {
-        padding: 10px 0 30px;
-      }
-
-      .toolbar {
-        width: calc(100% - 20px);
-        max-width: none;
-        flex-direction: column;
-        align-items: stretch;
-      }
-
-      .toolbar-actions {
-        width: 100%;
-      }
-
-      .toolbar-actions button {
-        flex: 1;
-      }
-
-      .document {
-        width: 100%;
-      }
-
-      .page {
-        width: 100%;
-        min-height: auto;
-        margin-bottom: 10px;
-        padding: 18mm 12mm 18mm 15mm;
-      }
-
-      .editable.wide,
-      .editable.medium {
-        min-width: 120px;
-        max-width: 100%;
-      }
-
-      .signature-area {
-        gap: 12mm;
-      }
-    }
-
-    @media print {
-      html,
-      body {
-        background: #fff;
-      }
-
-      body {
-        padding: 0;
-      }
-
-      .toolbar {
-        display: none !important;
-      }
-
-      .document {
-        width: auto;
-        margin: 0;
-      }
-
-      .page {
         width: 210mm;
-        height: 297mm;
         min-height: 297mm;
+
         margin: 0;
-        padding: 20mm 20mm 18mm 25mm;
+
         box-shadow: none;
+    }
+}
 
-        page-break-after: always;
-        break-after: page;
-      }
 
-      .page:last-child {
-        page-break-after: auto;
-        break-after: auto;
-      }
+/* =====================================================
+   RESPONSIVE
+===================================================== */
 
-      .editable {
-        border: 0;
-      }
+@media (max-width: 1100px) {
+
+    .workspace {
+        grid-template-columns: 320px minmax(0,1fr);
     }
 
-    @page {
-      size: A4;
-      margin: 0;
+    .document {
+        transform-origin: top left;
     }
-  </style>
+}
+
+
+@media (max-width: 800px) {
+
+    .workspace {
+        display: block;
+    }
+
+    .form-panel {
+        border-right: 0;
+        border-bottom: 1px solid #dce5e1;
+    }
+
+    .preview-area {
+        padding: 15px;
+
+        overflow-x: auto;
+    }
+
+    .document {
+        margin-left: 0;
+        margin-right: 0;
+    }
+}
+
+</style>
 </head>
+
 
 <body>
 
-  <!-- THANH CÔNG CỤ -->
-  <div class="toolbar">
 
-    <div>
-      <div class="toolbar-title">
-        GROVA DOCUMENT
-      </div>
+<!-- =====================================================
+     TOP BAR
+===================================================== -->
 
-      <div class="toolbar-subtitle">
-        Hợp đồng nguyên tắc thi công lắp đặt khung thép thang máy
-      </div>
-    </div>
+<header class="topbar">
 
-    <div class="toolbar-actions">
+    <div class="topbar-left">
 
-      <button
-        class="btn-back"
-        type="button"
-        onclick="history.back()"
-      >
-        ← Quay lại
-      </button>
-
-      <button
-        class="btn-print"
-        type="button"
-        onclick="window.print()"
-      >
-        In / Xuất PDF
-      </button>
-
-    </div>
-
-  </div>
-
-
-  <main class="document">
-
-
-    <!-- ========================= -->
-    <!-- TRANG 1 -->
-    <!-- ========================= -->
-
-    <section class="page">
-
-      <div class="header">
-
-        <div class="country">
-          CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM
-        </div>
-
-        <div class="motto">
-          Độc lập – Tự do – Hạnh phúc
-        </div>
-
-      </div>
-
-
-      <div class="title">
-        HỢP ĐỒNG NGUYÊN TẮC<br>
-        THI CÔNG LẮP ĐẶT KHUNG THÉP THANG MÁY
-      </div>
-
-
-      <div class="contract-number">
-        Số: 01/2026/HĐTC
-      </div>
-
-
-      <div class="basis">
-
-        <div>
-           Căn cứ Bộ luật Dân sự hiện hành;
-        </div>
-
-        <div>
-           Căn cứ Luật Thương mại hiện hành;
-        </div>
-
-        <div>
-           Căn cứ nhu cầu hợp tác và năng lực của các bên.
-        </div>
-
-      </div>
-
-
-      <div class="intro">
-        Hôm nay, ngày
-        <input class="editable short" type="text">
-        tháng
-        <input class="editable short" type="text">
-        năm 2026, chúng tôi gồm:
-      </div>
-
-
-      <div class="party-title">
-        BÊN A: BÊN THI CÔNG
-      </div>
-
-
-      <div class="line">
-        CÔNG TY CỔ PHẦN GROVA HOLDINGS
-      </div>
-
-      <div class="line">
-        Mã số thuế: 0202328361
-      </div>
-
-      <div class="line">
-        Địa chỉ: 49A/348 Trần Nguyên Hãn, Phường An Biên, Thành phố Hải Phòng
-      </div>
-
-      <div class="line">
-        Đại diện: PHẠM VĂN HỌC
-      </div>
-
-      <div class="line">
-        Chức vụ: Giám Đốc
-      </div>
-
-      <div class="line">
-        Điện thoại:
-        <input class="editable medium" type="text">
-      </div>
-
-
-      <div class="party-title">
-        VÀ
-      </div>
-
-
-      <div class="party-title">
-        BÊN B: BÊN THUÊ THI CÔNG
-      </div>
-
-
-      <div class="line">
-        <input
-          class="editable wide"
-          type="text"
-          placeholder=""
+        <button
+            class="back-button"
+            type="button"
+            onclick="goBack()"
         >
-      </div>
-
-      <div class="line">
-        Mã số thuế:
-        <input class="editable medium" type="text">
-      </div>
-
-      <div class="line">
-        Địa chỉ:
-        <input class="editable medium" type="text">
-      </div>
-
-      <div class="line">
-        Đại diện:
-        <input class="editable medium" type="text">
-      </div>
-
-      <div class="line">
-        Chức vụ:
-        <input class="editable medium" type="text">
-      </div>
-
-      <div class="line">
-        Điện thoại:
-        <input class="editable medium" type="text">
-      </div>
-
-
-      <div class="paragraph">
-        Sau khi bàn bạc trên tinh thần thiện chí, hợp tác và cùng có lợi, hai bên thống nhất ký kết Hợp
-        đồng nguyên tắc thi công lắp đặt khung thép thang máy với các điều khoản sau:
-      </div>
-
-
-      <div class="section-title">
-        ĐIỀU 1. PHẠM VI HỢP TÁC
-      </div>
-
-
-      <div class="paragraph">
-        1.1. Hợp đồng này quy định nguyên tắc hợp tác giữa Bên A và Bên B trong việc thi công lắp
-        đặt khung thép thang máy.
-      </div>
-
-
-      <div class="paragraph">
-        1.2. Đối với từng công trình cụ thể, hai bên sẽ ký Phụ lục công trình để xác nhận:
-      </div>
-
-
-      <div class="bullet"> Tên công trình;</div>
-      <div class="bullet"> Địa điểm thi công;</div>
-      <div class="bullet"> Chủ đầu tư;</div>
-      <div class="bullet"> Số stop;</div>
-      <div class="bullet"> Giá trị công trình;</div>
-      <div class="bullet"> Tiến độ thực hiện;</div>
-      <div class="bullet"> Các yêu cầu kỹ thuật đặc thù.</div>
-
-
-      <div class="paragraph">
-        1.3. Phụ lục công trình là một phần không tách rời của hợp đồng này.
-      </div>
-
-
-      <div class="page-number">
-        1
-      </div>
-
-    </section>
-
-
-
-    <!-- ========================= -->
-    <!-- TRANG 2 -->
-    <!-- ========================= -->
-
-    <section class="page">
-
-      <div class="section-title">
-        ĐIỀU 2. PHẠM VI CÔNG VIỆC
-      </div>
-
-      <div class="paragraph">
-        Bên A thực hiện:
-      </div>
-
-      <div class="bullet"> Lắp đặt khung thép thang máy;</div>
-      <div class="bullet"> Căn chỉnh kết cấu khung;</div>
-      <div class="bullet"> Liên kết bulong, bản mã;</div>
-      <div class="bullet"> Kiểm tra độ thẳng đứng và độ cân bằng của khung;</div>
-      <div class="bullet"> Bọc bảo vệ chống xước sau lắp đặt;</div>
-      <div class="bullet"> Vệ sinh khu vực thi công;</div>
-      <div class="bullet"> Hỗ trợ nghiệm thu kỹ thuật phần khung thép.</div>
-
-
-      <div class="section-title">
-        ĐIỀU 3. ĐƠN GIÁ THI CÔNG
-      </div>
-
-      <div class="paragraph">
-        3.1. Đơn giá tiêu chuẩn:
-      </div>
-
-      <div class="paragraph">
-        2.500.000 đồng/stop
-      </div>
-
-      <div class="paragraph">
-        (Đã bao gồm VAT)
-      </div>
-
-      <div class="paragraph">
-        3.2. Đơn giá áp dụng cho công trình trong bán kính 40km tính từ Nhà hát Thành phố Hải
-        Phòng.
-      </div>
-
-      <div class="paragraph">
-        3.3. Giá trị từng công trình được xác định trong phụ lục công trình.
-      </div>
-
-
-      <div class="section-title">
-        ĐIỀU 4. ĐIỀU KIỆN THI CÔNG
-      </div>
-
-      <div class="paragraph">
-        4.1. Điều kiện thi công được hiểu là các điều kiện cần thiết để Bên A triển khai công việc an
-        toàn và đúng tiến độ, bao gồm:
-      </div>
-
-      <div class="bullet"> Hố thang đúng kích thước;</div>
-      <div class="bullet"> Điện thi công;</div>
-      <div class="bullet"> Lối vận chuyển vật tư;</div>
-      <div class="bullet"> Khu vực tập kết vật tư;</div>
-      <div class="bullet"> Giàn giáo hoặc thiết bị nâng hạ;</div>
-      <div class="bullet"> Điều kiện an toàn lao động;</div>
-      <div class="bullet"> Sự phối hợp của chủ đầu tư và các đơn vị liên quan.</div>
-
-      <div class="paragraph">
-        4.2. Trường hợp công trình chưa đáp ứng điều kiện thi công nhưng Bên B vẫn yêu cầu triển
-        khai thì:
-      </div>
-
-      <div class="bullet"> Mọi chi phí phát sinh được tính riêng;</div>
-      <div class="bullet"> Chậm tiến độ không thuộc trách nhiệm của Bên A.</div>
-
-
-      <div class="section-title">
-        ĐIỀU 5. CHI PHÍ PHÁT SINH
-      </div>
-
-      <div class="paragraph">
-        Các trường hợp sau được tính là phát sinh:
-      </div>
-
-      <div class="bullet"> Hố thang xây sai kích thước;</div>
-      <div class="bullet"> Phải đục phá hoặc gia công bổ sung;</div>
-      <div class="bullet"> Thi công ban đêm;</div>
-      <div class="bullet"> Thi công ngoài giờ;</div>
-      <div class="bullet"> Chờ việc do nguyên nhân từ công trình;</div>
-      <div class="bullet"> Điều động nhân sự nhiều lần;</div>
-      <div class="bullet"> Thay đổi thiết kế;</div>
-      <div class="bullet"> Công việc ngoài phạm vi hợp đồng.</div>
-
-      <div class="paragraph">
-        Mọi phát sinh phải được Bên B xác nhận trước khi thực hiện.
-      </div>
-
-      <div class="paragraph">
-        Xác nhận qua văn bản, email, Zalo hoặc tin nhắn của người phụ trách công trình đều được
-        xem là hợp lệ.
-      </div>
-
-
-      <div class="page-number">
-        2
-      </div>
-
-    </section>
-
-
-
-    <!-- ========================= -->
-    <!-- TRANG 3 -->
-    <!-- ========================= -->
-
-    <section class="page">
-
-      <div class="section-title">
-        ĐIỀU 6. TIẾN ĐỘ THI CÔNG
-      </div>
-
-      <div class="paragraph">
-        6.1. Tiến độ được xác định tại phụ lục công trình.
-      </div>
-
-      <div class="paragraph">
-        6.2. Các khoảng thời gian sau không tính vào thời gian thi công của Bên A:
-      </div>
-
-      <div class="bullet"> Chờ điện;</div>
-      <div class="bullet"> Chờ mặt bằng;</div>
-      <div class="bullet"> Chờ vật tư;</div>
-      <div class="bullet"> Chờ hoàn thiện xây dựng;</div>
-      <div class="bullet"> Chờ xử lý sai sót công trình.</div>
-
-      <div class="paragraph">
-        6.3. Nếu Bên A chậm tiến độ do lỗi chủ quan:
-      </div>
-
-      <div class="paragraph">
-        Mức phạt: 0,05% giá trị phần công việc bị chậm/ngày.
-      </div>
-
-      <div class="paragraph">
-        Tổng mức phạt tối đa không vượt quá 8% giá trị phần công việc bị chậm.
-      </div>
-
-
-      <div class="section-title">
-        ĐIỀU 7. NGHIỆM THU
-      </div>
-
-      <div class="paragraph">
-        7.1. Sau khi hoàn thành công việc, hai bên tiến hành nghiệm thu kỹ thuật phần khung thép.
-      </div>
-
-      <div class="paragraph">
-        7.2. Việc nghiệm thu được thực hiện bằng Biên bản nghiệm thu kỹ thuật riêng.
-      </div>
-
-      <div class="paragraph">
-        7.3. Nội dung nghiệm thu gồm:
-      </div>
-
-      <div class="bullet"> Khối lượng thực hiện;</div>
-      <div class="bullet"> Độ thẳng đứng;</div>
-      <div class="bullet"> Độ cân bằng;</div>
-      <div class="bullet"> Liên kết kết cấu;</div>
-      <div class="bullet"> Công tác vệ sinh;</div>
-      <div class="bullet"> Bọc bảo vệ chống xước.</div>
-
-
-      <div class="section-title">
-        ĐIỀU 8. NGHIỆM THU MẶC ĐỊNH
-      </div>
-
-      <div class="paragraph">
-        8.1. Nếu Bên B không tiến hành nghiệm thu trong vòng 03 ngày kể từ ngày nhận thông báo
-        hoàn thành thì được xem là đã nghiệm thu.
-      </div>
-
-      <div class="paragraph">
-        8.2. Công trình được xem là đã nghiệm thu khi:
-      </div>
-
-      <div class="bullet"> Đưa vào sử dụng;</div>
-      <div class="bullet"> Lắp đặt thiết bị thang máy;</div>
-      <div class="bullet"> Hoặc có đơn vị khác tiếp tục thi công trên phần khung thép.</div>
-
-
-      <div class="section-title">
-        ĐIỀU 9. THANH TOÁN
-      </div>
-
-      <div class="paragraph">
-        9.1. Tiến độ thanh toán được xác định tại phụ lục công trình.
-      </div>
-
-      <div class="paragraph">
-        9.2. Hình thức thanh toán:
-      </div>
-
-      <div class="paragraph">
-        Chuyển khoản
-      </div>
-
-      <div class="paragraph">
-        9.3. Công nợ được xác nhận thông qua:
-      </div>
-
-      <div class="bullet"> Hợp đồng;</div>
-      <div class="bullet"> Phụ lục công trình;</div>
-      <div class="bullet"> Biên bản nghiệm thu;</div>
-      <div class="bullet"> Email;</div>
-      <div class="bullet"> Tin nhắn;</div>
-      <div class="bullet"> Zalo.</div>
-
-
-      <div class="page-number">
-        3
-      </div>
-
-    </section>
-
-
-
-    <!-- ========================= -->
-    <!-- TRANG 4 -->
-    <!-- ========================= -->
-
-    <section class="page">
-
-      <div class="section-title">
-        ĐIỀU 10. BẢO VỆ CÔNG NỢ
-      </div>
-
-      <div class="paragraph">
-        10.1. Nếu Bên B chậm thanh toán quá 15 ngày:
-      </div>
-
-      <div class="paragraph">
-        Bên A có quyền:
-      </div>
-
-      <div class="bullet"> Dừng thi công;</div>
-      <div class="bullet"> Rút nhân sự khỏi công trình;</div>
-      <div class="bullet"> Ngừng hỗ trợ kỹ thuật;</div>
-      <div class="bullet"> Từ chối nhận công trình mới.</div>
-
-      <div class="paragraph">
-        10.2. Việc dừng thi công theo điều này không được xem là vi phạm hợp đồng.
-      </div>
-
-      <div class="paragraph">
-        10.3. Mọi chi phí phát sinh do việc dừng và triển khai lại công trình sẽ do Bên B chịu.
-      </div>
-
-
-      <div class="section-title">
-        ĐIỀU 11. AN TOÀN LAO ĐỘNG
-      </div>
-
-      <div class="paragraph">
-        11.1. Bên A chịu trách nhiệm:
-      </div>
-
-      <div class="bullet"> Trang bị bảo hộ lao động;</div>
-      <div class="bullet"> Hướng dẫn an toàn;</div>
-      <div class="bullet"> Quản lý nhân sự thuộc phạm vi của mình.</div>
-
-      <div class="paragraph">
-        11.2. Bên B chịu trách nhiệm:
-      </div>
-
-      <div class="bullet"> Mặt bằng an toàn;</div>
-      <div class="bullet"> Điện thi công;</div>
-      <div class="bullet"> Điều kiện thi công phù hợp.</div>
-
-      <div class="paragraph">
-        11.3. Trường hợp tai nạn xảy ra do điều kiện công trình không đảm bảo thì Bên B chịu trách
-        nhiệm tương ứng theo mức độ lỗi thực tế.
-      </div>
-
-      <div class="paragraph">
-        11.4. Trường hợp tai nạn xảy ra do lỗi của nhân sự Bên A thì Bên A chịu trách nhiệm theo quy
-        định pháp luật.
-      </div>
-
-
-      <div class="section-title">
-        ĐIỀU 12. BẢO HÀNH VÀ TRÁCH NHIỆM
-      </div>
-
-      <div class="paragraph">
-        Sau khi nghiệm thu, Bên A không chịu trách nhiệm đối với các hư hỏng phát sinh do:
-      </div>
-
-      <div class="bullet"> Chủ đầu tư;</div>
-      <div class="bullet"> Đơn vị khác;</div>
-      <div class="bullet"> Bên thứ ba;</div>
-      <div class="bullet"> Tác động ngoại lực.</div>
-
-
-      <div class="section-title">
-        ĐIỀU 13. BẢO MẬT VÀ KHÔNG CẠNH TRANH
-      </div>
-
-      <div class="paragraph">
-        13.1. Hai bên cam kết bảo mật:
-      </div>
-
-      <div class="bullet"> Khách hàng;</div>
-      <div class="bullet"> Báo giá;</div>
-      <div class="bullet"> Hồ sơ kỹ thuật;</div>
-      <div class="bullet"> Dữ liệu kinh doanh.</div>
-
-
-      <div class="page-number">
-        4
-      </div>
-
-    </section>
-
-
-
-    <!-- ========================= -->
-    <!-- TRANG 5 -->
-    <!-- ========================= -->
-
-    <section class="page">
-
-      <div class="paragraph">
-        13.2. Trong thời gian hợp tác và 12 tháng sau khi chấm dứt hợp tác, Bên B không được:
-      </div>
-
-      <div class="bullet">
-         Thuê trực tiếp nhân sự chủ chốt của Bên A;
-      </div>
-
-      <div class="bullet">
-         Lôi kéo đội thi công của Bên A;
-      </div>
-
-      <div class="bullet">
-         Giao dịch trực tiếp với khách hàng do Bên A giới thiệu nhằm tránh nghĩa vụ thanh
-        toán.
-      </div>
-
-
-      <div class="section-title">
-        ĐIỀU 14. BẤT KHẢ KHÁNG
-      </div>
-
-      <div class="paragraph">
-        Thiên tai, hỏa hoạn, dịch bệnh, chiến tranh hoặc quyết định của cơ quan nhà nước được xem
-        là sự kiện bất khả kháng.
-      </div>
-
-
-      <div class="section-title">
-        ĐIỀU 15. GIẢI QUYẾT TRANH CHẤP
-      </div>
-
-      <div class="paragraph">
-        Mọi tranh chấp phát sinh sẽ được ưu tiên giải quyết bằng thương lượng.
-      </div>
-
-      <div class="paragraph">
-        Nếu không giải quyết được thì đưa ra Tòa án có thẩm quyền tại Thành phố Hải Phòng.
-      </div>
-
-
-      <div class="section-title">
-        ĐIỀU 16. HIỆU LỰC HỢP ĐỒNG
-      </div>
-
-      <div class="paragraph">
-        16.1. Hợp đồng có hiệu lực kể từ ngày ký.
-      </div>
-
-      <div class="paragraph">
-        16.2. Thời hạn hợp đồng: 01 năm.
-      </div>
-
-      <div class="paragraph">
-        16.3. Hợp đồng tự động gia hạn nếu không có thông báo chấm dứt trước 30 ngày.
-      </div>
-
-      <div class="paragraph">
-        16.4. Hợp đồng được lập thành 02 bản có giá trị pháp lý như nhau.
-      </div>
-
-
-      <div class="signature-area">
+            ←
+        </button>
 
         <div>
 
-          <div class="signature-title">
-            ĐẠI DIỆN BÊN A
-          </div>
+            <div class="topbar-title">
+                Hợp đồng nguyên tắc
+            </div>
 
-          <div class="signature-company">
+            <div class="topbar-subtitle">
+                GROVA DOCUMENT
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <button
+        class="button button-primary"
+        style="width:auto;padding:0 18px"
+        type="button"
+        onclick="printDocument()"
+    >
+        🖨 In / Xuất PDF
+    </button>
+
+</header>
+
+
+<!-- =====================================================
+     WORKSPACE
+===================================================== -->
+
+<main class="workspace">
+
+
+<!-- =====================================================
+     FORM
+===================================================== -->
+
+<section class="form-panel">
+
+    <div class="form-header">
+
+        <h1>
+            Tạo hợp đồng
+        </h1>
+
+        <p>
+            Nhập các thông tin được phép thay đổi.
+            Nội dung điều khoản của mẫu được khóa.
+        </p>
+
+    </div>
+
+
+    <!-- THÔNG TIN HỢP ĐỒNG -->
+
+    <div class="section">
+
+        <div class="section-title">
+            Thông tin hợp đồng
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                Số hợp đồng
+            </label>
+
+            <input
+                id="contractNumber"
+                type="text"
+                value="01/2026/HĐTC"
+                oninput="updateDocument()"
+            >
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                Ngày ký
+            </label>
+
+            <div class="grid-2">
+
+                <input
+                    id="contractDay"
+                    type="text"
+                    placeholder="Ngày"
+                    oninput="updateDocument()"
+                >
+
+                <input
+                    id="contractMonth"
+                    type="text"
+                    placeholder="Tháng"
+                    oninput="updateDocument()"
+                >
+
+            </div>
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                Năm
+            </label>
+
+            <input
+                id="contractYear"
+                type="text"
+                value="2026"
+                oninput="updateDocument()"
+            >
+
+        </div>
+
+    </div>
+
+
+    <!-- BÊN A -->
+
+    <div class="section">
+
+        <div class="section-title">
+            Bên A
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                Điện thoại Bên A
+            </label>
+
+            <input
+                id="partyAPhone"
+                type="text"
+                placeholder="Nhập số điện thoại"
+                oninput="updateDocument()"
+            >
+
+        </div>
+
+        <p style="
+            font-size:12px;
+            color:#7a858d;
+            line-height:1.5;
+            margin:0;
+        ">
+            Thông tin tên công ty, mã số thuế,
+            địa chỉ, người đại diện và chức vụ
+            được lấy cố định từ dữ liệu GROVA.
+        </p>
+
+    </div>
+
+
+    <!-- BÊN B -->
+
+    <div class="section">
+
+        <div class="section-title">
+            Bên B
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                Tên công ty
+            </label>
+
+            <input
+                id="partyBName"
+                type="text"
+                placeholder="Tên đơn vị thuê thi công"
+                oninput="updateDocument()"
+            >
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                Mã số thuế
+            </label>
+
+            <input
+                id="partyBTax"
+                type="text"
+                placeholder="Mã số thuế"
+                oninput="updateDocument()"
+            >
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                Địa chỉ
+            </label>
+
+            <input
+                id="partyBAddress"
+                type="text"
+                placeholder="Địa chỉ"
+                oninput="updateDocument()"
+            >
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                Người đại diện
+            </label>
+
+            <input
+                id="partyBRepresentative"
+                type="text"
+                placeholder="Họ và tên"
+                oninput="updateDocument()"
+            >
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                Chức vụ
+            </label>
+
+            <input
+                id="partyBPosition"
+                type="text"
+                placeholder="Chức vụ"
+                oninput="updateDocument()"
+            >
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                Điện thoại
+            </label>
+
+            <input
+                id="partyBPhone"
+                type="text"
+                placeholder="Số điện thoại"
+                oninput="updateDocument()"
+            >
+
+        </div>
+
+    </div>
+
+
+    <button
+        class="button button-primary"
+        type="button"
+        onclick="printDocument()"
+    >
+        🖨 In / Xuất PDF
+    </button>
+
+
+    <button
+        class="button button-secondary"
+        type="button"
+        onclick="goBack()"
+    >
+        ← Quay lại danh sách văn bản
+    </button>
+
+</section>
+
+
+<!-- =====================================================
+     PREVIEW
+===================================================== -->
+
+<section class="preview-area">
+
+    <div class="preview-label">
+        Xem trước văn bản A4
+    </div>
+
+
+    <!-- =================================================
+         PAGE 1
+    ================================================= -->
+
+    <article class="document page doc">
+
+        <header class="doc-header">
+
+            <img
+                class="doc-logo"
+                src="../assets/logo.png"
+                alt="GROVA HOLDINGS"
+            >
+
+            <div class="national">
+                CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM
+            </div>
+
+            <div class="motto">
+                Độc lập – Tự do – Hạnh phúc
+            </div>
+
+            <div class="doc-title">
+                HỢP ĐỒNG NGUYÊN TẮC
+            </div>
+
+            <div class="doc-subtitle">
+                THI CÔNG LẮP ĐẶT KHUNG THÉP THANG MÁY
+            </div>
+
+            <div class="doc-number">
+                Số:
+                <span id="previewContractNumber">
+                    01/2026/HĐTC
+                </span>
+            </div>
+
+        </header>
+
+
+        <p>
+            • Căn cứ Bộ luật Dân sự hiện hành;
+        </p>
+
+        <p>
+            • Căn cứ Luật Thương mại hiện hành;
+        </p>
+
+        <p>
+            • Căn cứ nhu cầu hợp tác và năng lực của các bên.
+        </p>
+
+
+        <p>
+            Hôm nay, ngày
+            <span class="variable short" id="previewDay">
+                ......
+            </span>
+            tháng
+            <span class="variable short" id="previewMonth">
+                ......
+            </span>
+            năm
+            <span id="previewYear">
+                2026
+            </span>,
+            chúng tôi gồm:
+        </p>
+
+
+        <p class="party-title">
+            BÊN A: BÊN THI CÔNG
+        </p>
+
+        <p>
             CÔNG TY CỔ PHẦN GROVA HOLDINGS
-          </div>
+        </p>
 
-          <div class="signature-note">
-            (Ký, ghi rõ họ tên, đóng dấu)
-          </div>
+        <p>
+            Mã số thuế: 0202328361
+        </p>
+
+        <p>
+            Địa chỉ:
+            49A/348 Trần Nguyên Hãn,
+            Phường An Biên,
+            Thành phố Hải Phòng
+        </p>
+
+        <p>
+            Đại diện: PHẠM VĂN HỌC
+        </p>
+
+        <p>
+            Chức vụ: Giám Đốc
+        </p>
+
+        <p>
+            Điện thoại:
+            <span
+                class="variable"
+                id="previewPartyAPhone"
+            >
+                ........................................
+            </span>
+        </p>
+
+
+        <p class="bold">
+            VÀ
+        </p>
+
+
+        <p class="party-title">
+            BÊN B: BÊN THUÊ THI CÔNG
+        </p>
+
+        <p>
+            <span
+                class="variable long"
+                id="previewPartyBName"
+            >
+                ...........................................................................................................................
+            </span>
+        </p>
+
+        <p>
+            Mã số thuế:
+            <span
+                class="variable medium"
+                id="previewPartyBTax"
+            >
+                ..........................................
+            </span>
+        </p>
+
+        <p>
+            Địa chỉ:
+            <span
+                class="variable medium"
+                id="previewPartyBAddress"
+            >
+                ..............................................
+            </span>
+        </p>
+
+        <p>
+            Đại diện:
+            <span
+                class="variable medium"
+                id="previewPartyBRepresentative"
+            >
+                ............................................
+            </span>
+        </p>
+
+        <p>
+            Chức vụ:
+            <span
+                class="variable medium"
+                id="previewPartyBPosition"
+            >
+                ............................................
+            </span>
+        </p>
+
+        <p>
+            Điện thoại:
+            <span
+                class="variable medium"
+                id="previewPartyBPhone"
+            >
+                ..........................................
+            </span>
+        </p>
+
+
+        <p>
+            Sau khi bàn bạc trên tinh thần thiện chí,
+            hợp tác và cùng có lợi, hai bên thống nhất
+            ký kết Hợp đồng nguyên tắc thi công lắp đặt
+            khung thép thang máy với các điều khoản sau:
+        </p>
+
+
+        <p class="section-heading">
+            ĐIỀU 1. PHẠM VI HỢP TÁC
+        </p>
+
+        <p>
+            1.1. Hợp đồng này quy định nguyên tắc hợp tác
+            giữa Bên A và Bên B trong việc thi công lắp
+            đặt khung thép thang máy.
+        </p>
+
+        <p>
+            1.2. Đối với từng công trình cụ thể, hai bên
+            sẽ ký Phụ lục công trình để xác nhận:
+        </p>
+
+        <ul>
+            <li>Tên công trình;</li>
+            <li>Địa điểm thi công;</li>
+            <li>Chủ đầu tư;</li>
+            <li>Số stop;</li>
+            <li>Giá trị công trình;</li>
+            <li>Tiến độ thực hiện;</li>
+            <li>Các yêu cầu kỹ thuật đặc thù.</li>
+        </ul>
+
+        <p>
+            1.3. Phụ lục công trình là một phần không
+            tách rời của hợp đồng này.
+        </p>
+
+    </article>
+
+
+    <!-- =================================================
+         PAGE 2
+    ================================================= -->
+
+    <article class="document page doc">
+
+        <p class="section-heading">
+            ĐIỀU 2. PHẠM VI CÔNG VIỆC
+        </p>
+
+        <p>
+            Bên A thực hiện:
+        </p>
+
+        <ul>
+            <li>Lắp đặt khung thép thang máy;</li>
+            <li>Căn chỉnh kết cấu khung;</li>
+            <li>Liên kết bulong, bản mã;</li>
+            <li>Kiểm tra độ thẳng đứng và độ cân bằng của khung;</li>
+            <li>Bọc bảo vệ chống xước sau lắp đặt;</li>
+            <li>Vệ sinh khu vực thi công;</li>
+            <li>Hỗ trợ nghiệm thu kỹ thuật phần khung thép.</li>
+        </ul>
+
+
+        <p class="section-heading">
+            ĐIỀU 3. ĐƠN GIÁ THI CÔNG
+        </p>
+
+        <p>
+            3.1. Đơn giá tiêu chuẩn:
+        </p>
+
+        <p>
+            2.500.000 đồng/stop
+        </p>
+
+        <p>
+            (Đã bao gồm VAT)
+        </p>
+
+        <p>
+            3.2. Đơn giá áp dụng cho công trình trong
+            bán kính 40km tính từ Nhà hát Thành phố Hải Phòng.
+        </p>
+
+        <p>
+            3.3. Giá trị từng công trình được xác định
+            trong phụ lục công trình.
+        </p>
+
+
+        <p class="section-heading">
+            ĐIỀU 4. ĐIỀU KIỆN THI CÔNG
+        </p>
+
+        <p>
+            4.1. Điều kiện thi công được hiểu là các
+            điều kiện cần thiết để Bên A triển khai
+            công việc an toàn và đúng tiến độ, bao gồm:
+        </p>
+
+        <ul>
+            <li>Hố thang đúng kích thước;</li>
+            <li>Điện thi công;</li>
+            <li>Lối vận chuyển vật tư;</li>
+            <li>Khu vực tập kết vật tư;</li>
+            <li>Giàn giáo hoặc thiết bị nâng hạ;</li>
+            <li>Điều kiện an toàn lao động;</li>
+            <li>Sự phối hợp của chủ đầu tư và các đơn vị liên quan.</li>
+        </ul>
+
+        <p>
+            4.2. Trường hợp công trình chưa đáp ứng
+            điều kiện thi công nhưng Bên B vẫn yêu cầu
+            triển khai thì:
+        </p>
+
+        <ul>
+            <li>Mọi chi phí phát sinh được tính riêng;</li>
+            <li>Chậm tiến độ không thuộc trách nhiệm của Bên A.</li>
+        </ul>
+
+
+        <p class="section-heading">
+            ĐIỀU 5. CHI PHÍ PHÁT SINH
+        </p>
+
+        <p>
+            Các trường hợp sau được tính là phát sinh:
+        </p>
+
+        <ul>
+            <li>Hố thang xây sai kích thước;</li>
+            <li>Phải đục phá hoặc gia công bổ sung;</li>
+            <li>Thi công ban đêm;</li>
+            <li>Thi công ngoài giờ;</li>
+            <li>Chờ việc do nguyên nhân từ công trình;</li>
+            <li>Điều động nhân sự nhiều lần;</li>
+            <li>Thay đổi thiết kế;</li>
+            <li>Công việc ngoài phạm vi hợp đồng.</li>
+        </ul>
+
+        <p>
+            Mọi phát sinh phải được Bên B xác nhận trước
+            khi thực hiện.
+        </p>
+
+        <p>
+            Xác nhận qua văn bản, email, Zalo hoặc tin
+            nhắn của người phụ trách công trình đều được
+            xem là hợp lệ.
+        </p>
+
+
+        <p class="section-heading">
+            ĐIỀU 6. TIẾN ĐỘ THI CÔNG
+        </p>
+
+        <p>
+            6.1. Tiến độ được xác định tại phụ lục công trình.
+        </p>
+
+        <p>
+            6.2. Các khoảng thời gian sau không tính vào
+            thời gian thi công của Bên A:
+        </p>
+
+        <ul>
+            <li>Chờ điện;</li>
+            <li>Chờ mặt bằng;</li>
+            <li>Chờ vật tư;</li>
+            <li>Chờ hoàn thiện xây dựng;</li>
+            <li>Chờ xử lý sai sót công trình.</li>
+        </ul>
+
+        <p>
+            6.3. Nếu Bên A chậm tiến độ do lỗi chủ quan:
+        </p>
+
+        <p>
+            Mức phạt: 0,05% giá trị phần công việc bị chậm/ngày.
+        </p>
+
+        <p>
+            Tổng mức phạt tối đa không vượt quá 8% giá trị
+            phần công việc bị chậm.
+        </p>
+
+    </article>
+
+
+    <!-- =================================================
+         PAGE 3
+    ================================================= -->
+
+    <article class="document page doc">
+
+        <p class="section-heading">
+            ĐIỀU 7. NGHIỆM THU
+        </p>
+
+        <p>
+            7.1. Sau khi hoàn thành công việc, hai bên
+            tiến hành nghiệm thu kỹ thuật phần khung thép.
+        </p>
+
+        <p>
+            7.2. Việc nghiệm thu được thực hiện bằng
+            Biên bản nghiệm thu kỹ thuật riêng.
+        </p>
+
+        <p>
+            7.3. Nội dung nghiệm thu gồm:
+        </p>
+
+        <ul>
+            <li>Khối lượng thực hiện;</li>
+            <li>Độ thẳng đứng;</li>
+            <li>Độ cân bằng;</li>
+            <li>Liên kết kết cấu;</li>
+            <li>Công tác vệ sinh;</li>
+            <li>Bọc bảo vệ chống xước.</li>
+        </ul>
+
+
+        <p class="section-heading">
+            ĐIỀU 8. NGHIỆM THU MẶC ĐỊNH
+        </p>
+
+        <p>
+            8.1. Nếu Bên B không tiến hành nghiệm thu
+            trong vòng 03 ngày kể từ ngày nhận thông báo
+            hoàn thành thì được xem là đã nghiệm thu.
+        </p>
+
+        <p>
+            8.2. Công trình được xem là đã nghiệm thu khi:
+        </p>
+
+        <ul>
+            <li>Đưa vào sử dụng;</li>
+            <li>Lắp đặt thiết bị thang máy;</li>
+            <li>Hoặc có đơn vị khác tiếp tục thi công trên phần khung thép.</li>
+        </ul>
+
+
+        <p class="section-heading">
+            ĐIỀU 9. THANH TOÁN
+        </p>
+
+        <p>
+            9.1. Tiến độ thanh toán được xác định tại
+            phụ lục công trình.
+        </p>
+
+        <p>
+            9.2. Hình thức thanh toán:
+        </p>
+
+        <p>
+            Chuyển khoản
+        </p>
+
+        <p>
+            9.3. Công nợ được xác nhận thông qua:
+        </p>
+
+        <ul>
+            <li>Hợp đồng;</li>
+            <li>Phụ lục công trình;</li>
+            <li>Biên bản nghiệm thu;</li>
+            <li>Email;</li>
+            <li>Tin nhắn;</li>
+            <li>Zalo.</li>
+        </ul>
+
+
+        <p class="section-heading">
+            ĐIỀU 10. BẢO VỆ CÔNG NỢ
+        </p>
+
+        <p>
+            10.1. Nếu Bên B chậm thanh toán quá 15 ngày:
+        </p>
+
+        <p>
+            Bên A có quyền:
+        </p>
+
+        <ul>
+            <li>Dừng thi công;</li>
+            <li>Rút nhân sự khỏi công trình;</li>
+            <li>Ngừng hỗ trợ kỹ thuật;</li>
+            <li>Từ chối nhận công trình mới.</li>
+        </ul>
+
+        <p>
+            10.2. Việc dừng thi công theo điều này không
+            được xem là vi phạm hợp đồng.
+        </p>
+
+        <p>
+            10.3. Mọi chi phí phát sinh do việc dừng và
+            triển khai lại công trình sẽ do Bên B chịu.
+        </p>
+
+
+        <p class="section-heading">
+            ĐIỀU 11. AN TOÀN LAO ĐỘNG
+        </p>
+
+        <p>
+            11.1. Bên A chịu trách nhiệm:
+        </p>
+
+        <ul>
+            <li>Trang bị bảo hộ lao động;</li>
+            <li>Hướng dẫn an toàn;</li>
+            <li>Quản lý nhân sự thuộc phạm vi của mình.</li>
+        </ul>
+
+        <p>
+            11.2. Bên B chịu trách nhiệm:
+        </p>
+
+        <ul>
+            <li>Mặt bằng an toàn;</li>
+            <li>Điện thi công;</li>
+            <li>Điều kiện thi công phù hợp.</li>
+        </ul>
+
+        <p>
+            11.3. Trường hợp tai nạn xảy ra do điều kiện
+            công trình không đảm bảo thì Bên B chịu trách
+            nhiệm tương ứng theo mức độ lỗi thực tế.
+        </p>
+
+        <p>
+            11.4. Trường hợp tai nạn xảy ra do lỗi của
+            nhân sự Bên A thì Bên A chịu trách nhiệm theo
+            quy định pháp luật.
+        </p>
+
+    </article>
+
+
+    <!-- =================================================
+         PAGE 4
+    ================================================= -->
+
+    <article class="document page doc">
+
+        <p class="section-heading">
+            ĐIỀU 12. BẢO HÀNH VÀ TRÁCH NHIỆM
+        </p>
+
+        <p>
+            Sau khi nghiệm thu, Bên A không chịu trách
+            nhiệm đối với các hư hỏng phát sinh do:
+        </p>
+
+        <ul>
+            <li>Chủ đầu tư;</li>
+            <li>Đơn vị khác;</li>
+            <li>Bên thứ ba;</li>
+            <li>Tác động ngoại lực.</li>
+        </ul>
+
+
+        <p class="section-heading">
+            ĐIỀU 13. BẢO MẬT VÀ KHÔNG CẠNH TRANH
+        </p>
+
+        <p>
+            13.1. Hai bên cam kết bảo mật:
+        </p>
+
+        <ul>
+            <li>Khách hàng;</li>
+            <li>Báo giá;</li>
+            <li>Hồ sơ kỹ thuật;</li>
+            <li>Dữ liệu kinh doanh.</li>
+        </ul>
+
+        <p>
+            13.2. Trong thời gian hợp tác và 12 tháng sau
+            khi chấm dứt hợp tác, Bên B không được:
+        </p>
+
+        <ul>
+            <li>Thuê trực tiếp nhân sự chủ chốt của Bên A;</li>
+            <li>Lôi kéo đội thi công của Bên A;</li>
+            <li>
+                Giao dịch trực tiếp với khách hàng do Bên A
+                giới thiệu nhằm tránh nghĩa vụ thanh toán.
+            </li>
+        </ul>
+
+
+        <p class="section-heading">
+            ĐIỀU 14. BẤT KHẢ KHÁNG
+        </p>
+
+        <p>
+            Thiên tai, hỏa hoạn, dịch bệnh, chiến tranh
+            hoặc quyết định của cơ quan nhà nước được xem
+            là sự kiện bất khả kháng.
+        </p>
+
+
+        <p class="section-heading">
+            ĐIỀU 15. GIẢI QUYẾT TRANH CHẤP
+        </p>
+
+        <p>
+            Mọi tranh chấp phát sinh sẽ được ưu tiên giải
+            quyết bằng thương lượng.
+        </p>
+
+        <p>
+            Nếu không giải quyết được thì đưa ra Tòa án
+            có thẩm quyền tại Thành phố Hải Phòng.
+        </p>
+
+
+        <p class="section-heading">
+            ĐIỀU 16. HIỆU LỰC HỢP ĐỒNG
+        </p>
+
+        <p>
+            16.1. Hợp đồng có hiệu lực kể từ ngày ký.
+        </p>
+
+        <p>
+            16.2. Thời hạn hợp đồng: 01 năm.
+        </p>
+
+        <p>
+            16.3. Hợp đồng tự động gia hạn nếu không có
+            thông báo chấm dứt trước 30 ngày.
+        </p>
+
+        <p>
+            16.4. Hợp đồng được lập thành 02 bản có giá
+            trị pháp lý như nhau.
+        </p>
+
+
+        <div class="signatures">
+
+            <div>
+
+                <div class="signature-title">
+                    ĐẠI DIỆN BÊN A
+                </div>
+
+                <div class="signature-company">
+                    CÔNG TY CỔ PHẦN GROVA HOLDINGS
+                </div>
+
+                <div class="signature-note">
+                    (Ký, ghi rõ họ tên, đóng dấu)
+                </div>
+
+            </div>
+
+
+            <div>
+
+                <div class="signature-title">
+                    ĐẠI DIỆN BÊN B
+                </div>
+
+                <div class="signature-note">
+                    (Ký, ghi rõ họ tên, đóng dấu)
+                </div>
+
+            </div>
 
         </div>
 
+    </article>
 
-        <div>
+</section>
 
-          <div class="signature-title">
-            ĐẠI DIỆN BÊN B
-          </div>
-
-          <div class="signature-note">
-            (Ký, ghi rõ họ tên, đóng dấu)
-          </div>
-
-        </div>
-
-      </div>
+</main>
 
 
-      <div class="page-number">
-        5
-      </div>
+<script>
 
-    </section>
+/* =====================================================
+   HELPERS
+===================================================== */
 
+function value(id, fallback = "") {
 
-    <!-- TRANG 6 -->
-    <!-- Giữ trang cuối để cấu trúc A4 có thể được điều chỉnh
-         theo bản Word gốc trong bước căn chỉnh bố cục tiếp theo -->
+    const element =
+        document.getElementById(id);
 
-    <section class="page">
+    if (!element) {
+        return fallback;
+    }
 
-      <div class="header">
+    const result =
+        element.value.trim();
 
-        <div class="country">
-          CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM
-        </div>
-
-        <div class="motto">
-          Độc lập – Tự do – Hạnh phúc
-        </div>
-
-      </div>
-
-      <div
-        style="
-          margin-top: 35mm;
-          text-align: center;
-          font-size: 13pt;
-          line-height: 1.6;
-        "
-      >
-        ĐẠI DIỆN BÊN A
-        <br>
-        CÔNG TY CỔ PHẦN GROVA HOLDINGS
-        <br>
-        <br>
-        (Ký, ghi rõ họ tên, đóng dấu)
-      </div>
-
-      <div
-        style="
-          margin-top: 45mm;
-          text-align: center;
-          font-size: 13pt;
-          line-height: 1.6;
-        "
-      >
-        ĐẠI DIỆN BÊN B
-        <br>
-        <br>
-        (Ký, ghi rõ họ tên, đóng dấu)
-      </div>
-
-      <div class="page-number">
-        6
-      </div>
-
-    </section>
+    return result || fallback;
+}
 
 
-  </main>
+function setText(id, text) {
+
+    const element =
+        document.getElementById(id);
+
+    if (!element) {
+        return;
+    }
+
+    element.textContent =
+        text;
+}
 
 
-  <script>
-    /*
-      Lưu dữ liệu các ô nhập trong phiên hiện tại.
-      Chưa kết nối database ở bước này.
-    */
+/* =====================================================
+   UPDATE DOCUMENT
+===================================================== */
 
-    const fields = document.querySelectorAll(".editable");
+function updateDocument() {
 
-    fields.forEach((field, index) => {
+    setText(
+        "previewContractNumber",
+        value(
+            "contractNumber",
+            "01/2026/HĐTC"
+        )
+    );
 
-      const key = "grova_contract_01_field_" + index;
 
-      const saved = sessionStorage.getItem(key);
+    setText(
+        "previewDay",
+        value(
+            "contractDay",
+            "......"
+        )
+    );
 
-      if (saved !== null) {
-        field.value = saved;
-      }
 
-      field.addEventListener("input", () => {
-        sessionStorage.setItem(key, field.value);
-      });
+    setText(
+        "previewMonth",
+        value(
+            "contractMonth",
+            "......"
+        )
+    );
 
-    });
-  </script>
+
+    setText(
+        "previewYear",
+        value(
+            "contractYear",
+            "2026"
+        )
+    );
+
+
+    setText(
+        "previewPartyAPhone",
+        value(
+            "partyAPhone",
+            "........................................"
+        )
+    );
+
+
+    setText(
+        "previewPartyBName",
+        value(
+            "partyBName",
+            "..........................................................................................................................."
+        )
+    );
+
+
+    setText(
+        "previewPartyBTax",
+        value(
+            "partyBTax",
+            ".........................................."
+        )
+    );
+
+
+    setText(
+        "previewPartyBAddress",
+        value(
+            "partyBAddress",
+            ".............................................."
+        )
+    );
+
+
+    setText(
+        "previewPartyBRepresentative",
+        value(
+            "partyBRepresentative",
+            "............................................"
+        )
+    );
+
+
+    setText(
+        "previewPartyBPosition",
+        value(
+            "partyBPosition",
+            "............................................"
+        )
+    );
+
+
+    setText(
+        "previewPartyBPhone",
+        value(
+            "partyBPhone",
+            ".........................................."
+        )
+    );
+}
+
+
+/* =====================================================
+   PRINT / PDF
+===================================================== */
+
+function printDocument() {
+
+    updateDocument();
+
+    window.print();
+}
+
+
+/* =====================================================
+   BACK
+===================================================== */
+
+function goBack() {
+
+    window.location.href =
+        "../index.html";
+}
+
+
+/* =====================================================
+   INITIALIZE
+===================================================== */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        updateDocument();
+
+    }
+);
+
+</script>
 
 </body>
 </html>
