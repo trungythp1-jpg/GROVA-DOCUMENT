@@ -62,7 +62,7 @@
 
   <link
     rel="manifest"
-    href="./manifest.json?v=201"
+    href="./manifest.json?v=202"
   >
 
 
@@ -83,18 +83,28 @@
 
 
   <!-- =====================================================
-       STYLESHEET
+       MAIN STYLESHEET
   ====================================================== -->
 
   <link
     rel="stylesheet"
-    href="./style.css?v=201"
+    href="./style.css?v=202"
+  >
+
+
+  <!-- =====================================================
+       AUTHENTICATION STYLESHEET
+  ====================================================== -->
+
+  <link
+    rel="stylesheet"
+    href="./auth.css?v=202"
   >
 
 </head>
 
 
-<body>
+<body class="auth-loading">
 
   <div class="app-shell">
 
@@ -272,19 +282,25 @@
         </div>
 
 
-        <div class="user">
+        <!-- =================================================
+             USER / AUTH
+        ================================================== -->
 
-          <span class="avatar">
+        <div class="user topbar-user">
+
+          <span
+            class="avatar user-avatar"
+          >
             A
           </span>
 
-          <div>
+          <div class="user-info">
 
-            <b id="userName">
+            <b id="currentUserName">
               Quản trị viên
             </b>
 
-            <small>
+            <small id="currentUserRole">
               Administrator
             </small>
 
@@ -1116,15 +1132,42 @@
 
 
   <!-- =====================================================
-       SCRIPTS
-  ====================================================== -->
+       FIREBASE
+       ===================================================== -->
 
   <script
-    src="./data/data.js?v=201"
+    src="https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js"
   ></script>
 
   <script
-    src="./app.js?v=201"
+    src="https://www.gstatic.com/firebasejs/12.18.0/firebase-auth-compat.js"
+  ></script>
+
+
+  <!-- =====================================================
+       GROVA AUTHENTICATION
+       ===================================================== -->
+
+  <script
+    src="./auth.js?v=202"
+  ></script>
+
+
+  <!-- =====================================================
+       DATA
+       ===================================================== -->
+
+  <script
+    src="./data/data.js?v=202"
+  ></script>
+
+
+  <!-- =====================================================
+       APPLICATION
+       ===================================================== -->
+
+  <script
+    src="./app.js?v=202"
   ></script>
 
 
