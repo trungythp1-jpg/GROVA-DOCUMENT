@@ -120,6 +120,18 @@ window.GROVA_DATA = {
       icon: "👤",
       file: "./templates/08-hop-dong-lao-dong.html",
       enabled: true
+    },
+
+    {
+      id: "09",
+      code: "BBTLHĐ",
+      name: "Biên bản thanh lý hợp đồng",
+      title: "BIÊN BẢN THANH LÝ HỢP ĐỒNG",
+      description: "Thanh lý hợp đồng thi công lắp đặt khung thép thang máy",
+      category: "Hợp đồng",
+      icon: "📑",
+      file: "./templates/09-thanh-ly-hop-dong.html",
+      enabled: true
     }
 
   ],
