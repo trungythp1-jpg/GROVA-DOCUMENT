@@ -1,0 +1,2343 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>
+    GROVA HOLDINGS – Phiếu đề nghị thi công
+  </title>
+
+  <style>
+
+    :root {
+      --grova-green: #0b7a5a;
+      --grova-dark: #075c44;
+      --grova-light: #eaf6f1;
+      --text: #17201d;
+      --muted: #68736f;
+      --border: #d9e2de;
+      --background: #f3f6f5;
+      --white: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      min-height: 100%;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--background);
+      color: var(--text);
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    /* =====================================================
+       TOP BAR
+    ===================================================== */
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      gap: 15px;
+
+      padding: 12px 18px;
+
+      background: rgba(255, 255, 255, 0.96);
+
+      border-bottom: 1px solid var(--border);
+
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+
+      backdrop-filter: blur(12px);
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      min-width: 0;
+    }
+
+    .back-button {
+      width: 40px;
+      height: 40px;
+
+      border: 0;
+      border-radius: 10px;
+
+      background: #eef3f1;
+
+      color: var(--grova-dark);
+
+      font-size: 19px;
+
+      cursor: pointer;
+
+      transition: 0.18s ease;
+    }
+
+    .back-button:hover {
+      background: var(--grova-light);
+      transform: translateY(-1px);
+    }
+
+    .topbar-title {
+      min-width: 0;
+    }
+
+    .topbar-title strong {
+      display: block;
+
+      color: var(--grova-dark);
+
+      font-size: 15px;
+      font-weight: 800;
+
+      letter-spacing: 0.02em;
+    }
+
+    .topbar-title span {
+      display: block;
+
+      margin-top: 2px;
+
+      color: var(--muted);
+
+      font-size: 12px;
+
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      flex-shrink: 0;
+    }
+
+    /* =====================================================
+       BUTTONS
+    ===================================================== */
+
+    .btn {
+      min-height: 40px;
+
+      padding: 9px 15px;
+
+      border: 0;
+      border-radius: 10px;
+
+      font-weight: 700;
+
+      cursor: pointer;
+
+      transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease,
+        background 0.18s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-primary {
+      background: var(--grova-green);
+      color: #ffffff;
+
+      box-shadow: 0 4px 12px rgba(11, 122, 90, 0.18);
+    }
+
+    .btn-primary:hover {
+      background: var(--grova-dark);
+    }
+
+    .btn-secondary {
+      background: #edf2f0;
+      color: #26312d;
+    }
+
+    .btn-secondary:hover {
+      background: #e2e9e6;
+    }
+
+    /* =====================================================
+       WORKSPACE
+    ===================================================== */
+
+    .workspace {
+      display: grid;
+
+      grid-template-columns:
+        minmax(290px, 380px)
+        minmax(0, 1fr);
+
+      gap: 20px;
+
+      width: min(1500px, calc(100% - 28px));
+
+      margin: 20px auto;
+
+      align-items: start;
+    }
+
+    /* =====================================================
+       PANELS
+    ===================================================== */
+
+    .panel {
+      background: var(--white);
+
+      border: 1px solid var(--border);
+
+      border-radius: 16px;
+
+      overflow: hidden;
+
+      box-shadow:
+        0 8px 28px rgba(18, 46, 37, 0.06);
+    }
+
+    .panel-header {
+      padding: 17px 18px 14px;
+
+      border-bottom: 1px solid var(--border);
+    }
+
+    .eyebrow {
+      display: block;
+
+      margin-bottom: 5px;
+
+      color: var(--grova-green);
+
+      font-size: 10px;
+
+      font-weight: 800;
+
+      letter-spacing: 0.09em;
+    }
+
+    .panel-header h2 {
+      margin: 0;
+
+      font-size: 18px;
+
+      color: #17201d;
+    }
+
+    .panel-body {
+      padding: 16px;
+    }
+
+    /* =====================================================
+       FORM
+    ===================================================== */
+
+    .section-title {
+      margin: 19px 0 10px;
+
+      padding-bottom: 7px;
+
+      border-bottom: 1px solid #e5ece9;
+
+      color: var(--grova-dark);
+
+      font-size: 12px;
+
+      font-weight: 800;
+
+      letter-spacing: 0.025em;
+
+      text-transform: uppercase;
+    }
+
+    .section-title:first-child {
+      margin-top: 0;
+    }
+
+    .field {
+      margin-bottom: 11px;
+    }
+
+    .field label {
+      display: block;
+
+      margin-bottom: 5px;
+
+      color: #4d5b56;
+
+      font-size: 12px;
+
+      font-weight: 700;
+    }
+
+    .field input,
+    .field textarea {
+      display: block;
+
+      width: 100%;
+
+      border: 1px solid #cfdad5;
+
+      border-radius: 9px;
+
+      padding: 10px 11px;
+
+      background: #fbfcfc;
+
+      color: var(--text);
+
+      outline: none;
+
+      transition:
+        border-color 0.18s ease,
+        box-shadow 0.18s ease,
+        background 0.18s ease;
+    }
+
+    .field input {
+      min-height: 40px;
+    }
+
+    .field textarea {
+      min-height: 80px;
+
+      resize: vertical;
+    }
+
+    .field input:focus,
+    .field textarea:focus {
+      border-color: var(--grova-green);
+
+      background: #ffffff;
+
+      box-shadow:
+        0 0 0 3px rgba(11, 122, 90, 0.10);
+    }
+
+    .field input[readonly] {
+      background: #f0f5f3;
+
+      color: var(--grova-dark);
+
+      font-weight: 700;
+
+      cursor: default;
+    }
+
+    .grid-2 {
+      display: grid;
+
+      grid-template-columns: 1fr 1fr;
+
+      gap: 10px;
+    }
+
+    .form-actions {
+      display: grid;
+
+      grid-template-columns: 1fr 1fr;
+
+      gap: 8px;
+
+      margin-top: 18px;
+    }
+
+    .draft-status {
+      margin-top: 9px;
+
+      color: var(--muted);
+
+      font-size: 11px;
+
+      text-align: center;
+    }
+
+    /* =====================================================
+       PREVIEW
+    ===================================================== */
+
+    .preview-panel {
+      min-width: 0;
+    }
+
+    .preview-wrap {
+      min-height: calc(100vh - 110px);
+
+      padding: 24px;
+
+      overflow: auto;
+
+      background-color: #eef2f0;
+
+      background-image:
+        linear-gradient(#e3e9e6 1px, transparent 1px),
+        linear-gradient(90deg, #e3e9e6 1px, transparent 1px);
+
+      background-size: 24px 24px;
+    }
+
+    /* =====================================================
+       A4 PAPER
+    ===================================================== */
+
+    .paper {
+      width: 210mm;
+
+      min-height: 297mm;
+
+      margin: 0 auto;
+
+      padding:
+        15mm
+        17mm
+        14mm;
+
+      background: #ffffff;
+
+      color: #111111;
+
+      box-shadow:
+        0 8px 30px rgba(0, 0, 0, 0.14);
+
+      font-family:
+        "Times New Roman",
+        Times,
+        serif;
+
+      font-size: 12.5pt;
+
+      line-height: 1.4;
+    }
+
+    /* =====================================================
+       DOCUMENT HEADER
+    ===================================================== */
+
+    .doc-header {
+      display: grid;
+
+      grid-template-columns: 43% 57%;
+
+      align-items: start;
+
+      min-height: 29mm;
+
+      padding-bottom: 4.5mm;
+
+      border-bottom: 1px solid #888888;
+    }
+
+    .logo-box {
+      display: flex;
+
+      align-items: flex-start;
+
+      padding-top: 1mm;
+    }
+
+    .logo-box img {
+      display: block;
+
+      width: 42mm;
+
+      max-height: 19mm;
+
+      object-fit: contain;
+
+      object-position: left center;
+    }
+
+    .national-header {
+      text-align: center;
+
+      font-size: 12.5pt;
+
+      font-weight: 700;
+
+      line-height: 1.5;
+    }
+
+    .national-header .underline {
+      width: 48mm;
+
+      height: 1px;
+
+      margin:
+        1mm
+        auto
+        0;
+
+      background: #111111;
+    }
+
+    /* =====================================================
+       COMPANY
+    ===================================================== */
+
+    .company-block {
+      margin-top: 6.5mm;
+    }
+
+    .company-name {
+      margin:
+        0
+        0
+        2mm;
+
+      font-size: 13pt;
+
+      font-weight: 700;
+    }
+
+    .company-address {
+      margin: 0;
+
+      font-size: 11.5pt;
+
+      font-style: italic;
+    }
+
+    /* =====================================================
+       TITLE
+    ===================================================== */
+
+    .doc-title {
+      margin:
+        7mm
+        0
+        3mm;
+
+      text-align: center;
+
+      font-size: 15pt;
+
+      font-weight: 700;
+    }
+
+    .doc-number {
+      margin: 0;
+
+      text-align: center;
+
+      font-size: 12pt;
+    }
+
+    .date-line {
+      margin:
+        7mm
+        0
+        6mm;
+
+      text-align: right;
+
+      font-size: 12pt;
+    }
+
+    /* =====================================================
+       DOCUMENT CONTENT
+    ===================================================== */
+
+    .document-section {
+      margin-top: 5mm;
+    }
+
+    .document-section h3 {
+      margin:
+        0
+        0
+        4mm;
+
+      font-size: 12.5pt;
+
+      font-weight: 700;
+    }
+
+    .doc-list {
+      margin: 0;
+
+      padding-left: 7mm;
+    }
+
+    .doc-list li {
+      margin:
+        0
+        0
+        3.2mm;
+
+      padding-left: 1.5mm;
+    }
+
+    .assignment {
+      margin-top: 5mm;
+    }
+
+    .assignment-row {
+      margin-bottom: 4mm;
+    }
+
+    .note-title {
+      margin-top: 5mm;
+
+      margin-bottom: 2mm;
+    }
+
+    .note-line {
+      min-height: 9mm;
+
+      border-bottom: 1px dotted #555555;
+
+      white-space: pre-wrap;
+    }
+
+    /* =====================================================
+       SIGNATURE
+    ===================================================== */
+
+    .signature-block {
+      display: grid;
+
+      grid-template-columns:
+        repeat(3, 1fr);
+
+      gap: 7mm;
+
+      margin-top: 10mm;
+
+      text-align: center;
+
+      break-inside: avoid;
+
+      page-break-inside: avoid;
+    }
+
+    .signature-title {
+      min-height: 10mm;
+
+      font-weight: 700;
+    }
+
+    .signature-subtitle {
+      margin-top: 2mm;
+    }
+
+    /* =====================================================
+       MOBILE / TABLET
+    ===================================================== */
+
+    @media (max-width: 1050px) {
+
+      .workspace {
+        grid-template-columns:
+          330px
+          minmax(0, 1fr);
+      }
+
+      .preview-wrap {
+        padding: 18px;
+      }
+
+    }
+
+    @media (max-width: 820px) {
+
+      .topbar {
+        position: static;
+      }
+
+      .workspace {
+        grid-template-columns: 1fr;
+
+        width: calc(100% - 20px);
+      }
+
+      .preview-wrap {
+        overflow-x: auto;
+      }
+
+    }
+
+    @media (max-width: 560px) {
+
+      .workspace {
+        width: 100%;
+
+        margin: 0;
+
+        gap: 10px;
+      }
+
+      .panel {
+        border-radius: 0;
+      }
+
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar {
+        padding:
+          10px
+          12px;
+      }
+
+      .topbar-actions .btn {
+        padding:
+          8px
+          10px;
+      }
+
+      .topbar-title span {
+        display: none;
+      }
+
+      .form-actions {
+        grid-template-columns: 1fr;
+      }
+
+      .preview-wrap {
+        padding: 10px;
+      }
+
+    }
+
+    /* =====================================================
+       PRINT
+    ===================================================== */
+
+    @media print {
+
+      @page {
+        size: A4 portrait;
+
+        margin: 0;
+      }
+
+      html,
+      body {
+        width: 210mm;
+
+        min-height: 297mm;
+
+        background: #ffffff;
+      }
+
+      body {
+        margin: 0;
+      }
+
+      .topbar,
+      .form-panel,
+      .preview-panel > .panel-header {
+        display: none !important;
+      }
+
+      .workspace {
+        display: block;
+
+        width: auto;
+
+        margin: 0;
+      }
+
+      .panel,
+      .preview-panel,
+      .preview-wrap {
+        display: block;
+
+        width: auto;
+
+        margin: 0;
+
+        padding: 0;
+
+        border: 0;
+
+        box-shadow: none;
+
+        background: #ffffff;
+      }
+
+      .paper {
+        width: 210mm;
+
+        min-height: 297mm;
+
+        margin: 0;
+
+        padding:
+          15mm
+          17mm
+          14mm;
+
+        box-shadow: none;
+      }
+
+    }
+
+  </style>
+</head>
+
+
+<body>
+
+  <!-- =====================================================
+       TOP BAR
+  ====================================================== -->
+
+  <header class="topbar">
+
+    <div class="topbar-left">
+
+      <button
+        class="back-button"
+        type="button"
+        onclick="goBack()"
+        aria-label="Quay lại"
+      >
+        ←
+      </button>
+
+      <div class="topbar-title">
+
+        <strong>
+          GROVA DOCUMENT
+        </strong>
+
+        <span>
+          Phiếu đề nghị thi công
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <div class="topbar-actions">
+
+      <button
+        class="btn btn-secondary"
+        type="button"
+        onclick="goBack()"
+      >
+        ← Quay lại
+      </button>
+
+      <button
+        class="btn btn-primary"
+        type="button"
+        onclick="window.print()"
+      >
+        🖨 In văn bản
+      </button>
+
+    </div>
+
+  </header>
+
+
+  <!-- =====================================================
+       WORKSPACE
+  ====================================================== -->
+
+  <main class="workspace">
+
+
+    <!-- ===================================================
+         FORM
+    ==================================================== -->
+
+    <section class="panel form-panel">
+
+      <div class="panel-header">
+
+        <span class="eyebrow">
+          MẪU 03
+        </span>
+
+        <h2>
+          Phiếu đề nghị thi công
+        </h2>
+
+      </div>
+
+
+      <div class="panel-body">
+
+
+        <!-- THÔNG TIN VĂN BẢN -->
+
+        <div class="section-title">
+          Thông tin văn bản
+        </div>
+
+
+        <div class="field">
+
+          <label for="documentNumber">
+            Số văn bản
+          </label>
+
+          <input
+            id="documentNumber"
+            type="text"
+            readonly
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label for="proposalDate">
+            Ngày đề nghị
+          </label>
+
+          <input
+            id="proposalDate"
+            type="date"
+          >
+
+        </div>
+
+
+        <!-- I -->
+
+        <div class="section-title">
+          I. Thông tin công trình
+        </div>
+
+
+        <div class="field">
+
+          <label for="projectName">
+            Tên công trình
+          </label>
+
+          <input
+            id="projectName"
+            type="text"
+            placeholder="Nhập tên công trình"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label for="projectAddress">
+            Địa chỉ
+          </label>
+
+          <input
+            id="projectAddress"
+            type="text"
+            placeholder="Nhập địa chỉ công trình"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label for="contractor">
+            Đơn vị thuê thi công
+          </label>
+
+          <input
+            id="contractor"
+            type="text"
+            placeholder="Nhập đơn vị thuê thi công"
+          >
+
+        </div>
+
+
+        <div class="grid-2">
+
+          <div class="field">
+
+            <label for="contactPerson">
+              Người liên hệ
+            </label>
+
+            <input
+              id="contactPerson"
+              type="text"
+            >
+
+          </div>
+
+
+          <div class="field">
+
+            <label for="contactPhone">
+              SĐT
+            </label>
+
+            <input
+              id="contactPhone"
+              type="text"
+            >
+
+          </div>
+
+        </div>
+
+
+        <!-- II -->
+
+        <div class="section-title">
+          II. Thông tin khung thép
+        </div>
+
+
+        <div class="field">
+
+          <label for="stopCount">
+            Số stop
+          </label>
+
+          <input
+            id="stopCount"
+            type="text"
+          >
+
+        </div>
+
+
+        <div class="grid-2">
+
+          <div class="field">
+
+            <label for="shaftWidth">
+              Hố thang – chiều thứ nhất (mm)
+            </label>
+
+            <input
+              id="shaftWidth"
+              type="text"
+            >
+
+          </div>
+
+
+          <div class="field">
+
+            <label for="shaftDepth">
+              Hố thang – chiều thứ hai (mm)
+            </label>
+
+            <input
+              id="shaftDepth"
+              type="text"
+            >
+
+          </div>
+
+        </div>
+
+
+        <div class="field">
+
+          <label for="frameType">
+            Loại khung
+          </label>
+
+          <input
+            id="frameType"
+            type="text"
+          >
+
+        </div>
+
+
+        <!-- III -->
+
+        <div class="section-title">
+          III. Tiến độ
+        </div>
+
+
+        <div class="grid-2">
+
+          <div class="field">
+
+            <label for="startDate">
+              Ngày khởi công
+            </label>
+
+            <input
+              id="startDate"
+              type="date"
+            >
+
+          </div>
+
+
+          <div class="field">
+
+            <label for="completionDate">
+              Ngày hoàn thành dự kiến
+            </label>
+
+            <input
+              id="completionDate"
+              type="date"
+            >
+
+          </div>
+
+        </div>
+
+
+        <!-- IV -->
+
+        <div class="section-title">
+          IV. Phân công
+        </div>
+
+
+        <div class="field">
+
+          <label for="teamLeader">
+            Đội trưởng
+          </label>
+
+          <input
+            id="teamLeader"
+            type="text"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label for="teamPhone">
+            SĐT
+          </label>
+
+          <input
+            id="teamPhone"
+            type="text"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label for="staffCount">
+            Số lượng nhân sự
+          </label>
+
+          <input
+            id="staffCount"
+            type="text"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label for="notes">
+            Ghi chú
+          </label>
+
+          <textarea
+            id="notes"
+          ></textarea>
+
+        </div>
+
+
+        <div class="form-actions">
+
+          <button
+            class="btn btn-secondary"
+            type="button"
+            onclick="resetDraft()"
+          >
+            Làm mới
+          </button>
+
+          <button
+            class="btn btn-primary"
+            type="button"
+            onclick="window.print()"
+          >
+            In phiếu
+          </button>
+
+        </div>
+
+
+        <div
+          id="draftStatus"
+          class="draft-status"
+        >
+          Bản nháp được lưu trên thiết bị
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         PREVIEW
+    ==================================================== -->
+
+    <section class="panel preview-panel">
+
+      <div class="panel-header">
+
+        <span class="eyebrow">
+          XEM TRƯỚC
+        </span>
+
+        <h2>
+          Phiếu đề nghị thi công
+        </h2>
+
+      </div>
+
+
+      <div class="preview-wrap">
+
+
+        <!-- =================================================
+             A4
+        ================================================== -->
+
+        <article
+          class="paper"
+          id="paper"
+        >
+
+
+          <!-- HEADER -->
+
+          <header class="doc-header">
+
+
+            <!-- LOGO GROVA -->
+
+            <div class="logo-box">
+
+              <img
+                src="../data/grova_logo.png"
+                alt="GROVA HOLDINGS"
+              >
+
+            </div>
+
+
+            <!-- QUỐC HIỆU -->
+
+            <div class="national-header">
+
+              <div>
+                CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM
+              </div>
+
+              <div>
+                Độc lập – Tự do – Hạnh phúc
+              </div>
+
+              <div class="underline"></div>
+
+            </div>
+
+          </header>
+
+
+          <!-- COMPANY -->
+
+          <section class="company-block">
+
+            <p class="company-name">
+              CÔNG TY CỔ PHẦN GROVA HOLDINGS
+            </p>
+
+            <p class="company-address">
+              Địa chỉ: 49A/348 Trần Nguyên Hãn, Phường An Biên, Thành phố Hải Phòng
+            </p>
+
+          </section>
+
+
+          <!-- TITLE -->
+
+          <h1 class="doc-title">
+            PHIẾU ĐỀ NGHỊ THI CÔNG
+          </h1>
+
+
+          <!-- NUMBER -->
+
+          <p class="doc-number">
+
+            Số:
+            <span id="previewNumber"></span>
+
+          </p>
+
+
+          <!-- DATE -->
+
+          <p class="date-line">
+
+            Ngày đề nghị:
+            <span id="previewDate"></span>
+
+          </p>
+
+
+          <!-- =================================================
+               I. THÔNG TIN CÔNG TRÌNH
+          ================================================== -->
+
+          <section class="document-section">
+
+            <h3>
+              I. THÔNG TIN CÔNG TRÌNH
+            </h3>
+
+
+            <ul class="doc-list">
+
+              <li>
+                Tên công trình:
+                <span id="previewProjectName"></span>
+              </li>
+
+              <li>
+                Địa chỉ:
+                <span id="previewProjectAddress"></span>
+              </li>
+
+              <li>
+                Đơn vị thuê thi công:
+                <span id="previewContractor"></span>
+              </li>
+
+              <li>
+                Người liên hệ:
+                <span id="previewContactPerson"></span>
+                &nbsp;SĐT:
+                <span id="previewContactPhone"></span>
+              </li>
+
+            </ul>
+
+          </section>
+
+
+          <!-- =================================================
+               II. THÔNG TIN KHUNG THÉP
+          ================================================== -->
+
+          <section class="document-section">
+
+            <h3>
+              II. THÔNG TIN KHUNG THÉP
+            </h3>
+
+
+            <ul class="doc-list">
+
+              <li>
+                Số stop:
+                <span id="previewStopCount"></span>
+              </li>
+
+              <li>
+                Hố thang:
+                <span id="previewShaftWidth"></span>
+                x
+                <span id="previewShaftDepth"></span>
+                mm
+              </li>
+
+              <li>
+                Loại khung:
+                <span id="previewFrameType"></span>
+              </li>
+
+            </ul>
+
+          </section>
+
+
+          <!-- =================================================
+               III. TIẾN ĐỘ
+          ================================================== -->
+
+          <section class="document-section">
+
+            <h3>
+              III. TIẾN ĐỘ
+            </h3>
+
+
+            <ul class="doc-list">
+
+              <li>
+                Ngày khởi công:
+                <span id="previewStartDate"></span>
+              </li>
+
+              <li>
+                Ngày hoàn thành dự kiến:
+                <span id="previewCompletionDate"></span>
+              </li>
+
+            </ul>
+
+          </section>
+
+
+          <!-- =================================================
+               IV. PHÂN CÔNG
+          ================================================== -->
+
+          <section class="document-section assignment">
+
+            <h3>
+              IV. PHÂN CÔNG
+            </h3>
+
+
+            <div class="assignment-row">
+
+              Đội trưởng:
+              <span id="previewTeamLeader"></span>
+
+            </div>
+
+
+            <div class="assignment-row">
+
+              SĐT:
+              <span id="previewTeamPhone"></span>
+
+            </div>
+
+
+            <div class="assignment-row">
+
+              Số lượng nhân sự:
+              <span id="previewStaffCount"></span>
+              người
+
+            </div>
+
+
+            <div class="note-title">
+              Ghi chú:
+            </div>
+
+
+            <div
+              class="note-line"
+              id="previewNotes"
+            ></div>
+
+          </section>
+
+
+          <!-- =================================================
+               SIGNATURE
+          ================================================== -->
+
+          <section class="signature-block">
+
+
+            <div>
+
+              <div class="signature-title">
+                NGƯỜI ĐỀ NGHỊ
+              </div>
+
+              <div class="signature-subtitle">
+                (Ký, ghi rõ họ tên)
+              </div>
+
+            </div>
+
+
+            <div>
+
+              <div class="signature-title">
+                ĐIỀU HÀNH THI CÔNG
+              </div>
+
+              <div class="signature-subtitle">
+                (Ký, ghi rõ họ tên)
+              </div>
+
+            </div>
+
+
+            <div>
+
+              <div class="signature-title">
+                PHÊ DUYỆT
+              </div>
+
+              <div class="signature-subtitle">
+                (Ký, ghi rõ họ tên)
+              </div>
+
+            </div>
+
+
+          </section>
+
+
+        </article>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- =====================================================
+       JAVASCRIPT
+  ====================================================== -->
+
+  <script>
+
+    /*
+     * =====================================================
+     * CẤU HÌNH
+     * =====================================================
+     */
+
+    const YEAR = new Date().getFullYear();
+
+    const COUNTER_KEY =
+      "grova_pdn_tc_counter_" + YEAR;
+
+    const DRAFT_KEY =
+      "grova_document_template_03";
+
+
+    /*
+     * =====================================================
+     * CÁC TRƯỜNG DỮ LIỆU
+     * =====================================================
+     */
+
+    const fields = [
+
+      "documentNumber",
+
+      "proposalDate",
+
+      "projectName",
+
+      "projectAddress",
+
+      "contractor",
+
+      "contactPerson",
+
+      "contactPhone",
+
+      "stopCount",
+
+      "shaftWidth",
+
+      "shaftDepth",
+
+      "frameType",
+
+      "startDate",
+
+      "completionDate",
+
+      "teamLeader",
+
+      "teamPhone",
+
+      "staffCount",
+
+      "notes"
+
+    ];
+
+
+    /*
+     * =====================================================
+     * PAD SỐ
+     * =====================================================
+     */
+
+    function pad2(value) {
+
+      return String(value)
+        .padStart(2, "0");
+
+    }
+
+
+    /*
+     * =====================================================
+     * NGÀY HIỆN TẠI
+     * =====================================================
+     */
+
+    function todayISO() {
+
+      const date = new Date();
+
+      return [
+
+        date.getFullYear(),
+
+        pad2(
+          date.getMonth() + 1
+        ),
+
+        pad2(
+          date.getDate()
+        )
+
+      ].join("-");
+
+    }
+
+
+    /*
+     * =====================================================
+     * FORMAT NGÀY
+     * =====================================================
+     */
+
+    function formatDate(value) {
+
+      if (!value) {
+
+        return "..... / ..... / 20.....";
+
+      }
+
+      const parts =
+        value.split("-");
+
+
+      if (parts.length !== 3) {
+
+        return value;
+
+      }
+
+
+      return [
+
+        parts[2],
+
+        parts[1],
+
+        parts[0]
+
+      ].join(" / ");
+
+    }
+
+
+    /*
+     * =====================================================
+     * TỰ ĐỘNG CẤP SỐ
+     *
+     * Ví dụ:
+     * 01/2026/PĐNTC
+     * 02/2026/PĐNTC
+     * 03/2026/PĐNTC
+     * =====================================================
+     */
+
+    function nextDocumentNumber() {
+
+      const current =
+
+        Number(
+          localStorage.getItem(
+            COUNTER_KEY
+          ) || 0
+        ) + 1;
+
+
+      localStorage.setItem(
+
+        COUNTER_KEY,
+
+        String(current)
+
+      );
+
+
+      return (
+
+        pad2(current) +
+
+        "/" +
+
+        YEAR +
+
+        "/PĐNTC"
+
+      );
+
+    }
+
+
+    /*
+     * =====================================================
+     * ESCAPE HTML
+     * =====================================================
+     */
+
+    function escapeHTML(value) {
+
+      return String(value)
+
+        .replace(
+          /&/g,
+          "&amp;"
+        )
+
+        .replace(
+          /</g,
+          "&lt;"
+        )
+
+        .replace(
+          />/g,
+          "&gt;"
+        )
+
+        .replace(
+          /"/g,
+          "&quot;"
+        )
+
+        .replace(
+          /'/g,
+          "&#039;"
+        );
+
+    }
+
+
+    /*
+     * =====================================================
+     * GIÁ TRỊ HOẶC DẤU CHẤM
+     * =====================================================
+     */
+
+    function valueOrDots(
+      value,
+      dots = "................................"
+    ) {
+
+      if (
+        value &&
+        value.trim()
+      ) {
+
+        return escapeHTML(
+          value.trim()
+        );
+
+      }
+
+      return dots;
+
+    }
+
+
+    /*
+     * =====================================================
+     * LẤY BẢN NHÁP
+     * =====================================================
+     */
+
+    function getDraft() {
+
+      try {
+
+        return JSON.parse(
+
+          localStorage.getItem(
+            DRAFT_KEY
+          ) || "{}"
+
+        );
+
+      } catch (error) {
+
+        return {};
+
+      }
+
+    }
+
+
+    /*
+     * =====================================================
+     * LƯU BẢN NHÁP
+     * =====================================================
+     */
+
+    function saveDraft() {
+
+      const draft = {};
+
+
+      fields.forEach(
+        function(id) {
+
+          const element =
+            document.getElementById(id);
+
+
+          if (element) {
+
+            draft[id] =
+              element.value;
+
+          }
+
+        }
+      );
+
+
+      localStorage.setItem(
+
+        DRAFT_KEY,
+
+        JSON.stringify(draft)
+
+      );
+
+
+      const status =
+        document.getElementById(
+          "draftStatus"
+        );
+
+
+      if (status) {
+
+        status.textContent =
+          "Đã lưu bản nháp trên thiết bị";
+
+      }
+
+    }
+
+
+    /*
+     * =====================================================
+     * LOAD BẢN NHÁP
+     * =====================================================
+     */
+
+    function loadDraft() {
+
+      const draft =
+        getDraft();
+
+
+      fields.forEach(
+        function(id) {
+
+          const element =
+            document.getElementById(id);
+
+
+          if (!element) {
+
+            return;
+
+          }
+
+
+          if (
+            draft[id] !== undefined
+          ) {
+
+            element.value =
+              draft[id];
+
+          }
+
+        }
+      );
+
+
+      /*
+       * Nếu chưa có số thì cấp số mới
+       */
+
+      const numberInput =
+        document.getElementById(
+          "documentNumber"
+        );
+
+
+      if (
+        !numberInput.value
+      ) {
+
+        numberInput.value =
+          nextDocumentNumber();
+
+      }
+
+
+      /*
+       * Nếu chưa có ngày thì lấy ngày hiện tại
+       */
+
+      const dateInput =
+        document.getElementById(
+          "proposalDate"
+        );
+
+
+      if (
+        !dateInput.value
+      ) {
+
+        dateInput.value =
+          todayISO();
+
+      }
+
+    }
+
+
+    /*
+     * =====================================================
+     * CẬP NHẬT PREVIEW
+     * =====================================================
+     */
+
+    function updatePreview() {
+
+      const map = {
+
+        previewNumber:
+
+          valueOrDots(
+
+            document.getElementById(
+              "documentNumber"
+            ).value,
+
+            "....../PĐNTC/20......"
+
+          ),
+
+
+        previewDate:
+
+          formatDate(
+
+            document.getElementById(
+              "proposalDate"
+            ).value
+
+          ),
+
+
+        previewProjectName:
+
+          valueOrDots(
+
+            document.getElementById(
+              "projectName"
+            ).value
+
+          ),
+
+
+        previewProjectAddress:
+
+          valueOrDots(
+
+            document.getElementById(
+              "projectAddress"
+            ).value
+
+          ),
+
+
+        previewContractor:
+
+          valueOrDots(
+
+            document.getElementById(
+              "contractor"
+            ).value
+
+          ),
+
+
+        previewContactPerson:
+
+          valueOrDots(
+
+            document.getElementById(
+              "contactPerson"
+            ).value,
+
+            "...................."
+
+          ),
+
+
+        previewContactPhone:
+
+          valueOrDots(
+
+            document.getElementById(
+              "contactPhone"
+            ).value,
+
+            ".............."
+
+          ),
+
+
+        previewStopCount:
+
+          valueOrDots(
+
+            document.getElementById(
+              "stopCount"
+            ).value,
+
+            ".........."
+
+          ),
+
+
+        previewShaftWidth:
+
+          valueOrDots(
+
+            document.getElementById(
+              "shaftWidth"
+            ).value,
+
+            ".........."
+
+          ),
+
+
+        previewShaftDepth:
+
+          valueOrDots(
+
+            document.getElementById(
+              "shaftDepth"
+            ).value,
+
+            ".........."
+
+          ),
+
+
+        previewFrameType:
+
+          valueOrDots(
+
+            document.getElementById(
+              "frameType"
+            ).value
+
+          ),
+
+
+        previewStartDate:
+
+          formatDate(
+
+            document.getElementById(
+              "startDate"
+            ).value
+
+          ),
+
+
+        previewCompletionDate:
+
+          formatDate(
+
+            document.getElementById(
+              "completionDate"
+            ).value
+
+          ),
+
+
+        previewTeamLeader:
+
+          valueOrDots(
+
+            document.getElementById(
+              "teamLeader"
+            ).value
+
+          ),
+
+
+        previewTeamPhone:
+
+          valueOrDots(
+
+            document.getElementById(
+              "teamPhone"
+            ).value
+
+          ),
+
+
+        previewStaffCount:
+
+          valueOrDots(
+
+            document.getElementById(
+              "staffCount"
+            ).value,
+
+            ".........."
+
+          ),
+
+
+        previewNotes:
+
+          valueOrDots(
+
+            document.getElementById(
+              "notes"
+            ).value,
+
+            "...................................................................."
+
+          )
+
+      };
+
+
+      Object.entries(map).forEach(
+
+        function([
+          id,
+          value
+        ]) {
+
+          const element =
+            document.getElementById(id);
+
+
+          if (element) {
+
+            element.innerHTML =
+              value;
+
+          }
+
+        }
+
+      );
+
+
+      saveDraft();
+
+    }
+
+
+    /*
+     * =====================================================
+     * LÀM MỚI
+     * =====================================================
+     */
+
+    function resetDraft() {
+
+      const confirmed =
+        confirm(
+          "Xóa dữ liệu đang nhập và tạo phiếu mới?"
+        );
+
+
+      if (!confirmed) {
+
+        return;
+
+      }
+
+
+      localStorage.removeItem(
+        DRAFT_KEY
+      );
+
+
+      fields.forEach(
+        function(id) {
+
+          const element =
+            document.getElementById(id);
+
+
+          if (element) {
+
+            element.value = "";
+
+          }
+
+        }
+      );
+
+
+      document.getElementById(
+        "documentNumber"
+      ).value =
+        nextDocumentNumber();
+
+
+      document.getElementById(
+        "proposalDate"
+      ).value =
+        todayISO();
+
+
+      updatePreview();
+
+    }
+
+
+    /*
+     * =====================================================
+     * QUAY LẠI
+     * =====================================================
+     */
+
+    function goBack() {
+
+      if (
+        document.referrer &&
+        document.referrer.includes(
+          "GROVA-DOCUMENT"
+        )
+      ) {
+
+        history.back();
+
+      } else {
+
+        window.location.href =
+          "../index.html";
+
+      }
+
+    }
+
+
+    /*
+     * =====================================================
+     * KHỞI TẠO
+     * =====================================================
+     */
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      function() {
+
+
+        loadDraft();
+
+
+        updatePreview();
+
+
+        fields.forEach(
+          function(id) {
+
+            const element =
+              document.getElementById(id);
+
+
+            if (!element) {
+
+              return;
+
+            }
+
+
+            element.addEventListener(
+              "input",
+              updatePreview
+            );
+
+
+            element.addEventListener(
+              "change",
+              updatePreview
+            );
+
+          }
+        );
+
+      }
+    );
+
+  </script>
+
+</body>
+
+</html>
