@@ -1,47 +1,22 @@
 <!DOCTYPE html>
 <html lang="vi">
-
 <head>
-
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<meta
-  name="viewport"
-  content="width=device-width, initial-scale=1.0"
->
-
-<title>
-  GROVA DOCUMENT – Phụ lục hợp đồng
-</title>
-
+<title>GROVA DOCUMENT · Phụ lục hợp đồng</title>
 
 <style>
-
-/* =========================================================
-   ROOT
-========================================================= */
-
 :root{
-
-  --grova-green:#087b59;
-  --grova-dark:#075a43;
-
+  --green:#287b61;
+  --green-dark:#205c4a;
+  --green-soft:#eef6f2;
+  --border:#d5e0dc;
+  --text:#263b35;
+  --muted:#71807a;
   --bg:#eef3f1;
-  --card:#ffffff;
-
-  --border:#d7e2de;
-
-  --text:#263832;
-  --muted:#71807b;
-
-  --soft:#edf7f3;
-
+  --white:#fff;
 }
-
-
-/* =========================================================
-   RESET
-========================================================= */
 
 *{
   box-sizing:border-box;
@@ -55,20 +30,15 @@ body{
 }
 
 body{
-
   background:var(--bg);
-
   color:var(--text);
-
   font-family:
     -apple-system,
     BlinkMacSystemFont,
     "Segoe UI",
     Arial,
     sans-serif;
-
   overflow-x:hidden;
-
 }
 
 button,
@@ -77,494 +47,322 @@ textarea{
   font:inherit;
 }
 
-
 /* =========================================================
-   TOP BAR
-========================================================= */
+   TOPBAR
+   ========================================================= */
 
 .topbar{
-
   position:sticky;
-
   top:0;
-
-  z-index:1000;
-
-  min-height:68px;
+  z-index:100;
 
   display:flex;
-
   align-items:center;
-
   justify-content:space-between;
 
-  gap:12px;
+  min-height:70px;
+  padding:11px 20px;
 
-  padding:
-    10px
-    20px;
-
-  background:
-    rgba(255,255,255,.98);
-
-  border-bottom:
-    1px solid var(--border);
+  background:rgba(255,255,255,.97);
+  border-bottom:1px solid var(--border);
 
   box-shadow:
-    0 2px 12px
-    rgba(20,60,45,.07);
-
+    0 2px 12px rgba(20,60,45,.06);
 }
 
 .topbar-left{
-
   display:flex;
-
   align-items:center;
-
-  gap:12px;
-
+  gap:13px;
   min-width:0;
-
-}
-
-.topbar-title{
-
-  margin:0;
-
-  font-size:17px;
-
-  font-weight:800;
-
-  white-space:nowrap;
-
-  overflow:hidden;
-
-  text-overflow:ellipsis;
-
 }
 
 .back-button,
-.print-button{
-
+.print-button,
+.new-number{
   border:0;
-
-  border-radius:10px;
-
   cursor:pointer;
-
   font-weight:750;
-
-  white-space:nowrap;
-
 }
 
 .back-button{
-
-  padding:
-    10px
-    15px;
-
+  border-radius:10px;
   background:#edf3f0;
-
-  color:var(--grova-dark);
-
+  color:var(--green-dark);
+  padding:10px 15px;
+  white-space:nowrap;
 }
 
 .back-button:hover{
+  background:#e2ebe7;
+}
 
-  background:#e1ebe7;
-
+.topbar-title{
+  margin:0;
+  font-size:18px;
+  font-weight:800;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 
 .print-button{
-
-  padding:
-    11px
-    18px;
-
-  background:var(--grova-green);
-
+  border-radius:10px;
+  background:var(--green);
   color:#fff;
-
+  padding:12px 18px;
+  white-space:nowrap;
 }
 
 .print-button:hover{
-
-  background:var(--grova-dark);
-
+  background:var(--green-dark);
 }
 
-
 /* =========================================================
-   WORKSPACE
-========================================================= */
+   APP LAYOUT
+   ========================================================= */
 
 .workspace{
-
   display:grid;
-
-  grid-template-columns:
-    330px
-    minmax(0,1fr);
-
-  gap:20px;
+  grid-template-columns:350px minmax(0,1fr);
+  gap:22px;
 
   max-width:1600px;
-
   margin:0 auto;
-
-  padding:20px;
-
+  padding:22px;
 }
 
-
 /* =========================================================
-   CONTROL PANEL
-========================================================= */
+   FORM
+   ========================================================= */
 
 .control-panel{
-
   align-self:start;
 
-  position:sticky;
-
-  top:88px;
-
-  max-height:
-    calc(100vh - 105px);
-
-  overflow:auto;
-
-  padding:16px;
-
   background:#fff;
+  border:1px solid var(--border);
+  border-radius:15px;
 
-  border:
-    1px solid var(--border);
-
-  border-radius:16px;
+  padding:18px;
 
   box-shadow:
-    0 5px 20px
-    rgba(20,60,45,.06);
-
+    0 4px 18px rgba(20,60,45,.05);
 }
 
 .control-title{
-
   margin:0;
-
-  font-size:20px;
-
+  font-size:22px;
   font-weight:800;
-
 }
 
 .control-subtitle{
-
-  margin:
-    4px
-    0
-    14px;
-
+  margin:4px 0 15px;
   color:var(--muted);
-
-  font-size:12px;
-
-  line-height:1.45;
-
+  font-size:13px;
+  line-height:1.4;
 }
 
-
-/* =========================================================
-   NUMBER
-========================================================= */
-
 .number-card{
-
-  padding:12px;
-
-  background:var(--soft);
-
-  border:
-    1px solid #c8ded5;
-
+  padding:13px;
   border-radius:11px;
-
+  background:var(--green-soft);
+  border:1px solid #c8ddd5;
 }
 
 .number-label{
-
-  color:var(--grova-dark);
-
-  font-size:10px;
-
+  color:var(--green-dark);
+  font-size:11px;
   font-weight:800;
-
-  letter-spacing:.04em;
-
   text-transform:uppercase;
-
+  letter-spacing:.03em;
 }
 
 .number-value{
-
   margin-top:4px;
-
-  color:var(--grova-dark);
+  color:var(--green-dark);
 
   font-family:
     Georgia,
     "Times New Roman",
     serif;
 
-  font-size:20px;
-
+  font-size:21px;
   font-weight:700;
-
 }
 
 .new-number{
-
   width:100%;
-
-  height:36px;
-
   margin-top:8px;
 
-  border:
-    1px solid var(--grova-green);
+  min-height:39px;
 
-  border-radius:8px;
+  border:1px solid var(--green);
+  border-radius:9px;
 
   background:#fff;
+  color:var(--green-dark);
 
-  color:var(--grova-dark);
-
-  font-size:12px;
-
-  font-weight:750;
-
-  cursor:pointer;
-
+  font-size:13px;
 }
 
 .new-number:hover{
-
-  background:var(--soft);
-
+  background:var(--green-soft);
 }
 
-
-/* =========================================================
-   FORM SECTION
-========================================================= */
-
 .form-section{
-
-  margin-top:14px;
-
+  margin-top:15px;
 }
 
 .form-section-title{
-
-  margin:
-    0
-    0
-    8px;
-
+  margin:0 0 8px;
   padding-bottom:6px;
 
-  border-bottom:
-    1px solid #dce5e2;
+  border-bottom:1px solid #dce5e2;
 
-  color:var(--grova-dark);
+  color:var(--green-dark);
 
-  font-size:11px;
-
+  font-size:12px;
   font-weight:800;
-
-  letter-spacing:.02em;
-
   text-transform:uppercase;
-
 }
 
 .field{
-
   margin-bottom:8px;
-
 }
 
 .field label{
-
   display:block;
-
   margin-bottom:3px;
 
   color:#56635f;
 
-  font-size:11px;
-
+  font-size:12px;
   font-weight:650;
-
 }
 
 .field input,
 .field textarea{
-
   width:100%;
 
-  border:
-    1px solid #cddbd6;
-
-  border-radius:7px;
+  border:1px solid #cddbd6;
+  border-radius:8px;
 
   outline:none;
-
   background:#fff;
-
   color:#263b35;
 
-  font-size:12px;
-
+  font-size:13px;
 }
 
 .field input{
-
-  height:35px;
-
-  padding:
-    0
-    9px;
-
+  height:38px;
+  padding:0 10px;
 }
 
 .field textarea{
-
-  min-height:50px;
-
-  padding:7px 9px;
+  min-height:54px;
+  padding:8px 10px;
 
   resize:vertical;
-
   line-height:1.35;
-
 }
 
 .field input:focus,
 .field textarea:focus{
-
-  border-color:
-    var(--grova-green);
+  border-color:var(--green);
 
   box-shadow:
-    0 0 0 2px
-    rgba(8,122,89,.10);
-
+    0 0 0 2px rgba(40,123,97,.10);
 }
 
 .two-fields{
-
   display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
 
-  grid-template-columns:
-    1fr
-    1fr;
+.option-group{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
 
-  gap:7px;
+.option{
+  display:flex;
+  align-items:center;
+  gap:8px;
 
+  min-height:30px;
+
+  color:#394a45;
+  font-size:12px;
+}
+
+.option input{
+  width:16px;
+  height:16px;
+  margin:0;
+  accent-color:var(--green);
 }
 
 .save-note{
-
-  margin-top:12px;
-
+  margin-top:13px;
   color:#8a9691;
-
-  font-size:10px;
-
+  font-size:11px;
   line-height:1.35;
-
   text-align:center;
-
 }
-
 
 /* =========================================================
    PREVIEW
-========================================================= */
+   ========================================================= */
 
 .preview-area{
-
   min-width:0;
-
 }
 
 .preview-heading{
-
   display:flex;
-
   align-items:center;
-
   justify-content:space-between;
 
-  gap:10px;
-
-  margin-bottom:10px;
-
-  padding:
-    0
-    3px;
-
+  margin-bottom:12px;
+  padding:0 3px;
 }
 
 .preview-heading h2{
-
   margin:0;
-
-  font-size:15px;
-
+  font-size:16px;
   font-weight:800;
-
 }
 
 .preview-heading span{
-
   color:var(--muted);
-
-  font-size:11px;
-
+  font-size:12px;
 }
 
 .document-wrap{
-
   display:flex;
-
   justify-content:center;
-
-  padding-bottom:50px;
-
+  padding-bottom:40px;
 }
-
 
 /* =========================================================
    DOCUMENT
-========================================================= */
+   Không khóa chiều cao.
+   Không khóa số trang.
+   ========================================================= */
 
 .document{
-
   width:210mm;
-
   max-width:100%;
 
-  padding:
-    14mm
-    17mm
-    16mm;
+  padding:15mm 17mm 18mm;
 
   background:#fff;
+
+  box-shadow:
+    0 5px 25px rgba(25,55,45,.13);
 
   color:#111;
 
@@ -574,185 +372,124 @@ textarea{
     serif;
 
   font-size:12pt;
-
   line-height:1.28;
-
-  box-shadow:
-    0 5px 25px
-    rgba(25,55,45,.13);
-
 }
 
-
 /* =========================================================
-   HEADER
-========================================================= */
+   DOCUMENT HEADER
+   ========================================================= */
 
 .document-header{
-
   display:grid;
-
-  grid-template-columns:
-    72mm
-    1fr;
+  grid-template-columns:62mm 1fr;
 
   align-items:start;
 
-  gap:4mm;
-
-  margin-bottom:4mm;
-
+  margin-bottom:3mm;
 }
 
 .logo-box{
-
   display:flex;
-
   align-items:flex-start;
-
   justify-content:flex-start;
 
   min-height:25mm;
-
 }
 
 .logo-box img{
-
   display:block;
 
-  width:58mm;
-
-  max-height:25mm;
+  width:55mm;
+  max-height:23mm;
 
   object-fit:contain;
-
   object-position:left top;
-
 }
 
 .national{
-
-  padding-top:1mm;
-
   text-align:center;
-
+  padding-top:1mm;
 }
 
 .national-main{
-
   font-size:13pt;
-
   font-weight:700;
-
   line-height:1.15;
-
 }
 
 .national-sub{
-
   margin-top:1.5mm;
 
   font-size:12pt;
-
   font-weight:700;
-
   line-height:1.15;
-
 }
 
 .national-line{
-
   width:35mm;
 
-  margin:
-    1.5mm
-    auto
-    0;
+  margin:1.5mm auto 0;
 
-  border-bottom:
-    .4mm
-    solid
-    #111;
-
+  border-bottom:.4mm solid #111;
 }
 
+.header-rule{
+  width:100%;
+  border-bottom:.35mm solid #777;
+  margin-bottom:5mm;
+}
 
 /* =========================================================
-   DOCUMENT TITLE
-========================================================= */
+   TITLE
+   ========================================================= */
 
 .document-title{
-
-  margin:
-    2mm
-    0
-    0;
+  margin:2mm 0 0;
 
   text-align:center;
 
   font-size:17pt;
-
   font-weight:700;
-
   line-height:1.2;
-
 }
 
 .document-number{
-
   margin-top:1mm;
 
   text-align:center;
 
   font-size:12pt;
-
 }
 
 .date-line{
-
   margin-top:3mm;
-
   text-align:center;
-
 }
-
 
 /* =========================================================
    CONTENT
-========================================================= */
+   ========================================================= */
 
 .section{
-
   margin-top:3.2mm;
 
-  break-inside:avoid;
-
-  page-break-inside:avoid;
-
+  /*
+    QUAN TRỌNG:
+    Không dùng break-inside:avoid.
+    Các Điều được phép chảy liên tục.
+  */
 }
 
 .section-title{
-
-  margin:
-    0
-    0
-    1.5mm;
+  margin:0 0 1.5mm;
 
   font-weight:700;
-
   line-height:1.2;
-
 }
 
 .line{
-
-  margin:
-    0
-    0
-    1.1mm;
-
-  line-height:1.28;
-
+  margin:0 0 1.25mm;
+  line-height:1.25;
 }
 
 .line:last-child{
@@ -760,492 +497,312 @@ textarea{
 }
 
 .bullet{
-
-  margin:
-    0
-    0
-    .8mm;
+  margin:0 0 1mm;
 
   padding-left:5mm;
-
   text-indent:-4mm;
 
-  line-height:1.24;
-
-}
-
-.checkbox-line{
-
-  margin:
-    0
-    0
-    .8mm;
-
-  line-height:1.24;
-
+  line-height:1.22;
 }
 
 .subheading{
-
-  margin:
-    2mm
-    0
-    1mm;
+  margin:2.2mm 0 1.2mm;
 
   font-weight:700;
-
   line-height:1.2;
+}
 
+.checkbox-line{
+  margin:0 0 1mm;
+  line-height:1.22;
 }
 
 .dotted-line{
-
   width:100%;
+  height:5mm;
 
-  min-height:5mm;
+  border-bottom:.25mm dotted #555;
 
   margin-bottom:1mm;
-
-  border-bottom:
-    .25mm
-    dotted
-    #555;
-
 }
 
+.variable-text{
+  white-space:pre-wrap;
+}
 
 /* =========================================================
    PRICE TABLE
-========================================================= */
+   ========================================================= */
 
 .price-table{
-
   width:100%;
 
   margin-top:2mm;
 
   border-collapse:collapse;
-
   table-layout:fixed;
 
   font-size:10pt;
-
-  break-inside:auto;
-
-  page-break-inside:auto;
-
 }
 
 .price-table th,
 .price-table td{
+  border:.3mm solid #222;
 
-  border:
-    .3mm
-    solid
-    #222;
-
-  padding:
-    1.6mm
-    1.3mm;
+  padding:1.8mm 1.5mm;
 
   vertical-align:middle;
 
-  line-height:1.18;
-
+  line-height:1.2;
 }
 
 .price-table th{
-
   text-align:center;
-
   font-weight:700;
-
 }
 
-.price-table th:nth-child(1){
-  width:28%;
-}
-
-.price-table th:nth-child(2){
-  width:13%;
-}
-
-.price-table th:nth-child(3){
-  width:15%;
-}
-
-.price-table th:nth-child(4){
-  width:21%;
-}
-
-.price-table th:nth-child(5){
-  width:23%;
-}
+.price-table th:nth-child(1){ width:28%; }
+.price-table th:nth-child(2){ width:13%; }
+.price-table th:nth-child(3){ width:15%; }
+.price-table th:nth-child(4){ width:21%; }
+.price-table th:nth-child(5){ width:23%; }
 
 .price-table td.center{
   text-align:center;
 }
 
-.price-table tr{
-
-  break-inside:avoid;
-
-  page-break-inside:avoid;
-
-}
-
 .total-line{
-
   margin-top:2mm;
 
   font-weight:700;
-
   line-height:1.25;
-
 }
-
 
 /* =========================================================
    SIGNATURE
-========================================================= */
+   ========================================================= */
 
 .signature-grid{
-
   display:grid;
-
-  grid-template-columns:
-    1fr
-    1fr;
-
-  gap:18mm;
+  grid-template-columns:1fr 1fr;
+  gap:15mm;
 
   margin-top:12mm;
 
-  break-inside:avoid;
-
-  page-break-inside:avoid;
-
+  /*
+    Không khóa nguyên khối.
+    Nếu hết giấy thì trình duyệt tự phân trang.
+  */
 }
 
 .signature{
-
   text-align:center;
-
 }
 
 .signature-title{
-
   font-weight:700;
-
 }
 
 .signature-company{
-
   min-height:8mm;
-
   margin-top:1.5mm;
 
   font-weight:700;
-
-  line-height:1.2;
-
 }
 
 .signature-note{
-
   margin-top:1.5mm;
-
   font-style:italic;
-
 }
 
 .signature-space{
-
   height:30mm;
-
 }
 
-
 /* =========================================================
-   MOBILE / TABLET
-========================================================= */
+   RESPONSIVE
+   ========================================================= */
 
 @media(max-width:1100px){
 
   .workspace{
-
     grid-template-columns:1fr;
-
   }
 
   .control-panel{
-
-    position:relative;
-
-    top:auto;
-
-    max-height:none;
-
-    overflow:visible;
-
+    width:100%;
   }
 
   .document-wrap{
-
     justify-content:flex-start;
-
     overflow-x:auto;
-
   }
 
   .document{
-
-    flex:
-      0
-      0
-      210mm;
-
+    flex:0 0 210mm;
     max-width:none;
-
   }
-
 }
-
 
 @media(max-width:600px){
 
   .topbar{
-
-    min-height:62px;
-
-    padding:
-      8px
-      10px;
-
+    min-height:64px;
+    padding:9px 12px;
   }
 
   .topbar-title{
-
-    font-size:14px;
-
+    font-size:15px;
   }
 
   .back-button{
-
-    padding:
-      9px
-      10px;
-
-    font-size:12px;
-
+    padding:9px 11px;
+    font-size:13px;
   }
 
   .print-button{
-
-    padding:
-      10px
-      11px;
-
-    font-size:12px;
-
+    padding:10px 12px;
+    font-size:13px;
   }
 
   .workspace{
-
-    padding:10px;
-
+    padding:12px;
   }
 
   .control-panel{
-
-    padding:13px;
-
+    padding:14px;
   }
-
 }
-
 
 /* =========================================================
    PRINT
-========================================================= */
+   ========================================================= */
 
 @page{
-
   size:A4 portrait;
-
-  margin:
-    14mm
-    17mm
-    16mm
-    17mm;
-
+  margin:14mm 17mm 16mm 17mm;
 }
-
 
 @media print{
 
   html,
   body{
-
     width:auto !important;
-
     min-height:0 !important;
 
     margin:0 !important;
-
     padding:0 !important;
 
     background:#fff !important;
 
     overflow:visible !important;
-
   }
-
 
   .topbar,
   .control-panel,
   .preview-heading{
-
     display:none !important;
-
   }
 
-
   .workspace{
-
     display:block !important;
 
     width:auto !important;
-
     max-width:none !important;
 
     margin:0 !important;
-
     padding:0 !important;
-
   }
-
 
   .preview-area{
-
     width:auto !important;
-
     margin:0 !important;
-
     padding:0 !important;
-
   }
 
-
   .document-wrap{
-
     display:block !important;
 
     width:auto !important;
 
     margin:0 !important;
-
     padding:0 !important;
 
     overflow:visible !important;
-
   }
 
-
   .document{
-
     width:auto !important;
-
     max-width:none !important;
 
     margin:0 !important;
-
     padding:0 !important;
 
     background:#fff !important;
-
     box-shadow:none !important;
-
   }
-
 
   /*
-    KHÔNG CỐ ĐỊNH CHIỀU CAO TRANG.
-    KHÔNG DÙNG PAGE-BREAK TOÀN TRANG.
-    TRÌNH DUYỆT TỰ CHIA TRANG A4.
+    NGUYÊN TẮC PHÂN TRANG:
+    - Không page-break-after.
+    - Không page-break-before.
+    - Không ép mỗi Điều sang trang.
+    - Không khóa chiều cao.
+    - Không khóa min-height.
+    - Nội dung cứ chạy liên tục.
+    - Hết phần giấy còn lại thì trình duyệt tự xuống trang.
   */
 
-
   .section{
-
-    break-inside:avoid;
-
-    page-break-inside:avoid;
-
+    break-inside:auto !important;
+    page-break-inside:auto !important;
   }
-
 
   .price-table{
-
-    break-inside:auto;
-
-    page-break-inside:auto;
-
+    break-inside:auto !important;
+    page-break-inside:auto !important;
   }
 
-
+  /*
+    Một hàng bảng không nên bị xé đôi.
+    Đây không phải ép từng Điều sang trang.
+  */
   .price-table tr{
-
     break-inside:avoid;
-
     page-break-inside:avoid;
-
   }
-
 
   .signature-grid{
-
-    break-inside:avoid;
-
-    page-break-inside:avoid;
-
+    break-inside:auto !important;
+    page-break-inside:auto !important;
   }
 
+  .signature{
+    break-inside:auto !important;
+    page-break-inside:auto !important;
+  }
 
   .logo-box img{
-
     print-color-adjust:exact;
-
     -webkit-print-color-adjust:exact;
-
   }
-
 }
-
 </style>
-
 </head>
 
-
 <body>
-
-
-<!-- =========================================================
-     TOPBAR
-========================================================= -->
 
 <header class="topbar">
 
   <div class="topbar-left">
 
     <button
-      class="back-button"
       type="button"
+      class="back-button"
       onclick="goBack()"
     >
       ← Quay lại
     </button>
-
 
     <h1 class="topbar-title">
       GROVA DOCUMENT · Phụ lục hợp đồng
@@ -1253,10 +810,9 @@ textarea{
 
   </div>
 
-
   <button
-    class="print-button"
     type="button"
+    class="print-button"
     onclick="window.print()"
   >
     🖨 In / PDF
@@ -1265,21 +821,17 @@ textarea{
 </header>
 
 
-
 <main class="workspace">
 
-
-<!-- =========================================================
+<!-- =======================================================
      CONTROL PANEL
-========================================================= -->
+     ======================================================= -->
 
 <aside class="control-panel">
-
 
   <h2 class="control-title">
     Phụ lục hợp đồng
   </h2>
-
 
   <p class="control-subtitle">
     Nội dung mẫu giữ nguyên theo văn bản gốc.
@@ -1287,15 +839,13 @@ textarea{
   </p>
 
 
-
-  <!-- NUMBER -->
+  <!-- SỐ PHỤ LỤC -->
 
   <div class="number-card">
 
     <div class="number-label">
       Số phụ lục tự sinh
     </div>
-
 
     <div
       class="number-value"
@@ -1304,34 +854,30 @@ textarea{
       01/PLHĐ/2026
     </div>
 
-
-    <button
-      class="new-number"
-      id="newNumberButton"
-      type="button"
-    >
-      + Tạo số phụ lục mới
-    </button>
-
   </div>
 
+  <button
+    type="button"
+    class="new-number"
+    id="newNumberButton"
+  >
+    + Tạo số phụ lục mới
+  </button>
 
 
-  <!-- CONTRACT REFERENCE -->
+  <!-- HỢP ĐỒNG THAM CHIẾU -->
 
   <section class="form-section">
 
     <h3 class="form-section-title">
-      Hợp đồng tham chiếu
+      Số hợp đồng nguyên tắc tham chiếu
     </h3>
-
 
     <div class="field">
 
       <label for="referenceContract">
-        Số hợp đồng nguyên tắc tham chiếu
+        Nhập tay
       </label>
-
 
       <input
         id="referenceContract"
@@ -1344,8 +890,7 @@ textarea{
   </section>
 
 
-
-  <!-- DATE -->
+  <!-- NGÀY -->
 
   <section class="form-section">
 
@@ -1353,35 +898,35 @@ textarea{
       Ngày ký
     </h3>
 
-
     <div class="two-fields">
 
       <div class="field">
 
-        <label for="day">
+        <label for="signDay">
           Ngày
         </label>
 
-
         <input
-          id="day"
+          id="signDay"
           type="text"
+          inputmode="numeric"
+          maxlength="2"
           placeholder="......"
         >
 
       </div>
 
-
       <div class="field">
 
-        <label for="month">
+        <label for="signMonth">
           Tháng
         </label>
 
-
         <input
-          id="month"
+          id="signMonth"
           type="text"
+          inputmode="numeric"
+          maxlength="2"
           placeholder="......"
         >
 
@@ -1392,8 +937,45 @@ textarea{
   </section>
 
 
+  <!-- BÊN A -->
 
-  <!-- PARTY B -->
+  <section class="form-section">
+
+    <h3 class="form-section-title">
+      Bên A
+    </h3>
+
+    <div class="field">
+
+      <label for="partyAPosition">
+        Chức vụ
+      </label>
+
+      <input
+        id="partyAPosition"
+        type="text"
+        placeholder="Giám Đốc"
+      >
+
+    </div>
+
+    <div class="field">
+
+      <label for="partyAPhone">
+        Điện thoại
+      </label>
+
+      <input
+        id="partyAPhone"
+        type="text"
+      >
+
+    </div>
+
+  </section>
+
+
+  <!-- BÊN B -->
 
   <section class="form-section">
 
@@ -1401,13 +983,11 @@ textarea{
       Bên B
     </h3>
 
-
     <div class="field">
 
       <label for="partyBCompany">
         Tên công ty
       </label>
-
 
       <input
         id="partyBCompany"
@@ -1416,13 +996,11 @@ textarea{
 
     </div>
 
-
     <div class="field">
 
       <label for="partyBTax">
         Mã số thuế
       </label>
-
 
       <input
         id="partyBTax"
@@ -1431,62 +1009,49 @@ textarea{
 
     </div>
 
-
     <div class="field">
 
       <label for="partyBAddress">
         Địa chỉ
       </label>
 
+      <textarea
+        id="partyBAddress"
+      ></textarea>
+
+    </div>
+
+    <div class="field">
+
+      <label for="partyBRepresentative">
+        Đại diện
+      </label>
 
       <input
-        id="partyBAddress"
+        id="partyBRepresentative"
         type="text"
       >
 
     </div>
 
+    <div class="field">
 
-    <div class="two-fields">
+      <label for="partyBPosition">
+        Chức vụ
+      </label>
 
-      <div class="field">
-
-        <label for="partyBRepresentative">
-          Đại diện
-        </label>
-
-
-        <input
-          id="partyBRepresentative"
-          type="text"
-        >
-
-      </div>
-
-
-      <div class="field">
-
-        <label for="partyBPosition">
-          Chức vụ
-        </label>
-
-
-        <input
-          id="partyBPosition"
-          type="text"
-        >
-
-      </div>
+      <input
+        id="partyBPosition"
+        type="text"
+      >
 
     </div>
-
 
     <div class="field">
 
       <label for="partyBPhone">
         Điện thoại
       </label>
-
 
       <input
         id="partyBPhone"
@@ -1498,8 +1063,7 @@ textarea{
   </section>
 
 
-
-  <!-- PROJECT -->
+  <!-- THÔNG TIN CÔNG TRÌNH -->
 
   <section class="form-section">
 
@@ -1507,28 +1071,23 @@ textarea{
       Thông tin công trình
     </h3>
 
-
     <div class="field">
 
       <label for="projectAddress">
         Địa chỉ công trình
       </label>
 
-
-      <input
+      <textarea
         id="projectAddress"
-        type="text"
-      >
+      ></textarea>
 
     </div>
-
 
     <div class="field">
 
       <label for="investor">
         Chủ đầu tư
       </label>
-
 
       <input
         id="investor"
@@ -1537,13 +1096,11 @@ textarea{
 
     </div>
 
-
     <div class="field">
 
       <label for="floors">
         Số tầng lắp đặt
       </label>
-
 
       <input
         id="floors"
@@ -1552,13 +1109,75 @@ textarea{
 
     </div>
 
+    <div class="field">
+
+      <label>
+        Loại khung
+      </label>
+
+      <div class="option-group">
+
+        <label class="option">
+          <input
+            type="checkbox"
+            id="frameSteel"
+          >
+          Khung thép
+        </label>
+
+        <label class="option">
+          <input
+            type="checkbox"
+            id="frameInox"
+          >
+          Khung thép bọc inox
+        </label>
+
+        <label class="option">
+          <input
+            type="checkbox"
+            id="frameAluminum"
+          >
+          Khung nhôm
+        </label>
+
+      </div>
+
+    </div>
+
+    <div class="field">
+
+      <label>
+        Vị trí lắp đặt
+      </label>
+
+      <div class="option-group">
+
+        <label class="option">
+          <input
+            type="checkbox"
+            id="locationIndoor"
+          >
+          Trong nhà
+        </label>
+
+        <label class="option">
+          <input
+            type="checkbox"
+            id="locationOutdoor"
+          >
+          Ngoài trời
+        </label>
+
+      </div>
+
+    </div>
 
     <div class="field">
 
       <label for="technicalNote">
-        Ghi chú kỹ thuật khác
+        Ghi chú kỹ thuật khác (nếu có)
       </label>
-
 
       <textarea
         id="technicalNote"
@@ -1569,8 +1188,7 @@ textarea{
   </section>
 
 
-
-  <!-- PRICE -->
+  <!-- GIÁ TRỊ -->
 
   <section class="form-section">
 
@@ -1578,48 +1196,38 @@ textarea{
       Giá trị công trình
     </h3>
 
+    <div class="field">
 
-    <div class="two-fields">
+      <label for="quantity">
+        Khối lượng
+      </label>
 
-      <div class="field">
-
-        <label for="quantity">
-          Khối lượng
-        </label>
-
-
-        <input
-          id="quantity"
-          type="text"
-        >
-
-      </div>
-
-
-      <div class="field">
-
-        <label for="unitPrice">
-          Đơn giá (VNĐ)
-        </label>
-
-
-        <input
-          id="unitPrice"
-          type="text"
-          value="2.5400.000"
-        >
-
-      </div>
+      <input
+        id="quantity"
+        type="text"
+      >
 
     </div>
 
+    <div class="field">
+
+      <label for="unitPrice">
+        Đơn giá (VNĐ)
+      </label>
+
+      <input
+        id="unitPrice"
+        type="text"
+        placeholder="2.5400.000"
+      >
+
+    </div>
 
     <div class="field">
 
       <label for="totalValue">
         Tổng giá trị phụ lục
       </label>
-
 
       <input
         id="totalValue"
@@ -1628,26 +1236,22 @@ textarea{
 
     </div>
 
-
     <div class="field">
 
-      <label for="amountWords">
+      <label for="valueWords">
         Bằng chữ
       </label>
 
-
-      <input
-        id="amountWords"
-        type="text"
-      >
+      <textarea
+        id="valueWords"
+      ></textarea>
 
     </div>
 
   </section>
 
 
-
-  <!-- PROGRESS -->
+  <!-- TIẾN ĐỘ -->
 
   <section class="form-section">
 
@@ -1655,13 +1259,11 @@ textarea{
       Tiến độ
     </h3>
 
-
     <div class="field">
 
       <label for="handoverDate">
         Ngày bàn giao mặt bằng
       </label>
-
 
       <input
         id="handoverDate"
@@ -1670,13 +1272,11 @@ textarea{
 
     </div>
 
-
     <div class="field">
 
       <label for="startDate">
         Ngày khởi công
       </label>
-
 
       <input
         id="startDate"
@@ -1685,13 +1285,11 @@ textarea{
 
     </div>
 
-
     <div class="field">
 
       <label for="duration">
         Thời gian thực hiện
       </label>
-
 
       <input
         id="duration"
@@ -1700,13 +1298,11 @@ textarea{
 
     </div>
 
-
     <div class="field">
 
       <label for="expectedDate">
         Ngày hoàn thành dự kiến
       </label>
-
 
       <input
         id="expectedDate"
@@ -1718,8 +1314,7 @@ textarea{
   </section>
 
 
-
-  <!-- PAYMENT -->
+  <!-- THANH TOÁN -->
 
   <section class="form-section">
 
@@ -1727,47 +1322,24 @@ textarea{
       Thanh toán
     </h3>
 
+    <div class="field">
 
-    <div class="two-fields">
+      <label for="advancePercent">
+        Tạm ứng %
+      </label>
 
-      <div class="field">
-
-        <label for="advancePercent">
-          Tạm ứng %
-        </label>
-
-
-        <input
-          id="advancePercent"
-          type="text"
-        >
-
-      </div>
-
-
-      <div class="field">
-
-        <label for="remainingPercent">
-          Còn lại %
-        </label>
-
-
-        <input
-          id="remainingPercent"
-          type="text"
-        >
-
-      </div>
+      <input
+        id="advancePercent"
+        type="text"
+      >
 
     </div>
-
 
     <div class="field">
 
       <label for="advanceAmount">
         Tương đương VNĐ
       </label>
-
 
       <input
         id="advanceAmount"
@@ -1776,13 +1348,24 @@ textarea{
 
     </div>
 
+    <div class="field">
+
+      <label for="remainingPercent">
+        Thanh toán còn lại %
+      </label>
+
+      <input
+        id="remainingPercent"
+        type="text"
+      >
+
+    </div>
 
     <div class="field">
 
       <label for="accountNumber">
         Số tài khoản
       </label>
-
 
       <input
         id="accountNumber"
@@ -1791,13 +1374,11 @@ textarea{
 
     </div>
 
-
     <div class="field">
 
       <label for="bank">
         Ngân hàng
       </label>
-
 
       <input
         id="bank"
@@ -1809,8 +1390,7 @@ textarea{
   </section>
 
 
-
-  <!-- SPECIAL CONDITION -->
+  <!-- ĐIỀU KIỆN ĐẶC BIỆT -->
 
   <section class="form-section">
 
@@ -1818,13 +1398,26 @@ textarea{
       Điều kiện thi công đặc biệt
     </h3>
 
+    <div class="field">
+
+      <label class="option">
+
+        <input
+          type="checkbox"
+          id="nightWork"
+        >
+
+        Công trình thi công ban đêm
+
+      </label>
+
+    </div>
 
     <div class="field">
 
       <label for="specialCondition">
         Công trình có yêu cầu đặc biệt
       </label>
-
 
       <textarea
         id="specialCondition"
@@ -1835,22 +1428,18 @@ textarea{
   </section>
 
 
-
   <div class="save-note">
     Dữ liệu được tự động lưu trên thiết bị này.
   </div>
 
-
 </aside>
 
 
-
-<!-- =========================================================
+<!-- =======================================================
      PREVIEW
-========================================================= -->
+     ======================================================= -->
 
 <section class="preview-area">
-
 
   <div class="preview-heading">
 
@@ -1858,27 +1447,20 @@ textarea{
       Xem trước · Khổ A4
     </h2>
 
-
     <span>
-      Tự động dàn trang
+      Phân trang tự động khi in
     </span>
 
   </div>
 
 
-
   <div class="document-wrap">
-
 
     <article class="document">
 
-
-      <!-- ===================================================
-           HEADER
-      =================================================== -->
+      <!-- HEADER -->
 
       <div class="document-header">
-
 
         <div class="logo-box">
 
@@ -1889,32 +1471,30 @@ textarea{
 
         </div>
 
-
         <div class="national">
 
           <div class="national-main">
             CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM
           </div>
 
-
           <div class="national-sub">
             Độc lập – Tự do – Hạnh phúc
           </div>
-
 
           <div class="national-line"></div>
 
         </div>
 
-
       </div>
 
+      <div class="header-rule"></div>
 
+
+      <!-- TITLE -->
 
       <div class="document-title">
         PHỤ LỤC HỢP ĐỒNG THI CÔNG
       </div>
-
 
       <div class="document-number">
 
@@ -1924,7 +1504,6 @@ textarea{
         </strong>
 
       </div>
-
 
       <div class="date-line">
 
@@ -1937,61 +1516,69 @@ textarea{
       </div>
 
 
-
-      <!-- ===================================================
+      <!-- =================================================
            BÊN A
-      =================================================== -->
+           ================================================= -->
 
       <section class="section">
 
         <div class="section-title">
-          BÊN A:
+          BÊN A (BÊN THI CÔNG)
         </div>
-
 
         <div class="line">
           CÔNG TY CỔ PHẦN GROVA HOLDINGS
         </div>
 
-
         <div class="line">
           Mã số thuế: 0202328361
         </div>
-
 
         <div class="line">
           Địa chỉ: 49A/348 Trần Nguyên Hãn, Phường An Biên, Thành phố Hải Phòng
         </div>
 
-
         <div class="line">
           Đại diện: PHẠM VĂN HỌC
         </div>
 
-
         <div class="line">
-          Chức vụ: ............................................
+          Chức vụ:
+          <span id="previewPartyAPosition">
+            ............................................
+          </span>
         </div>
 
-
         <div class="line">
-          Điện thoại: ..........................................
+          Điện thoại:
+          <span id="previewPartyAPhone">
+            ..........................................
+          </span>
         </div>
 
       </section>
 
 
+      <!-- VÀ -->
 
-      <!-- ===================================================
+      <div class="section">
+
+        <div class="line">
+          VÀ
+        </div>
+
+      </div>
+
+
+      <!-- =================================================
            BÊN B
-      =================================================== -->
+           ================================================= -->
 
       <section class="section">
 
         <div class="section-title">
-          BÊN B:
+          BÊN B (BÊN THUÊ THI CÔNG)
         </div>
-
 
         <div class="line">
 
@@ -2002,7 +1589,6 @@ textarea{
 
         </div>
 
-
         <div class="line">
 
           Mã số thuế:
@@ -2011,7 +1597,6 @@ textarea{
           </span>
 
         </div>
-
 
         <div class="line">
 
@@ -2022,7 +1607,6 @@ textarea{
 
         </div>
 
-
         <div class="line">
 
           Đại diện:
@@ -2032,7 +1616,6 @@ textarea{
 
         </div>
 
-
         <div class="line">
 
           Chức vụ:
@@ -2041,7 +1624,6 @@ textarea{
           </span>
 
         </div>
-
 
         <div class="line">
 
@@ -2055,29 +1637,20 @@ textarea{
       </section>
 
 
-
-      <section class="section">
-
-        <div class="line">
-
-          Hai bên thống nhất ký Phụ lục công trình với các nội dung như sau:
-
-        </div>
-
-      </section>
+      <div class="line">
+        Hai bên thống nhất ký Phụ lục công trình với các nội dung như sau:
+      </div>
 
 
-
-      <!-- ===================================================
+      <!-- =================================================
            ĐIỀU 1
-      =================================================== -->
+           ================================================= -->
 
       <section class="section">
 
         <div class="section-title">
           ĐIỀU 1. THÔNG TIN CÔNG TRÌNH
         </div>
-
 
         <div class="line">
 
@@ -2088,7 +1661,6 @@ textarea{
 
         </div>
 
-
         <div class="line">
 
           Chủ đầu tư:
@@ -2098,47 +1670,64 @@ textarea{
 
         </div>
 
-
         <div class="line">
           Thông số phục vụ thi công khung thang máy:
         </div>
 
-
         <div class="bullet">
+
            Số tầng lắp đặt:
           <span id="previewFloors">
             ............
           </span>
-        </div>
 
+        </div>
 
         <div class="bullet">
-           Loại khung: ☐ Khung thép ☐ Khung thép bọc inox ☐ Khung nhôm
-        </div>
 
+           Loại khung:
+
+          <span id="previewFrameSteel">☐</span>
+          Khung thép
+
+          <span id="previewFrameInox">☐</span>
+          Khung thép bọc inox
+
+          <span id="previewFrameAluminum">☐</span>
+          Khung nhôm
+
+        </div>
 
         <div class="bullet">
-           Vị trí lắp đặt: ☐ Trong nhà ☐ Ngoài trời
-        </div>
 
+           Vị trí lắp đặt:
+
+          <span id="previewLocationIndoor">☐</span>
+          Trong nhà
+
+          <span id="previewLocationOutdoor">☐</span>
+          Ngoài trời
+
+        </div>
 
         <div class="line">
-          Ghi chú kỹ thuật khác:
+          Ghi chú kỹ thuật khác (nếu có):
         </div>
 
-
         <div
-          class="dotted-line"
-          id="previewTechnicalNote"
+          id="previewTechnical"
+          class="variable-text"
+          style="display:none;"
         ></div>
+
+        <div class="dotted-line"></div>
 
       </section>
 
 
-
-      <!-- ===================================================
+      <!-- =================================================
            ĐIỀU 2
-      =================================================== -->
+           ================================================= -->
 
       <section class="section">
 
@@ -2146,60 +1735,52 @@ textarea{
           ĐIỀU 2. PHẠM VI CÔNG VIỆC
         </div>
 
-
         <div class="line">
           Bên A thực hiện:
         </div>
-
 
         <div class="checkbox-line">
           ☐ Lắp đặt khung thép thang máy
         </div>
 
-
         <div class="checkbox-line">
           ☐ Căn chỉnh kết cấu khung
         </div>
-
 
         <div class="checkbox-line">
           ☐ Liên kết bulong, bản mã
         </div>
 
-
         <div class="checkbox-line">
           ☐ Bọc bảo vệ chống xước sau lắp đặt
         </div>
-
 
         <div class="checkbox-line">
           ☐ Vệ sinh khu vực thi công
         </div>
 
-
         <div class="checkbox-line">
           ☐ Hỗ trợ nghiệm thu kỹ thuật
         </div>
 
-
         <div class="checkbox-line">
-          ☐ Công việc khác: ....................................................................
+          ☐ Công việc khác:
         </div>
+
+        <div class="dotted-line"></div>
 
       </section>
 
 
-
-      <!-- ===================================================
+      <!-- =================================================
            ĐIỀU 3
-      =================================================== -->
+           ================================================= -->
 
       <section class="section">
 
         <div class="section-title">
           ĐIỀU 3. GIÁ TRỊ CÔNG TRÌNH
         </div>
-
 
         <table class="price-table">
 
@@ -2231,7 +1812,6 @@ textarea{
 
           </thead>
 
-
           <tbody>
 
             <tr>
@@ -2240,30 +1820,32 @@ textarea{
                 Thi công lắp đặt khung thép thang máy
               </td>
 
-
               <td class="center">
                 Stop
               </td>
 
+              <td class="center">
 
-              <td
-                class="center"
-                id="previewQuantity"
-              >
-                ......
+                <span id="previewQuantity">
+                  ......
+                </span>
+
               </td>
-
-
-              <td
-                class="center"
-                id="previewUnitPrice"
-              >
-                2.5400.000
-              </td>
-
 
               <td class="center">
-                ..............
+
+                <span id="previewUnitPrice">
+                  2.5400.000
+                </span>
+
+              </td>
+
+              <td class="center">
+
+                <span id="previewTotalValueCell">
+                  ..............
+                </span>
+
               </td>
 
             </tr>
@@ -2271,7 +1853,6 @@ textarea{
           </tbody>
 
         </table>
-
 
         <div class="total-line">
 
@@ -2283,48 +1864,41 @@ textarea{
 
         </div>
 
-
         <div class="line">
 
           (Bằng chữ:
-          <span id="previewAmountWords">
+          <span id="previewValueWords">
             .................................................................................
           </span>)
 
         </div>
 
-
         <div class="line">
           Giá trên:
         </div>
 
-
-        <div class="bullet">
-          Đã bao gồm VAT
+        <div class="checkbox-line">
+          ☑ Đã bao gồm VAT
         </div>
 
-
-        <div class="bullet">
-          Bao gồm nhân công lắp đặt
+        <div class="checkbox-line">
+          ☑ Bao gồm nhân công lắp đặt
         </div>
 
-
-        <div class="bullet">
-          Bao gồm bọc bảo vệ chống xước sau thi công
+        <div class="checkbox-line">
+          ☑ Bao gồm bọc bảo vệ chống xước sau thi công
         </div>
 
-
-        <div class="bullet">
-          Chưa bao gồm các hạng mục phát sinh ngoài phạm vi hợp đồng (nếu có)
+        <div class="checkbox-line">
+          ☑ Chưa bao gồm các hạng mục phát sinh ngoài phạm vi hợp đồng (nếu có)
         </div>
 
       </section>
 
 
-
-      <!-- ===================================================
+      <!-- =================================================
            ĐIỀU 4
-      =================================================== -->
+           ================================================= -->
 
       <section class="section">
 
@@ -2332,11 +1906,9 @@ textarea{
           ĐIỀU 4. TIẾN ĐỘ VÀ THANH TOÁN
         </div>
 
-
         <div class="subheading">
           1. Tiến độ thi công
         </div>
-
 
         <div class="bullet">
 
@@ -2347,7 +1919,6 @@ textarea{
 
         </div>
 
-
         <div class="bullet">
 
            Ngày khởi công:
@@ -2356,7 +1927,6 @@ textarea{
           </span>
 
         </div>
-
 
         <div class="bullet">
 
@@ -2368,7 +1938,6 @@ textarea{
 
         </div>
 
-
         <div class="bullet">
 
            Ngày hoàn thành dự kiến:
@@ -2379,11 +1948,9 @@ textarea{
         </div>
 
 
-
         <div class="subheading">
           2. Thanh toán
         </div>
-
 
         <div class="checkbox-line">
 
@@ -2399,7 +1966,6 @@ textarea{
 
         </div>
 
-
         <div class="checkbox-line">
 
           ☐ Thanh toán còn lại:
@@ -2410,26 +1976,21 @@ textarea{
 
         </div>
 
-
-        <div class="line">
+        <div class="subheading">
           Hình thức thanh toán:
         </div>
-
 
         <div class="checkbox-line">
           ☑ Chuyển khoản
         </div>
 
-
-        <div class="line">
+        <div class="subheading">
           Thông tin tài khoản:
         </div>
-
 
         <div class="line">
           Tên tài khoản: CÔNG TY CỔ PHẦN GROVA HOLDINGS
         </div>
-
 
         <div class="line">
 
@@ -2440,7 +2001,6 @@ textarea{
 
         </div>
 
-
         <div class="line">
 
           Ngân hàng:
@@ -2450,25 +2010,20 @@ textarea{
 
         </div>
 
-
         <div class="subheading">
           Lưu ý:
         </div>
 
-
         <div class="line">
-
           Các khoảng thời gian chờ điện, chờ mặt bằng, chờ vật tư, chờ thiết bị nâng hạ hoặc chờ xử lý sai sót công trình không tính vào tiến độ thi công của Bên A.
-
         </div>
 
       </section>
 
 
-
-      <!-- ===================================================
+      <!-- =================================================
            ĐIỀU 5
-      =================================================== -->
+           ================================================= -->
 
       <section class="section">
 
@@ -2476,29 +2031,36 @@ textarea{
           ĐIỀU 5. ĐIỀU KIỆN THI CÔNG ĐẶC BIỆT
         </div>
 
-
         <div class="checkbox-line">
-          ☐ Công trình thi công ban đêm
-        </div>
 
+          <span id="previewNightWork">
+            ☐
+          </span>
+
+          Công trình thi công ban đêm
+
+        </div>
 
         <div class="checkbox-line">
           ☐ Công trình có yêu cầu đặc biệt:
         </div>
 
-
         <div
-          class="dotted-line"
-          id="previewSpecialCondition"
+          id="specialConditionPreview"
+          class="variable-text"
+          style="display:none;"
         ></div>
+
+        <div class="dotted-line"></div>
+
+        <div class="dotted-line"></div>
 
       </section>
 
 
-
-      <!-- ===================================================
+      <!-- =================================================
            ĐIỀU 7
-      =================================================== -->
+           ================================================= -->
 
       <section class="section">
 
@@ -2506,34 +2068,24 @@ textarea{
           ĐIỀU 7. PHÁT SINH
         </div>
 
-
         <div class="line">
-
           Các phát sinh ngoài phạm vi hợp đồng nguyên tắc hoặc ngoài nội dung phụ lục này sẽ được xác nhận riêng bằng:
-
         </div>
 
-
         <div class="bullet">
-
            Biên bản phát sinh; Email, Zalo, Viber , Wechat …
-
         </div>
 
-
         <div class="bullet">
-
            Tin nhắn của người phụ trách công trình.
-
         </div>
 
       </section>
 
 
-
-      <!-- ===================================================
+      <!-- =================================================
            ĐIỀU 8
-      =================================================== -->
+           ================================================= -->
 
       <section class="section">
 
@@ -2541,26 +2093,25 @@ textarea{
           ĐIỀU 8. HIỆU LỰC
         </div>
 
-
         <div class="line">
 
-          Phụ lục này là một phần không tách rời của Hợp đồng nguyên tắc số
-          <strong id="previewReferenceContract1">
-            .................................
+          Phụ lục này là một phần không tách rời của
+          Hợp đồng nguyên tắc số
+          <strong id="previewReferenceContract">
+            ................................
           </strong>.
 
         </div>
 
-
         <div class="line">
 
-          Các nội dung không quy định trong phụ lục này được áp dụng theo Hợp đồng nguyên tắc số
+          Các nội dung không quy định trong phụ lục này được áp dụng theo
+          Hợp đồng nguyên tắc số
           <strong id="previewReferenceContract2">
-            .................................
+            ................................
           </strong>.
 
         </div>
-
 
         <div class="line">
           Phụ lục có hiệu lực kể từ ngày ký.
@@ -2569,13 +2120,11 @@ textarea{
       </section>
 
 
-
-      <!-- ===================================================
-           SIGNATURE
-      =================================================== -->
+      <!-- =================================================
+           CHỮ KÝ
+           ================================================= -->
 
       <div class="signature-grid">
-
 
         <div class="signature">
 
@@ -2583,21 +2132,17 @@ textarea{
             ĐẠI DIỆN BÊN A
           </div>
 
-
           <div class="signature-company">
             CÔNG TY CỔ PHẦN GROVA HOLDINGS
           </div>
-
 
           <div class="signature-note">
             (Ký, ghi rõ họ tên, đóng dấu)
           </div>
 
-
           <div class="signature-space"></div>
 
         </div>
-
 
 
         <div class="signature">
@@ -2606,24 +2151,19 @@ textarea{
             ĐẠI DIỆN BÊN B
           </div>
 
-
           <div class="signature-company">
             &nbsp;
           </div>
-
 
           <div class="signature-note">
             (Ký, ghi rõ họ tên, đóng dấu)
           </div>
 
-
           <div class="signature-space"></div>
 
         </div>
 
-
       </div>
-
 
     </article>
 
@@ -2634,103 +2174,100 @@ textarea{
 </main>
 
 
-
 <script>
-
-/* =========================================================
-   CONFIG
-========================================================= */
-
 "use strict";
 
+/* =========================================================
+   CẤU HÌNH
+   ========================================================= */
 
 const YEAR = 2026;
 
-
 const COUNTER_KEY =
   "grova_plhd_counter_" + YEAR;
-
 
 const DRAFT_KEY =
   "grova_document_template_02";
 
 
-
 /* =========================================================
-   HELPERS
-========================================================= */
+   TIỆN ÍCH
+   ========================================================= */
 
 function $(id){
-
   return document.getElementById(id);
-
 }
 
-
 function getValue(id){
+  const el = $(id);
 
-  const element = $(id);
-
-  if(!element){
+  if(!el){
     return "";
   }
 
-  return String(
-    element.value || ""
-  ).trim();
-
+  return String(el.value || "").trim();
 }
 
+function getChecked(id){
+  const el = $(id);
+
+  return !!(el && el.checked);
+}
 
 function setText(
   id,
-  value,
-  fallback=""
+  content,
+  fallback
 ){
+  const el = $(id);
 
-  const element = $(id);
-
-  if(!element){
+  if(!el){
     return;
   }
 
   const clean =
-    String(value || "").trim();
+    String(content || "").trim();
 
-  element.textContent =
-    clean || fallback;
+  el.textContent =
+    clean || fallback || "";
+}
 
+function setCheck(
+  id,
+  checked
+){
+  const el = $(id);
+
+  if(!el){
+    return;
+  }
+
+  el.textContent =
+    checked ? "☑" : "☐";
 }
 
 
-
 /* =========================================================
-   COUNTER
-========================================================= */
+   SỐ PHỤ LỤC
+   ========================================================= */
 
 function getCounter(){
 
+  const raw =
+    localStorage.getItem(COUNTER_KEY);
+
   const number =
-    parseInt(
-      localStorage.getItem(
-        COUNTER_KEY
-      ) || "0",
-      10
-    );
+    parseInt(raw || "0",10);
 
   if(
     Number.isFinite(number) &&
     number >= 0
   ){
-
     return number;
-
   }
 
   return 0;
-
 }
-
 
 function setCounter(number){
 
@@ -2741,31 +2278,43 @@ function setCounter(number){
 
 }
 
-
 function makeAppendixNumber(number){
 
   return (
-    String(number).padStart(2,"0")
-    + "/PLHĐ/"
-    + YEAR
+    String(number).padStart(2,"0") +
+    "/PLHĐ/" +
+    YEAR
+  );
+
+}
+
+function updateAppendixNumber(number){
+
+  setText(
+    "appendixNumberDisplay",
+    number,
+    "01/PLHĐ/2026"
+  );
+
+  setText(
+    "previewAppendixNumber",
+    number,
+    "01/PLHĐ/2026"
   );
 
 }
 
 
-
 /* =========================================================
-   DRAFT
-========================================================= */
+   LƯU BẢN NHÁP
+   ========================================================= */
 
 function loadDraft(){
 
   try{
 
     const raw =
-      localStorage.getItem(
-        DRAFT_KEY
-      );
+      localStorage.getItem(DRAFT_KEY);
 
     if(!raw){
       return {};
@@ -2778,44 +2327,31 @@ function loadDraft(){
       data &&
       typeof data === "object"
     ){
-
       return data;
-
     }
 
   }catch(error){
 
     console.warn(
-      "Không đọc được dữ liệu bản nháp.",
+      "Không đọc được bản nháp.",
       error
     );
 
   }
 
   return {};
-
 }
 
 
-function saveDraft(){
+function saveDraft(extra = {}){
 
-  const data =
+  const oldData =
     loadDraft();
 
-
-  document
-    .querySelectorAll(
-      ".control-panel input, .control-panel textarea"
-    )
-    .forEach(
-      element => {
-
-        data[element.id] =
-          element.value;
-
-      }
-    );
-
+  const data = {
+    ...oldData,
+    ...extra
+  };
 
   try{
 
@@ -2836,51 +2372,26 @@ function saveDraft(){
 }
 
 
-
 /* =========================================================
-   NUMBER DISPLAY
-========================================================= */
-
-function updateNumber(number){
-
-  setText(
-    "appendixNumberDisplay",
-    number,
-    "01/PLHĐ/2026"
-  );
-
-
-  setText(
-    "previewAppendixNumber",
-    number,
-    "01/PLHĐ/2026"
-  );
-
-}
-
+   ĐẢM BẢO SỐ HIỆN TẠI
+   ========================================================= */
 
 function ensureNumber(){
 
   const draft =
     loadDraft();
 
+  if(draft.appendixNumber){
 
-  if(
-    draft.appendixNumber
-  ){
-
-    updateNumber(
+    updateAppendixNumber(
       draft.appendixNumber
     );
 
     return;
-
   }
-
 
   let counter =
     getCounter();
-
 
   if(counter < 1){
 
@@ -2890,130 +2401,212 @@ function ensureNumber(){
 
   }
 
-
   const number =
-    makeAppendixNumber(
-      counter
-    );
+    makeAppendixNumber(counter);
 
+  saveDraft({
+    appendixNumber:number
+  });
 
-  draft.appendixNumber =
-    number;
-
-
-  try{
-
-    localStorage.setItem(
-      DRAFT_KEY,
-      JSON.stringify(draft)
-    );
-
-  }catch(error){
-
-    console.warn(
-      "Không thể lưu số phụ lục.",
-      error
-    );
-
-  }
-
-
-  updateNumber(number);
+  updateAppendixNumber(number);
 
 }
 
 
+/* =========================================================
+   TẠO SỐ MỚI
+   ========================================================= */
+
 function createNewNumber(){
 
-  let counter =
-    getCounter();
+  const next =
+    getCounter() + 1;
 
-
-  counter += 1;
-
-
-  setCounter(counter);
-
+  setCounter(next);
 
   const number =
-    makeAppendixNumber(
-      counter
-    );
+    makeAppendixNumber(next);
 
+  /*
+    Chỉ thay số phụ lục.
+    Không tự xóa dữ liệu đang nhập.
+  */
+
+  saveDraft({
+    appendixNumber:number
+  });
+
+  updateAppendixNumber(number);
+
+}
+
+
+/* =========================================================
+   DANH SÁCH FIELD
+   ========================================================= */
+
+const fieldIds = [
+
+  "referenceContract",
+
+  "signDay",
+  "signMonth",
+
+  "partyAPosition",
+  "partyAPhone",
+
+  "partyBCompany",
+  "partyBTax",
+  "partyBAddress",
+  "partyBRepresentative",
+  "partyBPosition",
+  "partyBPhone",
+
+  "projectAddress",
+  "investor",
+  "floors",
+  "technicalNote",
+
+  "quantity",
+  "unitPrice",
+  "totalValue",
+  "valueWords",
+
+  "handoverDate",
+  "startDate",
+  "duration",
+  "expectedDate",
+
+  "advancePercent",
+  "advanceAmount",
+  "remainingPercent",
+  "accountNumber",
+  "bank",
+
+  "specialCondition"
+
+];
+
+const checkboxIds = [
+
+  "frameSteel",
+  "frameInox",
+  "frameAluminum",
+
+  "locationIndoor",
+  "locationOutdoor",
+
+  "nightWork"
+
+];
+
+
+/* =========================================================
+   KHÔI PHỤC BẢN NHÁP
+   ========================================================= */
+
+function restoreDraft(){
 
   const draft =
     loadDraft();
 
+  fieldIds.forEach(
+    function(id){
 
-  draft.appendixNumber =
-    number;
+      const el =
+        $(id);
+
+      if(!el){
+        return;
+      }
+
+      if(
+        Object.prototype.hasOwnProperty.call(
+          draft,
+          id
+        )
+      ){
+
+        el.value =
+          draft[id] || "";
+
+      }
+
+    }
+  );
 
 
-  try{
+  checkboxIds.forEach(
+    function(id){
 
-    localStorage.setItem(
-      DRAFT_KEY,
-      JSON.stringify(draft)
-    );
+      const el =
+        $(id);
 
-  }catch(error){
+      if(!el){
+        return;
+      }
 
-    console.warn(
-      "Không thể lưu số phụ lục.",
-      error
-    );
+      if(
+        Object.prototype.hasOwnProperty.call(
+          draft,
+          id
+        )
+      ){
 
-  }
+        el.checked =
+          !!draft[id];
 
+      }
 
-  updateNumber(number);
+    }
+  );
 
 }
 
 
-
 /* =========================================================
-   PREVIEW
-========================================================= */
+   CẬP NHẬT PREVIEW
+   ========================================================= */
 
 function updatePreview(){
 
-
-  /* DATE */
+  /* -------------------------------------------------------
+     NGÀY
+     ------------------------------------------------------- */
 
   setText(
     "previewDay",
-    getValue("day"),
+    getValue("signDay"),
     "......"
   );
-
 
   setText(
     "previewMonth",
-    getValue("month"),
+    getValue("signMonth"),
     "......"
   );
 
 
-
-  /* CONTRACT */
+  /* -------------------------------------------------------
+     BÊN A
+     ------------------------------------------------------- */
 
   setText(
-    "previewReferenceContract1",
-    getValue("referenceContract"),
-    "................................"
+    "previewPartyAPosition",
+    getValue("partyAPosition"),
+    "............................................"
+  );
+
+  setText(
+    "previewPartyAPhone",
+    getValue("partyAPhone"),
+    ".........................................."
   );
 
 
-  setText(
-    "previewReferenceContract2",
-    getValue("referenceContract"),
-    "................................"
-  );
-
-
-
-  /* PARTY B */
+  /* -------------------------------------------------------
+     BÊN B
+     ------------------------------------------------------- */
 
   setText(
     "previewPartyBCompany",
@@ -3021,13 +2614,11 @@ function updatePreview(){
     "............................................"
   );
 
-
   setText(
     "previewPartyBTax",
     getValue("partyBTax"),
     ".............................................."
   );
-
 
   setText(
     "previewPartyBAddress",
@@ -3035,20 +2626,17 @@ function updatePreview(){
     ".................................................."
   );
 
-
   setText(
     "previewPartyBRepresentative",
     getValue("partyBRepresentative"),
     "................................................"
   );
 
-
   setText(
     "previewPartyBPosition",
     getValue("partyBPosition"),
     "................................................"
   );
-
 
   setText(
     "previewPartyBPhone",
@@ -3057,8 +2645,9 @@ function updatePreview(){
   );
 
 
-
-  /* PROJECT */
+  /* -------------------------------------------------------
+     CÔNG TRÌNH
+     ------------------------------------------------------- */
 
   setText(
     "previewProjectAddress",
@@ -3066,13 +2655,11 @@ function updatePreview(){
     "......................................................"
   );
 
-
   setText(
     "previewInvestor",
     getValue("investor"),
     ".........................................................."
   );
-
 
   setText(
     "previewFloors",
@@ -3081,58 +2668,117 @@ function updatePreview(){
   );
 
 
+  /* -------------------------------------------------------
+     LOẠI KHUNG
+     ------------------------------------------------------- */
 
-  /* TECHNICAL NOTE */
+  setCheck(
+    "previewFrameSteel",
+    getChecked("frameSteel")
+  );
 
-  const technicalNote =
+  setCheck(
+    "previewFrameInox",
+    getChecked("frameInox")
+  );
+
+  setCheck(
+    "previewFrameAluminum",
+    getChecked("frameAluminum")
+  );
+
+
+  /* -------------------------------------------------------
+     VỊ TRÍ
+     ------------------------------------------------------- */
+
+  setCheck(
+    "previewLocationIndoor",
+    getChecked("locationIndoor")
+  );
+
+  setCheck(
+    "previewLocationOutdoor",
+    getChecked("locationOutdoor")
+  );
+
+
+  /* -------------------------------------------------------
+     GHI CHÚ KỸ THUẬT
+     ------------------------------------------------------- */
+
+  const technical =
     getValue("technicalNote");
 
+  const technicalPreview =
+    $("previewTechnical");
 
-  const technicalElement =
-    $("previewTechnicalNote");
+  if(technical){
 
+    technicalPreview.style.display =
+      "block";
 
-  if(technicalElement){
+    technicalPreview.textContent =
+      technical;
 
-    technicalElement.textContent =
-      technicalNote;
+  }else{
+
+    technicalPreview.style.display =
+      "none";
+
+    technicalPreview.textContent =
+      "";
 
   }
 
 
+  /* -------------------------------------------------------
+     GIÁ
+     ------------------------------------------------------- */
 
-  /* PRICE */
+  const quantity =
+    getValue("quantity");
+
+  const unitPrice =
+    getValue("unitPrice");
+
+  const totalValue =
+    getValue("totalValue");
 
   setText(
     "previewQuantity",
-    getValue("quantity"),
+    quantity,
     "......"
   );
 
-
   setText(
     "previewUnitPrice",
-    getValue("unitPrice"),
+    unitPrice,
     "2.5400.000"
   );
 
-
   setText(
     "previewTotalValue",
-    getValue("totalValue"),
+    totalValue,
     ".................................................."
   );
 
+  setText(
+    "previewTotalValueCell",
+    totalValue,
+    ".............."
+  );
 
   setText(
-    "previewAmountWords",
-    getValue("amountWords"),
+    "previewValueWords",
+    getValue("valueWords"),
     "................................................................................."
   );
 
 
-
-  /* PROGRESS */
+  /* -------------------------------------------------------
+     TIẾN ĐỘ
+     ------------------------------------------------------- */
 
   setText(
     "previewHandoverDate",
@@ -3140,20 +2786,17 @@ function updatePreview(){
     "..... / ..... / 20....."
   );
 
-
   setText(
     "previewStartDate",
     getValue("startDate"),
     "..... / ..... / 20....."
   );
 
-
   setText(
     "previewDuration",
     getValue("duration"),
     ".........."
   );
-
 
   setText(
     "previewExpectedDate",
@@ -3162,8 +2805,9 @@ function updatePreview(){
   );
 
 
-
-  /* PAYMENT */
+  /* -------------------------------------------------------
+     THANH TOÁN
+     ------------------------------------------------------- */
 
   setText(
     "previewAdvancePercent",
@@ -3171,13 +2815,11 @@ function updatePreview(){
     ".........."
   );
 
-
   setText(
     "previewAdvanceAmount",
     getValue("advanceAmount"),
     "........................"
   );
-
 
   setText(
     "previewRemainingPercent",
@@ -3185,13 +2827,11 @@ function updatePreview(){
     ".........."
   );
 
-
   setText(
     "previewAccountNumber",
     getValue("accountNumber"),
     "...................................."
   );
-
 
   setText(
     "previewBank",
@@ -3200,92 +2840,186 @@ function updatePreview(){
   );
 
 
+  /* -------------------------------------------------------
+     HỢP ĐỒNG THAM CHIẾU
+     ------------------------------------------------------- */
 
-  /* SPECIAL CONDITION */
+  setText(
+    "previewReferenceContract",
+    getValue("referenceContract"),
+    "................................"
+  );
 
-  const specialCondition =
+  setText(
+    "previewReferenceContract2",
+    getValue("referenceContract"),
+    "................................"
+  );
+
+
+  /* -------------------------------------------------------
+     ĐIỀU KIỆN ĐẶC BIỆT
+     ------------------------------------------------------- */
+
+  setCheck(
+    "previewNightWork",
+    getChecked("nightWork")
+  );
+
+  const special =
     getValue("specialCondition");
 
+  const specialPreview =
+    $("specialConditionPreview");
 
-  const specialElement =
-    $("previewSpecialCondition");
+  if(special){
 
+    specialPreview.style.display =
+      "block";
 
-  if(specialElement){
-
-    specialElement.textContent =
-      specialCondition;
-
-  }
-
-}
-
-
-
-/* =========================================================
-   LOAD FIELDS
-========================================================= */
-
-function loadFields(){
-
-  const draft =
-    loadDraft();
-
-
-  Object.keys(draft)
-    .forEach(
-      id => {
-
-        const element =
-          $(id);
-
-
-        if(
-          element &&
-          id !== "appendixNumber"
-        ){
-
-          element.value =
-            draft[id] || "";
-
-        }
-
-      }
-    );
-
-}
-
-
-
-/* =========================================================
-   BACK
-========================================================= */
-
-function goBack(){
-
-  if(
-    document.referrer &&
-    document.referrer.includes(
-      location.origin
-    )
-  ){
-
-    history.back();
+    specialPreview.textContent =
+      special;
 
   }else{
 
-    location.href =
-      "../index.html";
+    specialPreview.style.display =
+      "none";
+
+    specialPreview.textContent =
+      "";
 
   }
+
+
+  /* -------------------------------------------------------
+     LƯU
+     ------------------------------------------------------- */
+
+  const data = {};
+
+  fieldIds.forEach(
+    function(id){
+
+      data[id] =
+        getValue(id);
+
+    }
+  );
+
+  checkboxIds.forEach(
+    function(id){
+
+      data[id] =
+        getChecked(id);
+
+    }
+  );
+
+  saveDraft(data);
 
 }
 
 
+/* =========================================================
+   GẮN SỰ KIỆN
+   ========================================================= */
+
+fieldIds.forEach(
+  function(id){
+
+    const el =
+      $(id);
+
+    if(!el){
+      return;
+    }
+
+    el.addEventListener(
+      "input",
+      updatePreview
+    );
+
+    el.addEventListener(
+      "change",
+      updatePreview
+    );
+
+  }
+);
+
+
+checkboxIds.forEach(
+  function(id){
+
+    const el =
+      $(id);
+
+    if(!el){
+      return;
+    }
+
+    el.addEventListener(
+      "change",
+      updatePreview
+    );
+
+  }
+);
+
 
 /* =========================================================
-   INIT
-========================================================= */
+   NÚT TẠO SỐ MỚI
+   ========================================================= */
+
+const newNumberButton =
+  $("newNumberButton");
+
+if(newNumberButton){
+
+  newNumberButton.addEventListener(
+    "click",
+    createNewNumber
+  );
+
+}
+
+
+/* =========================================================
+   QUAY LẠI
+   ========================================================= */
+
+function goBack(){
+
+  try{
+
+    if(
+      document.referrer &&
+      document.referrer.includes(
+        "GROVA-DOCUMENT"
+      )
+    ){
+
+      history.back();
+
+      return;
+
+    }
+
+  }catch(error){
+
+    console.warn(error);
+
+  }
+
+  window.location.href =
+    "../index.html";
+
+}
+
+
+/* =========================================================
+   KHỞI ĐỘNG
+   ========================================================= */
 
 document.addEventListener(
   "DOMContentLoaded",
@@ -3293,54 +3027,14 @@ document.addEventListener(
 
     ensureNumber();
 
-
-    loadFields();
-
+    restoreDraft();
 
     updatePreview();
-
-
-    document
-      .querySelectorAll(
-        ".control-panel input, .control-panel textarea"
-      )
-      .forEach(
-        element => {
-
-          element.addEventListener(
-            "input",
-            function(){
-
-              updatePreview();
-
-              saveDraft();
-
-            }
-          );
-
-        }
-      );
-
-
-    const newNumberButton =
-      $("newNumberButton");
-
-
-    if(newNumberButton){
-
-      newNumberButton.addEventListener(
-        "click",
-        createNewNumber
-      );
-
-    }
 
   }
 );
 
 </script>
 
-
 </body>
-
 </html>
