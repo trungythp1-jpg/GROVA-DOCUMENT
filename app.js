@@ -102,19 +102,44 @@
 
 
   /* ==========================================
-     CARD
+     ESCAPE HTML
+     ========================================== */
+
+  function escapeHtml(value) {
+
+    var text = String(
+      value == null ? "" : value
+    );
+
+    return text
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+
+  }
+
+
+  /* ==========================================
+     DOCUMENT CARD
      ========================================== */
 
   function createCard(template) {
 
-    var card = document.createElement("article");
+    var card =
+      document.createElement("article");
 
-    card.className = "document-card";
+
+    card.className =
+      "document-card";
+
 
     card.setAttribute(
       "data-template-id",
       template.id
     );
+
 
     card.setAttribute(
       "data-file",
@@ -125,30 +150,57 @@
     card.innerHTML =
 
       '<div class="document-icon">' +
-        escapeHtml(template.icon || "📄") +
+
+        escapeHtml(
+          template.icon || "📄"
+        ) +
+
       '</div>' +
+
 
       '<div class="document-content">' +
 
         '<div class="document-code">' +
-          escapeHtml(template.code || "") +
+
+          escapeHtml(
+            template.code || ""
+          ) +
+
         '</div>' +
 
+
         '<h3>' +
-          escapeHtml(template.name || "") +
+
+          escapeHtml(
+            template.name || ""
+          ) +
+
         '</h3>' +
 
+
         '<p>' +
-          escapeHtml(template.description || "") +
+
+          escapeHtml(
+            template.description || ""
+          ) +
+
         '</p>' +
 
+
         '<span class="document-category">' +
-          escapeHtml(template.category || "Văn bản") +
+
+          escapeHtml(
+            template.category || "Văn bản"
+          ) +
+
         '</span>' +
 
       '</div>' +
 
-      '<div class="document-arrow">→</div>';
+
+      '<div class="document-arrow">' +
+        "→" +
+      '</div>';
 
 
     card.addEventListener(
@@ -162,34 +214,19 @@
 
 
     return card;
-  }
-
-
-  /* ==========================================
-     ESCAPE HTML
-     ========================================== */
-
-  function escapeHtml(value) {
-
-    var text = String(value == null ? "" : value);
-
-    return text
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
 
   }
 
 
   /* ==========================================
-     RENDER DOCUMENTS PAGE
+     DOCUMENTS PAGE
      ========================================== */
 
   function renderDocumentsPage() {
 
-    var grid = $("#documentsPageGrid");
+    var grid =
+      $("#documentsPageGrid");
+
 
     if (!grid) {
       return;
@@ -199,34 +236,33 @@
     grid.innerHTML = "";
 
 
-    getTemplates().forEach(function (template) {
+    getTemplates().forEach(
+      function (template) {
 
-      grid.appendChild(
-        createCard(template)
-      );
+        grid.appendChild(
+          createCard(template)
+        );
 
-    });
+      }
+    );
 
   }
 
 
   /* ==========================================
-     SYNC DASHBOARD
+     DASHBOARD CARDS
      ========================================== */
 
   function syncDashboardCards() {
 
-    var grid = $("#documentGrid");
+    var grid =
+      $("#documentGrid");
+
 
     if (!grid) {
       return;
     }
 
-
-    /*
-     * Dashboard có HTML fallback.
-     * Không xoá nếu JS/data không có.
-     */
 
     if (getTemplates().length === 0) {
       return;
@@ -236,13 +272,15 @@
     grid.innerHTML = "";
 
 
-    getTemplates().forEach(function (template) {
+    getTemplates().forEach(
+      function (template) {
 
-      grid.appendChild(
-        createCard(template)
-      );
+        grid.appendChild(
+          createCard(template)
+        );
 
-    });
+      }
+    );
 
   }
 
@@ -256,7 +294,9 @@
 
   function openModal() {
 
-    var modal = $("#documentModal");
+    var modal =
+      $("#documentModal");
+
 
     if (!modal) {
       return;
@@ -266,12 +306,18 @@
     renderTemplateSelector();
 
 
-    modal.classList.remove("hidden");
+    modal.classList.remove(
+      "hidden"
+    );
 
-    document.body.classList.add("modal-open");
+
+    document.body.classList.add(
+      "modal-open"
+    );
 
 
     selectedTemplate = null;
+
 
     updateModalButton();
 
@@ -280,16 +326,24 @@
 
   function closeModal() {
 
-    var modal = $("#documentModal");
+    var modal =
+      $("#documentModal");
+
 
     if (!modal) {
       return;
     }
 
 
-    modal.classList.add("hidden");
+    modal.classList.add(
+      "hidden"
+    );
 
-    document.body.classList.remove("modal-open");
+
+    document.body.classList.remove(
+      "modal-open"
+    );
+
 
     selectedTemplate = null;
 
@@ -298,7 +352,9 @@
 
   function renderTemplateSelector() {
 
-    var box = $("#templateSelector");
+    var box =
+      $("#templateSelector");
+
 
     if (!box) {
       return;
@@ -308,77 +364,115 @@
     box.innerHTML = "";
 
 
-    getTemplates().forEach(function (template) {
+    getTemplates().forEach(
+      function (template) {
 
-      var item = document.createElement("button");
-
-      item.type = "button";
-
-      item.className = "template-option";
-
-
-      item.innerHTML =
-
-        '<span class="template-option-icon">' +
-          escapeHtml(template.icon || "📄") +
-        '</span>' +
-
-        '<span class="template-option-content">' +
-
-          '<strong>' +
-            escapeHtml(template.name || "") +
-          '</strong>' +
-
-          '<small>' +
-            escapeHtml(template.description || "") +
-          '</small>' +
-
-        '</span>' +
-
-        '<span class="template-option-check">✓</span>';
-
-
-      item.addEventListener(
-        "click",
-        function () {
-
-          selectedTemplate = template;
-
-
-          $$(".template-option").forEach(
-            function (element) {
-
-              element.classList.remove("selected");
-
-            }
+        var item =
+          document.createElement(
+            "button"
           );
 
 
-          item.classList.add("selected");
-
-          updateModalButton();
-
-        }
-      );
+        item.type =
+          "button";
 
 
-      box.appendChild(item);
+        item.className =
+          "template-option";
 
-    });
+
+        item.innerHTML =
+
+          '<span class="template-option-icon">' +
+
+            escapeHtml(
+              template.icon || "📄"
+            ) +
+
+          '</span>' +
+
+
+          '<span class="template-option-content">' +
+
+            '<strong>' +
+
+              escapeHtml(
+                template.name || ""
+              ) +
+
+            '</strong>' +
+
+
+            '<small>' +
+
+              escapeHtml(
+                template.description || ""
+              ) +
+
+            '</small>' +
+
+          '</span>' +
+
+
+          '<span class="template-option-check">' +
+            "✓" +
+          '</span>';
+
+
+        item.addEventListener(
+          "click",
+          function () {
+
+            selectedTemplate =
+              template;
+
+
+            $$(".template-option")
+              .forEach(
+                function (element) {
+
+                  element.classList.remove(
+                    "selected"
+                  );
+
+                }
+              );
+
+
+            item.classList.add(
+              "selected"
+            );
+
+
+            updateModalButton();
+
+          }
+        );
+
+
+        box.appendChild(
+          item
+        );
+
+      }
+    );
 
   }
 
 
   function updateModalButton() {
 
-    var button = $("#openTemplate");
+    var button =
+      $("#openTemplate");
+
 
     if (!button) {
       return;
     }
 
 
-    button.disabled = !selectedTemplate;
+    button.disabled =
+      !selectedTemplate;
 
   }
 
@@ -390,7 +484,9 @@
     }
 
 
-    openTemplate(selectedTemplate);
+    openTemplate(
+      selectedTemplate
+    );
 
   }
 
@@ -401,26 +497,27 @@
 
   function openTemplate(template) {
 
-    if (!template || !template.file) {
+    if (
+      !template ||
+      !template.file
+    ) {
       return;
     }
 
 
-    /*
-     * Ghi nhận hoạt động trước khi
-     * chuyển sang trang mẫu.
-     */
-
-    saveRecentDocument(template);
+    saveRecentDocument(
+      template
+    );
 
 
-    window.location.href = template.file;
+    window.location.href =
+      template.file;
 
   }
 
 
   /* ==========================================
-     RECENT STORAGE
+     HISTORY STORAGE
      ========================================== */
 
   function getRecentDocuments() {
@@ -447,17 +544,14 @@
       }
 
 
-      /*
-       * Lọc dữ liệu lỗi.
-       */
+      return parsed.filter(
+        function (item) {
 
-      return parsed.filter(function (item) {
+          return item &&
+                 typeof item === "object";
 
-        return item &&
-               typeof item === "object";
-
-      });
-
+        }
+      );
 
     } catch (error) {
 
@@ -469,7 +563,7 @@
 
 
   /* ==========================================
-     SAVE RECENT ACTIVITY
+     SAVE HISTORY
      ========================================== */
 
   function saveRecentDocument(template) {
@@ -518,15 +612,13 @@
     };
 
 
-    /*
-     * Hoạt động mới nhất lên đầu.
-     */
-
-    list.unshift(activity);
+    list.unshift(
+      activity
+    );
 
 
     /*
-     * Chỉ giữ tối đa 20 hoạt động.
+     * Tối đa 20 hoạt động.
      */
 
     list =
@@ -551,6 +643,8 @@
 
 
     renderRecentDocuments();
+
+    renderHistoryDocuments();
 
     updateStats();
 
@@ -598,15 +692,8 @@
       24 * hour;
 
 
-    /*
-     * Trường hợp thời gian tương lai
-     * do đồng hồ thiết bị lệch.
-     */
-
     if (diff < 0) {
-
       diff = 0;
-
     }
 
 
@@ -619,34 +706,27 @@
 
     if (diff < hour) {
 
-      var minutes =
+      return (
         Math.floor(
           diff / minute
-        );
-
-      return minutes +
-        " phút trước";
+        ) +
+        " phút trước"
+      );
 
     }
 
 
     if (diff < day) {
 
-      var hours =
+      return (
         Math.floor(
           diff / hour
-        );
-
-      return hours +
-        " giờ trước";
+        ) +
+        " giờ trước"
+      );
 
     }
 
-
-    /*
-     * Khác ngày:
-     * DD/MM/YYYY • HH:MM
-     */
 
     try {
 
@@ -677,13 +757,15 @@
 
 
   /* ==========================================
-     CREATE RECENT ROW
+     CREATE HISTORY ROW
      ========================================== */
 
-  function createRecentRow(item) {
+  function createHistoryRow(item) {
 
     var row =
-      document.createElement("button");
+      document.createElement(
+        "button"
+      );
 
 
     row.type =
@@ -785,8 +867,8 @@
 
 
         /*
-         * Mở lại văn bản không tạo
-         * thêm một dòng lịch sử mới.
+         * Mở lại văn bản nhưng
+         * KHÔNG tạo lịch sử mới.
          */
 
         window.location.href =
@@ -805,9 +887,9 @@
      EMPTY STATE
      ========================================== */
 
-  function renderRecentEmpty(
+  function renderEmptyState(
     container,
-    historyPage
+    history
   ) {
 
     if (!container) {
@@ -823,14 +905,16 @@
           "◷" +
         '</div>' +
 
+
         '<h3>' +
           "Chưa có lịch sử" +
         '</h3>' +
 
+
         '<p>' +
 
           (
-            historyPage
+            history
               ? "Các văn bản được mở và xử lý sẽ xuất hiện tại đây."
               : "Các văn bản được mở sẽ xuất hiện tại đây."
           ) +
@@ -843,39 +927,156 @@
 
 
   /* ==========================================
-     CLEAR HISTORY BUTTON
+     DASHBOARD RECENT
      ========================================== */
 
-  function createClearHistoryButton() {
+  function renderRecentDocuments() {
 
-    var button =
-      document.createElement("button");
+    var container =
+      $("#recentDocuments");
 
 
-    button.type =
+    if (!container) {
+      return;
+    }
+
+
+    var list =
+      getRecentDocuments();
+
+
+    /*
+     * Dashboard chỉ lấy 4 hoạt động
+     * mới nhất.
+     */
+
+    var recent =
+      list.slice(0, 4);
+
+
+    if (!recent.length) {
+
+      renderEmptyState(
+        container,
+        false
+      );
+
+      return;
+
+    }
+
+
+    container.innerHTML = "";
+
+
+    recent.forEach(
+      function (item) {
+
+        container.appendChild(
+          createHistoryRow(item)
+        );
+
+      }
+    );
+
+  }
+
+
+  /* ==========================================
+     HISTORY PAGE
+     ========================================== */
+
+  function renderHistoryDocuments() {
+
+    /*
+     * QUAN TRỌNG:
+     * Trang Lịch sử dùng
+     * #historyDocuments
+     */
+
+    var container =
+      $("#historyDocuments");
+
+
+    if (!container) {
+      return;
+    }
+
+
+    var list =
+      getRecentDocuments();
+
+
+    if (!list.length) {
+
+      renderEmptyState(
+        container,
+        true
+      );
+
+      return;
+
+    }
+
+
+    container.innerHTML = "";
+
+
+    /*
+     * Thanh công cụ lịch sử.
+     */
+
+    var toolbar =
+      document.createElement(
+        "div"
+      );
+
+
+    toolbar.className =
+      "history-toolbar";
+
+
+    var count =
+      document.createElement(
+        "span"
+      );
+
+
+    count.className =
+      "history-count";
+
+
+    count.textContent =
+      list.length +
+      " hoạt động";
+
+
+    toolbar.appendChild(
+      count
+    );
+
+
+    var clear =
+      document.createElement(
+        "button"
+      );
+
+
+    clear.type =
       "button";
 
 
-    button.className =
+    clear.className =
       "secondary-button history-clear-button";
 
 
-    button.textContent =
+    clear.textContent =
       "Xóa lịch sử";
 
 
-    button.addEventListener(
+    clear.addEventListener(
       "click",
       function () {
-
-        var list =
-          getRecentDocuments();
-
-
-        if (!list.length) {
-          return;
-        }
-
 
         var confirmed =
           window.confirm(
@@ -906,132 +1107,33 @@
 
         renderRecentDocuments();
 
+        renderHistoryDocuments();
+
         updateStats();
 
       }
     );
 
 
-    return button;
+    toolbar.appendChild(
+      clear
+    );
 
-  }
 
+    container.appendChild(
+      toolbar
+    );
 
-  /* ==========================================
-     RENDER RECENT DOCUMENTS
-     ========================================== */
-
-  function renderRecentDocuments() {
 
     /*
-     * Có thể có 2 vùng:
-     *
-     * 1. Dashboard
-     * 2. Lịch sử
-     *
-     * Vì index.html có hai phần
-     * dùng cùng id recentDocuments,
-     * ta lấy toàn bộ bằng $$().
+     * Hiển thị toàn bộ tối đa 20 hoạt động.
      */
 
-    var containers =
-      $$("#recentDocuments");
+    list.forEach(
+      function (item) {
 
-
-    if (!containers.length) {
-      return;
-    }
-
-
-    var list =
-      getRecentDocuments();
-
-
-    containers.forEach(
-      function (container, index) {
-
-        var isHistoryPage =
-          index > 0;
-
-
-        /*
-         * Dashboard chỉ hiện
-         * 4 hoạt động gần nhất.
-         */
-
-        var displayList =
-          isHistoryPage
-            ? list
-            : list.slice(0, 4);
-
-
-        if (!displayList.length) {
-
-          renderRecentEmpty(
-            container,
-            isHistoryPage
-          );
-
-          return;
-
-        }
-
-
-        container.innerHTML = "";
-
-
-        /*
-         * Trang Lịch sử có nút xóa.
-         */
-
-        if (isHistoryPage) {
-
-          var historyToolbar =
-            document.createElement("div");
-
-
-          historyToolbar.className =
-            "history-toolbar";
-
-
-          var historyCount =
-            document.createElement("span");
-
-
-          historyCount.className =
-            "history-count";
-
-
-          historyCount.textContent =
-            list.length +
-            " hoạt động";
-
-
-          historyToolbar.appendChild(
-            historyCount
-          );
-
-
-          historyToolbar.appendChild(
-            createClearHistoryButton()
-          );
-
-
-          container.appendChild(
-            historyToolbar
-          );
-
-        }
-
-
-        displayList.forEach(
-          function (item) {
-
-            container.appendChild(
-              createRecentRow(item)
-            );
-
-          }
+        container.appendChild(
+          createHistoryRow(item)
         );
 
       }
@@ -1041,7 +1143,7 @@
 
 
   /* ==========================================
-     UPDATE RELATIVE TIMES
+     REFRESH TIME
      ========================================== */
 
   function refreshRecentTimes() {
@@ -1074,7 +1176,9 @@
 
               return String(
                 entry.id || ""
-              ) === String(id || "");
+              ) === String(
+                id || ""
+              );
 
             }
           );
@@ -1260,19 +1364,7 @@
 
 
     /*
-     * Luôn render lại khi mở Lịch sử.
-     */
-
-    if (pageName === "history") {
-
-      renderRecentDocuments();
-
-    }
-
-
-    /*
-     * Luôn render lại Dashboard
-     * khi quay về.
+     * Dashboard.
      */
 
     if (pageName === "dashboard") {
@@ -1280,6 +1372,17 @@
       renderRecentDocuments();
 
       updateStats();
+
+    }
+
+
+    /*
+     * Lịch sử.
+     */
+
+    if (pageName === "history") {
+
+      renderHistoryDocuments();
 
     }
 
@@ -1522,51 +1625,19 @@
 
   function init() {
 
-    /*
-     * Dashboard có fallback HTML.
-     */
-
     syncDashboardCards();
-
-
-    /*
-     * Trang Văn bản.
-     */
 
     renderDocumentsPage();
 
-
-    /*
-     * Hoạt động gần đây + Lịch sử.
-     */
-
     renderRecentDocuments();
 
-
-    /*
-     * Thống kê.
-     */
+    renderHistoryDocuments();
 
     updateStats();
 
-
-    /*
-     * Navigation.
-     */
-
     bindNavigation();
 
-
-    /*
-     * Sidebar.
-     */
-
     bindSidebar();
-
-
-    /*
-     * Modal.
-     */
 
     bindModal();
 
@@ -1606,6 +1677,9 @@
     renderRecentDocuments:
       renderRecentDocuments,
 
+    renderHistoryDocuments:
+      renderHistoryDocuments,
+
     updateStats:
       updateStats,
 
@@ -1629,6 +1703,8 @@
 
 
         renderRecentDocuments();
+
+        renderHistoryDocuments();
 
         updateStats();
 
@@ -1661,14 +1737,8 @@
 
 
   /* ==========================================
-     REFRESH TIME
+     UPDATE TIME
      ========================================== */
-
-  /*
-   * Cập nhật "Vừa xong",
-   * "5 phút trước", "1 giờ trước"...
-   * mà không cần tải lại trang.
-   */
 
   window.setInterval(
     function () {
