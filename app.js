@@ -1,14 +1,14 @@
 /* =========================================================
    GROVA DOCUMENT
    app.js
-   Version: 1.1
+   Stable version
    ========================================================= */
 
 (function () {
   "use strict";
 
   /* =======================================================
-     1. STATE
+     STATE
      ======================================================= */
 
   const state = {
@@ -19,16 +19,18 @@
 
 
   /* =======================================================
-     2. HELPERS
+     HELPERS
      ======================================================= */
 
-  const $ = (selector, parent = document) => {
-    return parent.querySelector(selector);
-  };
+  function $(selector, parent) {
+    return (parent || document).querySelector(selector);
+  }
 
-  const $$ = (selector, parent = document) => {
-    return Array.from(parent.querySelectorAll(selector));
-  };
+  function $$(selector, parent) {
+    return Array.from(
+      (parent || document).querySelectorAll(selector)
+    );
+  }
 
   function escapeHTML(value) {
     if (value === null || value === undefined) {
@@ -42,6 +44,11 @@
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#039;");
   }
+
+
+  /* =======================================================
+     DATA
+     ======================================================= */
 
   function getAppData() {
     return (
@@ -59,118 +66,40 @@
       return [];
     }
 
-    return data.templates
-      .filter(template => template && template.enabled !== false)
-      .map((template, index) => {
-        return {
-          id:
-            template.id ||
-            template.code ||
-            String(index + 1),
-
-          code:
-            template.code ||
-            template.id ||
-            String(index + 1),
-
-          name:
-            template.name ||
-            template.title ||
-            "Biểu mẫu",
-
-          title:
-            template.title ||
-            template.name ||
-            "Biểu mẫu",
-
-          description:
-            template.description ||
-            template.desc ||
-            "",
-
-          category:
-            template.category ||
-            template.type ||
-            "Văn bản",
-
-          file:
-            template.file ||
-            template.path ||
-            template.url ||
-            "",
-
-          enabled:
-            template.enabled !== false
-        };
-      });
+    return data.templates.filter(function (item) {
+      return item && item.enabled !== false;
+    });
   }
 
   function getTemplateById(id) {
-    return getTemplates().find(
-      template => String(template.id) === String(id)
-    );
-  }
+    const templates = getTemplates();
 
-  function getCompany() {
-    const data = getAppData();
-
-    return (
-      data.company ||
-      data.organization ||
-      {}
-    );
-  }
-
-  function getCompanyName() {
-    const company = getCompany();
-
-    return (
-      company.name ||
-      company.companyName ||
-      "CÔNG TY CỔ PHẦN GROVA HOLDINGS"
-    );
-  }
-
-  function getInitials(name) {
-    const text = String(name || "").trim();
-
-    if (!text) {
-      return "G";
-    }
-
-    const parts = text
-      .split(/\s+/)
-      .filter(Boolean);
-
-    if (parts.length === 1) {
-      return parts[0].substring(0, 2).toUpperCase();
-    }
-
-    return (
-      parts[0].charAt(0) +
-      parts[parts.length - 1].charAt(0)
-    ).toUpperCase();
+    return templates.find(function (template) {
+      return String(
+        template.id
+      ) === String(id);
+    });
   }
 
 
   /* =======================================================
-     3. PAGE CONFIG
+     PAGE CONFIG
      ======================================================= */
 
   const PAGE_CONFIG = {
     dashboard: {
       title: "Tổng quan",
-      subtitle: "Quản lý hồ sơ và biểu mẫu GROVA"
+      subtitle: "Hệ thống quản lý hồ sơ và văn bản"
     },
 
     documents: {
-      title: "Biểu mẫu",
-      subtitle: "Danh sách biểu mẫu văn bản"
+      title: "Văn bản",
+      subtitle: "Quản lý các biểu mẫu văn bản"
     },
 
     projects: {
       title: "Công trình",
-      subtitle: "Quản lý thông tin công trình"
+      subtitle: "Quản lý dữ liệu công trình"
     },
 
     customers: {
@@ -180,12 +109,12 @@
 
     employees: {
       title: "Nhân sự",
-      subtitle: "Quản lý thông tin nhân sự"
+      subtitle: "Quản lý hồ sơ nhân sự"
     },
 
     history: {
       title: "Lịch sử",
-      subtitle: "Lịch sử tạo và xử lý văn bản"
+      subtitle: "Theo dõi các văn bản đã tạo"
     },
 
     reports: {
@@ -195,75 +124,27 @@
 
     settings: {
       title: "Cài đặt",
-      subtitle: "Thiết lập hệ thống GROVA DOCUMENT"
+      subtitle: "Cấu hình GROVA DOCUMENT"
     },
 
     admin: {
-      title: "Quản trị",
-      subtitle: "Quản lý hệ thống"
+      title: "Quản trị hệ thống",
+      subtitle: "Quản lý người dùng, mẫu văn bản và dữ liệu"
     }
   };
 
 
   /* =======================================================
-     4. CURRENT USER
+     HEADER
      ======================================================= */
 
-  function renderCurrentUser() {
-    const data = getAppData();
-
-    const user =
-      data.currentUser ||
-      data.user ||
-      {};
-
-    const userName =
-      user.name ||
-      user.fullName ||
-      "Quản trị viên";
-
-    const userRole =
-      user.role ||
-      user.position ||
-      "GROVA HOLDINGS";
-
-    const avatar =
-      $(".user-avatar");
-
-    const name =
-      $(".user-info strong");
-
-    const role =
-      $(".user-info span");
-
-    if (avatar) {
-      avatar.textContent = getInitials(userName);
-    }
-
-    if (name) {
-      name.textContent = userName;
-    }
-
-    if (role) {
-      role.textContent = userRole;
-    }
-  }
-
-
-  /* =======================================================
-     5. PAGE HEADER
-     ======================================================= */
-
-  function updatePageHeader(pageId) {
+  function updateHeader(pageId) {
     const config =
       PAGE_CONFIG[pageId] ||
       PAGE_CONFIG.dashboard;
 
-    const title =
-      $(".page-title h1");
-
-    const subtitle =
-      $(".page-title p");
+    const title = $(".page-title h1");
+    const subtitle = $(".page-title p");
 
     if (title) {
       title.textContent = config.title;
@@ -276,20 +157,66 @@
 
 
   /* =======================================================
-     6. STATS
+     USER
      ======================================================= */
 
-  function getStats() {
+  function renderUser() {
     const data = getAppData();
 
-    return (
-      data.stats ||
-      {}
-    );
+    const user =
+      data.currentUser ||
+      data.user ||
+      {};
+
+    const name =
+      user.name ||
+      user.fullName ||
+      "Quản trị viên";
+
+    const role =
+      user.role ||
+      user.position ||
+      "Administrator";
+
+    const avatar = $(".user-avatar");
+    const userName = $(".user-info strong");
+    const userRole = $(".user-info span");
+
+    if (avatar) {
+      const words = name
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean);
+
+      if (words.length >= 2) {
+        avatar.textContent =
+          (
+            words[0][0] +
+            words[words.length - 1][0]
+          ).toUpperCase();
+      } else {
+        avatar.textContent =
+          name.substring(0, 2).toUpperCase();
+      }
+    }
+
+    if (userName) {
+      userName.textContent = name;
+    }
+
+    if (userRole) {
+      userRole.textContent = role;
+    }
   }
 
+
+  /* =======================================================
+     STATISTICS
+     ======================================================= */
+
   function renderStats() {
-    const stats = getStats();
+    const data = getAppData();
+    const stats = data.stats || {};
 
     const values = {
       documents:
@@ -313,7 +240,7 @@
         0
     };
 
-    const mappings = {
+    const selectors = {
       documents: [
         "#statDocuments",
         "[data-stat='documents']"
@@ -335,8 +262,8 @@
       ]
     };
 
-    Object.keys(mappings).forEach(key => {
-      mappings[key].forEach(selector => {
+    Object.keys(selectors).forEach(function (key) {
+      selectors[key].forEach(function (selector) {
         const element = $(selector);
 
         if (element) {
@@ -348,35 +275,82 @@
 
 
   /* =======================================================
-     7. DOCUMENT CARDS
+     FIND DOCUMENT GRID
+     ======================================================= */
+
+  function findDocumentContainers() {
+    const result = [];
+
+    $$(
+      "[data-template-grid]"
+    ).forEach(function (element) {
+      if (!result.includes(element)) {
+        result.push(element);
+      }
+    });
+
+    /*
+     * Nếu index.html không có data-template-grid,
+     * tìm khu vực Văn bản dựa trên heading.
+     */
+
+    $$(".document-grid").forEach(function (element) {
+      if (!result.includes(element)) {
+        result.push(element);
+      }
+    });
+
+    /*
+     * Không tự động lấy mọi .document-grid nếu đó là
+     * khu vực khác. Chỉ xử lý grid thực sự rỗng.
+     */
+
+    return result;
+  }
+
+
+  /* =======================================================
+     DOCUMENT CARDS
      ======================================================= */
 
   function renderDocumentCards() {
     const templates = getTemplates();
+    const containers = findDocumentContainers();
 
-    const containers = [
-      ...$$(".document-grid"),
-      ...$$("[data-template-grid]")
-    ];
+    /*
+     * Không có container thì không làm gì.
+     * Điều này giúp app không phá HTML hiện tại.
+     */
 
     if (!containers.length) {
       return;
     }
 
-    containers.forEach(container => {
+    containers.forEach(function (container) {
+
+      /*
+       * Nếu HTML đã có nội dung mẫu và không phải
+       * container được app quản lý thì giữ nguyên.
+       */
+
       if (
-        container.closest(".template-selector") ||
-        container.dataset.excludeRender === "true"
+        container.dataset.managed !== "true" &&
+        container.children.length > 0 &&
+        !container.hasAttribute("data-template-grid")
       ) {
         return;
       }
+
+      container.dataset.managed = "true";
 
       if (!templates.length) {
         container.innerHTML = `
           <div class="empty-state">
             <div class="empty-state-icon">📄</div>
             <h3>Chưa có biểu mẫu</h3>
-            <p>Hiện chưa có biểu mẫu nào được cấu hình.</p>
+            <p>
+              Chưa có biểu mẫu nào được cấu hình trong hệ thống.
+            </p>
           </div>
         `;
 
@@ -384,41 +358,61 @@
       }
 
       container.innerHTML = templates
-        .map(template => {
+        .map(function (template) {
+
+          const id =
+            template.id ||
+            template.code ||
+            "";
+
+          const name =
+            template.name ||
+            template.title ||
+            "Biểu mẫu";
+
+          const description =
+            template.description ||
+            "";
+
+          const category =
+            template.category ||
+            "Văn bản";
+
           return `
             <article
               class="document-card"
-              data-template-id="${escapeHTML(template.id)}"
+              data-template-id="${escapeHTML(id)}"
             >
 
               <div>
                 <span class="document-tag">
-                  ${escapeHTML(template.category)}
+                  ${escapeHTML(category)}
                 </span>
               </div>
 
               <h3 class="document-name">
-                ${escapeHTML(template.name)}
+                ${escapeHTML(name)}
               </h3>
 
               <p class="document-description">
-                ${escapeHTML(template.description)}
+                ${escapeHTML(description)}
               </p>
-            ` +
-            `
+
               <div class="document-meta">
+
                 <span class="document-category">
-                  Mẫu ${escapeHTML(template.code)}
+                  Mẫu ${escapeHTML(id)}
                 </span>
 
                 <button
                   type="button"
                   class="document-action"
                   data-action="open-template"
-                  data-template-id="${escapeHTML(template.id)}"
+                  data-template-id="${escapeHTML(id)}"
                 >
                   Mở biểu mẫu →
                 </button>
+
               </div>
 
             </article>
@@ -430,7 +424,7 @@
 
 
   /* =======================================================
-     8. RECENT DOCUMENTS
+     RECENT DOCUMENTS
      ======================================================= */
 
   function renderRecentDocuments() {
@@ -441,22 +435,22 @@
         ? data.recentDocuments
         : [];
 
-    const containers = $$(
-      "[data-recent-documents]"
-    );
+    const containers =
+      $$("[data-recent-documents]");
 
     if (!containers.length) {
       return;
     }
 
-    containers.forEach(container => {
+    containers.forEach(function (container) {
+
       if (!recent.length) {
         container.innerHTML = `
           <div class="empty-state">
             <div class="empty-state-icon">🗂️</div>
-            <h3>Chưa có văn bản gần đây</h3>
+            <h3>Chưa có lịch sử</h3>
             <p>
-              Các văn bản bạn tạo sau này sẽ xuất hiện tại đây.
+              Các văn bản được tạo sẽ xuất hiện tại đây.
             </p>
           </div>
         `;
@@ -465,7 +459,8 @@
       }
 
       container.innerHTML = recent
-        .map(item => {
+        .map(function (item) {
+
           const name =
             item.name ||
             item.title ||
@@ -476,12 +471,9 @@
             item.createdAt ||
             "";
 
-          const status =
-            item.status ||
-            "Đã tạo";
-
           return `
             <div class="recent-document">
+
               <div>
                 <strong>
                   ${escapeHTML(name)}
@@ -492,9 +484,6 @@
                 </small>
               </div>
 
-              <span class="badge badge-success">
-                ${escapeHTML(status)}
-              </span>
             </div>
           `;
         })
@@ -504,14 +493,10 @@
 
 
   /* =======================================================
-     9. PAGE SWITCHING
+     PAGE SWITCH
      ======================================================= */
 
   function switchPage(pageId) {
-    if (!pageId) {
-      return;
-    }
-
     const target =
       document.getElementById(pageId);
 
@@ -519,7 +504,7 @@
       return;
     }
 
-    $$(".page").forEach(page => {
+    $$(".page").forEach(function (page) {
       page.classList.remove("active");
       page.classList.add("hidden");
     });
@@ -529,10 +514,9 @@
 
     state.currentPage = pageId;
 
-    $$(".nav-item").forEach(item => {
+    $$(".nav-item").forEach(function (item) {
       const itemPage =
-        item.dataset.page ||
-        item.getAttribute("data-page");
+        item.dataset.page;
 
       item.classList.toggle(
         "active",
@@ -540,7 +524,7 @@
       );
     });
 
-    updatePageHeader(pageId);
+    updateHeader(pageId);
 
     closeSidebar();
 
@@ -552,51 +536,222 @@
 
 
   /* =======================================================
-     10. NAVIGATION
+     NAVIGATION
      ======================================================= */
 
   function bindNavigation() {
-    $$(".nav-item").forEach(item => {
-      item.addEventListener("click", event => {
-        event.preventDefault();
+    $$(".nav-item").forEach(function (item) {
 
-        const pageId =
-          item.dataset.page ||
-          item.getAttribute("data-page");
+      item.addEventListener(
+        "click",
+        function (event) {
 
-        if (pageId) {
-          switchPage(pageId);
+          event.preventDefault();
+
+          const page =
+            item.dataset.page;
+
+          if (page) {
+            switchPage(page);
+          }
+
         }
-      });
+      );
+
     });
   }
 
 
   /* =======================================================
-     11. DOCUMENT MODAL
+     TEMPLATE MODAL
      ======================================================= */
 
-  function getDocumentModal() {
+  function getModal() {
     return (
-      $("#documentModal") ||
-      $(".document-modal")
+      document.getElementById(
+        "documentModal"
+      ) ||
+      $(".modal")
     );
   }
 
-  function openModal(modal) {
+  function getTemplateSelector(modal) {
+    if (!modal) {
+      return null;
+    }
+
+    return $(
+      ".template-selector",
+      modal
+    );
+  }
+
+
+  function renderTemplateSelector() {
+    const modal = getModal();
+
     if (!modal) {
       return;
     }
 
+    const selector =
+      getTemplateSelector(modal);
+
+    if (!selector) {
+      return;
+    }
+
+    const templates =
+      getTemplates();
+
+    if (!templates.length) {
+      selector.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">📄</div>
+          <h3>Chưa có biểu mẫu</h3>
+          <p>
+            Kiểm tra file data/data.js.
+          </p>
+        </div>
+      `;
+
+      return;
+    }
+
+    selector.innerHTML =
+      templates.map(function (template) {
+
+        const id =
+          template.id ||
+          template.code ||
+          "";
+
+        const name =
+          template.name ||
+          template.title ||
+          "Biểu mẫu";
+
+        const description =
+          template.description ||
+          "";
+
+        return `
+          <label
+            class="template-option"
+            data-template-id="${escapeHTML(id)}"
+          >
+
+            <input
+              type="radio"
+              name="grovaTemplate"
+              value="${escapeHTML(id)}"
+            >
+
+            <div class="template-option-title">
+              ${escapeHTML(name)}
+            </div>
+
+            <div class="template-option-description">
+              ${escapeHTML(description)}
+            </div>
+
+          </label>
+        `;
+      }).join("");
+
+    $$(".template-option", selector)
+      .forEach(function (option) {
+
+        option.addEventListener(
+          "click",
+          function () {
+
+            selectTemplate(
+              option.dataset.templateId
+            );
+
+          }
+        );
+
+      });
+  }
+
+
+  /* =======================================================
+     SELECT TEMPLATE
+     ======================================================= */
+
+  function selectTemplate(id) {
+    const template =
+      getTemplateById(id);
+
+    if (!template) {
+      return;
+    }
+
+    state.selectedTemplate =
+      String(
+        template.id ||
+        template.code
+      );
+
+    $$(".template-option")
+      .forEach(function (option) {
+
+        const selected =
+          String(
+            option.dataset.templateId
+          ) ===
+          String(
+            state.selectedTemplate
+          );
+
+        option.classList.toggle(
+          "selected",
+          selected
+        );
+
+        const radio =
+          $("input[type='radio']", option);
+
+        if (radio) {
+          radio.checked = selected;
+        }
+
+      });
+  }
+
+
+  /* =======================================================
+     OPEN MODAL
+     ======================================================= */
+
+  function openModal() {
+    const modal = getModal();
+
+    if (!modal) {
+      return false;
+    }
+
+    renderTemplateSelector();
+
     modal.classList.add("open");
     modal.classList.add("active");
 
-    modal.removeAttribute("aria-hidden");
+    modal.removeAttribute(
+      "aria-hidden"
+    );
 
-    document.body.style.overflow = "hidden";
+    document.body.style.overflow =
+      "hidden";
+
+    return true;
   }
 
-  function closeModal(modal) {
+
+  function closeModal() {
+    const modal = getModal();
+
     if (!modal) {
       return;
     }
@@ -609,315 +764,109 @@
       "true"
     );
 
-    document.body.style.overflow = "";
-  }
-
-  function closeAllModals() {
-    $$(".modal").forEach(modal => {
-      closeModal(modal);
-    });
+    document.body.style.overflow =
+      "";
   }
 
 
   /* =======================================================
-     12. TEMPLATE SELECTOR
+     OPEN TEMPLATE
      ======================================================= */
 
-  function renderTemplateSelector() {
-    const templates = getTemplates();
-
-    const containers = $$(
-      ".template-selector"
-    );
-
-    if (!containers.length) {
-      return;
-    }
-
-    containers.forEach(container => {
-      if (!templates.length) {
-        container.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-state-icon">📄</div>
-            <h3>Chưa có biểu mẫu</h3>
-            <p>
-              Vui lòng cấu hình biểu mẫu trong data/data.js.
-            </p>
-          </div>
-        `;
-
-        return;
-      }
-
-      container.innerHTML = templates
-        .map(template => {
-          return `
-            <label
-              class="template-option"
-              data-template-id="${escapeHTML(template.id)}"
-            >
-
-              <input
-                type="radio"
-                name="grovaTemplate"
-                value="${escapeHTML(template.id)}"
-              >
-
-              <div class="template-option-title">
-                ${escapeHTML(template.name)}
-              </div>
-
-              <div class="template-option-description">
-                ${escapeHTML(template.description)}
-              </div>
-
-            </label>
-          `;
-        })
-        .join("");
-
-      $$(
-        ".template-option",
-        container
-      ).forEach(option => {
-        option.addEventListener(
-          "click",
-          () => {
-            selectTemplate(
-              option.dataset.templateId,
-              container
-            );
-          }
-        );
-      });
-    });
-  }
-
-  function selectTemplate(
-    templateId,
-    container = document
-  ) {
+  function openTemplate(id) {
     const template =
-      getTemplateById(templateId);
+      getTemplateById(id);
 
     if (!template) {
-      return;
-    }
-
-    state.selectedTemplate =
-      String(template.id);
-
-    $$(".template-option", container)
-      .forEach(option => {
-        option.classList.toggle(
-          "selected",
-          String(option.dataset.templateId) ===
-          String(template.id)
-        );
-
-        const radio =
-          $("input[type='radio']", option);
-
-        if (radio) {
-          radio.checked =
-            String(radio.value) ===
-            String(template.id);
-        }
-      });
-
-    $$(".template-option")
-      .filter(option => {
-        return option.closest(
-          ".template-selector"
-        ) !== container;
-      })
-      .forEach(option => {
-        option.classList.toggle(
-          "selected",
-          String(option.dataset.templateId) ===
-          String(template.id)
-        );
-
-        const radio =
-          $("input[type='radio']", option);
-
-        if (radio) {
-          radio.checked =
-            String(radio.value) ===
-            String(template.id);
-        }
-      });
-  }
-
-
-  /* =======================================================
-     13. NEW DOCUMENT
-     ======================================================= */
-
-  function openNewDocumentModal(
-    templateId = null
-  ) {
-    const modal =
-      getDocumentModal();
-
-    if (!modal) {
-      if (templateId) {
-        openTemplate(templateId);
-      }
-
-      return;
-    }
-
-    renderTemplateSelector();
-
-    openModal(modal);
-
-    if (templateId) {
-      selectTemplate(
-        templateId,
-        $(".template-selector", modal) || modal
-      );
-    } else {
-      state.selectedTemplate = null;
-
-      $$(".template-option", modal)
-        .forEach(option => {
-          option.classList.remove(
-            "selected"
-          );
-
-          const radio =
-            $("input[type='radio']", option);
-
-          if (radio) {
-            radio.checked = false;
-          }
-        });
-    }
-  }
-
-
-  /* =======================================================
-     14. OPEN TEMPLATE
-     ======================================================= */
-
-  function openTemplate(templateId) {
-    const template =
-      getTemplateById(templateId);
-
-    if (!template) {
-      console.warn(
-        "Không tìm thấy biểu mẫu:",
-        templateId
+      alert(
+        "Không tìm thấy biểu mẫu."
       );
 
       return;
     }
 
-    if (!template.file) {
-      console.warn(
-        "Biểu mẫu chưa có đường dẫn:",
-        template
+    const file =
+      template.file ||
+      template.path ||
+      template.url;
+
+    if (!file) {
+      alert(
+        "Biểu mẫu chưa được cấu hình đường dẫn."
       );
 
       return;
     }
 
     state.selectedTemplate =
-      String(template.id);
+      String(
+        template.id ||
+        template.code
+      );
 
-    window.location.href =
-      template.file;
+    window.location.href = file;
   }
 
 
   /* =======================================================
-     15. START SELECTED DOCUMENT
+     NEW DOCUMENT
+     ======================================================= */
+
+  function openNewDocument() {
+    state.selectedTemplate = null;
+
+    const modalOpened =
+      openModal();
+
+    if (!modalOpened) {
+      console.warn(
+        "Không tìm thấy #documentModal."
+      );
+    }
+  }
+
+
+  /* =======================================================
+     START DOCUMENT
      ======================================================= */
 
   function startSelectedDocument() {
-    let templateId =
+
+    let id =
       state.selectedTemplate;
 
-    if (!templateId) {
+    if (!id) {
       const checked =
-        $(".template-option input[type='radio']:checked");
+        $("input[name='grovaTemplate']:checked");
 
       if (checked) {
-        templateId =
-          checked.value;
+        id = checked.value;
       }
     }
 
-    if (!templateId) {
+    if (!id) {
       alert(
-        "Vui lòng chọn một biểu mẫu trước khi tiếp tục."
+        "Vui lòng chọn một biểu mẫu."
       );
 
       return;
     }
 
-    closeAllModals();
+    closeModal();
 
-    openTemplate(templateId);
+    openTemplate(id);
   }
 
 
   /* =======================================================
-     16. MODAL BINDING
+     GLOBAL ACTIONS
      ======================================================= */
 
-  function bindModal() {
-    const modal =
-      getDocumentModal();
+  function bindActions() {
 
-    if (!modal) {
-      return;
-    }
-
-    $$(".modal-close", modal)
-      .forEach(button => {
-        button.addEventListener(
-          "click",
-          event => {
-            event.preventDefault();
-
-            closeModal(modal);
-          }
-        );
-      });
-
-    $$(".modal-overlay", modal)
-      .forEach(overlay => {
-        overlay.addEventListener(
-          "click",
-          () => {
-            closeModal(modal);
-          }
-        );
-      });
-
-    modal.addEventListener(
-      "click",
-      event => {
-        if (
-          event.target === modal
-        ) {
-          closeModal(modal);
-        }
-      }
-    );
-  }
-
-
-  /* =======================================================
-     17. DOCUMENT ACTIONS
-     ======================================================= */
-
-  function bindDocumentActions() {
     document.addEventListener(
       "click",
-      event => {
+      function (event) {
 
         const target =
           event.target.closest(
@@ -933,27 +882,27 @@
 
         if (
           action ===
-          "open-template"
+          "new-document"
         ) {
           event.preventDefault();
 
-          const templateId =
-            target.dataset.templateId;
-
-          openNewDocumentModal(
-            templateId
-          );
+          openNewDocument();
 
           return;
         }
 
         if (
           action ===
-          "new-document"
+          "open-template"
         ) {
           event.preventDefault();
 
-          openNewDocumentModal();
+          const id =
+            target.dataset.templateId;
+
+          if (id) {
+            openTemplate(id);
+          }
 
           return;
         }
@@ -975,84 +924,142 @@
         ) {
           event.preventDefault();
 
-          closeAllModals();
+          closeModal();
 
           return;
         }
+
       }
     );
+
+
+    /*
+     * Hỗ trợ cả nút cũ nếu index.html
+     * đang dùng ID thay vì data-action.
+     */
+
+    $$("#newDocumentBtn").forEach(
+      function (button) {
+
+        button.addEventListener(
+          "click",
+          function (event) {
+
+            event.preventDefault();
+
+            openNewDocument();
+
+          }
+        );
+
+      }
+    );
+
+
+    $$("#startDocumentBtn").forEach(
+      function (button) {
+
+        button.addEventListener(
+          "click",
+          function (event) {
+
+            event.preventDefault();
+
+            startSelectedDocument();
+
+          }
+        );
+
+      }
+    );
+
+
+    $$("[data-new-document]").forEach(
+      function (button) {
+
+        button.addEventListener(
+          "click",
+          function (event) {
+
+            event.preventDefault();
+
+            openNewDocument();
+
+          }
+        );
+
+      }
+    );
+
   }
 
 
   /* =======================================================
-     18. NEW DOCUMENT BUTTONS
+     MODAL EVENTS
      ======================================================= */
 
-  function bindNewDocumentButtons() {
+  function bindModal() {
 
-    $$(
-      "[data-new-document]"
-    ).forEach(button => {
-      button.addEventListener(
-        "click",
-        event => {
-          event.preventDefault();
+    const modal = getModal();
 
-          openNewDocumentModal();
+    if (!modal) {
+      return;
+    }
+
+    $$(".modal-close", modal)
+      .forEach(function (button) {
+
+        button.addEventListener(
+          "click",
+          function (event) {
+
+            event.preventDefault();
+
+            closeModal();
+
+          }
+        );
+
+      });
+
+
+    $$(".modal-overlay", modal)
+      .forEach(function (overlay) {
+
+        overlay.addEventListener(
+          "click",
+          function () {
+
+            closeModal();
+
+          }
+        );
+
+      });
+
+
+    modal.addEventListener(
+      "click",
+      function (event) {
+
+        if (
+          event.target === modal
+        ) {
+          closeModal();
         }
-      );
-    });
 
-    $$(
-      "#newDocumentBtn"
-    ).forEach(button => {
-      button.addEventListener(
-        "click",
-        event => {
-          event.preventDefault();
+      }
+    );
 
-          openNewDocumentModal();
-        }
-      );
-    });
-
-    $$(
-      "[data-start-document]"
-    ).forEach(button => {
-      button.addEventListener(
-        "click",
-        event => {
-          event.preventDefault();
-
-          startSelectedDocument();
-        }
-      );
-    });
-
-    $$(
-      "#startDocumentBtn"
-    ).forEach(button => {
-      button.addEventListener(
-        "click",
-        event => {
-          event.preventDefault();
-
-          startSelectedDocument();
-        }
-      );
-    });
   }
 
 
   /* =======================================================
-     19. SIDEBAR
+     SIDEBAR
      ======================================================= */
-
-  function getSidebar() {
-    return $(".sidebar");
-  }
 
   function createSidebarBackdrop() {
+
     let backdrop =
       $(".sidebar-backdrop");
 
@@ -1078,27 +1085,29 @@
     return backdrop;
   }
 
+
   function openSidebar() {
+
     const sidebar =
-      getSidebar();
+      $(".sidebar");
 
     if (!sidebar) {
       return;
     }
 
-    sidebar.classList.add("open");
-
-    const backdrop =
-      createSidebarBackdrop();
-
-    backdrop.classList.add(
-      "active"
+    sidebar.classList.add(
+      "open"
     );
+
+    createSidebarBackdrop()
+      .classList.add("active");
   }
 
+
   function closeSidebar() {
+
     const sidebar =
-      getSidebar();
+      $(".sidebar");
 
     if (sidebar) {
       sidebar.classList.remove(
@@ -1116,20 +1125,24 @@
     }
   }
 
+
   function bindSidebar() {
+
     const buttons = [
       ...$$(".menu-toggle"),
       ...$$("[data-menu-toggle]")
     ];
 
-    buttons.forEach(button => {
+    buttons.forEach(function (button) {
+
       button.addEventListener(
         "click",
-        event => {
+        function (event) {
+
           event.preventDefault();
 
           const sidebar =
-            getSidebar();
+            $(".sidebar");
 
           if (
             sidebar &&
@@ -1141,56 +1154,43 @@
           } else {
             openSidebar();
           }
+
         }
       );
+
     });
   }
 
 
   /* =======================================================
-     20. ESC KEY
+     KEYBOARD
      ======================================================= */
 
   function bindKeyboard() {
+
     document.addEventListener(
       "keydown",
-      event => {
+      function (event) {
+
         if (
-          event.key ===
-          "Escape"
+          event.key === "Escape"
         ) {
-          closeAllModals();
+          closeModal();
           closeSidebar();
         }
+
       }
     );
+
   }
 
 
   /* =======================================================
-     21. RESPONSIVE SIDEBAR
-     ======================================================= */
-
-  function bindResize() {
-    window.addEventListener(
-      "resize",
-      () => {
-        if (
-          window.innerWidth >
-          900
-        ) {
-          closeSidebar();
-        }
-      }
-    );
-  }
-
-
-  /* =======================================================
-     22. SERVICE WORKER
+     SERVICE WORKER
      ======================================================= */
 
   function registerServiceWorker() {
+
     if (
       !("serviceWorker" in navigator)
     ) {
@@ -1199,65 +1199,47 @@
 
     window.addEventListener(
       "load",
-      () => {
+      function () {
+
         navigator.serviceWorker
           .register("./sw.js")
-          .catch(error => {
+          .catch(function (error) {
+
             console.warn(
-              "Service Worker registration failed:",
+              "Service Worker:",
               error
             );
+
           });
+
       }
     );
   }
 
 
   /* =======================================================
-     23. PWA UPDATE
+     REFRESH
      ======================================================= */
 
-  function listenForServiceWorkerUpdate() {
-    if (
-      !("serviceWorker" in navigator)
-    ) {
-      return;
-    }
+  function refresh() {
 
-    navigator.serviceWorker.addEventListener(
-      "controllerchange",
-      () => {
-        /*
-         * Không tự reload cưỡng bức.
-         * Tránh làm mất dữ liệu người dùng
-         * đang nhập trong biểu mẫu.
-         */
-      }
-    );
-  }
-
-
-  /* =======================================================
-     24. GLOBAL REFRESH
-     ======================================================= */
-
-  function refreshUI() {
-    renderCurrentUser();
+    renderUser();
     renderStats();
     renderDocumentCards();
     renderRecentDocuments();
-    renderTemplateSelector();
-    updatePageHeader(
+    updateHeader(
       state.currentPage
     );
+
   }
 
 
   /* =======================================================
-     25. INITIALIZE
+     INIT
      ======================================================= */
 
   function init() {
+
     if (state.initialized) {
       return;
     }
@@ -1265,83 +1247,112 @@
     state.initialized = true;
 
     bindNavigation();
+    bindActions();
     bindModal();
-    bindDocumentActions();
-    bindNewDocumentButtons();
     bindSidebar();
     bindKeyboard();
-    bindResize();
 
-    refreshUI();
+    refresh();
 
     registerServiceWorker();
-    listenForServiceWorkerUpdate();
+
 
     /*
-     * Nếu index.html chưa đánh dấu page active,
-     * mặc định mở Dashboard.
+     * Xác định trang ban đầu.
      */
+
     const activePage =
       $(".page.active");
 
-    if (!activePage) {
-      switchPage(
-        state.currentPage
-      );
-    } else {
+    if (activePage) {
+
       state.currentPage =
         activePage.id ||
         "dashboard";
 
-      updatePageHeader(
+      updateHeader(
         state.currentPage
       );
+
+    } else {
+
+      switchPage(
+        "dashboard"
+      );
+
     }
+
   }
 
 
   /* =======================================================
-     26. PUBLIC API
+     PUBLIC API
      ======================================================= */
 
   window.GROVA_DOCUMENT = {
-    state,
 
-    getAppData,
-    getTemplates,
-    getTemplateById,
+    state: state,
 
-    switchPage,
+    getAppData:
+      getAppData,
 
-    openNewDocumentModal,
-    openTemplate,
+    getTemplates:
+      getTemplates,
 
-    closeModal,
-    closeAllModals,
+    getTemplateById:
+      getTemplateById,
 
-    openSidebar,
-    closeSidebar,
+    switchPage:
+      switchPage,
 
-    refreshUI,
+    openNewDocument:
+      openNewDocument,
 
-    init
+    openTemplate:
+      openTemplate,
+
+    selectTemplate:
+      selectTemplate,
+
+    startSelectedDocument:
+      startSelectedDocument,
+
+    closeModal:
+      closeModal,
+
+    openSidebar:
+      openSidebar,
+
+    closeSidebar:
+      closeSidebar,
+
+    refresh:
+      refresh,
+
+    init:
+      init
+
   };
 
 
   /* =======================================================
-     27. START
+     START
      ======================================================= */
 
   if (
     document.readyState ===
     "loading"
   ) {
+
     document.addEventListener(
       "DOMContentLoaded",
       init
     );
+
   } else {
+
     init();
+
   }
 
 })();
