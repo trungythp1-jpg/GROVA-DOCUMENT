@@ -1,6 +1,6 @@
 /* =========================================================
    GROVA DOCUMENT
-   STYLE v100
+   STYLE v101
    ========================================================= */
 
 :root {
@@ -26,6 +26,10 @@
 
 }
 
+
+/* =========================================================
+   RESET
+   ========================================================= */
 
 * {
   box-sizing: border-box;
@@ -64,19 +68,26 @@ body {
 }
 
 
+body.modal-open {
+  overflow: hidden;
+}
+
+
 button,
 input,
 select,
 textarea {
-
-  font:
-    inherit;
-
+  font: inherit;
 }
 
 
 button {
   cursor: pointer;
+}
+
+
+button:disabled {
+  cursor: not-allowed;
 }
 
 
@@ -240,9 +251,7 @@ img {
 
 
 .sidebar-close {
-
   display: none;
-
 }
 
 
@@ -439,9 +448,7 @@ img {
 
 
 .mobile-menu {
-
   display: none;
-
 }
 
 
@@ -550,16 +557,17 @@ img {
 
 
 .page {
-
   display: none;
-
 }
 
 
-.page.active {
+/*
+ * Hỗ trợ cả 2 class.
+ */
 
+.page.active,
+.page.active-page {
   display: block;
-
 }
 
 
@@ -695,7 +703,16 @@ img {
 
   font-weight: 600;
 
-  border: 1px solid transparent;
+  border:
+    1px solid transparent;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  white-space: nowrap;
 
 }
 
@@ -715,6 +732,13 @@ img {
 
   background:
     var(--green-dark);
+
+}
+
+
+.primary-button:disabled {
+
+  opacity: .5;
 
 }
 
@@ -975,6 +999,8 @@ img {
 
   min-height: 160px;
 
+  overflow: hidden;
+
 }
 
 
@@ -1064,6 +1090,8 @@ img {
 
   text-align: left;
 
+  color: var(--text);
+
 }
 
 
@@ -1087,6 +1115,9 @@ img {
   width: 38px;
 
   height: 38px;
+
+  flex:
+    0 0 38px;
 
   display: grid;
 
@@ -1132,10 +1163,76 @@ img {
 }
 
 
+.recent-row-separator {
+
+  margin: 0 4px;
+
+}
+
+
 .recent-row-arrow {
 
   color:
     var(--green);
+
+}
+
+
+/* =========================================================
+   HISTORY
+   ========================================================= */
+
+.history-list {
+
+  overflow: hidden;
+
+}
+
+
+.history-toolbar {
+
+  min-height: 58px;
+
+  padding:
+    10px 15px;
+
+  background:
+    #fbfdfc;
+
+  border-bottom:
+    1px solid var(--border);
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 10px;
+
+}
+
+
+.history-count {
+
+  color:
+    var(--muted);
+
+  font-size: 12px;
+
+  font-weight: 600;
+
+}
+
+
+.history-clear-button {
+
+  min-height: 34px;
+
+  padding:
+    0 12px;
+
+  font-size: 11px;
 
 }
 
@@ -1451,6 +1548,8 @@ img {
   border-bottom:
     1px solid var(--border);
 
+  flex-shrink: 0;
+
 }
 
 
@@ -1468,6 +1567,10 @@ img {
     20px 22px;
 
   overflow: auto;
+
+  flex: 1;
+
+  min-height: 0;
 
 }
 
@@ -1514,6 +1617,8 @@ img {
   gap: 12px;
 
   text-align: left;
+
+  color: var(--text);
 
 }
 
@@ -1606,6 +1711,8 @@ img {
 
   font-weight: 700;
 
+  font-size: 22px;
+
 }
 
 
@@ -1620,16 +1727,25 @@ img {
 .modal-footer {
 
   padding:
-    16px 22px;
+    14px 22px;
 
   border-top:
     1px solid var(--border);
+
+  background:
+    white;
 
   display: flex;
 
   justify-content: flex-end;
 
   gap: 10px;
+
+  flex-shrink: 0;
+
+  position: relative;
+
+  z-index: 2;
 
 }
 
@@ -1780,14 +1896,26 @@ img {
 
   .section-heading {
 
-    align-items: flex-start;
+    align-items: center;
 
   }
 
 
+  /*
+   * KHÔNG ẨN NÚT TRÊN MOBILE.
+   * Đây là lỗi làm nút bị mất trước đó.
+   */
+
   .section-heading .secondary-button {
 
-    display: none;
+    display: inline-flex;
+
+    min-height: 38px;
+
+    padding:
+      0 12px;
+
+    font-size: 11px;
 
   }
 
@@ -1812,6 +1940,83 @@ img {
   .page-header .primary-button {
 
     width: 100%;
+
+  }
+
+
+  .history-toolbar {
+
+    padding:
+      10px 12px;
+
+  }
+
+
+  .history-clear-button {
+
+    display: inline-flex;
+
+  }
+
+
+  .modal-overlay {
+
+    align-items: flex-end;
+
+    padding: 0;
+
+  }
+
+
+  .modal {
+
+    max-width: none;
+
+    width: 100%;
+
+    max-height:
+      calc(100vh - 10px);
+
+    border-radius:
+      18px 18px 0 0;
+
+  }
+
+
+  .modal-header {
+
+    padding:
+      16px 18px;
+
+  }
+
+
+  .modal-body {
+
+    padding:
+      16px 18px;
+
+  }
+
+
+  .modal-footer {
+
+    padding:
+      12px 18px;
+
+    padding-bottom:
+      calc(
+        12px +
+        env(safe-area-inset-bottom)
+      );
+
+  }
+
+
+  .modal-footer .primary-button,
+  .modal-footer .secondary-button {
+
+    min-height: 44px;
 
   }
 
@@ -1867,17 +2072,48 @@ img {
   }
 
 
-  .modal-overlay {
+  .section-heading {
 
-    padding: 10px;
+    gap: 8px;
 
   }
 
 
-  .modal {
+  .section-heading .secondary-button {
 
-    max-height:
-      calc(100vh - 20px);
+    padding:
+      0 10px;
+
+    font-size: 10px;
+
+  }
+
+
+  .modal-header h2 {
+
+    font-size: 18px;
+
+  }
+
+
+  .modal-footer {
+
+    flex-direction: column-reverse;
+
+  }
+
+
+  .modal-footer .primary-button,
+  .modal-footer .secondary-button {
+
+    width: 100%;
+
+  }
+
+
+  .history-toolbar {
+
+    flex-wrap: wrap;
 
   }
 
