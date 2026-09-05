@@ -1,6 +1,16 @@
 /* =========================================================
    GROVA DOCUMENT
-   STYLE v101
+   STYLE v102
+   FIX:
+   - Modal iPhone/iPad scroll
+   - Safari 26.x flex scroll
+   - Footer luôn hiển thị
+   - Danh sách mẫu vuốt được
+   ========================================================= */
+
+
+/* =========================================================
+   ROOT
    ========================================================= */
 
 :root {
@@ -83,6 +93,7 @@ textarea {
 
 button {
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
 
@@ -561,10 +572,6 @@ img {
 }
 
 
-/*
- * Hỗ trợ cả 2 class.
- */
-
 .page.active,
 .page.active-page {
   display: block;
@@ -713,6 +720,8 @@ img {
   justify-content: center;
 
   white-space: nowrap;
+
+  -webkit-tap-highlight-color: transparent;
 
 }
 
@@ -1478,6 +1487,19 @@ img {
    MODAL
    ========================================================= */
 
+/*
+ * QUAN TRỌNG:
+ *
+ * Modal dùng flex column.
+ *
+ * .modal-body là vùng duy nhất được phép scroll.
+ *
+ * Không dùng padding-top / padding-bottom trực tiếp
+ * trên .modal-body vì Safari 26.x có lỗi tính scrollHeight
+ * đối với flex-column + overflow + vertical padding.
+ */
+
+
 .modal-overlay {
 
   position: fixed;
@@ -1513,8 +1535,13 @@ img {
 
   max-width: 650px;
 
+  height:
+    calc(100vh - 40px);
+
   max-height:
     calc(100vh - 40px);
+
+  min-height: 0;
 
   background:
     white;
@@ -1548,7 +1575,10 @@ img {
   border-bottom:
     1px solid var(--border);
 
-  flex-shrink: 0;
+  flex:
+    0 0 auto;
+
+  min-height: 76px;
 
 }
 
@@ -1561,16 +1591,84 @@ img {
 }
 
 
+/*
+ * VÙNG CUỘN
+ */
+
 .modal-body {
 
+  /*
+   * Không dùng padding-top/bottom ở đây.
+   */
+
   padding:
-    20px 22px;
+    0 22px;
 
-  overflow: auto;
+  overflow-y:
+    auto;
 
-  flex: 1;
+  overflow-x:
+    hidden;
 
-  min-height: 0;
+  flex:
+    1 1 0;
+
+  min-height:
+    0;
+
+  height:
+    0;
+
+  /*
+   * Safari / iOS
+   */
+  touch-action:
+    pan-y;
+
+  overscroll-behavior-y:
+    contain;
+
+}
+
+
+/*
+ * Khoảng trống đầu vùng danh sách.
+ *
+ * Dùng pseudo-element thay cho padding-top.
+ * Đây là workaround cho Safari 26.x.
+ */
+
+.modal-body::before {
+
+  content:
+    "";
+
+  display:
+    block;
+
+  height:
+    20px;
+
+  flex:
+    0 0 20px;
+
+}
+
+
+/*
+ * Khoảng trống cuối vùng danh sách.
+ */
+
+.modal-body::after {
+
+  content:
+    "";
+
+  display:
+    block;
+
+  height:
+    20px;
 
 }
 
@@ -1580,23 +1678,30 @@ img {
   color:
     var(--muted);
 
-  margin-top: 0;
+  margin-top:
+    0;
 
 }
 
 
 .template-selector {
 
-  display: grid;
+  display:
+    grid;
 
-  gap: 9px;
+  gap:
+    9px;
 
 }
 
 
 .template-option {
 
-  width: 100%;
+  width:
+    100%;
+
+  min-height:
+    66px;
 
   background:
     white;
@@ -1610,15 +1715,27 @@ img {
   padding:
     12px;
 
-  display: flex;
+  display:
+    flex;
 
-  align-items: center;
+  align-items:
+    center;
 
-  gap: 12px;
+  gap:
+    12px;
 
-  text-align: left;
+  text-align:
+    left;
 
-  color: var(--text);
+  color:
+    var(--text);
+
+  /*
+   * Không để card bị co trong vùng scroll.
+   */
+
+  flex-shrink:
+    0;
 
 }
 
@@ -1647,71 +1764,91 @@ img {
 
 .template-option-icon {
 
-  width: 42px;
+  width:
+    42px;
 
-  height: 42px;
+  height:
+    42px;
 
   flex:
     0 0 42px;
 
-  border-radius: 10px;
+  border-radius:
+    10px;
 
   background:
     #f1f5f3;
 
-  display: grid;
+  display:
+    grid;
 
-  place-items: center;
+  place-items:
+    center;
 
-  font-size: 20px;
+  font-size:
+    20px;
 
 }
 
 
 .template-option-content {
 
-  min-width: 0;
+  min-width:
+    0;
 
-  flex: 1;
+  flex:
+    1;
 
 }
 
 
 .template-option-content strong {
 
-  display: block;
+  display:
+    block;
 
-  font-size: 13px;
+  font-size:
+    13px;
 
 }
 
 
 .template-option-content small {
 
-  display: block;
+  display:
+    block;
 
-  margin-top: 3px;
+  margin-top:
+    3px;
 
   color:
     var(--muted);
 
-  font-size: 11px;
+  font-size:
+    11px;
 
-  line-height: 1.4;
+  line-height:
+    1.4;
 
 }
 
 
 .template-option-check {
 
-  opacity: 0;
+  opacity:
+    0;
 
   color:
     var(--green);
 
-  font-weight: 700;
+  font-weight:
+    700;
 
-  font-size: 22px;
+  font-size:
+    22px;
+
+  flex:
+    0 0 auto;
 
 }
 
@@ -1719,10 +1856,18 @@ img {
 .template-option.selected
 .template-option-check {
 
-  opacity: 1;
+  opacity:
+    1;
 
 }
 
+
+/*
+ * FOOTER
+ *
+ * Footer không thuộc vùng scroll.
+ * Luôn cố định ở đáy modal.
+ */
 
 .modal-footer {
 
@@ -1735,17 +1880,23 @@ img {
   background:
     white;
 
-  display: flex;
+  display:
+    flex;
 
-  justify-content: flex-end;
+  justify-content:
+    flex-end;
 
-  gap: 10px;
+  gap:
+    10px;
 
-  flex-shrink: 0;
+  flex:
+    0 0 auto;
 
-  position: relative;
+  position:
+    relative;
 
-  z-index: 2;
+  z-index:
+    10;
 
 }
 
@@ -1774,6 +1925,10 @@ img {
 }
 
 
+/* =========================================================
+   TABLET / MOBILE
+   ========================================================= */
+
 @media (max-width: 760px) {
 
   .sidebar {
@@ -1800,23 +1955,27 @@ img {
 
   .sidebar-close {
 
-    display: block;
+    display:
+      block;
 
   }
 
 
   .main {
 
-    margin-left: 0;
+    margin-left:
+      0;
 
-    width: 100%;
+    width:
+      100%;
 
   }
 
 
   .topbar {
 
-    height: 70px;
+    height:
+      70px;
 
     padding:
       0 15px;
@@ -1826,30 +1985,35 @@ img {
 
   .mobile-menu {
 
-    display: block;
+    display:
+      block;
 
-    margin-right: 8px;
+    margin-right:
+      8px;
 
   }
 
 
   .topbar-title h1 {
 
-    font-size: 18px;
+    font-size:
+      18px;
 
   }
 
 
   .topbar-title p {
 
-    display: none;
+    display:
+      none;
 
   }
 
 
   .user-info {
 
-    display: none;
+    display:
+      none;
 
   }
 
@@ -1864,58 +2028,63 @@ img {
 
   .welcome-card {
 
-    align-items: flex-start;
+    align-items:
+      flex-start;
 
-    flex-direction: column;
+    flex-direction:
+      column;
 
-    padding: 20px;
+    padding:
+      20px;
 
   }
 
 
   .welcome-left {
 
-    align-items: flex-start;
+    align-items:
+      flex-start;
 
   }
 
 
   .welcome-card h2 {
 
-    font-size: 23px;
+    font-size:
+      23px;
 
   }
 
 
   .welcome-card .primary-button {
 
-    width: 100%;
+    width:
+      100%;
 
   }
 
 
   .section-heading {
 
-    align-items: center;
+    align-items:
+      center;
 
   }
 
 
-  /*
-   * KHÔNG ẨN NÚT TRÊN MOBILE.
-   * Đây là lỗi làm nút bị mất trước đó.
-   */
-
   .section-heading .secondary-button {
 
-    display: inline-flex;
+    display:
+      inline-flex;
 
-    min-height: 38px;
+    min-height:
+      38px;
 
     padding:
       0 12px;
 
-    font-size: 11px;
+    font-size:
+      11px;
 
   }
 
@@ -1930,16 +2099,19 @@ img {
 
   .page-header {
 
-    align-items: flex-start;
+    align-items:
+      flex-start;
 
-    flex-direction: column;
+    flex-direction:
+      column;
 
   }
 
 
   .page-header .primary-button {
 
-    width: 100%;
+    width:
+      100%;
 
   }
 
@@ -1954,31 +2126,56 @@ img {
 
   .history-clear-button {
 
-    display: inline-flex;
+    display:
+      inline-flex;
 
   }
 
 
+  /* =====================================================
+     MOBILE MODAL
+     ===================================================== */
+
   .modal-overlay {
 
-    align-items: flex-end;
+    align-items:
+      flex-end;
 
-    padding: 0;
+    justify-content:
+      center;
+
+    padding:
+      0;
 
   }
 
 
   .modal {
 
-    max-width: none;
+    width:
+      100%;
 
-    width: 100%;
+    max-width:
+      none;
+
+    /*
+     * Dùng dvh để phù hợp viewport Safari iOS.
+     */
+
+    height:
+      calc(100dvh - 10px);
 
     max-height:
-      calc(100vh - 10px);
+      calc(100dvh - 10px);
+
+    min-height:
+      0;
 
     border-radius:
       18px 18px 0 0;
+
+    box-shadow:
+      0 -10px 40px rgba(0,0,0,.18);
 
   }
 
@@ -1988,16 +2185,94 @@ img {
     padding:
       16px 18px;
 
+    min-height:
+      68px;
+
+    flex:
+      0 0 auto;
+
   }
 
+
+  /*
+   * VÙNG DANH SÁCH TRÊN MOBILE
+   */
 
   .modal-body {
 
     padding:
-      16px 18px;
+      0 18px;
+
+    overflow-y:
+      auto;
+
+    overflow-x:
+      hidden;
+
+    flex:
+      1 1 0;
+
+    min-height:
+      0;
+
+    height:
+      0;
+
+    touch-action:
+      pan-y;
+
+    overscroll-behavior-y:
+      contain;
 
   }
 
+
+  .modal-body::before {
+
+    height:
+      16px;
+
+  }
+
+
+  .modal-body::after {
+
+    height:
+      16px;
+
+  }
+
+
+  .modal-description {
+
+    margin-bottom:
+      14px;
+
+  }
+
+
+  .template-selector {
+
+    gap:
+      9px;
+
+  }
+
+
+  .template-option {
+
+    min-height:
+      66px;
+
+    padding:
+      12px;
+
+  }
+
+
+  /*
+   * FOOTER MOBILE
+   */
 
   .modal-footer {
 
@@ -2010,18 +2285,35 @@ img {
         env(safe-area-inset-bottom)
       );
 
+    flex:
+      0 0 auto;
+
+    background:
+      white;
+
+    position:
+      relative;
+
+    z-index:
+      10;
+
   }
 
 
   .modal-footer .primary-button,
   .modal-footer .secondary-button {
 
-    min-height: 44px;
+    min-height:
+      44px;
 
   }
 
 }
 
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
 
 @media (max-width: 480px) {
 
@@ -2035,46 +2327,54 @@ img {
 
   .document-card {
 
-    padding: 15px;
+    padding:
+      15px;
 
   }
 
 
   .document-icon {
 
-    flex-basis: 42px;
+    flex-basis:
+      42px;
 
-    width: 42px;
+    width:
+      42px;
 
-    height: 42px;
+    height:
+      42px;
 
   }
 
 
   .document-card h3 {
 
-    font-size: 14px;
+    font-size:
+      14px;
 
   }
 
 
   .document-card p {
 
-    font-size: 11px;
+    font-size:
+      11px;
 
   }
 
 
   .document-arrow {
 
-    display: none;
+    display:
+      none;
 
   }
 
 
   .section-heading {
 
-    gap: 8px;
+    gap:
+      8px;
 
   }
 
@@ -2084,21 +2384,34 @@ img {
     padding:
       0 10px;
 
-    font-size: 10px;
+    font-size:
+      10px;
 
   }
 
 
   .modal-header h2 {
 
-    font-size: 18px;
+    font-size:
+      18px;
 
   }
 
 
+  /*
+   * Hai nút xếp dọc.
+   *
+   * MỞ MẪU nằm trên.
+   * HỦY nằm dưới.
+   */
+
   .modal-footer {
 
-    flex-direction: column-reverse;
+    flex-direction:
+      column-reverse;
+
+    gap:
+      8px;
 
   }
 
@@ -2106,14 +2419,16 @@ img {
   .modal-footer .primary-button,
   .modal-footer .secondary-button {
 
-    width: 100%;
+    width:
+      100%;
 
   }
 
 
   .history-toolbar {
 
-    flex-wrap: wrap;
+    flex-wrap:
+      wrap;
 
   }
 
@@ -2128,16 +2443,20 @@ img {
 
   body.sidebar-open::after {
 
-    content: "";
+    content:
+      "";
 
-    position: fixed;
+    position:
+      fixed;
 
-    inset: 0;
+    inset:
+      0;
 
     background:
       rgba(0,0,0,.35);
 
-    z-index: 90;
+    z-index:
+      90;
 
   }
 
@@ -2153,23 +2472,27 @@ img {
   .sidebar,
   .topbar {
 
-    display: none !important;
+    display:
+      none !important;
 
   }
 
 
   .main {
 
-    margin: 0;
+    margin:
+      0;
 
-    width: 100%;
+    width:
+      100%;
 
   }
 
 
   .content {
 
-    padding: 0;
+    padding:
+      0;
 
   }
 
