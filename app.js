@@ -7,7 +7,6 @@
      GROVA DOCUMENT APP
      ========================================== */
 
-
   var DATA = window.GROVA_DATA || {};
 
   var templates = Array.isArray(DATA.templates)
@@ -227,8 +226,6 @@
     /*
      * Dashboard đã có HTML fallback.
      * Không xoá nếu JS/data không có.
-     *
-     * Nếu data có đủ 9 mẫu thì đồng bộ lại.
      */
 
     if (getTemplates().length === 0) {
@@ -409,8 +406,17 @@
     }
 
 
+    /*
+     * Ghi nhận hoạt động trước khi chuyển
+     * sang trang mẫu văn bản.
+     */
+
     saveRecentDocument(template);
 
+
+    /*
+     * Chuyển tới mẫu văn bản.
+     */
 
     window.location.href = template.file;
 
@@ -452,6 +458,10 @@
   }
 
 
+  /* ==========================================
+     SAVE RECENT ACTIVITY
+     ========================================== */
+
   function saveRecentDocument(template) {
 
     if (!template) {
@@ -462,20 +472,41 @@
     var list = getRecentDocuments();
 
 
-    list.unshift({
+    var activity = {
 
-      id: template.id,
+      id: template.id || "",
 
-      code: template.code,
+      code: template.code || "",
 
-      name: template.name,
+      name: template.name || "",
 
-      file: template.file,
+      title: template.title || "",
+
+      description: template.description || "",
+
+      category: template.category || "Văn bản",
+
+      icon: template.icon || "📄",
+
+      file: template.file || "",
+
+      action: "Mở văn bản",
 
       createdAt: new Date().toISOString()
 
-    });
+    };
 
+
+    /*
+     * Đưa hoạt động mới nhất lên đầu.
+     */
+
+    list.unshift(activity);
+
+
+    /*
+     * Giữ tối đa 20 hoạt động.
+     */
 
     list = list.slice(0, 20);
 
@@ -490,14 +521,136 @@
     } catch (error) {
 
       console.warn(
-        "Không thể lưu lịch sử.",
+        "Không thể lưu hoạt động gần đây.",
         error
       );
 
     }
 
+
+    /*
+     * Nếu đang ở trang Dashboard,
+     * cập nhật ngay giao diện.
+     */
+
+    renderRecentDocuments();
+
+    updateStats();
+
   }
 
+
+  /* ==========================================
+     FORMAT TIME
+     ========================================== */
+
+  function formatRecentTime(value) {
+
+    if (!value) {
+      return "";
+    }
+
+
+    var date = new Date(value);
+
+
+    if (isNaN(date.getTime())) {
+      return "";
+    }
+
+
+    var now = new Date();
+
+    var diff =
+      now.getTime() -
+      date.getTime();
+
+
+    var minute =
+      60 * 1000;
+
+    var hour =
+      60 * minute;
+
+    var day =
+      24 * hour;
+
+
+    /*
+     * Vừa thực hiện.
+     */
+
+    if (diff >= 0 && diff < minute) {
+
+      return "Vừa xong";
+
+    }
+
+
+    /*
+     * Trong vòng 1 giờ.
+     */
+
+    if (diff >= minute && diff < hour) {
+
+      var minutes =
+        Math.floor(diff / minute);
+
+      return minutes + " phút trước";
+
+    }
+
+
+    /*
+     * Trong ngày.
+     */
+
+    if (diff >= hour && diff < day) {
+
+      var hours =
+        Math.floor(diff / hour);
+
+      return hours + " giờ trước";
+
+    }
+
+
+    /*
+     * Nếu khác ngày,
+     * hiển thị ngày + giờ.
+     */
+
+    try {
+
+      return date.toLocaleDateString(
+        "vi-VN",
+        {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric"
+        }
+      ) +
+      " • " +
+      date.toLocaleTimeString(
+        "vi-VN",
+        {
+          hour: "2-digit",
+          minute: "2-digit"
+        }
+      );
+
+    } catch (error) {
+
+      return date.toLocaleString();
+
+    }
+
+  }
+
+
+  /* ==========================================
+     RENDER RECENT DOCUMENTS
+     ========================================== */
 
   function renderRecentDocuments() {
 
@@ -537,25 +690,65 @@
 
     list.forEach(function (item) {
 
-      var row = document.createElement("button");
+      var row =
+        document.createElement("button");
+
 
       row.type = "button";
 
       row.className = "recent-row";
 
 
+      row.setAttribute(
+        "data-template-id",
+        item.id || ""
+      );
+
+
       row.innerHTML =
 
-        '<span class="recent-row-icon">📄</span>' +
+        '<span class="recent-row-icon">' +
+
+          escapeHtml(
+            item.icon || "📄"
+          ) +
+
+        '</span>' +
 
         '<span class="recent-row-content">' +
 
           '<strong>' +
-            escapeHtml(item.name || "") +
+            escapeHtml(
+              item.name || item.title || ""
+            ) +
           '</strong>' +
 
           '<small>' +
-            escapeHtml(item.code || "") +
+
+            '<span>' +
+              escapeHtml(
+                item.code || ""
+              ) +
+            '</span>' +
+
+            '<span class="recent-row-separator">•</span>' +
+
+            '<span>' +
+              escapeHtml(
+                item.action || "Mở văn bản"
+              ) +
+            '</span>' +
+
+            '<span class="recent-row-separator">•</span>' +
+
+            '<span>' +
+              escapeHtml(
+                formatRecentTime(
+                  item.createdAt
+                )
+              ) +
+            '</span>' +
+
           '</small>' +
 
         '</span>' +
@@ -567,7 +760,18 @@
         "click",
         function () {
 
-          window.location.href = item.file;
+          if (!item.file) {
+            return;
+          }
+
+
+          /*
+           * Không ghi thêm một hoạt động
+           * khi chỉ mở lại từ lịch sử.
+           */
+
+          window.location.href =
+            item.file;
 
         }
       );
@@ -589,16 +793,20 @@
     var documents =
       $("#statDocuments");
 
+
     if (documents) {
 
       documents.textContent =
-        String(getRecentDocuments().length);
+        String(
+          getRecentDocuments().length
+        );
 
     }
 
 
     var projects =
       $("#statProjects");
+
 
     if (projects) {
 
@@ -616,6 +824,7 @@
     var customers =
       $("#statCustomers");
 
+
     if (customers) {
 
       customers.textContent =
@@ -631,6 +840,7 @@
 
     var employees =
       $("#statEmployees");
+
 
     if (employees) {
 
@@ -703,14 +913,44 @@
 
 
     if (title) {
+
       title.textContent =
         config.title;
+
     }
 
 
     if (subtitle) {
+
       subtitle.textContent =
         config.subtitle;
+
+    }
+
+
+    /*
+     * Khi mở trang Lịch sử,
+     * luôn lấy dữ liệu mới nhất.
+     */
+
+    if (pageName === "history") {
+
+      renderRecentDocuments();
+
+    }
+
+
+    /*
+     * Khi quay về Dashboard,
+     * cập nhật lại Hoạt động gần đây.
+     */
+
+    if (pageName === "dashboard") {
+
+      renderRecentDocuments();
+
+      updateStats();
+
     }
 
 
@@ -770,6 +1010,7 @@
     var sidebar =
       $("#sidebar");
 
+
     if (!sidebar) {
       return;
     }
@@ -777,7 +1018,9 @@
 
     sidebar.classList.add("open");
 
-    document.body.classList.add("sidebar-open");
+    document.body.classList.add(
+      "sidebar-open"
+    );
 
   }
 
@@ -787,6 +1030,7 @@
     var sidebar =
       $("#sidebar");
 
+
     if (!sidebar) {
       return;
     }
@@ -794,7 +1038,9 @@
 
     sidebar.classList.remove("open");
 
-    document.body.classList.remove("sidebar-open");
+    document.body.classList.remove(
+      "sidebar-open"
+    );
 
   }
 
@@ -945,15 +1191,21 @@
 
     syncDashboardCards();
 
+
     renderDocumentsPage();
+
 
     renderRecentDocuments();
 
+
     updateStats();
+
 
     bindNavigation();
 
+
     bindSidebar();
+
 
     bindModal();
 
@@ -977,6 +1229,12 @@
     closeModal: closeModal,
 
     openTemplate: openTemplate,
+
+    getRecentDocuments: getRecentDocuments,
+
+    saveRecentDocument: saveRecentDocument,
+
+    renderRecentDocuments: renderRecentDocuments,
 
     refresh: init
 
