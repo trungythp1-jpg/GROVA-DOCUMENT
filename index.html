@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
+
   <meta charset="UTF-8">
 
   <meta
@@ -8,13 +9,27 @@
     content="width=device-width, initial-scale=1, viewport-fit=cover"
   >
 
+  <!-- =====================================================
+       PWA / APP CONFIGURATION
+  ====================================================== -->
+
   <meta
     name="theme-color"
     content="#0b7a5a"
   >
 
   <meta
+    name="application-name"
+    content="GROVA DOCUMENT"
+  >
+
+  <meta
     name="apple-mobile-web-app-capable"
+    content="yes"
+  >
+
+  <meta
+    name="mobile-web-app-capable"
     content="yes"
   >
 
@@ -28,10 +43,36 @@
     content="GROVA DOCUMENT"
   >
 
+  <meta
+    name="format-detection"
+    content="telephone=no"
+  >
+
+
+  <!-- =====================================================
+       TITLE
+  ====================================================== -->
+
   <title>GROVA DOCUMENT</title>
+
+
+  <!-- =====================================================
+       PWA MANIFEST
+  ====================================================== -->
+
+  <link
+    rel="manifest"
+    href="./manifest.json?v=201"
+  >
+
+
+  <!-- =====================================================
+       ICON
+  ====================================================== -->
 
   <link
     rel="icon"
+    type="image/png"
     href="./data/grova_logo.png"
   >
 
@@ -40,15 +81,23 @@
     href="./data/grova_logo.png"
   >
 
+
+  <!-- =====================================================
+       STYLESHEET
+  ====================================================== -->
+
   <link
     rel="stylesheet"
-    href="./style.css?v=200"
+    href="./style.css?v=201"
   >
+
 </head>
+
 
 <body>
 
   <div class="app-shell">
+
 
     <!-- =====================================================
          SIDEBAR
@@ -193,7 +242,10 @@
 
     <main class="main">
 
-      <!-- TOPBAR -->
+
+      <!-- ===================================================
+           TOPBAR
+      ==================================================== -->
 
       <header class="topbar">
 
@@ -1068,11 +1120,11 @@
   ====================================================== -->
 
   <script
-    src="./data/data.js?v=200"
+    src="./data/data.js?v=201"
   ></script>
 
   <script
-    src="./app.js?v=200"
+    src="./app.js?v=201"
   ></script>
 
 
