@@ -264,11 +264,6 @@
     }
 
 
-    if (getTemplates().length === 0) {
-      return;
-    }
-
-
     grid.innerHTML = "";
 
 
@@ -311,6 +306,12 @@
     );
 
 
+    modal.setAttribute(
+      "aria-hidden",
+      "false"
+    );
+
+
     document.body.classList.add(
       "modal-open"
     );
@@ -337,6 +338,12 @@
 
     modal.classList.add(
       "hidden"
+    );
+
+
+    modal.setAttribute(
+      "aria-hidden",
+      "true"
     );
 
 
@@ -520,13 +527,17 @@
      HISTORY STORAGE
      ========================================== */
 
+  var HISTORY_KEY =
+    "GROVA_DOCUMENT_RECENT";
+
+
   function getRecentDocuments() {
 
     try {
 
       var raw =
         localStorage.getItem(
-          "GROVA_DOCUMENT_RECENT"
+          HISTORY_KEY
         );
 
 
@@ -554,6 +565,11 @@
       );
 
     } catch (error) {
+
+      console.warn(
+        "Không thể đọc lịch sử.",
+        error
+      );
 
       return [];
 
@@ -618,7 +634,7 @@
 
 
     /*
-     * Tối đa 20 hoạt động.
+     * Giữ tối đa 20 hoạt động.
      */
 
     list =
@@ -628,7 +644,7 @@
     try {
 
       localStorage.setItem(
-        "GROVA_DOCUMENT_RECENT",
+        HISTORY_KEY,
         JSON.stringify(list)
       );
 
@@ -867,8 +883,8 @@
 
 
         /*
-         * Mở lại văn bản nhưng
-         * KHÔNG tạo lịch sử mới.
+         * Mở lại văn bản.
+         * Không ghi thêm lịch sử.
          */
 
         window.location.href =
@@ -927,6 +943,79 @@
 
 
   /* ==========================================
+     HISTORY CONTAINER
+     ========================================== */
+
+  function ensureHistoryContainer() {
+
+    var page =
+      $("#page-history");
+
+
+    if (!page) {
+      return null;
+    }
+
+
+    var container =
+      $("#historyDocuments");
+
+
+    if (container) {
+      return container;
+    }
+
+
+    /*
+     * index.html hiện tại chưa có
+     * #historyDocuments.
+     *
+     * Tạo container ngay bên trong
+     * trang Lịch sử để app.js tự quản lý.
+     */
+
+    var existingEmpty =
+      page.querySelector(
+        ".empty-state"
+      );
+
+
+    container =
+      document.createElement(
+        "div"
+      );
+
+
+    container.id =
+      "historyDocuments";
+
+
+    container.className =
+      "activity-list history-list";
+
+
+    if (existingEmpty) {
+
+      existingEmpty.parentNode.replaceChild(
+        container,
+        existingEmpty
+      );
+
+    } else {
+
+      page.appendChild(
+        container
+      );
+
+    }
+
+
+    return container;
+
+  }
+
+
+  /* ==========================================
      DASHBOARD RECENT
      ========================================== */
 
@@ -946,8 +1035,8 @@
 
 
     /*
-     * Dashboard chỉ lấy 4 hoạt động
-     * mới nhất.
+     * Dashboard chỉ hiển thị
+     * 4 hoạt động mới nhất.
      */
 
     var recent =
@@ -988,14 +1077,8 @@
 
   function renderHistoryDocuments() {
 
-    /*
-     * QUAN TRỌNG:
-     * Trang Lịch sử dùng
-     * #historyDocuments
-     */
-
     var container =
-      $("#historyDocuments");
+      ensureHistoryContainer();
 
 
     if (!container) {
@@ -1092,7 +1175,7 @@
         try {
 
           localStorage.removeItem(
-            "GROVA_DOCUMENT_RECENT"
+            HISTORY_KEY
           );
 
         } catch (error) {
@@ -1297,11 +1380,21 @@
     }
 
 
+    /*
+     * Hỗ trợ cả cấu trúc hiện tại:
+     * .page
+     * .active-page
+     */
+
     $$(".page").forEach(
       function (page) {
 
         page.classList.remove(
           "active"
+        );
+
+        page.classList.remove(
+          "active-page"
         );
 
       }
@@ -1315,7 +1408,7 @@
     if (target) {
 
       target.classList.add(
-        "active"
+        "active-page"
       );
 
     }
@@ -1377,6 +1470,17 @@
 
 
     /*
+     * Văn bản.
+     */
+
+    if (pageName === "documents") {
+
+      renderDocumentsPage();
+
+    }
+
+
+    /*
      * Lịch sử.
      */
 
@@ -1393,6 +1497,10 @@
 
 
   function bindNavigation() {
+
+    /*
+     * Menu bên trái.
+     */
 
     $$(".menu-item").forEach(
       function (item) {
@@ -1414,6 +1522,10 @@
     );
 
 
+    /*
+     * Các nút dùng data-page-target.
+     */
+
     $$("[data-page-target]").forEach(
       function (button) {
 
@@ -1424,6 +1536,33 @@
             showPage(
               button.getAttribute(
                 "data-page-target"
+              )
+            );
+
+          }
+        );
+
+      }
+    );
+
+
+    /*
+     * Nút "Xem tất cả" ở Dashboard
+     * của index.html hiện tại dùng:
+     *
+     * data-page="history"
+     */
+
+    $$(".text-button[data-page]").forEach(
+      function (button) {
+
+        button.addEventListener(
+          "click",
+          function () {
+
+            showPage(
+              button.getAttribute(
+                "data-page"
               )
             );
 
@@ -1589,8 +1728,16 @@
         "click",
         function (event) {
 
+          /*
+           * index.html hiện tại dùng
+           * .modal-overlay.
+           */
+
           if (
-            event.target === modal
+            event.target === modal ||
+            event.target.classList.contains(
+              "modal-overlay"
+            )
           ) {
 
             closeModal();
@@ -1689,7 +1836,7 @@
         try {
 
           localStorage.removeItem(
-            "GROVA_DOCUMENT_RECENT"
+            HISTORY_KEY
           );
 
         } catch (error) {
