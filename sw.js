@@ -1,11 +1,12 @@
-const CACHE_NAME = "grova-document-v3";
+const CACHE_NAME = "grova-document-v4";
 
 const APP_SHELL = [
     "./",
     "./index.html",
     "./style.css",
     "./app.js",
-    "./manifest.json"
+    "./manifest.json",
+    "./data/data.js"
 ];
 
 
@@ -21,15 +22,17 @@ self.addEventListener("install", (event) => {
             .open(CACHE_NAME)
             .then((cache) => {
 
-                return cache.addAll(
-                    APP_SHELL
-                );
+                return cache.addAll(APP_SHELL);
+
             })
             .then(() => {
 
                 return self.skipWaiting();
+
             })
+
     );
+
 });
 
 
@@ -56,13 +59,18 @@ self.addEventListener("activate", (event) => {
                             (key) =>
                                 caches.delete(key)
                         )
+
                 );
+
             })
             .then(() => {
 
                 return self.clients.claim();
+
             })
+
     );
+
 });
 
 
@@ -72,34 +80,25 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
 
-    const request =
-        event.request;
+    const request = event.request;
 
-
-    if (
-        request.method !== "GET"
-    ) {
-
+    if (request.method !== "GET") {
         return;
     }
 
 
-    const url =
-        new URL(
-            request.url
-        );
+    const url = new URL(request.url);
 
 
-    /*
-     * DATA LUÔN ƯU TIÊN LẤY BẢN MỚI
-     *
-     * Đây là phần quan trọng nhất.
-     */
+    /* =================================================
+       HTML
+       Luôn ưu tiên bản mới trên mạng.
+       Nếu mất mạng mới dùng cache.
+    ================================================= */
 
     if (
-        url.pathname.endsWith(
-            "/data/data.js"
-        )
+        request.destination === "document" ||
+        url.pathname.endsWith(".html")
     ) {
 
         event.respondWith(
@@ -112,29 +111,74 @@ self.addEventListener("fetch", (event) => {
                         response.status === 200
                     ) {
 
-                        return response;
+                        const clone =
+                            response.clone();
+
+                        caches
+                            .open(CACHE_NAME)
+                            .then((cache) => {
+
+                                cache.put(
+                                    request,
+                                    clone
+                                );
+
+                            });
+
                     }
 
-                    return caches.match(
-                        request
-                    );
+                    return response;
+
                 })
                 .catch(() => {
 
-                    return caches.match(
-                        request
-                    );
+                    return caches.match(request);
+
                 })
+
         );
 
         return;
+
     }
 
 
-    /*
-     * Các file giao diện:
-     * cache trước, nếu không có thì lấy mạng.
-     */
+    /* =================================================
+       DATA.JS
+       Luôn lấy bản mới trước.
+    ================================================= */
+
+    if (
+        url.pathname.endsWith(
+            "/data/data.js"
+        )
+    ) {
+
+        event.respondWith(
+
+            fetch(request)
+                .then((response) => {
+
+                    return response;
+
+                })
+                .catch(() => {
+
+                    return caches.match(request);
+
+                })
+
+        );
+
+        return;
+
+    }
+
+
+    /* =================================================
+       FILE KHÁC
+       Cache trước → mạng sau
+    ================================================= */
 
     event.respondWith(
 
@@ -145,6 +189,7 @@ self.addEventListener("fetch", (event) => {
                 if (cachedResponse) {
 
                     return cachedResponse;
+
                 }
 
 
@@ -158,6 +203,7 @@ self.addEventListener("fetch", (event) => {
                         ) {
 
                             return response;
+
                         }
 
 
@@ -173,17 +219,16 @@ self.addEventListener("fetch", (event) => {
                                     request,
                                     clone
                                 );
+
                             });
 
 
                         return response;
-                    })
-                    .catch(() => {
 
-                        return caches.match(
-                            "./index.html"
-                        );
                     });
+
             })
+
     );
+
 });
