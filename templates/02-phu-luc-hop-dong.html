@@ -1,0 +1,2513 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Phụ lục hợp đồng - GROVA DOCUMENT</title>
+
+  <link
+    rel="stylesheet"
+    href="../style.css"
+  >
+
+  <style>
+
+    /* =====================================================
+       TEMPLATE 02
+       PHỤ LỤC HỢP ĐỒNG THI CÔNG
+       ===================================================== */
+
+    .document-editor {
+      min-height: 100vh;
+      background: #eef3f1;
+    }
+
+    .document-editor-header {
+      height: 76px;
+      background: #ffffff;
+      border-bottom: 1px solid #dfe7e3;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .document-title-area {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .back-button {
+      width: 48px;
+      height: 48px;
+      border: 0;
+      border-radius: 14px;
+      background: #edf7f3;
+      color: #378166;
+      font-size: 25px;
+      cursor: pointer;
+    }
+
+    .document-title-area h1 {
+      margin: 0;
+      font-size: 21px;
+      line-height: 1.2;
+    }
+
+    .document-title-area span {
+      display: block;
+      margin-top: 3px;
+      color: #87918e;
+      font-size: 14px;
+    }
+
+    .print-button {
+      border: 0;
+      background: #378166;
+      color: #ffffff;
+      padding: 15px 28px;
+      border-radius: 13px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .editor-layout {
+      display: grid;
+      grid-template-columns: 390px minmax(0, 1fr);
+      min-height: calc(100vh - 76px);
+    }
+
+    /* =====================================================
+       FORM
+       ===================================================== */
+
+    .form-panel {
+      background: #ffffff;
+      border-right: 1px solid #dfe7e3;
+      padding: 30px;
+      overflow-y: auto;
+      height: calc(100vh - 76px);
+    }
+
+    .form-panel h2 {
+      margin: 0 0 8px;
+      font-size: 29px;
+    }
+
+    .form-description {
+      color: #7d8785;
+      line-height: 1.55;
+      margin: 0 0 28px;
+    }
+
+    .form-section {
+      border-top: 1px solid #e4ebe8;
+      padding-top: 24px;
+      margin-top: 24px;
+    }
+
+    .form-section:first-of-type {
+      border-top: 0;
+      padding-top: 0;
+      margin-top: 0;
+    }
+
+    .form-section h3 {
+      color: #378166;
+      font-size: 17px;
+      margin: 0 0 18px;
+      text-transform: uppercase;
+    }
+
+    .field {
+      margin-bottom: 15px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 14px;
+      font-weight: 700;
+      color: #56615e;
+      margin-bottom: 7px;
+    }
+
+    .field input,
+    .field textarea,
+    .field select {
+      width: 100%;
+      box-sizing: border-box;
+      border: 1px solid #d4ded9;
+      border-radius: 11px;
+      padding: 13px 14px;
+      background: #ffffff;
+      color: #27302e;
+      font-size: 15px;
+      outline: none;
+      transition: .2s;
+    }
+
+    .field input:focus,
+    .field textarea:focus,
+    .field select:focus {
+      border-color: #378166;
+      box-shadow: 0 0 0 3px rgba(55,129,102,.10);
+    }
+
+    .field textarea {
+      min-height: 82px;
+      resize: vertical;
+    }
+
+    .two-columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .three-columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+    }
+
+    .fixed-field {
+      background: #f3f7f5 !important;
+      color: #66716e !important;
+    }
+
+    .locked-note {
+      font-size: 12px;
+      color: #8a9491;
+      margin-top: 6px;
+      line-height: 1.45;
+    }
+
+    /* =====================================================
+       CHECKBOX
+       ===================================================== */
+
+    .check-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .check-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      font-size: 14px;
+      color: #414b48;
+      line-height: 1.4;
+    }
+
+    .check-item input {
+      width: 18px;
+      height: 18px;
+      margin-top: 1px;
+      accent-color: #378166;
+      flex: 0 0 auto;
+    }
+
+    /* =====================================================
+       PREVIEW
+       ===================================================== */
+
+    .preview-panel {
+      padding: 35px;
+      overflow: auto;
+    }
+
+    .preview-label {
+      color: #7d8785;
+      font-size: 14px;
+      margin: 0 auto 12px;
+      max-width: 794px;
+    }
+
+    .a4-page {
+      width: 794px;
+      min-height: 1123px;
+      box-sizing: border-box;
+      background: #ffffff;
+      margin: 0 auto 30px;
+      padding: 65px 68px 65px 68px;
+      box-shadow: 0 3px 20px rgba(28, 55, 45, .12);
+      color: #111111;
+      font-family: "Times New Roman", Times, serif;
+      font-size: 16px;
+      line-height: 1.45;
+    }
+
+    .a4-page p {
+      margin: 0 0 10px;
+    }
+
+    .center {
+      text-align: center;
+    }
+
+    .bold {
+      font-weight: 700;
+    }
+
+    .national-title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .national-subtitle {
+      font-size: 16px;
+      font-weight: 700;
+      margin-top: 3px;
+    }
+
+    .document-heading {
+      margin-top: 35px;
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .document-number {
+      margin-top: 7px;
+      font-style: italic;
+    }
+
+    .section-heading {
+      font-weight: 700;
+      font-size: 17px;
+      margin-top: 20px;
+      margin-bottom: 9px;
+    }
+
+    .indent {
+      margin-left: 0;
+    }
+
+    .bullet {
+      margin-left: 20px;
+      margin-bottom: 4px;
+    }
+
+    .preview-line {
+      display: inline-block;
+      min-width: 180px;
+      border-bottom: 1px dotted #333;
+      padding: 0 4px;
+      min-height: 20px;
+    }
+
+    .preview-line.long {
+      min-width: 420px;
+    }
+
+    .preview-line.short {
+      min-width: 80px;
+    }
+
+    .preview-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0 15px;
+      font-size: 14px;
+    }
+
+    .preview-table th,
+    .preview-table td {
+      border: 1px solid #333;
+      padding: 7px 6px;
+      vertical-align: middle;
+    }
+
+    .preview-table th {
+      text-align: center;
+      font-weight: 700;
+    }
+
+    .signature-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 35px;
+      margin-top: 35px;
+      text-align: center;
+    }
+
+    .signature-title {
+      font-weight: 700;
+    }
+
+    .signature-company {
+      font-weight: 700;
+      margin-top: 5px;
+    }
+
+    .signature-space {
+      height: 90px;
+    }
+
+    .preview-checkbox {
+      font-family: "Times New Roman", Times, serif;
+    }
+
+    /* =====================================================
+       RESPONSIVE
+       ===================================================== */
+
+    @media (max-width: 1100px) {
+
+      .editor-layout {
+        grid-template-columns: 350px minmax(0, 1fr);
+      }
+
+      .form-panel {
+        padding: 22px;
+      }
+
+      .preview-panel {
+        padding: 25px;
+      }
+
+    }
+
+    @media (max-width: 850px) {
+
+      .editor-layout {
+        display: block;
+      }
+
+      .form-panel {
+        height: auto;
+        max-height: none;
+        border-right: 0;
+      }
+
+      .preview-panel {
+        overflow-x: auto;
+      }
+
+      .document-editor-header {
+        padding: 0 15px;
+      }
+
+      .print-button {
+        padding: 12px 16px;
+      }
+
+    }
+
+    @media print {
+
+      body {
+        background: #ffffff !important;
+      }
+
+      .document-editor-header,
+      .form-panel,
+      .preview-label {
+        display: none !important;
+      }
+
+      .preview-panel {
+        padding: 0 !important;
+        overflow: visible !important;
+      }
+
+      .a4-page {
+        width: 210mm;
+        min-height: 297mm;
+        margin: 0;
+        padding: 17mm 18mm;
+        box-shadow: none;
+        page-break-after: always;
+      }
+
+      @page {
+        size: A4 portrait;
+        margin: 0;
+      }
+
+    }
+
+  </style>
+</head>
+
+
+<body>
+
+<div class="document-editor">
+
+  <!-- =====================================================
+       HEADER
+       ===================================================== -->
+
+  <header class="document-editor-header">
+
+    <div class="document-title-area">
+
+      <button
+        class="back-button"
+        type="button"
+        onclick="goBack()"
+        aria-label="Quay lại"
+      >
+        ←
+      </button>
+
+      <div>
+
+        <h1>
+          Phụ lục hợp đồng
+        </h1>
+
+        <span>
+          GROVA DOCUMENT
+        </span>
+
+      </div>
+
+    </div>
+
+    <button
+      class="print-button"
+      type="button"
+      onclick="window.print()"
+    >
+      🖨 In / Xuất PDF
+    </button>
+
+  </header>
+
+
+  <!-- =====================================================
+       MAIN
+       ===================================================== -->
+
+  <main class="editor-layout">
+
+
+    <!-- ===================================================
+         LEFT FORM
+         =================================================== -->
+
+    <aside class="form-panel">
+
+      <h2>
+        Tạo phụ lục
+      </h2>
+
+      <p class="form-description">
+        Nhập các thông tin được phép thay đổi.
+        Nội dung điều khoản của mẫu được khóa.
+      </p>
+
+
+      <!-- ===============================================
+           THÔNG TIN PHỤ LỤC
+           =============================================== -->
+
+      <section class="form-section">
+
+        <h3>
+          Thông tin phụ lục
+        </h3>
+
+        <div class="field">
+
+          <label>
+            Số phụ lục
+          </label>
+
+          <input
+            id="appendixNumber"
+            type="text"
+            value="01/PLHĐ/2026"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Ngày ký
+          </label>
+
+          <div class="three-columns">
+
+            <input
+              id="signDay"
+              type="number"
+              min="1"
+              max="31"
+              placeholder="Ngày"
+            >
+
+            <input
+              id="signMonth"
+              type="number"
+              min="1"
+              max="12"
+              placeholder="Tháng"
+            >
+
+            <input
+              id="signYear"
+              type="number"
+              value="2026"
+              placeholder="Năm"
+            >
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- ===============================================
+           BÊN A
+           =============================================== -->
+
+      <section class="form-section">
+
+        <h3>
+          Bên A
+        </h3>
+
+        <div class="field">
+
+          <label>
+            Công ty
+          </label>
+
+          <input
+            class="fixed-field"
+            type="text"
+            value="CÔNG TY CỔ PHẦN GROVA HOLDINGS"
+            readonly
+          >
+
+          <div class="locked-note">
+            Thông tin cố định từ dữ liệu GROVA.
+          </div>
+
+        </div>
+
+        <div class="field">
+
+          <label>
+            Mã số thuế
+          </label>
+
+          <input
+            class="fixed-field"
+            type="text"
+            value="0202328361"
+            readonly
+          >
+
+        </div>
+
+        <div class="field">
+
+          <label>
+            Địa chỉ
+          </label>
+
+          <input
+            class="fixed-field"
+            type="text"
+            value="49A/348 Trần Nguyên Hãn, Phường An Biên, Thành phố Hải Phòng"
+            readonly
+          >
+
+        </div>
+
+        <div class="field">
+
+          <label>
+            Đại diện
+          </label>
+
+          <input
+            class="fixed-field"
+            type="text"
+            value="PHẠM VĂN HỌC"
+            readonly
+          >
+
+        </div>
+
+        <div class="field">
+
+          <label>
+            Chức vụ
+          </label>
+
+          <input
+            id="aPosition"
+            type="text"
+            placeholder="Chức vụ"
+          >
+
+        </div>
+
+        <div class="field">
+
+          <label>
+            Điện thoại
+          </label>
+
+          <input
+            id="aPhone"
+            type="tel"
+            placeholder="Số điện thoại"
+          >
+
+        </div>
+
+      </section>
+
+
+      <!-- ===============================================
+           BÊN B
+           =============================================== -->
+
+      <section class="form-section">
+
+        <h3>
+          Bên B
+        </h3>
+
+        <div class="field">
+
+          <label>
+            Tên công ty
+          </label>
+
+          <input
+            id="bCompany"
+            type="text"
+            placeholder="Tên đơn vị thuê thi công"
+          >
+
+        </div>
+
+        <div class="field">
+
+          <label>
+            Mã số thuế
+          </label>
+
+          <input
+            id="bTax"
+            type="text"
+            placeholder="Mã số thuế"
+          >
+
+        </div>
+
+        <div class="field">
+
+          <label>
+            Địa chỉ
+          </label>
+
+          <input
+            id="bAddress"
+            type="text"
+            placeholder="Địa chỉ"
+          >
+
+        </div>
+
+        <div class="field">
+
+          <label>
+            Đại diện
+          </label>
+
+          <input
+            id="bRepresentative"
+            type="text"
+            placeholder="Họ và tên"
+          >
+
+        </div>
+
+        <div class="field">
+
+          <label>
+            Chức vụ
+          </label>
+
+          <input
+            id="bPosition"
+            type="text"
+            placeholder="Chức vụ"
+          >
+
+        </div>
+
+        <div class="field">
+
+          <label>
+            Điện thoại
+          </label>
+
+          <input
+            id="bPhone"
+            type="tel"
+            placeholder="Số điện thoại"
+          >
+
+        </div>
+
+      </section>
+
+
+      <!-- ===============================================
+           THÔNG TIN CÔNG TRÌNH
+           =============================================== -->
+
+      <section class="form-section">
+
+        <h3>
+          Thông tin công trình
+        </h3>
+
+        <div class="field">
+
+          <label>
+            Địa chỉ công trình
+          </label>
+
+          <input
+            id="projectAddress"
+            type="text"
+            placeholder="Địa chỉ công trình"
+          >
+
+        </div>
+
+        <div class="field">
+
+          <label>
+            Chủ đầu tư
+          </label>
+
+          <input
+            id="investor"
+            type="text"
+            placeholder="Tên chủ đầu tư"
+          >
+
+        </div>
+
+        <div class="field">
+
+          <label>
+            Số tầng lắp đặt
+          </label>
+
+          <input
+            id="floorCount"
+            type="text"
+            placeholder="Số tầng"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Loại khung
+          </label>
+
+          <select id="frameType">
+
+            <option value="">
+              Chọn loại khung
+            </option>
+
+            <option value="Khung thép">
+              Khung thép
+            </option>
+
+            <option value="Khung thép bọc inox">
+              Khung thép bọc inox
+            </option>
+
+            <option value="Khung nhôm">
+              Khung nhôm
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Vị trí lắp đặt
+          </label>
+
+          <select id="installationLocation">
+
+            <option value="">
+              Chọn vị trí
+            </option>
+
+            <option value="Trong nhà">
+              Trong nhà
+            </option>
+
+            <option value="Ngoài trời">
+              Ngoài trời
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Ghi chú kỹ thuật khác
+          </label>
+
+          <textarea
+            id="technicalNote"
+            placeholder="Nếu có"
+          ></textarea>
+
+        </div>
+
+      </section>
+
+
+      <!-- ===============================================
+           PHẠM VI CÔNG VIỆC
+           =============================================== -->
+
+      <section class="form-section">
+
+        <h3>
+          Phạm vi công việc
+        </h3>
+
+        <div class="check-group">
+
+          <label class="check-item">
+            <input
+              type="checkbox"
+              id="work1"
+              checked
+            >
+            <span>
+              Lắp đặt khung thép thang máy
+            </span>
+          </label>
+
+          <label class="check-item">
+            <input
+              type="checkbox"
+              id="work2"
+              checked
+            >
+            <span>
+              Căn chỉnh kết cấu khung
+            </span>
+          </label>
+
+          <label class="check-item">
+            <input
+              type="checkbox"
+              id="work3"
+              checked
+            >
+            <span>
+              Liên kết bulong, bản mã
+            </span>
+          </label>
+
+          <label class="check-item">
+            <input
+              type="checkbox"
+              id="work4"
+              checked
+            >
+            <span>
+              Bọc bảo vệ chống xước sau lắp đặt
+            </span>
+          </label>
+
+          <label class="check-item">
+            <input
+              type="checkbox"
+              id="work5"
+              checked
+            >
+            <span>
+              Vệ sinh khu vực thi công
+            </span>
+          </label>
+
+          <label class="check-item">
+            <input
+              type="checkbox"
+              id="work6"
+              checked
+            >
+            <span>
+              Hỗ trợ nghiệm thu kỹ thuật
+            </span>
+          </label>
+
+        </div>
+
+
+        <div class="field" style="margin-top:15px;">
+
+          <label>
+            Công việc khác
+          </label>
+
+          <input
+            id="otherWork"
+            type="text"
+            placeholder="Nếu có"
+          >
+
+        </div>
+
+      </section>
+
+
+      <!-- ===============================================
+           GIÁ TRỊ CÔNG TRÌNH
+           =============================================== -->
+
+      <section class="form-section">
+
+        <h3>
+          Giá trị công trình
+        </h3>
+
+        <div class="field">
+
+          <label>
+            Khối lượng / số stop
+          </label>
+
+          <input
+            id="quantity"
+            type="number"
+            min="0"
+            step="1"
+            placeholder="Số stop"
+          >
+
+        </div>
+
+        <div class="field">
+
+          <label>
+            Đơn giá (VNĐ)
+          </label>
+
+          <input
+            id="unitPrice"
+            type="number"
+            min="0"
+            value="2500000"
+          >
+
+        </div>
+
+        <div class="field">
+
+          <label>
+            Tổng giá trị phụ lục (VNĐ)
+          </label>
+
+          <input
+            id="totalValue"
+            class="fixed-field"
+            type="text"
+            readonly
+          >
+
+        </div>
+
+        <div class="field">
+
+          <label>
+            Bằng chữ
+          </label>
+
+          <input
+            id="totalWords"
+            type="text"
+            placeholder="Nhập bằng chữ"
+          >
+
+        </div>
+
+      </section>
+
+
+      <!-- ===============================================
+           TIẾN ĐỘ
+           =============================================== -->
+
+      <section class="form-section">
+
+        <h3>
+          Tiến độ
+        </h3>
+
+        <div class="field">
+
+          <label>
+            Ngày bàn giao mặt bằng
+          </label>
+
+          <input
+            id="handoverDate"
+            type="date"
+          >
+
+        </div>
+
+        <div class="field">
+
+          <label>
+            Ngày khởi công
+          </label>
+
+          <input
+            id="startDate"
+            type="date"
+          >
+
+        </div>
+
+        <div class="field">
+
+          <label>
+            Thời gian thực hiện (ngày)
+          </label>
+
+          <input
+            id="duration"
+            type="number"
+            min="0"
+            placeholder="Số ngày"
+          >
+
+        </div>
+
+        <div class="field">
+
+          <label>
+            Ngày hoàn thành dự kiến
+          </label>
+
+          <input
+            id="finishDate"
+            type="date"
+          >
+
+        </div>
+
+      </section>
+
+
+      <!-- ===============================================
+           THANH TOÁN
+           =============================================== -->
+
+      <section class="form-section">
+
+        <h3>
+          Thanh toán
+        </h3>
+
+        <div class="field">
+
+          <label>
+            Tạm ứng (%)
+          </label>
+
+          <input
+            id="advancePercent"
+            type="number"
+            min="0"
+            max="100"
+            placeholder="%"
+          >
+
+        </div>
+
+        <div class="field">
+
+          <label>
+            Tạm ứng tương đương (VNĐ)
+          </label>
+
+          <input
+            id="advanceAmount"
+            class="fixed-field"
+            type="text"
+            readonly
+          >
+
+        </div>
+
+        <div class="field">
+
+          <label>
+            Thanh toán còn lại (%)
+          </label>
+
+          <input
+            id="remainingPercent"
+            type="number"
+            min="0"
+            max="100"
+            placeholder="%"
+          >
+
+        </div>
+
+        <div class="field">
+
+          <label>
+            Số tài khoản
+          </label>
+
+          <input
+            id="bankAccount"
+            type="text"
+            placeholder="Số tài khoản"
+          >
+
+        </div>
+
+        <div class="field">
+
+          <label>
+            Ngân hàng
+          </label>
+
+          <input
+            id="bankName"
+            type="text"
+            placeholder="Tên ngân hàng"
+          >
+
+        </div>
+
+      </section>
+
+
+      <!-- ===============================================
+           ĐIỀU KIỆN ĐẶC BIỆT
+           =============================================== -->
+
+      <section class="form-section">
+
+        <h3>
+          Điều kiện thi công đặc biệt
+        </h3>
+
+        <label class="check-item">
+
+          <input
+            type="checkbox"
+            id="nightWork"
+          >
+
+          <span>
+            Công trình thi công ban đêm
+          </span>
+
+        </label>
+
+        <div class="field" style="margin-top:15px;">
+
+          <label>
+            Công trình có yêu cầu đặc biệt
+          </label>
+
+          <textarea
+            id="specialRequirement"
+            placeholder="Nếu có"
+          ></textarea>
+
+        </div>
+
+      </section>
+
+
+      <!-- ===============================================
+           BUTTON
+           =============================================== -->
+
+      <button
+        class="print-button"
+        type="button"
+        onclick="window.print()"
+        style="
+          width:100%;
+          margin-top:25px;
+        "
+      >
+        🖨 In / Xuất PDF
+      </button>
+
+      <button
+        type="button"
+        onclick="goBack()"
+        style="
+          width:100%;
+          margin-top:10px;
+          padding:14px;
+          border-radius:11px;
+          border:1px solid #d8e1dd;
+          background:#f4f7f5;
+          color:#46514e;
+          font-size:15px;
+          font-weight:700;
+          cursor:pointer;
+        "
+      >
+        ← Quay lại danh sách văn bản
+      </button>
+
+    </aside>
+
+
+    <!-- ===================================================
+         PREVIEW
+         =================================================== -->
+
+    <section class="preview-panel">
+
+      <p class="preview-label">
+        Bản xem trước A4
+      </p>
+
+
+      <!-- =================================================
+           PAGE 1
+           ================================================= -->
+
+      <article class="a4-page" id="page1">
+
+        <div class="center">
+
+          <div class="national-title">
+            CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM
+          </div>
+
+          <div class="national-subtitle">
+            Độc lập – Tự do – Hạnh phúc
+          </div>
+
+
+          <div class="document-heading">
+            PHỤ LỤC HỢP ĐỒNG THI CÔNG
+          </div>
+
+          <div class="document-number">
+            Số:
+            <span id="pvAppendixNumber">
+              ...../PLHĐ/2026
+            </span>
+          </div>
+
+        </div>
+
+
+        <p style="margin-top:25px;">
+          Hôm nay, ngày
+          <span class="preview-line short" id="pvDay"></span>
+          tháng
+          <span class="preview-line short" id="pvMonth"></span>
+          năm
+          <span id="pvYear">2026</span>,
+          chúng tôi gồm:
+        </p>
+
+
+        <div class="section-heading">
+          BÊN A (BÊN THI CÔNG)
+        </div>
+
+        <p>
+          CÔNG TY CỔ PHẦN GROVA HOLDINGS
+        </p>
+
+        <p>
+          Mã số thuế: 0202328361
+        </p>
+
+        <p>
+          Địa chỉ: 49A/348 Trần Nguyên Hãn,
+          Phường An Biên, Thành phố Hải Phòng
+        </p>
+
+        <p>
+          Đại diện: PHẠM VĂN HỌC
+        </p>
+
+        <p>
+          Chức vụ:
+          <span
+            class="preview-line"
+            id="pvAPosition"
+          ></span>
+        </p>
+
+        <p>
+          Điện thoại:
+          <span
+            class="preview-line"
+            id="pvAPhone"
+          ></span>
+        </p>
+
+
+        <div class="center bold" style="margin:12px 0;">
+          VÀ
+        </div>
+
+
+        <div class="section-heading">
+          BÊN B (BÊN THUÊ THI CÔNG)
+        </div>
+
+        <p>
+          Tên công ty:
+          <span
+            class="preview-line long"
+            id="pvBCompany"
+          ></span>
+        </p>
+
+        <p>
+          Mã số thuế:
+          <span
+            class="preview-line"
+            id="pvBTax"
+          ></span>
+        </p>
+
+        <p>
+          Địa chỉ:
+          <span
+            class="preview-line long"
+            id="pvBAddress"
+          ></span>
+        </p>
+
+        <p>
+          Đại diện:
+          <span
+            class="preview-line"
+            id="pvBRepresentative"
+          ></span>
+        </p>
+
+        <p>
+          Chức vụ:
+          <span
+            class="preview-line"
+            id="pvBPosition"
+          ></span>
+        </p>
+
+        <p>
+          Điện thoại:
+          <span
+            class="preview-line"
+            id="pvBPhone"
+          ></span>
+        </p>
+
+        <p style="margin-top:18px;">
+          Hai bên thống nhất ký Phụ lục công trình
+          với các nội dung như sau:
+        </p>
+
+
+        <div class="section-heading">
+          ĐIỀU 1. THÔNG TIN CÔNG TRÌNH
+        </div>
+
+        <p>
+          Địa chỉ công trình:
+          <span
+            class="preview-line long"
+            id="pvProjectAddress"
+          ></span>
+        </p>
+
+        <p>
+          Chủ đầu tư:
+          <span
+            class="preview-line long"
+            id="pvInvestor"
+          ></span>
+        </p>
+
+        <p>
+          Thông số phục vụ thi công khung thang máy:
+        </p>
+
+        <p class="bullet">
+           Số tầng lắp đặt:
+          <span
+            class="preview-line short"
+            id="pvFloorCount"
+          ></span>
+        </p>
+
+        <p class="bullet">
+           Loại khung:
+          <span class="preview-checkbox">
+            ☐ Khung thép
+            ☐ Khung thép bọc inox
+            ☐ Khung nhôm
+          </span>
+        </p>
+
+        <p class="bullet">
+           Vị trí lắp đặt:
+          <span class="preview-checkbox">
+            ☐ Trong nhà
+            ☐ Ngoài trời
+          </span>
+        </p>
+
+        <p class="bullet">
+           Ghi chú kỹ thuật khác (nếu có):
+        </p>
+
+        <p>
+          <span
+            class="preview-line long"
+            id="pvTechnicalNote"
+          ></span>
+        </p>
+
+      </article>
+
+
+      <!-- =================================================
+           PAGE 2
+           ================================================= -->
+
+      <article class="a4-page">
+
+        <div class="section-heading">
+          ĐIỀU 2. PHẠM VI CÔNG VIỆC
+        </div>
+
+        <p>
+          Bên A thực hiện:
+        </p>
+
+        <div id="pvWorkList">
+
+          <p class="bullet">
+            ☐ Lắp đặt khung thép thang máy
+          </p>
+
+          <p class="bullet">
+            ☐ Căn chỉnh kết cấu khung
+          </p>
+
+          <p class="bullet">
+            ☐ Liên kết bulong, bản mã
+          </p>
+
+          <p class="bullet">
+            ☐ Bọc bảo vệ chống xước sau lắp đặt
+          </p>
+
+          <p class="bullet">
+            ☐ Vệ sinh khu vực thi công
+          </p>
+
+          <p class="bullet">
+            ☐ Hỗ trợ nghiệm thu kỹ thuật
+          </p>
+
+          <p class="bullet">
+            ☐ Công việc khác:
+            <span
+              class="preview-line"
+              id="pvOtherWork"
+            ></span>
+          </p>
+
+        </div>
+
+
+        <div class="section-heading">
+          ĐIỀU 3. GIÁ TRỊ CÔNG TRÌNH
+        </div>
+
+
+        <table class="preview-table">
+
+          <thead>
+
+            <tr>
+              <th>
+                Nội dung
+              </th>
+
+              <th>
+                Đơn vị
+              </th>
+
+              <th>
+                Khối lượng
+              </th>
+
+              <th>
+                Đơn giá (VNĐ)
+              </th>
+
+              <th>
+                Thành tiền (VNĐ)
+              </th>
+            </tr>
+
+          </thead>
+
+          <tbody>
+
+            <tr>
+
+              <td>
+                Thi công lắp đặt khung thép
+                thang máy
+              </td>
+
+              <td style="text-align:center;">
+                Stop
+              </td>
+
+              <td
+                style="text-align:center;"
+                id="pvQuantity"
+              >
+                ......
+              </td>
+
+              <td
+                style="text-align:right;"
+                id="pvUnitPrice"
+              >
+                2.500.000
+              </td>
+
+              <td
+                style="text-align:right;"
+                id="pvTotalValueTable"
+              >
+                ..............
+              </td>
+
+            </tr>
+
+          </tbody>
+
+        </table>
+
+
+        <p>
+          <strong>
+            TỔNG GIÁ TRỊ PHỤ LỤC:
+          </strong>
+
+          <span id="pvTotalValue">
+            .................................................. VNĐ
+          </span>
+        </p>
+
+        <p>
+          (Bằng chữ:
+          <span
+            class="preview-line long"
+            id="pvTotalWords"
+          ></span>)
+        </p>
+
+
+        <p style="margin-top:15px;">
+          Giá trên:
+        </p>
+
+        <p class="bullet">
+          ☑ Đã bao gồm VAT
+        </p>
+
+        <p class="bullet">
+          ☑ Bao gồm nhân công lắp đặt
+        </p>
+
+        <p class="bullet">
+          ☑ Bao gồm bọc bảo vệ chống xước sau thi công
+        </p>
+
+        <p class="bullet">
+          ☑ Chưa bao gồm các hạng mục phát sinh
+          ngoài phạm vi hợp đồng (nếu có)
+        </p>
+
+
+        <div class="section-heading">
+          ĐIỀU 4. TIẾN ĐỘ VÀ THANH TOÁN
+        </div>
+
+        <p class="bold">
+          1. Tiến độ thi công
+        </p>
+
+        <p class="bullet">
+           Ngày bàn giao mặt bằng:
+          <span id="pvHandoverDate">
+            ..... / ..... / 20.....
+          </span>
+        </p>
+
+        <p class="bullet">
+           Ngày khởi công:
+          <span id="pvStartDate">
+            ..... / ..... / 20.....
+          </span>
+        </p>
+
+        <p class="bullet">
+           Thời gian thực hiện:
+          <span id="pvDuration">
+            ..........
+          </span>
+          ngày
+        </p>
+
+        <p class="bullet">
+           Ngày hoàn thành dự kiến:
+          <span id="pvFinishDate">
+            ..... / ..... / 20.....
+          </span>
+        </p>
+
+
+        <p class="bold">
+          2. Thanh toán
+        </p>
+
+        <p>
+          ☐ Tạm ứng:
+          <span id="pvAdvancePercent">
+            ..........
+          </span>
+          % tương đương:
+          <span id="pvAdvanceAmount">
+            ........................
+          </span>
+          VNĐ
+        </p>
+
+        <p>
+          ☐ Thanh toán còn lại:
+          <span id="pvRemainingPercent">
+            ..........
+          </span>
+          % sau khi nghiệm thu kỹ thuật khung thép.
+        </p>
+
+      </article>
+
+
+      <!-- =================================================
+           PAGE 3
+           ================================================= -->
+
+      <article class="a4-page">
+
+        <p>
+          Hình thức thanh toán:
+        </p>
+
+        <p>
+          ☑ Chuyển khoản
+        </p>
+
+
+        <p style="margin-top:15px;">
+          Thông tin tài khoản:
+        </p>
+
+        <p>
+          Tên tài khoản:
+          CÔNG TY CỔ PHẦN GROVA HOLDINGS
+        </p>
+
+        <p>
+          Số tài khoản:
+          <span
+            class="preview-line"
+            id="pvBankAccount"
+          ></span>
+        </p>
+
+        <p>
+          Ngân hàng:
+          <span
+            class="preview-line"
+            id="pvBankName"
+          ></span>
+        </p>
+
+
+        <p class="bold" style="margin-top:18px;">
+          Lưu ý:
+        </p>
+
+        <p>
+          Các khoảng thời gian chờ điện, chờ mặt bằng,
+          chờ vật tư, chờ thiết bị nâng hạ hoặc chờ xử lý
+          sai sót công trình không tính vào tiến độ thi công
+          của Bên A.
+        </p>
+
+
+        <div class="section-heading">
+          ĐIỀU 5. ĐIỀU KIỆN THI CÔNG ĐẶC BIỆT
+        </div>
+
+        <p>
+          <span id="pvNightWork">
+            ☐
+          </span>
+          Công trình thi công ban đêm
+        </p>
+
+        <p>
+          ☐ Công trình có yêu cầu đặc biệt:
+        </p>
+
+        <p>
+          <span
+            class="preview-line long"
+            id="pvSpecialRequirement"
+          ></span>
+        </p>
+
+        <p>
+          <span class="preview-line long"></span>
+        </p>
+
+
+        <!-- GIỮ NGUYÊN ĐIỀU 7 THEO FILE GỐC -->
+
+        <div class="section-heading">
+          ĐIỀU 7. PHÁT SINH
+        </div>
+
+        <p>
+          Các phát sinh ngoài phạm vi hợp đồng nguyên tắc
+          hoặc ngoài nội dung phụ lục này sẽ được xác nhận
+          riêng bằng:
+        </p>
+
+        <p class="bullet">
+           Biên bản phát sinh; Email, Zalo, Viber , Wechat …
+        </p>
+
+        <p class="bullet">
+           Tin nhắn của người phụ trách công trình.
+        </p>
+
+
+        <div class="section-heading">
+          ĐIỀU 8. HIỆU LỰC
+        </div>
+
+        <p>
+          Phụ lục này là một phần không tách rời của
+          Hợp đồng nguyên tắc số 01/2026/HĐNT.
+        </p>
+
+        <p>
+          Các nội dung không quy định trong phụ lục này
+          được áp dụng theo Hợp đồng nguyên tắc số
+          01/2026/HĐNT.
+        </p>
+
+        <p>
+          Phụ lục có hiệu lực kể từ ngày ký.
+        </p>
+
+
+        <div class="signature-grid">
+
+          <div>
+
+            <div class="signature-title">
+              ĐẠI DIỆN BÊN A
+            </div>
+
+            <div class="signature-company">
+              CÔNG TY CỔ PHẦN GROVA HOLDINGS
+            </div>
+
+            <div class="signature-space"></div>
+
+            <div>
+              (Ký, ghi rõ họ tên, đóng dấu)
+            </div>
+
+          </div>
+
+
+          <div>
+
+            <div class="signature-title">
+              ĐẠI DIỆN BÊN B
+            </div>
+
+            <div class="signature-space"></div>
+
+            <div>
+              (Ký, ghi rõ họ tên, đóng dấu)
+            </div>
+
+          </div>
+
+        </div>
+
+      </article>
+
+    </section>
+
+  </main>
+
+</div>
+
+
+<script>
+
+  /* =====================================================
+     HELPERS
+     ===================================================== */
+
+  function getValue(id) {
+
+    const element =
+      document.getElementById(id);
+
+    if (!element) return "";
+
+    return element.value || "";
+
+  }
+
+
+  function setText(id, value) {
+
+    const element =
+      document.getElementById(id);
+
+    if (!element) return;
+
+    element.textContent =
+      value || "";
+  }
+
+
+  function formatMoney(value) {
+
+    const number =
+      Number(value || 0);
+
+    if (!number) return "";
+
+    return new Intl.NumberFormat(
+      "vi-VN"
+    ).format(number);
+  }
+
+
+  function formatDate(value) {
+
+    if (!value) {
+      return "..... / ..... / 20.....";
+    }
+
+    const parts =
+      value.split("-");
+
+    if (parts.length !== 3) {
+      return value;
+    }
+
+    return (
+      parts[2] +
+      " / " +
+      parts[1] +
+      " / " +
+      parts[0]
+    );
+  }
+
+
+  /* =====================================================
+     UPDATE PREVIEW
+     ===================================================== */
+
+  function updatePreview() {
+
+    /* -----------------------------------------------
+       THÔNG TIN PHỤ LỤC
+       ----------------------------------------------- */
+
+    setText(
+      "pvAppendixNumber",
+      getValue("appendixNumber") ||
+      "...../PLHĐ/2026"
+    );
+
+    setText(
+      "pvDay",
+      getValue("signDay")
+    );
+
+    setText(
+      "pvMonth",
+      getValue("signMonth")
+    );
+
+    setText(
+      "pvYear",
+      getValue("signYear") || "2026"
+    );
+
+
+    /* -----------------------------------------------
+       BÊN A
+       ----------------------------------------------- */
+
+    setText(
+      "pvAPosition",
+      getValue("aPosition")
+    );
+
+    setText(
+      "pvAPhone",
+      getValue("aPhone")
+    );
+
+
+    /* -----------------------------------------------
+       BÊN B
+       ----------------------------------------------- */
+
+    setText(
+      "pvBCompany",
+      getValue("bCompany")
+    );
+
+    setText(
+      "pvBTax",
+      getValue("bTax")
+    );
+
+    setText(
+      "pvBAddress",
+      getValue("bAddress")
+    );
+
+    setText(
+      "pvBRepresentative",
+      getValue("bRepresentative")
+    );
+
+    setText(
+      "pvBPosition",
+      getValue("bPosition")
+    );
+
+    setText(
+      "pvBPhone",
+      getValue("bPhone")
+    );
+
+
+    /* -----------------------------------------------
+       CÔNG TRÌNH
+       ----------------------------------------------- */
+
+    setText(
+      "pvProjectAddress",
+      getValue("projectAddress")
+    );
+
+    setText(
+      "pvInvestor",
+      getValue("investor")
+    );
+
+    setText(
+      "pvFloorCount",
+      getValue("floorCount")
+    );
+
+    setText(
+      "pvTechnicalNote",
+      getValue("technicalNote")
+    );
+
+
+    /* -----------------------------------------------
+       LOẠI KHUNG
+       ----------------------------------------------- */
+
+    const frameType =
+      getValue("frameType");
+
+    const frameText =
+      frameType === "Khung thép"
+        ? "☑ Khung thép   ☐ Khung thép bọc inox   ☐ Khung nhôm"
+        : frameType === "Khung thép bọc inox"
+          ? "☐ Khung thép   ☑ Khung thép bọc inox   ☐ Khung nhôm"
+          : frameType === "Khung nhôm"
+            ? "☐ Khung thép   ☐ Khung thép bọc inox   ☑ Khung nhôm"
+            : "☐ Khung thép   ☐ Khung thép bọc inox   ☐ Khung nhôm";
+
+    const frameContainer =
+      document.querySelector(
+        "#pvFloorCount"
+      )?.parentElement?.nextElementSibling;
+
+    if (frameContainer) {
+      frameContainer.innerHTML =
+        " Loại khung: " +
+        frameText;
+    }
+
+
+    /* -----------------------------------------------
+       VỊ TRÍ
+       ----------------------------------------------- */
+
+    const location =
+      getValue("installationLocation");
+
+    const locationText =
+      location === "Trong nhà"
+        ? "☑ Trong nhà   ☐ Ngoài trời"
+        : location === "Ngoài trời"
+          ? "☐ Trong nhà   ☑ Ngoài trời"
+          : "☐ Trong nhà   ☐ Ngoài trời";
+
+    const locationContainer =
+      document.querySelector(
+        "#pvFloorCount"
+      )?.parentElement?.nextElementSibling
+        ?.nextElementSibling;
+
+    if (locationContainer) {
+      locationContainer.innerHTML =
+        " Vị trí lắp đặt: " +
+        locationText;
+    }
+
+
+    /* -----------------------------------------------
+       PHẠM VI CÔNG VIỆC
+       ----------------------------------------------- */
+
+    const works = [
+      {
+        id: "work1",
+        text: "Lắp đặt khung thép thang máy"
+      },
+      {
+        id: "work2",
+        text: "Căn chỉnh kết cấu khung"
+      },
+      {
+        id: "work3",
+        text: "Liên kết bulong, bản mã"
+      },
+      {
+        id: "work4",
+        text: "Bọc bảo vệ chống xước sau lắp đặt"
+      },
+      {
+        id: "work5",
+        text: "Vệ sinh khu vực thi công"
+      },
+      {
+        id: "work6",
+        text: "Hỗ trợ nghiệm thu kỹ thuật"
+      }
+    ];
+
+    const workList =
+      document.getElementById(
+        "pvWorkList"
+      );
+
+    if (workList) {
+
+      let html = "";
+
+      works.forEach(work => {
+
+        const checked =
+          document.getElementById(
+            work.id
+          )?.checked;
+
+        html += `
+          <p class="bullet">
+            ${checked ? "☑" : "☐"}
+            ${work.text}
+          </p>
+        `;
+
+      });
+
+      html += `
+        <p class="bullet">
+          ☐ Công việc khác:
+          <span class="preview-line">
+            ${escapeHTML(
+              getValue("otherWork")
+            )}
+          </span>
+        </p>
+      `;
+
+      workList.innerHTML = html;
+    }
+
+
+    /* -----------------------------------------------
+       GIÁ TRỊ
+       ----------------------------------------------- */
+
+    const quantity =
+      Number(
+        getValue("quantity") || 0
+      );
+
+    const unitPrice =
+      Number(
+        getValue("unitPrice") || 0
+      );
+
+    const total =
+      quantity * unitPrice;
+
+    setText(
+      "pvQuantity",
+      quantity
+        ? quantity
+        : "......"
+    );
+
+    setText(
+      "pvUnitPrice",
+      unitPrice
+        ? formatMoney(unitPrice)
+        : "2.500.000"
+    );
+
+    setText(
+      "pvTotalValueTable",
+      total
+        ? formatMoney(total)
+        : ".............."
+    );
+
+    setText(
+      "pvTotalValue",
+      total
+        ? formatMoney(total) + " VNĐ"
+        : ".................................................. VNĐ"
+    );
+
+    setText(
+      "pvTotalWords",
+      getValue("totalWords")
+    );
+
+
+    /* -----------------------------------------------
+       TIẾN ĐỘ
+       ----------------------------------------------- */
+
+    setText(
+      "pvHandoverDate",
+      formatDate(
+        getValue("handoverDate")
+      )
+    );
+
+    setText(
+      "pvStartDate",
+      formatDate(
+        getValue("startDate")
+      )
+    );
+
+    setText(
+      "pvDuration",
+      getValue("duration") ||
+      ".........."
+    );
+
+    setText(
+      "pvFinishDate",
+      formatDate(
+        getValue("finishDate")
+      )
+    );
+
+
+    /* -----------------------------------------------
+       THANH TOÁN
+       ----------------------------------------------- */
+
+    const advancePercent =
+      Number(
+        getValue("advancePercent") || 0
+      );
+
+    const advanceAmount =
+      total *
+      advancePercent /
+      100;
+
+    setText(
+      "pvAdvancePercent",
+      advancePercent
+        ? advancePercent
+        : ".........."
+    );
+
+    setText(
+      "pvAdvanceAmount",
+      advanceAmount
+        ? formatMoney(advanceAmount)
+        : "........................"
+    );
+
+    setText(
+      "pvRemainingPercent",
+      getValue("remainingPercent") ||
+      ".........."
+    );
+
+    setText(
+      "pvBankAccount",
+      getValue("bankAccount")
+    );
+
+    setText(
+      "pvBankName",
+      getValue("bankName")
+    );
+
+
+    /* -----------------------------------------------
+       ĐIỀU KIỆN ĐẶC BIỆT
+       ----------------------------------------------- */
+
+    setText(
+      "pvNightWork",
+      document.getElementById(
+        "nightWork"
+      )?.checked
+        ? "☑"
+        : "☐"
+    );
+
+    setText(
+      "pvSpecialRequirement",
+      getValue("specialRequirement")
+    );
+
+  }
+
+
+  /* =====================================================
+     ESCAPE HTML
+     ===================================================== */
+
+  function escapeHTML(value) {
+
+    return String(value || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+
+  /* =====================================================
+     LIVE UPDATE
+     ===================================================== */
+
+  document.addEventListener(
+    "input",
+    updatePreview
+  );
+
+  document.addEventListener(
+    "change",
+    updatePreview
+  );
+
+
+  /* =====================================================
+     BACK
+     ===================================================== */
+
+  function goBack() {
+
+    if (document.referrer) {
+
+      history.back();
+
+    } else {
+
+      window.location.href =
+        "../index.html";
+
+    }
+
+  }
+
+
+  /* =====================================================
+     LOAD GROVA DATA
+     ===================================================== */
+
+  function loadGrovaData() {
+
+    try {
+
+      const data =
+        window.GROVA_DATA ||
+        window.grovaData ||
+        window.GROVA;
+
+      if (!data) {
+        updatePreview();
+        return;
+      }
+
+      const company =
+        data.company || {};
+
+      const companyName =
+        company.name ||
+        "CÔNG TY CỔ PHẦN GROVA HOLDINGS";
+
+      const taxCode =
+        company.taxCode ||
+        "0202328361";
+
+      const address =
+        company.address ||
+        "49A/348 Trần Nguyên Hãn, Phường An Biên, Thành phố Hải Phòng";
+
+      const representative =
+        company.representative ||
+        "PHẠM VĂN HỌC";
+
+
+      /*
+       * Cập nhật các trường cố định
+       */
+      const fixedInputs =
+        document.querySelectorAll(
+          ".fixed-field"
+        );
+
+      /*
+       * Không cần ghi đè toàn bộ,
+       * các giá trị đã được khai báo
+       * đúng theo dữ liệu GROVA.
+       */
+
+      console.log(
+        "GROVA DATA loaded:",
+        {
+          companyName,
+          taxCode,
+          address,
+          representative
+        }
+      );
+
+    } catch (error) {
+
+      console.warn(
+        "Không thể tải dữ liệu GROVA:",
+        error
+      );
+
+    }
+
+    updatePreview();
+  }
+
+
+  /* =====================================================
+     INIT
+     ===================================================== */
+
+  document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+      loadGrovaData();
+
+      updatePreview();
+
+    }
+  );
+
+</script>
+
+</body>
+
+</html>
