@@ -1075,7 +1075,194 @@
      HISTORY PAGE
      ========================================== */
 
+    /* ==========================================
+     HISTORY PAGE
+     ========================================== */
+
   function renderHistoryDocuments() {
+
+    /*
+     * Trang Lịch sử hiện tại trong index.html
+     * dùng #recentDocuments.
+     *
+     * Dashboard cũng có #recentDocuments,
+     * vì vậy phải tìm riêng bên trong
+     * #page-history.
+     */
+
+    var historyPage =
+      $("#page-history");
+
+
+    if (!historyPage) {
+      return;
+    }
+
+
+    var container =
+      historyPage.querySelector(
+        "#historyDocuments"
+      );
+
+
+    /*
+     * Nếu không có #historyDocuments,
+     * sử dụng #recentDocuments của riêng
+     * trang Lịch sử.
+     */
+
+    if (!container) {
+
+      container =
+        historyPage.querySelector(
+          "#recentDocuments"
+        );
+
+    }
+
+
+    if (!container) {
+      return;
+    }
+
+
+    var list =
+      getRecentDocuments();
+
+
+    if (!list.length) {
+
+      renderEmptyState(
+        container,
+        true
+      );
+
+      return;
+
+    }
+
+
+    container.innerHTML = "";
+
+
+    /* ========================================
+       THANH CÔNG CỤ
+       ======================================== */
+
+    var toolbar =
+      document.createElement(
+        "div"
+      );
+
+
+    toolbar.className =
+      "history-toolbar";
+
+
+    var count =
+      document.createElement(
+        "span"
+      );
+
+
+    count.className =
+      "history-count";
+
+
+    count.textContent =
+      list.length +
+      " hoạt động";
+
+
+    toolbar.appendChild(
+      count
+    );
+
+
+    var clear =
+      document.createElement(
+        "button"
+      );
+
+
+    clear.type =
+      "button";
+
+
+    clear.className =
+      "secondary-button history-clear-button";
+
+
+    clear.textContent =
+      "Xóa lịch sử";
+
+
+    clear.addEventListener(
+      "click",
+      function () {
+
+        var confirmed =
+          window.confirm(
+            "Bạn có chắc muốn xóa toàn bộ lịch sử hoạt động?"
+          );
+
+
+        if (!confirmed) {
+          return;
+        }
+
+
+        try {
+
+          localStorage.removeItem(
+            "GROVA_DOCUMENT_RECENT"
+          );
+
+        } catch (error) {
+
+          console.warn(
+            "Không thể xóa lịch sử.",
+            error
+          );
+
+        }
+
+
+        renderRecentDocuments();
+
+        renderHistoryDocuments();
+
+        updateStats();
+
+      }
+    );
+
+
+    toolbar.appendChild(
+      clear
+    );
+
+
+    container.appendChild(
+      toolbar
+    );
+
+
+    /* ========================================
+       DANH SÁCH LỊCH SỬ
+       ======================================== */
+
+    list.forEach(
+      function (item) {
+
+        container.appendChild(
+          createHistoryRow(item)
+        );
+
+      }
+    );
+
+  } {
 
     var container =
       ensureHistoryContainer();
