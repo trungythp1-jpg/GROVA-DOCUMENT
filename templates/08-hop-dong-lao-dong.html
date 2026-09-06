@@ -2114,8 +2114,11 @@
                 NGƯỜI SỬ DỤNG LAO ĐỘNG
               </div>
 
-              <div class="signature-company">
-                &nbsp;
+              <div
+                class="signature-company"
+                id="previewSignatureCompany"
+              >
+                CÔNG TY CỔ PHẦN GROVA HOLDINGS
               </div>
 
               <div class="signature-space"></div>
@@ -2143,6 +2146,36 @@
 
   const STORAGE_KEY =
     "grova_document_template_08_hop_dong_lao_dong";
+
+  /*
+    ============================================================
+    GROVA COMPANY SETTINGS
+    Đọc thông tin công ty dùng chung từ GROVA DOCUMENT
+    ============================================================
+  */
+
+  const SETTINGS_KEY =
+    "GROVA_SETTINGS_V1";
+
+
+  const DEFAULT_SETTINGS = {
+
+    companyName:
+      "CÔNG TY CỔ PHẦN GROVA HOLDINGS",
+
+    taxCode:
+      "0202328361",
+
+    address:
+      "49A/348 Trần Nguyên Hãn, Phường An Biên, Thành phố Hải Phòng",
+
+    representative:
+      "PHẠM VĂN HỌC",
+
+    position:
+      "Giám Đốc"
+
+  };
 
 
   const fields = [
@@ -2221,18 +2254,256 @@
   }
 
 
+  /*
+    ============================================================
+    ĐỌC CÀI ĐẶT CÔNG TY
+    ============================================================
+  */
+
+  function getGrovaSettings(){
+
+    try{
+
+      const raw =
+        localStorage.getItem(
+          SETTINGS_KEY
+        );
+
+
+      if(!raw){
+
+        return {
+          ...DEFAULT_SETTINGS
+        };
+
+      }
+
+
+      const saved =
+        JSON.parse(raw);
+
+
+      return {
+        ...DEFAULT_SETTINGS,
+        ...(saved || {})
+      };
+
+    }catch(error){
+
+      console.warn(
+        "Không thể đọc GROVA_SETTINGS_V1:",
+        error
+      );
+
+
+      return {
+        ...DEFAULT_SETTINGS
+      };
+
+    }
+
+  }
+
+
+  function safeText(value,fallback){
+
+    const text =
+      String(value ?? "").trim();
+
+
+    return text ||
+      fallback;
+
+  }
+
+
+  /*
+    ============================================================
+    ĐƯA CÀI ĐẶT CÔNG TY VÀO FORM BÊN A
+    ============================================================
+  */
+
+  function applyCompanySettingsToForm(){
+
+    const settings =
+      getGrovaSettings();
+
+
+    const companyName =
+      safeText(
+        settings.companyName,
+        DEFAULT_SETTINGS.companyName
+      );
+
+
+    const companyAddress =
+      safeText(
+        settings.address,
+        DEFAULT_SETTINGS.address
+      );
+
+
+    const companyTax =
+      safeText(
+        settings.taxCode,
+        DEFAULT_SETTINGS.taxCode
+      );
+
+
+    const representative =
+      safeText(
+        settings.representative,
+        DEFAULT_SETTINGS.representative
+      );
+
+
+    const position =
+      safeText(
+        settings.position,
+        DEFAULT_SETTINGS.position
+      );
+
+
+    const companyNameInput =
+      $("companyName");
+
+
+    if(companyNameInput){
+
+      companyNameInput.value =
+        companyName;
+
+    }
+
+
+    const companyAddressInput =
+      $("companyAddress");
+
+
+    if(companyAddressInput){
+
+      companyAddressInput.value =
+        companyAddress;
+
+    }
+
+
+    const companyTaxInput =
+      $("companyTax");
+
+
+    if(companyTaxInput){
+
+      companyTaxInput.value =
+        companyTax;
+
+    }
+
+
+    const companyRepresentativeInput =
+      $("companyRepresentative");
+
+
+    if(companyRepresentativeInput){
+
+      companyRepresentativeInput.value =
+        representative;
+
+    }
+
+
+    const companyPositionInput =
+      $("companyPosition");
+
+
+    if(companyPositionInput){
+
+      companyPositionInput.value =
+        position;
+
+    }
+
+  }
+
+
+  /*
+    ============================================================
+    CẬP NHẬT THÔNG TIN CÔNG TY TRÊN BẢN IN
+    ============================================================
+  */
+
+  function updateCompanyInformation(){
+
+    const settings =
+      getGrovaSettings();
+
+
+    const companyName =
+      safeText(
+        settings.companyName,
+        DEFAULT_SETTINGS.companyName
+      );
+
+
+    const taxCode =
+      safeText(
+        settings.taxCode,
+        DEFAULT_SETTINGS.taxCode
+      );
+
+
+    const address =
+      safeText(
+        settings.address,
+        DEFAULT_SETTINGS.address
+      );
+
+
+    setPreview(
+      "previewCompany",
+      companyName,
+      DEFAULT_SETTINGS.companyName
+    );
+
+
+    setPreview(
+      "previewCompanyAddress",
+      address,
+      DEFAULT_SETTINGS.address
+    );
+
+
+    setPreview(
+      "previewCompanyTax",
+      taxCode,
+      DEFAULT_SETTINGS.taxCode
+    );
+
+
+    setPreview(
+      "previewSignatureCompany",
+      companyName,
+      DEFAULT_SETTINGS.companyName
+    );
+
+  }
+
+
   function formatDateVN(value){
 
     if(!value){
       return "......";
     }
 
+
     const parts =
       value.split("-");
+
 
     if(parts.length !== 3){
       return value;
     }
+
 
     return `${parts[2]}/${parts[1]}/${parts[0]}`;
 
@@ -2240,6 +2511,13 @@
 
 
   function updatePreview(){
+
+    /*
+      Thông tin công ty lấy từ Cài đặt GROVA DOCUMENT
+    */
+
+    updateCompanyInformation();
+
 
     setPreview(
       "previewContractDate",
@@ -2253,35 +2531,35 @@
     setPreview(
       "previewCompany",
       getValue("companyName"),
-      "CÔNG TY CỔ PHẦN GROVAHOLDINGS SJC"
+      DEFAULT_SETTINGS.companyName
     );
 
 
     setPreview(
       "previewCompanyAddress",
       getValue("companyAddress"),
-      "Số 49A/348 Trần Nguyên Hãn , Phường An Biên, Thành phố Hải Phòng, Việt Nam"
+      DEFAULT_SETTINGS.address
     );
 
 
     setPreview(
       "previewCompanyTax",
       getValue("companyTax"),
-      "0202328361"
+      DEFAULT_SETTINGS.taxCode
     );
 
 
     setPreview(
       "previewCompanyRepresentative",
       getValue("companyRepresentative"),
-      "Phạm Văn Học"
+      DEFAULT_SETTINGS.representative
     );
 
 
     setPreview(
       "previewCompanyPosition",
       getValue("companyPosition"),
-      "Giám đốc"
+      DEFAULT_SETTINGS.position
     );
 
 
@@ -2446,6 +2724,7 @@
 
       const element =
         $(id);
+
 
       if(element){
 
@@ -2613,6 +2892,31 @@
   }
 
 
+  /*
+    ============================================================
+    ĐỒNG BỘ KHI CÀI ĐẶT GROVA DOCUMENT THAY ĐỔI
+    ============================================================
+  */
+
+  window.addEventListener(
+    "storage",
+    function(event){
+
+      if(
+        event.key === SETTINGS_KEY ||
+        event.key === null
+      ){
+
+        applyCompanySettingsToForm();
+
+        updatePreview();
+
+      }
+
+    }
+  );
+
+
   document.addEventListener(
     "DOMContentLoaded",
     function(){
@@ -2620,6 +2924,14 @@
       loadDraft();
 
       setDefaultDate();
+
+      /*
+        Cài đặt công ty được áp dụng sau khi đọc bản nháp.
+        Vì vậy thông tin công ty dùng chung của GROVA
+        sẽ luôn được ưu tiên.
+      */
+
+      applyCompanySettingsToForm();
 
 
       fields.forEach(id => {
