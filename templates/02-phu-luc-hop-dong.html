@@ -1202,23 +1202,37 @@ li{
           </div>
 
           <div class="party-line">
-            CÔNG TY CỔ PHẦN GROVA HOLDINGS
+            <span id="previewCompanyName">
+              CÔNG TY CỔ PHẦN GROVA HOLDINGS
+            </span>
           </div>
 
           <div class="party-line">
-            Mã số thuế: 0202328361
+            Mã số thuế:
+            <span id="previewCompanyTaxCode">
+              0202328361
+            </span>
           </div>
 
           <div class="party-line">
-            Địa chỉ: 49A/348 Trần Nguyên Hãn, Phường An Biên, Thành phố Hải Phòng
+            Địa chỉ:
+            <span id="previewCompanyAddress">
+              49A/348 Trần Nguyên Hãn, Phường An Biên, Thành phố Hải Phòng
+            </span>
           </div>
 
           <div class="party-line">
-            Đại diện: PHẠM VĂN HỌC
+            Đại diện:
+            <span id="previewCompanyRepresentative">
+              PHẠM VĂN HỌC
+            </span>
           </div>
 
           <div class="party-line">
-            Chức vụ: Giám Đốc
+            Chức vụ:
+            <span id="previewCompanyPosition">
+              Giám Đốc
+            </span>
           </div>
 
           <div class="party-line">
@@ -1568,7 +1582,10 @@ li{
           </p>
 
           <p class="indent">
-            Tên tài khoản: CÔNG TY CỔ PHẦN GROVA HOLDINGS
+            Tên tài khoản:
+            <span id="previewAccountName">
+              CÔNG TY CỔ PHẦN GROVA HOLDINGS
+            </span>
           </p>
 
           <p class="indent">
@@ -1697,7 +1714,10 @@ li{
               ĐẠI DIỆN BÊN A
             </div>
 
-            <div class="signature-company">
+            <div
+              class="signature-company"
+              id="previewSignatureCompany"
+            >
               CÔNG TY CỔ PHẦN GROVA HOLDINGS
             </div>
 
@@ -1749,13 +1769,189 @@ const COUNTER_KEY =
 const DRAFT_KEY =
   "grova_document_template_02";
 
+const SETTINGS_KEY =
+  "GROVA_SETTINGS_V1";
+
+
+/* =========================
+   DEFAULT COMPANY SETTINGS
+========================= */
+
+function getGrovaSettings(){
+
+  const defaults = {
+
+    companyName:
+      "CÔNG TY CỔ PHẦN GROVA HOLDINGS",
+
+    taxCode:
+      "0202328361",
+
+    address:
+      "49A/348 Trần Nguyên Hãn, Phường An Biên, Thành phố Hải Phòng",
+
+    representative:
+      "PHẠM VĂN HỌC",
+
+    position:
+      "Giám Đốc"
+
+  };
+
+
+  try{
+
+    const raw =
+      localStorage.getItem(
+        SETTINGS_KEY
+      );
+
+    if(!raw){
+      return defaults;
+    }
+
+
+    const saved =
+      JSON.parse(raw);
+
+
+    return {
+      ...defaults,
+      ...(saved || {})
+    };
+
+  }catch(error){
+
+    console.warn(
+      "Không thể đọc cài đặt GROVA:",
+      error
+    );
+
+    return defaults;
+
+  }
+
+}
+
+
+/* =========================
+   UPDATE COMPANY INFORMATION
+========================= */
+
+function updateCompanyInformation(){
+
+  const settings =
+    getGrovaSettings();
+
+
+  const companyName =
+    settings.companyName ||
+    "CÔNG TY CỔ PHẦN GROVA HOLDINGS";
+
+  const taxCode =
+    settings.taxCode ||
+    "0202328361";
+
+  const address =
+    settings.address ||
+    "49A/348 Trần Nguyên Hãn, Phường An Biên, Thành phố Hải Phòng";
+
+  const representative =
+    settings.representative ||
+    "PHẠM VĂN HỌC";
+
+  const position =
+    settings.position ||
+    "Giám Đốc";
+
+
+  const companyNameEl =
+    $("previewCompanyName");
+
+  if(companyNameEl){
+
+    companyNameEl.textContent =
+      companyName;
+
+  }
+
+
+  const taxCodeEl =
+    $("previewCompanyTaxCode");
+
+  if(taxCodeEl){
+
+    taxCodeEl.textContent =
+      taxCode;
+
+  }
+
+
+  const addressEl =
+    $("previewCompanyAddress");
+
+  if(addressEl){
+
+    addressEl.textContent =
+      address;
+
+  }
+
+
+  const representativeEl =
+    $("previewCompanyRepresentative");
+
+  if(representativeEl){
+
+    representativeEl.textContent =
+      representative;
+
+  }
+
+
+  const positionEl =
+    $("previewCompanyPosition");
+
+  if(positionEl){
+
+    positionEl.textContent =
+      position;
+
+  }
+
+
+  const signatureEl =
+    $("previewSignatureCompany");
+
+  if(signatureEl){
+
+    signatureEl.textContent =
+      companyName;
+
+  }
+
+
+  const accountNameEl =
+    $("previewAccountName");
+
+  if(accountNameEl){
+
+    accountNameEl.textContent =
+      companyName;
+
+  }
+
+}
+
 
 /* =========================
    ELEMENT HELPER
 ========================= */
 
 function $(id){
+
   return document.getElementById(id);
+
 }
 
 
@@ -1771,18 +1967,24 @@ function getNextNumber(){
       10
     );
 
+
   if(current < 1){
+
     current = 1;
+
     localStorage.setItem(
       COUNTER_KEY,
       String(current)
     );
+
   }
+
 
   return String(current)
     .padStart(2,"0")
     + "/PLHĐ/"
     + YEAR;
+
 }
 
 
@@ -1794,19 +1996,24 @@ function getCurrentNumber(){
       10
     );
 
+
   if(current < 1){
+
     current = 1;
 
     localStorage.setItem(
       COUNTER_KEY,
       String(current)
     );
+
   }
+
 
   return String(current)
     .padStart(2,"0")
     + "/PLHĐ/"
     + YEAR;
+
 }
 
 
@@ -1818,17 +2025,21 @@ function increaseNumber(){
       10
     );
 
+
   current++;
+
 
   localStorage.setItem(
     COUNTER_KEY,
     String(current)
   );
 
+
   return String(current)
     .padStart(2,"0")
     + "/PLHĐ/"
     + YEAR;
+
 }
 
 
@@ -1839,7 +2050,10 @@ function increaseNumber(){
 function initializeNumber(){
 
   let current =
-    localStorage.getItem(COUNTER_KEY);
+    localStorage.getItem(
+      COUNTER_KEY
+    );
+
 
   if(!current){
 
@@ -1850,14 +2064,17 @@ function initializeNumber(){
 
   }
 
+
   const number =
     getCurrentNumber();
+
 
   $("appendixNumberDisplay").textContent =
     number;
 
   $("previewAppendixNumber").textContent =
     number;
+
 }
 
 
@@ -1867,13 +2084,20 @@ function initializeNumber(){
 
 function value(id, fallback=""){
 
-  const el = $(id);
+  const el =
+    $(id);
+
 
   if(!el){
+
     return fallback;
+
   }
 
-  return el.value.trim() || fallback;
+
+  return el.value.trim() ||
+    fallback;
+
 }
 
 
@@ -1884,12 +2108,17 @@ function value(id, fallback=""){
 function selectedValues(name){
 
   return Array.from(
+
     document.querySelectorAll(
       'input[name="' + name + '"]:checked'
     )
+
   ).map(
+
     el => el.value
+
   );
+
 }
 
 
@@ -1902,11 +2131,13 @@ function frameDisplay(){
   const selected =
     selectedValues("frameType");
 
+
   return `
     ${selected.includes("Khung thép") ? "☑" : "☐"} Khung thép
     ${selected.includes("Khung thép bọc inox") ? "☑" : "☐"} Khung thép bọc inox
     ${selected.includes("Khung nhôm") ? "☑" : "☐"} Khung nhôm
   `;
+
 }
 
 
@@ -1915,10 +2146,12 @@ function locationDisplay(){
   const selected =
     selectedValues("locationType");
 
+
   return `
     ${selected.includes("Trong nhà") ? "☑" : "☐"} Trong nhà
     ${selected.includes("Ngoài trời") ? "☑" : "☐"} Ngoài trời
   `;
+
 }
 
 
@@ -1928,12 +2161,28 @@ function locationDisplay(){
 
 function updatePreview(){
 
+  /* COMPANY */
+
+  updateCompanyInformation();
+
+
+  /* DATE */
+
   $("previewDay").textContent =
-    value("signDay","......");
+    value(
+      "signDay",
+      "......"
+    );
+
 
   $("previewMonth").textContent =
-    value("signMonth","......");
+    value(
+      "signMonth",
+      "......"
+    );
 
+
+  /* PARTY B */
 
   $("previewPartyBName").textContent =
     value(
@@ -1941,11 +2190,13 @@ function updatePreview(){
       "............................................"
     );
 
+
   $("previewPartyBTax").textContent =
     value(
       "partyBTax",
       "............................................"
     );
+
 
   $("previewPartyBAddress").textContent =
     value(
@@ -1953,17 +2204,20 @@ function updatePreview(){
       ".................................................."
     );
 
+
   $("previewPartyBRepresentative").textContent =
     value(
       "partyBRepresentative",
       "................................................"
     );
 
+
   $("previewPartyBPosition").textContent =
     value(
       "partyBPosition",
       "................................................"
     );
+
 
   $("previewPartyBPhone").textContent =
     value(
@@ -1972,17 +2226,21 @@ function updatePreview(){
     );
 
 
+  /* PROJECT */
+
   $("previewProjectAddress").textContent =
     value(
       "projectAddress",
       "......................................................"
     );
 
+
   $("previewInvestor").textContent =
     value(
       "investor",
       ".........................................................."
     );
+
 
   $("previewFloorCount").textContent =
     value(
@@ -1994,9 +2252,12 @@ function updatePreview(){
   $("previewFrameType").innerHTML =
     frameDisplay();
 
+
   $("previewLocationType").innerHTML =
     locationDisplay();
 
+
+  /* PRICE */
 
   $("previewQuantity").textContent =
     value(
@@ -2004,11 +2265,13 @@ function updatePreview(){
       "......"
     );
 
+
   $("previewUnitPrice").textContent =
     value(
       "unitPrice",
       "2.5400.000"
     );
+
 
   $("previewTotalPrice").textContent =
     value(
@@ -2016,11 +2279,13 @@ function updatePreview(){
       ".............."
     );
 
+
   $("previewAppendixTotal").textContent =
     value(
       "appendixTotal",
       ".................................................."
     );
+
 
   $("previewAmountWords").textContent =
     value(
@@ -2029,11 +2294,14 @@ function updatePreview(){
     );
 
 
+  /* PROGRESS */
+
   $("previewHandoverDate").textContent =
     value(
       "handoverDate",
       "..... / ..... / 20....."
     );
+
 
   $("previewStartDate").textContent =
     value(
@@ -2041,11 +2309,13 @@ function updatePreview(){
       "..... / ..... / 20....."
     );
 
+
   $("previewDuration").textContent =
     value(
       "duration",
       ".........."
     );
+
 
   $("previewExpectedEndDate").textContent =
     value(
@@ -2054,17 +2324,21 @@ function updatePreview(){
     );
 
 
+  /* PAYMENT */
+
   $("previewAdvancePercent").textContent =
     value(
       "advancePercent",
       ".........."
     );
 
+
   $("previewAdvanceAmount").textContent =
     value(
       "advanceAmount",
       "........................"
     );
+
 
   $("previewRemainingPercent").textContent =
     value(
@@ -2073,10 +2347,13 @@ function updatePreview(){
     );
 
 
+  /* SPECIAL CONDITIONS */
+
   $("previewNightWork").textContent =
     $("nightWork").checked
       ? "☑"
       : "☐";
+
 
   $("previewSpecialWork").textContent =
     $("specialWork").checked
@@ -2085,12 +2362,17 @@ function updatePreview(){
 
 
   const special =
-    value("specialCondition","");
+    value(
+      "specialCondition",
+      ""
+    );
+
 
   if(special){
 
     $("previewSpecialLine1").textContent =
       special;
+
 
     $("previewSpecialLine2").style.display =
       "none";
@@ -2100,11 +2382,14 @@ function updatePreview(){
     $("previewSpecialLine1").textContent =
       "";
 
+
     $("previewSpecialLine2").style.display =
       "block";
 
   }
 
+
+  /* CONTRACT REFERENCE */
 
   const reference =
     value(
@@ -2112,12 +2397,16 @@ function updatePreview(){
       "[REFERENCE]"
     );
 
+
   $("previewContractReference1").textContent =
     reference;
+
 
   $("previewContractReference2").textContent =
     reference;
 
+
+  /* SAVE */
 
   saveDraft();
 
@@ -2131,6 +2420,7 @@ function updatePreview(){
 function saveDraft(){
 
   const data = {};
+
 
   document
     .querySelectorAll(
@@ -2154,10 +2444,15 @@ function saveDraft(){
 
 
   data.frameType =
-    selectedValues("frameType");
+    selectedValues(
+      "frameType"
+    );
+
 
   data.locationType =
-    selectedValues("locationType");
+    selectedValues(
+      "locationType"
+    );
 
 
   localStorage.setItem(
@@ -2175,11 +2470,17 @@ function saveDraft(){
 function loadDraft(){
 
   let raw =
-    localStorage.getItem(DRAFT_KEY);
+    localStorage.getItem(
+      DRAFT_KEY
+    );
+
 
   if(!raw){
+
     return;
+
   }
+
 
   try{
 
@@ -2187,69 +2488,90 @@ function loadDraft(){
       JSON.parse(raw);
 
 
-    Object.keys(data).forEach(key => {
+    Object.keys(data).forEach(
+      key => {
 
-      if(
-        key === "frameType" ||
-        key === "locationType"
-      ){
-        return;
+        if(
+          key === "frameType" ||
+          key === "locationType"
+        ){
+
+          return;
+
+        }
+
+
+        const el =
+          $(key);
+
+
+        if(!el){
+
+          return;
+
+        }
+
+
+        if(el.type === "checkbox"){
+
+          el.checked =
+            Boolean(data[key]);
+
+        }else{
+
+          el.value =
+            data[key] || "";
+
+        }
+
       }
-
-      const el =
-        $(key);
-
-      if(!el){
-        return;
-      }
-
-      if(el.type === "checkbox"){
-
-        el.checked =
-          Boolean(data[key]);
-
-      }else{
-
-        el.value =
-          data[key] || "";
-
-      }
-
-    });
+    );
 
 
-    if(Array.isArray(data.frameType)){
+    if(
+      Array.isArray(
+        data.frameType
+      )
+    ){
 
       document
         .querySelectorAll(
           'input[name="frameType"]'
         )
-        .forEach(el => {
+        .forEach(
+          el => {
 
-          el.checked =
-            data.frameType.includes(
-              el.value
-            );
+            el.checked =
+              data.frameType.includes(
+                el.value
+              );
 
-        });
+          }
+        );
 
     }
 
 
-    if(Array.isArray(data.locationType)){
+    if(
+      Array.isArray(
+        data.locationType
+      )
+    ){
 
       document
         .querySelectorAll(
           'input[name="locationType"]'
         )
-        .forEach(el => {
+        .forEach(
+          el => {
 
-          el.checked =
-            data.locationType.includes(
-              el.value
-            );
+            el.checked =
+              data.locationType.includes(
+                el.value
+              );
 
-        });
+          }
+        );
 
     }
 
@@ -2275,21 +2597,44 @@ function bindEvents(){
     .querySelectorAll(
       ".control-panel input, .control-panel textarea"
     )
-    .forEach(el => {
+    .forEach(
+      el => {
 
-      el.addEventListener(
-        "input",
-        updatePreview
-      );
+        el.addEventListener(
+          "input",
+          updatePreview
+        );
 
-      el.addEventListener(
-        "change",
-        updatePreview
-      );
 
-    });
+        el.addEventListener(
+          "change",
+          updatePreview
+        );
+
+      }
+    );
 
 }
+
+
+/* =========================
+   STORAGE EVENT
+========================= */
+
+window.addEventListener(
+  "storage",
+  function(event){
+
+    if(
+      event.key === SETTINGS_KEY
+    ){
+
+      updateCompanyInformation();
+
+    }
+
+  }
+);
 
 
 /* =========================
