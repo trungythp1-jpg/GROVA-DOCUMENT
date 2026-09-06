@@ -1,6 +1,6 @@
 /* =========================================================
    GROVA DOCUMENT
-   APP.JS — VERSION 208
+   APP.JS — VERSION 209
    FIRESTORE PHASE 3 — PROJECTS + CUSTOMERS + EMPLOYEES
 ========================================================= */
 
@@ -1800,7 +1800,7 @@
     currentUser variable. Firebase Auth can already have a
     signed-in user while the Auth state bridge is still catching up.
   */
-  function getActiveAuthUser() {
+  async function getActiveAuthUser() {
 
     if (currentUser) {
       return currentUser;
@@ -1809,14 +1809,78 @@
     const auth =
       getAuthObject();
 
-    if (
-      auth &&
-      auth.currentUser
-    ) {
-      currentUser =
-        auth.currentUser;
+    if (auth) {
 
-      return currentUser;
+      /*
+        Firebase Auth có thể đang ở trạng thái khởi tạo trong
+        đúng thời điểm người dùng vừa mở app. Khi đó currentUser
+        tạm thời có thể là null dù phiên đăng nhập vẫn hợp lệ.
+        Chờ Auth hoàn tất trạng thái ban đầu trước khi kết luận
+        rằng người dùng chưa đăng nhập.
+      */
+      if (typeof auth.authStateReady === "function") {
+        try {
+          await auth.authStateReady();
+        } catch (error) {
+          console.warn(
+            "GROVA DOCUMENT: Không thể chờ Firebase Auth sẵn sàng.",
+            error
+          );
+        }
+      }
+
+      if (auth.currentUser) {
+        currentUser =
+          auth.currentUser;
+
+        return currentUser;
+      }
+
+      /*
+        Fallback cho trường hợp SDK không cung cấp authStateReady:
+        dùng đúng observer của Firebase để chờ trạng thái Auth.
+      */
+      if (typeof auth.onAuthStateChanged === "function") {
+        const observedUser =
+          await new Promise((resolve) => {
+            let unsubscribe = null;
+            let settled = false;
+
+            const finish = (user) => {
+              if (settled) {
+                return;
+              }
+
+              settled = true;
+
+              if (unsubscribe) {
+                unsubscribe();
+              }
+
+              resolve(user || null);
+            };
+
+            try {
+              unsubscribe =
+                auth.onAuthStateChanged(
+                  (user) => finish(user)
+                );
+            } catch (error) {
+              console.warn(
+                "GROVA DOCUMENT: Không thể đọc trạng thái Firebase Auth.",
+                error
+              );
+              finish(null);
+            }
+          });
+
+        if (observedUser) {
+          currentUser =
+            observedUser;
+
+          return currentUser;
+        }
+      }
     }
 
     if (
@@ -4576,7 +4640,7 @@
     try {
 
       const authUser =
-        getActiveAuthUser();
+        await getActiveAuthUser();
 
       if (!authUser) {
         throw new Error(
@@ -4677,7 +4741,7 @@
     try {
 
       const authUser =
-        getActiveAuthUser();
+        await getActiveAuthUser();
 
       if (!authUser) {
         throw new Error(
