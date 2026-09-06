@@ -1,7 +1,8 @@
 /* =========================================================
    GROVA DOCUMENT
-   APP.JS — VERSION 205
-   FIRESTORE PHASE 2 — PROJECTS + CUSTOMERS
+   APP.JS — VERSION 209
+   FIRESTORE PHASE 3 — PROJECTS + CUSTOMERS + EMPLOYEES
+   CLEAN BASE FROM STABLE VERSION 206
 ========================================================= */
 
 (() => {
@@ -84,6 +85,8 @@
 
   let currentUser = null;
 
+  let authReadyPromise = null;
+
   let projectsCache = [];
 
   let firestoreDb = null;
@@ -99,6 +102,12 @@
   let customersSyncToken = 0;
 
   let customersSyncRunning = false;
+
+  let employeesCache = [];
+
+  let employeesSyncToken = 0;
+
+  let employeesSyncRunning = false;
 
   /* =======================================================
      DATA
@@ -370,8 +379,41 @@
     );
   }
 
+  function getEmployeeCacheKey(uid) {
+    return "GROVA_EMPLOYEES_V2_" + String(uid || "");
+  }
+
+  function readEmployeeCache(uid) {
+    if (!uid) return [];
+    return readStorage(getEmployeeCacheKey(uid), []);
+  }
+
+  function writeEmployeeCache(uid, employees) {
+    if (!uid) return false;
+    return writeStorage(getEmployeeCacheKey(uid), Array.isArray(employees) ? employees : []);
+  }
+
+  function normalizeEmployees(employees) {
+    if (!Array.isArray(employees)) return [];
+    return employees
+      .filter((employee) => employee && employee.id)
+      .map((employee) => ({ ...employee, id: String(employee.id) }))
+      .sort((a, b) => String(b.updatedAt || b.createdAt || "").localeCompare(String(a.updatedAt || a.createdAt || "")));
+  }
+
+  function setEmployeesCache(employees) {
+    employeesCache = normalizeEmployees(employees);
+  }
+
+  function getBestLocalEmployees(uid) {
+    const scopedCache = normalizeEmployees(readEmployeeCache(uid));
+    if (scopedCache.length) return scopedCache;
+    return normalizeEmployees(readStorage(STORAGE.employees, []));
+  }
+
   function getEmployees() {
-    return readStorage(STORAGE.employees, []);
+    if (currentUser) return employeesCache.slice();
+    return normalizeEmployees(readStorage(STORAGE.employees, []));
   }
 
   function getHistory() {
@@ -457,6 +499,73 @@
         );
       }
 
+    }
+
+    return null;
+
+  }
+
+  async function getActiveAuthUser() {
+
+    if (currentUser) {
+      return currentUser;
+    }
+
+    const auth = getAuthObject();
+
+    if (!auth) {
+      return null;
+    }
+
+    /*
+      Firebase Auth có thể chưa hoàn tất khởi tạo dù giao diện đã mở.
+      Chờ trạng thái Auth ban đầu trước khi kết luận user chưa đăng nhập.
+    */
+    if (typeof auth.authStateReady === "function") {
+      try {
+        await auth.authStateReady();
+      } catch (error) {
+        console.warn(
+          "GROVA DOCUMENT: Auth readiness warning.",
+          error
+        );
+      }
+    }
+
+    if (auth.currentUser) {
+      currentUser = auth.currentUser;
+      return currentUser;
+    }
+
+    if (authReadyPromise) {
+      try {
+        await authReadyPromise;
+      } catch (error) {
+        console.warn(
+          "GROVA DOCUMENT: Auth state promise warning.",
+          error
+        );
+      }
+    }
+
+    if (currentUser) {
+      return currentUser;
+    }
+
+    if (auth.currentUser) {
+      currentUser = auth.currentUser;
+      return currentUser;
+    }
+
+    if (
+      window.GROVA_AUTH &&
+      typeof window.GROVA_AUTH.getCurrentUser === "function"
+    ) {
+      const user = window.GROVA_AUTH.getCurrentUser();
+      if (user) {
+        currentUser = user;
+        return user;
+      }
     }
 
     return null;
@@ -1109,6 +1218,7 @@
 
     projectsSyncToken++;
     customersSyncToken++;
+    employeesSyncToken++;
 
     currentUser =
       user || null;
@@ -1117,11 +1227,16 @@
 
       setProjectsCache([]);
       setCustomersCache([]);
+      setEmployeesCache([]);
 
       renderProjectViews();
 
       if (currentPage === "customers") {
         renderCustomers();
+      }
+
+      if (currentPage === "employees") {
+        renderEmployees();
       }
 
       updateStats();
@@ -1131,22 +1246,16 @@
     }
 
     const cachedProjects =
-      getBestLocalProjects(
-        user.uid
-      );
-
-    setProjectsCache(
-      cachedProjects
-    );
+      getBestLocalProjects(user.uid);
+    setProjectsCache(cachedProjects);
 
     const cachedCustomers =
-      getBestLocalCustomers(
-        user.uid
-      );
+      getBestLocalCustomers(user.uid);
+    setCustomersCache(cachedCustomers);
 
-    setCustomersCache(
-      cachedCustomers
-    );
+    const cachedEmployees =
+      getBestLocalEmployees(user.uid);
+    setEmployeesCache(cachedEmployees);
 
     renderProjectViews();
 
@@ -1154,13 +1263,13 @@
       renderCustomers();
     }
 
-    syncProjectsFromCloud(
-      user
-    );
+    if (currentPage === "employees") {
+      renderEmployees();
+    }
 
-    syncCustomersFromCloud(
-      user
-    );
+    syncProjectsFromCloud(user);
+    syncCustomersFromCloud(user);
+    syncEmployeesFromCloud(user);
 
   }
 
@@ -1179,15 +1288,24 @@
 
     }
 
-    auth.onAuthStateChanged(
-      (user) => {
+    authReadyPromise = new Promise((resolve) => {
 
-        handleAuthUser(
-          user
-        );
+      let settled = false;
 
-      }
-    );
+      const finishInitialState = (user) => {
+        handleAuthUser(user);
+
+        if (!settled) {
+          settled = true;
+          resolve(user || null);
+        }
+      };
+
+      auth.onAuthStateChanged(
+        finishInitialState
+      );
+
+    });
 
   }
 
@@ -1675,6 +1793,164 @@
       ) {
         customersSyncRunning = false;
       }
+    }
+  }
+
+  /* =======================================================
+     FIRESTORE SERVICE — EMPLOYEES
+  ======================================================= */
+
+  function getEmployeesCollection() {
+    if (!firestoreDb) return null;
+    return firestoreDb.collection("employees");
+  }
+
+  function buildEmployeeData(employee, user) {
+    const now = nowISO();
+    const uid = user?.uid || "";
+    return {
+      id: String(employee.id),
+      name: employee.name || "",
+      position: employee.position || "",
+      department: employee.department || "",
+      phone: employee.phone || "",
+      email: employee.email || "",
+      startDate: employee.startDate || "",
+      note: employee.note || "",
+      createdAt: employee.createdAt || now,
+      updatedAt: now,
+      createdBy: employee.createdBy || uid,
+      updatedBy: uid
+    };
+  }
+
+  function mapFirestoreEmployee(doc) {
+    return { ...(doc.data() || {}), id: String(doc.id) };
+  }
+
+  async function readCloudEmployees(user = currentUser) {
+    if (!user) return null;
+    if (!initializeFirestore()) return null;
+    await waitForFirestore();
+    const collection = getEmployeesCollection();
+    if (!collection) return null;
+    const snapshot = await collection.get();
+    return normalizeEmployees(snapshot.docs.map(mapFirestoreEmployee));
+  }
+
+  async function writeCloudEmployee(employee, user) {
+    if (!user) throw new Error("AUTH_REQUIRED");
+    if (!initializeFirestore()) throw new Error("FIRESTORE_UNAVAILABLE");
+    await waitForFirestore();
+    const reference = getEmployeesCollection().doc(String(employee.id));
+    await reference.set(buildEmployeeData(employee, user), { merge: true });
+    const verification = await reference.get();
+    if (!verification.exists) throw new Error("WRITE_VERIFICATION_FAILED");
+    return mapFirestoreEmployee(verification);
+  }
+
+  async function deleteCloudEmployee(id, user) {
+    if (!user) throw new Error("AUTH_REQUIRED");
+    if (!initializeFirestore()) throw new Error("FIRESTORE_UNAVAILABLE");
+    await waitForFirestore();
+    const reference = getEmployeesCollection().doc(String(id));
+    await reference.delete();
+    const verification = await reference.get();
+    if (verification.exists) throw new Error("DELETE_VERIFICATION_FAILED");
+    return true;
+  }
+
+  function employeeIds(employees) {
+    return normalizeEmployees(employees).map((employee) => String(employee.id)).sort();
+  }
+
+  function sameEmployeeIdSet(a, b) {
+    const left = employeeIds(a);
+    const right = employeeIds(b);
+    if (left.length !== right.length) return false;
+    return left.every((id, index) => id === right[index]);
+  }
+
+  async function verifyEmployeeMigration(expectedEmployees, user) {
+    const cloud = await readCloudEmployees(user);
+    if (!cloud) return false;
+    const expected = normalizeEmployees(expectedEmployees);
+    if (cloud.length !== expected.length) return false;
+    return sameEmployeeIdSet(cloud, expected);
+  }
+
+  function showEmployeeSyncError(error) {
+    console.error("GROVA DOCUMENT: Employee Firestore error.", error);
+    showToast("Không thể đồng bộ nhân sự. Ứng dụng vẫn đang dùng dữ liệu cục bộ.");
+  }
+
+  async function migrateLocalEmployeesIfNeeded(user, localEmployees) {
+    if (!user) return false;
+    const sourceEmployees = normalizeEmployees(localEmployees);
+    if (!sourceEmployees.length) return false;
+    const cloud = await readCloudEmployees(user);
+    if (!cloud) return false;
+    if (cloud.length > 0) {
+      setEmployeesCache(cloud);
+      writeEmployeeCache(user.uid, cloud);
+      return false;
+    }
+    try {
+      for (const employee of sourceEmployees) {
+        await getEmployeesCollection().doc(String(employee.id)).set(buildEmployeeData(employee, user));
+      }
+      if (!await verifyEmployeeMigration(sourceEmployees, user)) {
+        throw new Error("MIGRATION_VERIFICATION_FAILED");
+      }
+      const migratedCloud = await readCloudEmployees(user);
+      if (!migratedCloud) throw new Error("MIGRATION_READBACK_FAILED");
+      setEmployeesCache(migratedCloud);
+      writeEmployeeCache(user.uid, migratedCloud);
+      showToast("Đã đồng bộ nhân sự cũ lên Firestore.");
+      return true;
+    } catch (error) {
+      showEmployeeSyncError(error);
+      return false;
+    }
+  }
+
+  async function syncEmployeesFromCloud(user) {
+    if (!user) return;
+    const token = ++employeesSyncToken;
+    employeesSyncRunning = true;
+    try {
+      if (!initializeFirestore()) return;
+      const localEmployees = getBestLocalEmployees(user.uid);
+      if (localEmployees.length) {
+        setEmployeesCache(localEmployees);
+        if (currentPage === "employees") renderEmployees();
+        updateStats();
+      }
+      const cloud = await readCloudEmployees(user);
+      if (token !== employeesSyncToken || currentUser?.uid !== user.uid) return;
+      if (!cloud) return;
+      if (cloud.length > 0) {
+        setEmployeesCache(cloud);
+        writeEmployeeCache(user.uid, cloud);
+        if (currentPage === "employees") renderEmployees();
+        updateStats();
+        return;
+      }
+      if (localEmployees.length) {
+        const migrated = await migrateLocalEmployeesIfNeeded(user, localEmployees);
+        if (token !== employeesSyncToken || currentUser?.uid !== user.uid) return;
+        if (currentPage === "employees") renderEmployees();
+        updateStats();
+        return;
+      }
+      setEmployeesCache([]);
+      writeEmployeeCache(user.uid, []);
+      if (currentPage === "employees") renderEmployees();
+      updateStats();
+    } catch (error) {
+      if (token === employeesSyncToken) showEmployeeSyncError(error);
+    } finally {
+      if (token === employeesSyncToken) employeesSyncRunning = false;
     }
   }
 
@@ -2945,7 +3221,10 @@
 
     try {
 
-      if (!currentUser) {
+      const authUser =
+        await getActiveAuthUser();
+
+      if (!authUser) {
 
         throw new Error(
           "AUTH_REQUIRED"
@@ -2956,7 +3235,7 @@
       const savedProject =
         await writeCloudProject(
           localProject,
-          currentUser,
+          authUser,
           !modalEditId
         );
 
@@ -2970,7 +3249,7 @@
       ]);
 
       writeProjectCache(
-        currentUser.uid,
+        authUser.uid,
         projectsCache
       );
 
@@ -3046,7 +3325,10 @@
 
     try {
 
-      if (!currentUser) {
+      const authUser =
+        await getActiveAuthUser();
+
+      if (!authUser) {
 
         throw new Error(
           "AUTH_REQUIRED"
@@ -3056,7 +3338,7 @@
 
       await deleteCloudProject(
         id,
-        currentUser
+        authUser
       );
 
       const updatedProjects =
@@ -3070,7 +3352,7 @@
       );
 
       writeProjectCache(
-        currentUser.uid,
+        authUser.uid,
         projectsCache
       );
 
@@ -3436,7 +3718,10 @@
 
     try {
 
-      if (!currentUser) {
+      const authUser =
+        await getActiveAuthUser();
+
+      if (!authUser) {
         throw new Error(
           "AUTH_REQUIRED"
         );
@@ -3445,7 +3730,7 @@
       const savedCustomer =
         await writeCloudCustomer(
           localCustomer,
-          currentUser,
+          authUser,
           !modalEditId
         );
 
@@ -3459,7 +3744,7 @@
       ]);
 
       writeCustomerCache(
-        currentUser.uid,
+        authUser.uid,
         customersCache
       );
 
@@ -3534,7 +3819,10 @@
 
     try {
 
-      if (!currentUser) {
+      const authUser =
+        await getActiveAuthUser();
+
+      if (!authUser) {
         throw new Error(
           "AUTH_REQUIRED"
         );
@@ -3542,7 +3830,7 @@
 
       await deleteCloudCustomer(
         id,
-        currentUser
+        authUser
       );
 
       const updatedCustomers =
@@ -3556,7 +3844,7 @@
       );
 
       writeCustomerCache(
-        currentUser.uid,
+        authUser.uid,
         customersCache
       );
 
@@ -3837,164 +4125,128 @@
 
   }
 
-  function saveEmployee() {
+  async function saveEmployee() {
 
     const name =
-      $("#modalEmployeeName")
-        ?.value
-        .trim();
+      $("#modalEmployeeName")?.value.trim();
 
     if (!name) {
-
-      showToast(
-        "Vui lòng nhập họ và tên."
-      );
-
+      showToast("Vui lòng nhập họ và tên.");
       return;
-
     }
 
-    const employees =
-      getEmployees();
+    const employees = getEmployees();
+    const existingEmployee =
+      modalEditId
+        ? employees.find((item) => item.id === modalEditId)
+        : null;
+
+    const now = nowISO();
 
     const data = {
-
       name,
-
-      position:
-        $("#modalEmployeePosition")
-          ?.value
-          .trim() || "",
-
-      department:
-        $("#modalEmployeeDepartment")
-          ?.value
-          .trim() || "",
-
-      phone:
-        $("#modalEmployeePhone")
-          ?.value
-          .trim() || "",
-
-      email:
-        $("#modalEmployeeEmail")
-          ?.value
-          .trim() || "",
-
-      startDate:
-        $("#modalEmployeeStart")
-          ?.value || "",
-
-      note:
-        $("#modalEmployeeNote")
-          ?.value
-          .trim() || ""
-
+      position: $("#modalEmployeePosition")?.value.trim() || "",
+      department: $("#modalEmployeeDepartment")?.value.trim() || "",
+      phone: $("#modalEmployeePhone")?.value.trim() || "",
+      email: $("#modalEmployeeEmail")?.value.trim() || "",
+      startDate: $("#modalEmployeeStart")?.value || "",
+      note: $("#modalEmployeeNote")?.value.trim() || ""
     };
 
-    if (modalEditId) {
+    const localEmployee =
+      modalEditId && existingEmployee
+        ? { ...existingEmployee, ...data, updatedAt: now }
+        : { id: createId("NS"), ...data, createdAt: now, updatedAt: now };
 
-      const index =
-        employees.findIndex(
-          (item) =>
-            item.id ===
-            modalEditId
-        );
-
-      if (index >= 0) {
-
-        employees[index] = {
-
-          ...employees[index],
-
-          ...data,
-
-          updatedAt:
-            nowISO()
-
-        };
-
-      }
-
-      showToast(
-        "Đã cập nhật nhân sự."
-      );
-
-    } else {
-
-      employees.unshift({
-
-        id:
-          createId("NS"),
-
-        ...data,
-
-        createdAt:
-          nowISO(),
-
-        updatedAt:
-          nowISO()
-
-      });
-
-      showToast(
-        "Đã thêm nhân sự."
-      );
-
+    const saveButton = $("#modalSave");
+    if (saveButton) {
+      saveButton.disabled = true;
+      saveButton.textContent = "Đang lưu...";
     }
 
-    writeStorage(
-      STORAGE.employees,
-      employees
-    );
+    try {
 
-    closeModal();
+      const authUser = await getActiveAuthUser();
+      if (!authUser) throw new Error("AUTH_REQUIRED");
 
-    renderEmployees();
+      const savedEmployee =
+        await writeCloudEmployee(localEmployee, authUser);
 
-    updateStats();
+      setEmployeesCache([
+        ...employees.filter((item) => item.id !== savedEmployee.id),
+        savedEmployee
+      ]);
+
+      writeEmployeeCache(authUser.uid, employeesCache);
+
+      closeModal();
+      renderEmployees();
+      updateStats();
+
+      showToast(
+        modalEditId
+          ? "Đã cập nhật nhân sự."
+          : "Đã thêm nhân sự."
+      );
+
+    } catch (error) {
+
+      console.error("GROVA DOCUMENT: saveEmployee failed.", error);
+
+      if (error && error.message === "AUTH_REQUIRED") {
+        showToast("Chưa đăng nhập. Không thể lưu nhân sự.");
+      } else {
+        showToast("Không thể lưu nhân sự lên hệ thống. Dữ liệu cục bộ chưa bị thay đổi.");
+      }
+
+    } finally {
+
+      if (saveButton) {
+        saveButton.disabled = false;
+        saveButton.textContent = "Lưu";
+      }
+
+    }
 
   }
 
-  function deleteEmployee(id) {
+  async function deleteEmployee(id) {
 
-    const employees =
-      getEmployees();
+    const employees = getEmployees();
+    const employee = employees.find((item) => item.id === id);
+    if (!employee) return;
 
-    const employee =
-      employees.find(
-        (item) =>
-          item.id === id
+    const ok = confirm(`Xóa nhân sự "${employee.name}"?`);
+    if (!ok) return;
+
+    try {
+
+      const authUser = await getActiveAuthUser();
+      if (!authUser) throw new Error("AUTH_REQUIRED");
+
+      await deleteCloudEmployee(id, authUser);
+
+      setEmployeesCache(
+        employees.filter((item) => item.id !== id)
       );
 
-    if (!employee) {
-      return;
+      writeEmployeeCache(authUser.uid, employeesCache);
+
+      renderEmployees();
+      updateStats();
+      showToast("Đã xóa nhân sự.");
+
+    } catch (error) {
+
+      console.error("GROVA DOCUMENT: deleteEmployee failed.", error);
+
+      if (error && error.message === "AUTH_REQUIRED") {
+        showToast("Chưa đăng nhập. Không thể xóa nhân sự.");
+      } else {
+        showToast("Không thể xóa nhân sự trên hệ thống. Dữ liệu cục bộ chưa bị thay đổi.");
+      }
+
     }
-
-    const ok =
-      confirm(
-        `Xóa nhân sự "${employee.name}"?`
-      );
-
-    if (!ok) {
-      return;
-    }
-
-    writeStorage(
-      STORAGE.employees,
-      employees.filter(
-        (item) =>
-          item.id !== id
-      )
-    );
-
-    renderEmployees();
-
-    updateStats();
-
-    showToast(
-      "Đã xóa nhân sự."
-    );
 
   }
 
@@ -4496,6 +4748,8 @@
     );
 
     projectsSyncToken++;
+    customersSyncToken++;
+    employeesSyncToken++;
 
     if (currentUser) {
 
@@ -4511,10 +4765,17 @@
         )
       );
 
+      localStorage.removeItem(
+        getEmployeeCacheKey(
+          currentUser.uid
+        )
+      );
+
     }
 
     setProjectsCache([]);
     setCustomersCache([]);
+    setEmployeesCache([]);
 
     renderDashboard();
 
@@ -4947,3 +5208,5 @@
   }
 
 })();
+
+
