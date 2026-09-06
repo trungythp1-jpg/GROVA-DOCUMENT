@@ -1,6 +1,7 @@
 /* =========================================================
    GROVA DOCUMENT
-   APP.JS — VERSION 200
+   APP.JS — VERSION 204
+   FIRESTORE PHASE 1 — PROJECTS ONLY
 ========================================================= */
 
 (() => {
@@ -23,6 +24,8 @@
     history: "GROVA_HISTORY_V1",
     settings: "GROVA_SETTINGS_V1"
   };
+
+  const PROJECT_CACHE_PREFIX = "GROVA_PROJECTS_V2_";
 
   const PAGE_INFO = {
     dashboard: {
@@ -73,6 +76,22 @@
   let modalEditId = null;
 
   let toastTimer = null;
+
+  /* =======================================================
+     PROJECT FIRESTORE STATE
+  ======================================================= */
+
+  let currentUser = null;
+
+  let projectsCache = [];
+
+  let firestoreDb = null;
+
+  let firestoreReadyPromise = null;
+
+  let projectsSyncToken = 0;
+
+  let firestoreSyncRunning = false;
 
   /* =======================================================
      DATA
@@ -154,8 +173,101 @@
 
   }
 
+  function getProjectCacheKey(uid) {
+
+    return (
+      PROJECT_CACHE_PREFIX +
+      String(uid || "")
+    );
+
+  }
+
+  function readProjectCache(uid) {
+
+    if (!uid) {
+      return [];
+    }
+
+    return readStorage(
+      getProjectCacheKey(uid),
+      []
+    );
+
+  }
+
+  function writeProjectCache(uid, projects) {
+
+    if (!uid) {
+      return false;
+    }
+
+    return writeStorage(
+      getProjectCacheKey(uid),
+      Array.isArray(projects)
+        ? projects
+        : []
+    );
+
+  }
+
+  function getBestLocalProjects(uid) {
+
+    const scopedCache =
+      normalizeProjects(
+        readProjectCache(uid)
+      );
+
+    if (scopedCache.length) {
+      return scopedCache;
+    }
+
+    return normalizeProjects(
+      readStorage(
+        STORAGE.projects,
+        []
+      )
+    );
+  }
+
+  function normalizeProjects(projects) {
+
+    if (!Array.isArray(projects)) {
+      return [];
+    }
+
+    return projects
+      .filter(
+        (project) =>
+          project &&
+          project.id
+      )
+      .map(
+        (project) => ({
+          ...project,
+          id: String(project.id)
+        })
+      )
+      .sort(
+        (a, b) =>
+          String(b.updatedAt || b.createdAt || "")
+            .localeCompare(
+              String(a.updatedAt || a.createdAt || "")
+            )
+      );
+
+  }
+
+  function setProjectsCache(projects) {
+
+    projectsCache =
+      normalizeProjects(projects);
+
+  }
+
   function getProjects() {
-    return readStorage(STORAGE.projects, []);
+
+    return projectsCache.slice();
+
   }
 
   function getCustomers() {
@@ -190,6 +302,769 @@
       ...defaults,
       ...(saved || {})
     };
+
+  }
+
+  /* =======================================================
+     FIRESTORE SERVICE — PROJECTS ONLY
+  ======================================================= */
+
+  function getAuthObject() {
+
+    if (
+      window.GROVA_AUTH &&
+      window.GROVA_AUTH.auth
+    ) {
+      return window.GROVA_AUTH.auth;
+    }
+
+    if (
+      window.firebase &&
+      typeof firebase.auth === "function"
+    ) {
+
+      try {
+        return firebase.auth();
+      } catch (error) {
+        console.warn(
+          "GROVA DOCUMENT: Firebase Auth unavailable.",
+          error
+        );
+      }
+
+    }
+
+    return null;
+
+  }
+
+  function getFirebaseApp() {
+
+    if (
+      window.GROVA_AUTH &&
+      window.GROVA_AUTH.firebase
+    ) {
+      return window.GROVA_AUTH.firebase;
+    }
+
+    if (
+      window.firebase &&
+      typeof firebase.app === "function"
+    ) {
+
+      try {
+        return firebase.app();
+      } catch (error) {
+        console.warn(
+          "GROVA DOCUMENT: Firebase App unavailable.",
+          error
+        );
+      }
+
+    }
+
+    return null;
+
+  }
+
+  function initializeFirestore() {
+
+    if (firestoreDb) {
+      return true;
+    }
+
+    try {
+
+      if (
+        !window.firebase ||
+        typeof firebase.firestore !== "function"
+      ) {
+
+        console.warn(
+          "GROVA DOCUMENT: Firestore SDK chưa sẵn sàng."
+        );
+
+        return false;
+
+      }
+
+      const app =
+        getFirebaseApp();
+
+      if (!app) {
+
+        console.warn(
+          "GROVA DOCUMENT: Firebase App chưa sẵn sàng."
+        );
+
+        return false;
+
+      }
+
+      firestoreDb =
+        app.firestore();
+
+      firestoreReadyPromise =
+        firestoreDb
+          .enablePersistence({
+            synchronizeTabs: true
+          })
+          .catch(
+            (error) => {
+
+              if (
+                error &&
+                (
+                  error.code ===
+                    "failed-precondition" ||
+                  error.code ===
+                    "unimplemented"
+                )
+              ) {
+
+                console.warn(
+                  "GROVA DOCUMENT: Firestore persistence không khả dụng, tiếp tục không offline persistence.",
+                  error.code
+                );
+
+              } else {
+
+                console.warn(
+                  "GROVA DOCUMENT: Không thể bật Firestore persistence.",
+                  error
+                );
+
+              }
+
+            }
+          );
+
+      return true;
+
+    } catch (error) {
+
+      console.error(
+        "GROVA DOCUMENT: Firestore initialization failed.",
+        error
+      );
+
+      firestoreDb = null;
+
+      firestoreReadyPromise = null;
+
+      return false;
+
+    }
+
+  }
+
+  async function waitForFirestore() {
+
+    if (!firestoreDb) {
+      return false;
+    }
+
+    if (firestoreReadyPromise) {
+
+      try {
+        await firestoreReadyPromise;
+      } catch (error) {
+        console.warn(
+          "GROVA DOCUMENT: Firestore readiness warning.",
+          error
+        );
+      }
+
+    }
+
+    return true;
+
+  }
+
+  function getProjectsCollection() {
+
+    if (!firestoreDb) {
+      return null;
+    }
+
+    return firestoreDb.collection("projects");
+
+  }
+
+  function buildProjectData(project, user, isCreate = false) {
+
+    const now =
+      nowISO();
+
+    const uid =
+      user?.uid || "";
+
+    const existingCreatedAt =
+      project.createdAt ||
+      now;
+
+    const existingUpdatedAt =
+      project.updatedAt ||
+      now;
+
+    return {
+
+      id:
+        String(project.id),
+
+      name:
+        project.name || "",
+
+      code:
+        project.code || "",
+
+      customer:
+        project.customer || "",
+
+      address:
+        project.address || "",
+
+      status:
+        project.status || "Chuẩn bị",
+
+      startDate:
+        project.startDate || "",
+
+      note:
+        project.note || "",
+
+      createdAt:
+        existingCreatedAt,
+
+      updatedAt:
+        existingUpdatedAt,
+
+      createdBy:
+        project.createdBy ||
+        (
+          isCreate
+            ? uid
+            : uid
+        ),
+
+      updatedBy:
+        uid
+
+    };
+
+  }
+
+  function mapFirestoreProject(doc) {
+
+    const data =
+      doc.data() || {};
+
+    return {
+
+      ...data,
+
+      id:
+        String(doc.id)
+
+    };
+
+  }
+
+  async function readCloudProjects() {
+
+    if (!currentUser) {
+      return null;
+    }
+
+    if (!initializeFirestore()) {
+      return null;
+    }
+
+    await waitForFirestore();
+
+    const collection =
+      getProjectsCollection();
+
+    if (!collection) {
+      return null;
+    }
+
+    const snapshot =
+      await collection.get();
+
+    return normalizeProjects(
+      snapshot.docs.map(
+        mapFirestoreProject
+      )
+    );
+
+  }
+
+  async function writeCloudProject(project, user, isCreate = false) {
+
+    if (!user) {
+      throw new Error(
+        "AUTH_REQUIRED"
+      );
+    }
+
+    if (!initializeFirestore()) {
+      throw new Error(
+        "FIRESTORE_UNAVAILABLE"
+      );
+    }
+
+    await waitForFirestore();
+
+    const data =
+      buildProjectData(
+        project,
+        user,
+        isCreate
+      );
+
+    const reference =
+      getProjectsCollection()
+        .doc(String(project.id));
+
+    await reference.set(
+      data,
+      {
+        merge: true
+      }
+    );
+
+    const verification =
+      await reference.get();
+
+    if (!verification.exists) {
+
+      throw new Error(
+        "WRITE_VERIFICATION_FAILED"
+      );
+
+    }
+
+    return mapFirestoreProject(
+      verification
+    );
+
+  }
+
+  async function deleteCloudProject(id, user) {
+
+    if (!user) {
+      throw new Error(
+        "AUTH_REQUIRED"
+      );
+    }
+
+    if (!initializeFirestore()) {
+      throw new Error(
+        "FIRESTORE_UNAVAILABLE"
+      );
+    }
+
+    await waitForFirestore();
+
+    const reference =
+      getProjectsCollection()
+        .doc(String(id));
+
+    await reference.delete();
+
+    const verification =
+      await reference.get();
+
+    if (verification.exists) {
+
+      throw new Error(
+        "DELETE_VERIFICATION_FAILED"
+      );
+
+    }
+
+    return true;
+
+  }
+
+  function projectIds(projects) {
+
+    return normalizeProjects(projects)
+      .map(
+        (project) =>
+          String(project.id)
+      )
+      .sort();
+
+  }
+
+  function sameIdSet(a, b) {
+
+    const left =
+      projectIds(a);
+
+    const right =
+      projectIds(b);
+
+    if (
+      left.length !==
+      right.length
+    ) {
+      return false;
+    }
+
+    return left.every(
+      (id, index) =>
+        id === right[index]
+    );
+
+  }
+
+  async function verifyMigration(expectedProjects) {
+
+    const cloud =
+      await readCloudProjects();
+
+    if (!cloud) {
+      return false;
+    }
+
+    const expected =
+      normalizeProjects(
+        expectedProjects
+      );
+
+    if (
+      cloud.length !==
+      expected.length
+    ) {
+      return false;
+    }
+
+    return sameIdSet(
+      cloud,
+      expected
+    );
+
+  }
+
+  function renderProjectViews() {
+
+    updateStats();
+
+    if (currentPage === "dashboard") {
+      renderDashboard();
+    }
+
+    if (currentPage === "projects") {
+      renderProjects();
+    }
+
+    if (currentPage === "reports") {
+      renderReports();
+    }
+
+  }
+
+  function showProjectSyncError(error) {
+
+    console.error(
+      "GROVA DOCUMENT: Project Firestore error.",
+      error
+    );
+
+    showToast(
+      "Không thể đồng bộ công trình. Ứng dụng vẫn đang dùng dữ liệu cục bộ."
+    );
+
+  }
+
+  async function migrateLocalProjectsIfNeeded(
+    user,
+    localProjects
+  ) {
+
+    if (!user) {
+      return false;
+    }
+
+    const sourceProjects =
+      normalizeProjects(
+        localProjects
+      );
+
+    if (!sourceProjects.length) {
+      return false;
+    }
+
+    const cloud =
+      await readCloudProjects();
+
+    if (!cloud) {
+      return false;
+    }
+
+    if (cloud.length > 0) {
+      setProjectsCache(cloud);
+
+      writeProjectCache(
+        user.uid,
+        cloud
+      );
+
+      return false;
+    }
+
+    try {
+
+      for (
+        const project of sourceProjects
+      ) {
+
+        const data =
+          buildProjectData(
+            project,
+            user,
+            !project.createdBy
+          );
+
+        await getProjectsCollection()
+          .doc(String(project.id))
+          .set(data);
+      }
+
+      const verified =
+        await verifyMigration(
+          sourceProjects
+        );
+
+      if (!verified) {
+        throw new Error(
+          "MIGRATION_VERIFICATION_FAILED"
+        );
+      }
+
+      const migratedCloud =
+        await readCloudProjects();
+
+      if (!migratedCloud) {
+        throw new Error(
+          "MIGRATION_READBACK_FAILED"
+        );
+      }
+
+      setProjectsCache(
+        migratedCloud
+      );
+
+      writeProjectCache(
+        user.uid,
+        migratedCloud
+      );
+
+      showToast(
+        "Đã đồng bộ công trình cũ lên Firestore."
+      );
+
+      return true;
+
+    } catch (error) {
+
+      showProjectSyncError(
+        error
+      );
+
+      return false;
+    }
+  }
+
+  async function syncProjectsFromCloud(user) {
+
+    if (!user) {
+      return;
+    }
+
+    const token =
+      ++projectsSyncToken;
+
+    firestoreSyncRunning = true;
+
+    try {
+
+      const initialized =
+        initializeFirestore();
+
+      if (!initialized) {
+        return;
+      }
+
+      const localProjects =
+        getBestLocalProjects(
+          user.uid
+        );
+
+      if (localProjects.length) {
+        setProjectsCache(
+          localProjects
+        );
+
+        renderProjectViews();
+      }
+
+      const cloud =
+        await readCloudProjects();
+
+      if (
+        token !==
+          projectsSyncToken ||
+        currentUser?.uid !==
+          user.uid
+      ) {
+        return;
+      }
+
+      if (!cloud) {
+        return;
+      }
+
+      /* Cloud có dữ liệu => Cloud thắng. */
+      if (cloud.length > 0) {
+
+        setProjectsCache(
+          cloud
+        );
+
+        writeProjectCache(
+          user.uid,
+          cloud
+        );
+
+        renderProjectViews();
+
+        return;
+      }
+
+      /*
+        Cloud đang rỗng:
+        chỉ migrate nếu local thật sự có dữ liệu.
+        Không bao giờ xóa V2 cache chỉ vì cloud rỗng.
+      */
+      if (localProjects.length) {
+
+        const migrated =
+          await migrateLocalProjectsIfNeeded(
+            user,
+            localProjects
+          );
+
+        if (
+          token !==
+            projectsSyncToken ||
+          currentUser?.uid !==
+            user.uid
+        ) {
+          return;
+        }
+
+        if (migrated) {
+          renderProjectViews();
+          return;
+        }
+
+        /* Migration lỗi => giữ nguyên local cache. */
+        renderProjectViews();
+        return;
+      }
+
+      /* Cả local và cloud đều rỗng. */
+      setProjectsCache([]);
+
+      writeProjectCache(
+        user.uid,
+        []
+      );
+
+      renderProjectViews();
+
+    } catch (error) {
+
+      if (
+        token ===
+        projectsSyncToken
+      ) {
+        showProjectSyncError(
+          error
+        );
+      }
+
+    } finally {
+
+      if (
+        token ===
+        projectsSyncToken
+      ) {
+        firestoreSyncRunning = false;
+      }
+    }
+  }
+
+  function handleAuthUser(user) {
+
+    projectsSyncToken++;
+
+    currentUser =
+      user || null;
+
+    if (!user) {
+
+      setProjectsCache([]);
+
+      renderProjectViews();
+
+      return;
+
+    }
+
+    const cached =
+      getBestLocalProjects(
+        user.uid
+      );
+
+    setProjectsCache(
+      cached
+    );renderProjectViews();
+
+    syncProjectsFromCloud(
+      user
+    );
+
+  }
+
+  function initFirestoreAuthBridge() {
+
+    const auth =
+      getAuthObject();
+
+    if (!auth) {
+
+      console.warn(
+        "GROVA DOCUMENT: Firebase Auth chưa sẵn sàng. App vẫn chạy local."
+      );
+
+      return;
+
+    }
+
+    auth.onAuthStateChanged(
+      (user) => {
+
+        handleAuthUser(
+          user
+        );
+
+      }
+    );
 
   }
 
@@ -1369,7 +2244,7 @@
 
   }
 
-  function saveProject() {
+  async function saveProject() {
 
     const name =
       $("#modalProjectName")
@@ -1388,6 +2263,18 @@
 
     const projects =
       getProjects();
+
+    const existingProject =
+      modalEditId
+        ? projects.find(
+            (item) =>
+              item.id ===
+              modalEditId
+          )
+        : null;
+
+    const now =
+      nowISO();
 
     const data = {
 
@@ -1424,71 +2311,106 @@
 
     };
 
-    if (modalEditId) {
+    const localProject =
+      modalEditId && existingProject
+        ? {
+            ...existingProject,
+            ...data,
+            updatedAt: now
+          }
+        : {
+            id: createId("CT"),
+            ...data,
+            createdAt: now,
+            updatedAt: now
+          };
 
-      const index =
-        projects.findIndex(
-          (item) =>
-            item.id ===
-            modalEditId
+    const saveButton =
+      $("#modalSave");
+
+    if (saveButton) {
+      saveButton.disabled = true;
+      saveButton.textContent = "Đang lưu...";
+    }
+
+    try {
+
+      if (!currentUser) {
+
+        throw new Error(
+          "AUTH_REQUIRED"
         );
-
-      if (index >= 0) {
-
-        projects[index] = {
-
-          ...projects[index],
-
-          ...data,
-
-          updatedAt:
-            nowISO()
-
-        };
 
       }
 
-      showToast(
-        "Đã cập nhật công trình."
+      const savedProject =
+        await writeCloudProject(
+          localProject,
+          currentUser,
+          !modalEditId
+        );
+
+      setProjectsCache([
+        ...projects.filter(
+          (item) =>
+            item.id !==
+            savedProject.id
+        ),
+        savedProject
+      ]);
+
+      writeProjectCache(
+        currentUser.uid,
+        projectsCache
       );
 
-    } else {
+      closeModal();
 
-      projects.unshift({
-
-        id:
-          createId("CT"),
-
-        ...data,
-
-        createdAt:
-          nowISO(),
-
-        updatedAt:
-          nowISO()
-
-      });
+      renderProjectViews();
 
       showToast(
-        "Đã thêm công trình."
+        modalEditId
+          ? "Đã cập nhật công trình."
+          : "Đã thêm công trình."
       );
+
+    } catch (error) {
+
+      console.error(
+        "GROVA DOCUMENT: saveProject failed.",
+        error
+      );
+
+      if (
+        error &&
+        error.message ===
+          "AUTH_REQUIRED"
+      ) {
+
+        showToast(
+          "Chưa đăng nhập. Không thể lưu công trình."
+        );
+
+      } else {
+
+        showToast(
+          "Không thể lưu công trình lên hệ thống. Dữ liệu cục bộ chưa bị thay đổi."
+        );
+
+      }
+
+    } finally {
+
+      if (saveButton) {
+        saveButton.disabled = false;
+        saveButton.textContent = "Lưu";
+      }
 
     }
 
-    writeStorage(
-      STORAGE.projects,
-      projects
-    );
-
-    closeModal();
-
-    renderProjects();
-
-    updateStats();
-
   }
 
-  function deleteProject(id) {
+  async function deleteProject(id) {
 
     const projects =
       getProjects();
@@ -1512,21 +2434,68 @@
       return;
     }
 
-    writeStorage(
-      STORAGE.projects,
-      projects.filter(
-        (item) =>
-          item.id !== id
-      )
-    );
+    try {
 
-    renderProjects();
+      if (!currentUser) {
 
-    updateStats();
+        throw new Error(
+          "AUTH_REQUIRED"
+        );
 
-    showToast(
-      "Đã xóa công trình."
-    );
+      }
+
+      await deleteCloudProject(
+        id,
+        currentUser
+      );
+
+      const updatedProjects =
+        projects.filter(
+          (item) =>
+            item.id !== id
+        );
+
+      setProjectsCache(
+        updatedProjects
+      );
+
+      writeProjectCache(
+        currentUser.uid,
+        projectsCache
+      );
+
+      renderProjectViews();
+
+      showToast(
+        "Đã xóa công trình."
+      );
+
+    } catch (error) {
+
+      console.error(
+        "GROVA DOCUMENT: deleteProject failed.",
+        error
+      );
+
+      if (
+        error &&
+        error.message ===
+          "AUTH_REQUIRED"
+      ) {
+
+        showToast(
+          "Chưa đăng nhập. Không thể xóa công trình."
+        );
+
+      } else {
+
+        showToast(
+          "Không thể xóa công trình. Dữ liệu cục bộ chưa bị thay đổi."
+        );
+
+      }
+
+    }
 
   }
 
@@ -2509,21 +3478,13 @@
 
             <tr>
 
-              <th>
-                Công trình
-              </th>
+              <th>Công trình</th>
 
-              <th>
-                Khách hàng
-              </th>
+              <th>Khách hàng</th>
 
-              <th>
-                Trạng thái
-              </th>
+              <th>Trạng thái</th>
 
-              <th>
-                Ngày bắt đầu
-              </th>
+              <th>Ngày bắt đầu</th>
 
             </tr>
 
@@ -2839,6 +3800,20 @@
       }
     );
 
+    projectsSyncToken++;
+
+    if (currentUser) {
+
+      localStorage.removeItem(
+        getProjectCacheKey(
+          currentUser.uid
+        )
+      );
+
+    }
+
+    setProjectsCache([]);
+
     renderDashboard();
 
     showPage(
@@ -2934,105 +3909,75 @@
     switch (action) {
 
       case "new-document":
-
         openTemplatePicker();
-
         break;
 
       case "new-project":
-
         openProjectModal();
-
         break;
 
       case "edit-project":
-
         openProjectModal(
           actionButton.dataset.id
         );
-
         break;
 
       case "delete-project":
-
         deleteProject(
           actionButton.dataset.id
         );
-
         break;
 
       case "new-customer":
-
         openCustomerModal();
-
         break;
 
       case "edit-customer":
-
         openCustomerModal(
           actionButton.dataset.id
         );
-
         break;
 
       case "delete-customer":
-
         deleteCustomer(
           actionButton.dataset.id
         );
-
         break;
 
       case "new-employee":
-
         openEmployeeModal();
-
         break;
 
       case "edit-employee":
-
         openEmployeeModal(
           actionButton.dataset.id
         );
-
         break;
 
       case "delete-employee":
-
         deleteEmployee(
           actionButton.dataset.id
         );
-
         break;
 
       case "clear-history":
-
         clearHistory();
-
         break;
 
       case "close-modal":
-
         closeModal();
-
         break;
 
       case "save-settings":
-
         saveSettings();
-
         break;
 
       case "export-data":
-
         exportData();
-
         break;
 
       case "reset-data":
-
         resetData();
-
         break;
 
     }
@@ -3099,21 +4044,15 @@
     switch (modalMode) {
 
       case "project":
-
         saveProject();
-
         break;
 
       case "customer":
-
         saveCustomer();
-
         break;
 
       case "employee":
-
         saveEmployee();
-
         break;
 
     }
@@ -3194,8 +4133,6 @@
 
   function init() {
 
-    /* Navigation */
-
     $$(".nav-item").forEach(
       (button) => {
 
@@ -3213,14 +4150,10 @@
       }
     );
 
-    /* Global click */
-
     document.addEventListener(
       "click",
       handleClick
     );
-
-    /* Input / search */
 
     document.addEventListener(
       "input",
@@ -3231,8 +4164,6 @@
       "change",
       handleInput
     );
-
-    /* Modal */
 
     if ($("#modalSave")) {
 
@@ -3252,8 +4183,6 @@
 
     }
 
-    /* Mobile sidebar */
-
     if ($("#openSidebar")) {
 
       $("#openSidebar").addEventListener(
@@ -3272,14 +4201,10 @@
 
     }
 
-    /* Keyboard */
-
     document.addEventListener(
       "keydown",
       handleKeydown
     );
-
-    /* Initial render */
 
     initDocumentCategories();
 
@@ -3287,7 +4212,13 @@
 
     renderDashboard();
 
-    /* Service worker */
+    /*
+      QUAN TRỌNG:
+      Firestore bridge chạy SAU khi app đã render.
+      Lỗi Firebase/Firestore không được phép chặn init().
+    */
+
+    initFirestoreAuthBridge();
 
     registerServiceWorker();
 
