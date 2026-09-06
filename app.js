@@ -1,6 +1,6 @@
 /* =========================================================
    GROVA DOCUMENT
-   APP.JS — VERSION 206
+   APP.JS — VERSION 207
    FIRESTORE PHASE 3 — PROJECTS + CUSTOMERS + EMPLOYEES
 ========================================================= */
 
@@ -1794,6 +1794,49 @@
   /* =======================================================
      FIRESTORE SERVICE — EMPLOYEES
   ======================================================= */
+
+  /*
+    Employee actions must not depend only on the app's cached
+    currentUser variable. Firebase Auth can already have a
+    signed-in user while the Auth state bridge is still catching up.
+  */
+  function getActiveAuthUser() {
+
+    if (currentUser) {
+      return currentUser;
+    }
+
+    const auth =
+      getAuthObject();
+
+    if (
+      auth &&
+      auth.currentUser
+    ) {
+      currentUser =
+        auth.currentUser;
+
+      return currentUser;
+    }
+
+    if (
+      window.GROVA_AUTH &&
+      typeof window.GROVA_AUTH.getCurrentUser === "function"
+    ) {
+
+      const user =
+        window.GROVA_AUTH.getCurrentUser();
+
+      if (user) {
+        currentUser =
+          user;
+
+        return currentUser;
+      }
+    }
+
+    return null;
+  }
 
   function getEmployeesCollection() {
     if (!firestoreDb) {
@@ -4532,7 +4575,10 @@
 
     try {
 
-      if (!currentUser) {
+      const authUser =
+        getActiveAuthUser();
+
+      if (!authUser) {
         throw new Error(
           "AUTH_REQUIRED"
         );
@@ -4541,7 +4587,7 @@
       const savedEmployee =
         await writeCloudEmployee(
           localEmployee,
-          currentUser,
+          authUser,
           !modalEditId
         );
 
@@ -4555,7 +4601,7 @@
       ]);
 
       writeEmployeeCache(
-        currentUser.uid,
+        authUser.uid,
         employeesCache
       );
 
@@ -4630,7 +4676,10 @@
 
     try {
 
-      if (!currentUser) {
+      const authUser =
+        getActiveAuthUser();
+
+      if (!authUser) {
         throw new Error(
           "AUTH_REQUIRED"
         );
@@ -4638,7 +4687,7 @@
 
       await deleteCloudEmployee(
         id,
-        currentUser
+        authUser
       );
 
       const updatedEmployees =
