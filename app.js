@@ -1,7 +1,7 @@
 /* =========================================================
    GROVA DOCUMENT
-   APP.JS — VERSION 204
-   FIRESTORE PHASE 1 — PROJECTS ONLY
+   APP.JS — VERSION 205
+   FIRESTORE PHASE 2 — PROJECTS + CUSTOMERS
 ========================================================= */
 
 (() => {
@@ -26,6 +26,7 @@
   };
 
   const PROJECT_CACHE_PREFIX = "GROVA_PROJECTS_V2_";
+  const CUSTOMER_CACHE_PREFIX = "GROVA_CUSTOMERS_V2_";
 
   const PAGE_INFO = {
     dashboard: {
@@ -92,6 +93,12 @@
   let projectsSyncToken = 0;
 
   let firestoreSyncRunning = false;
+
+  let customersCache = [];
+
+  let customersSyncToken = 0;
+
+  let customersSyncRunning = false;
 
   /* =======================================================
      DATA
@@ -270,8 +277,97 @@
 
   }
 
+  function getCustomerCacheKey(uid) {
+    return (
+      CUSTOMER_CACHE_PREFIX +
+      String(uid || "")
+    );
+  }
+
+  function readCustomerCache(uid) {
+    if (!uid) {
+      return [];
+    }
+
+    return readStorage(
+      getCustomerCacheKey(uid),
+      []
+    );
+  }
+
+  function writeCustomerCache(uid, customers) {
+    if (!uid) {
+      return false;
+    }
+
+    return writeStorage(
+      getCustomerCacheKey(uid),
+      Array.isArray(customers)
+        ? customers
+        : []
+    );
+  }
+
+  function normalizeCustomers(customers) {
+    if (!Array.isArray(customers)) {
+      return [];
+    }
+
+    return customers
+      .filter(
+        (customer) =>
+          customer &&
+          customer.id
+      )
+      .map(
+        (customer) => ({
+          ...customer,
+          id: String(customer.id)
+        })
+      )
+      .sort(
+        (a, b) =>
+          String(b.updatedAt || b.createdAt || "")
+            .localeCompare(
+              String(a.updatedAt || a.createdAt || "")
+            )
+      );
+  }
+
+  function setCustomersCache(customers) {
+    customersCache =
+      normalizeCustomers(customers);
+  }
+
+  function getBestLocalCustomers(uid) {
+    const scopedCache =
+      normalizeCustomers(
+        readCustomerCache(uid)
+      );
+
+    if (scopedCache.length) {
+      return scopedCache;
+    }
+
+    return normalizeCustomers(
+      readStorage(
+        STORAGE.customers,
+        []
+      )
+    );
+  }
+
   function getCustomers() {
-    return readStorage(STORAGE.customers, []);
+    if (currentUser) {
+      return customersCache.slice();
+    }
+
+    return normalizeCustomers(
+      readStorage(
+        STORAGE.customers,
+        []
+      )
+    );
   }
 
   function getEmployees() {
@@ -306,7 +402,7 @@
   }
 
   /* =======================================================
-     FIRESTORE SERVICE — PROJECTS ONLY
+     FIRESTORE SERVICE — PROJECTS + CUSTOMERS
   ======================================================= */
 
   function getAuthObject() {
@@ -1012,6 +1108,7 @@
   function handleAuthUser(user) {
 
     projectsSyncToken++;
+    customersSyncToken++;
 
     currentUser =
       user || null;
@@ -1019,23 +1116,49 @@
     if (!user) {
 
       setProjectsCache([]);
+      setCustomersCache([]);
 
       renderProjectViews();
+
+      if (currentPage === "customers") {
+        renderCustomers();
+      }
+
+      updateStats();
 
       return;
 
     }
 
-    const cached =
+    const cachedProjects =
       getBestLocalProjects(
         user.uid
       );
 
     setProjectsCache(
-      cached
-    );renderProjectViews();
+      cachedProjects
+    );
+
+    const cachedCustomers =
+      getBestLocalCustomers(
+        user.uid
+      );
+
+    setCustomersCache(
+      cachedCustomers
+    );
+
+    renderProjectViews();
+
+    if (currentPage === "customers") {
+      renderCustomers();
+    }
 
     syncProjectsFromCloud(
+      user
+    );
+
+    syncCustomersFromCloud(
       user
     );
 
@@ -1066,6 +1189,493 @@
       }
     );
 
+  }
+
+  /* =======================================================
+     FIRESTORE SERVICE — CUSTOMERS
+  ======================================================= */
+
+  function getCustomersCollection() {
+    if (!firestoreDb) {
+      return null;
+    }
+
+    return firestoreDb.collection("customers");
+  }
+
+  function buildCustomerData(customer, user, isCreate = false) {
+    const now =
+      nowISO();
+
+    const uid =
+      user?.uid || "";
+
+    return {
+      id:
+        String(customer.id),
+
+      name:
+        customer.name || "",
+
+      phone:
+        customer.phone || "",
+
+      email:
+        customer.email || "",
+
+      taxCode:
+        customer.taxCode || "",
+
+      contact:
+        customer.contact || "",
+
+      address:
+        customer.address || "",
+
+      note:
+        customer.note || "",
+
+      createdAt:
+        customer.createdAt ||
+        now,
+
+      updatedAt:
+        customer.updatedAt ||
+        now,
+
+      createdBy:
+        customer.createdBy ||
+        uid,
+
+      updatedBy:
+        uid
+    };
+  }
+
+  function mapFirestoreCustomer(doc) {
+    const data =
+      doc.data() || {};
+
+    return {
+      ...data,
+      id:
+        String(doc.id)
+    };
+  }
+
+  async function readCloudCustomers() {
+    if (!currentUser) {
+      return null;
+    }
+
+    if (!initializeFirestore()) {
+      return null;
+    }
+
+    await waitForFirestore();
+
+    const collection =
+      getCustomersCollection();
+
+    if (!collection) {
+      return null;
+    }
+
+    const snapshot =
+      await collection.get();
+
+    return normalizeCustomers(
+      snapshot.docs.map(
+        mapFirestoreCustomer
+      )
+    );
+  }
+
+  async function writeCloudCustomer(customer, user, isCreate = false) {
+    if (!user) {
+      throw new Error(
+        "AUTH_REQUIRED"
+      );
+    }
+
+    if (!initializeFirestore()) {
+      throw new Error(
+        "FIRESTORE_UNAVAILABLE"
+      );
+    }
+
+    await waitForFirestore();
+
+    const data =
+      buildCustomerData(
+        customer,
+        user,
+        isCreate
+      );
+
+    const reference =
+      getCustomersCollection()
+        .doc(String(customer.id));
+
+    await reference.set(
+      data,
+      {
+        merge: true
+      }
+    );
+
+    const verification =
+      await reference.get();
+
+    if (!verification.exists) {
+      throw new Error(
+        "WRITE_VERIFICATION_FAILED"
+      );
+    }
+
+    return mapFirestoreCustomer(
+      verification
+    );
+  }
+
+  async function deleteCloudCustomer(id, user) {
+    if (!user) {
+      throw new Error(
+        "AUTH_REQUIRED"
+      );
+    }
+
+    if (!initializeFirestore()) {
+      throw new Error(
+        "FIRESTORE_UNAVAILABLE"
+      );
+    }
+
+    await waitForFirestore();
+
+    const reference =
+      getCustomersCollection()
+        .doc(String(id));
+
+    await reference.delete();
+
+    const verification =
+      await reference.get();
+
+    if (verification.exists) {
+      throw new Error(
+        "DELETE_VERIFICATION_FAILED"
+      );
+    }
+
+    return true;
+  }
+
+  function customerIds(customers) {
+    return normalizeCustomers(customers)
+      .map(
+        (customer) =>
+          String(customer.id)
+      )
+      .sort();
+  }
+
+  function sameCustomerIdSet(a, b) {
+    const left =
+      customerIds(a);
+
+    const right =
+      customerIds(b);
+
+    if (
+      left.length !==
+      right.length
+    ) {
+      return false;
+    }
+
+    return left.every(
+      (id, index) =>
+        id === right[index]
+    );
+  }
+
+  async function verifyCustomerMigration(expectedCustomers) {
+    const cloud =
+      await readCloudCustomers();
+
+    if (!cloud) {
+      return false;
+    }
+
+    const expected =
+      normalizeCustomers(
+        expectedCustomers
+      );
+
+    if (
+      cloud.length !==
+      expected.length
+    ) {
+      return false;
+    }
+
+    return sameCustomerIdSet(
+      cloud,
+      expected
+    );
+  }
+
+  function showCustomerSyncError(error) {
+    console.error(
+      "GROVA DOCUMENT: Customer Firestore error.",
+      error
+    );
+
+    showToast(
+      "Không thể đồng bộ khách hàng. Ứng dụng vẫn đang dùng dữ liệu cục bộ."
+    );
+  }
+
+  async function migrateLocalCustomersIfNeeded(
+    user,
+    localCustomers
+  ) {
+    if (!user) {
+      return false;
+    }
+
+    const sourceCustomers =
+      normalizeCustomers(
+        localCustomers
+      );
+
+    if (!sourceCustomers.length) {
+      return false;
+    }
+
+    const cloud =
+      await readCloudCustomers();
+
+    if (!cloud) {
+      return false;
+    }
+
+    if (cloud.length > 0) {
+      setCustomersCache(cloud);
+
+      writeCustomerCache(
+        user.uid,
+        cloud
+      );
+
+      return false;
+    }
+
+    try {
+      for (
+        const customer of sourceCustomers
+      ) {
+        const data =
+          buildCustomerData(
+            customer,
+            user,
+            !customer.createdBy
+          );
+
+        await getCustomersCollection()
+          .doc(String(customer.id))
+          .set(data);
+      }
+
+      const verified =
+        await verifyCustomerMigration(
+          sourceCustomers
+        );
+
+      if (!verified) {
+        throw new Error(
+          "MIGRATION_VERIFICATION_FAILED"
+        );
+      }
+
+      const migratedCloud =
+        await readCloudCustomers();
+
+      if (!migratedCloud) {
+        throw new Error(
+          "MIGRATION_READBACK_FAILED"
+        );
+      }
+
+      setCustomersCache(
+        migratedCloud
+      );
+
+      writeCustomerCache(
+        user.uid,
+        migratedCloud
+      );
+
+      showToast(
+        "Đã đồng bộ khách hàng cũ lên Firestore."
+      );
+
+      return true;
+
+    } catch (error) {
+      showCustomerSyncError(
+        error
+      );
+
+      return false;
+    }
+  }
+
+  async function syncCustomersFromCloud(user) {
+    if (!user) {
+      return;
+    }
+
+    const token =
+      ++customersSyncToken;
+
+    customersSyncRunning = true;
+
+    try {
+      const initialized =
+        initializeFirestore();
+
+      if (!initialized) {
+        return;
+      }
+
+      const localCustomers =
+        getBestLocalCustomers(
+          user.uid
+        );
+
+      if (localCustomers.length) {
+        setCustomersCache(
+          localCustomers
+        );
+
+        if (currentPage === "customers") {
+          renderCustomers();
+        }
+
+        updateStats();
+      }
+
+      const cloud =
+        await readCloudCustomers();
+
+      if (
+        token !==
+          customersSyncToken ||
+        currentUser?.uid !==
+          user.uid
+      ) {
+        return;
+      }
+
+      if (!cloud) {
+        return;
+      }
+
+      /* Cloud có dữ liệu => Cloud thắng. */
+      if (cloud.length > 0) {
+        setCustomersCache(
+          cloud
+        );
+
+        writeCustomerCache(
+          user.uid,
+          cloud
+        );
+
+        if (currentPage === "customers") {
+          renderCustomers();
+        }
+
+        updateStats();
+
+        return;
+      }
+
+      /*
+        Cloud đang rỗng:
+        chỉ migrate nếu local thật sự có dữ liệu.
+        Không bao giờ xóa cache chỉ vì cloud rỗng.
+      */
+      if (localCustomers.length) {
+        const migrated =
+          await migrateLocalCustomersIfNeeded(
+            user,
+            localCustomers
+          );
+
+        if (
+          token !==
+            customersSyncToken ||
+          currentUser?.uid !==
+            user.uid
+        ) {
+          return;
+        }
+
+        if (migrated) {
+          if (currentPage === "customers") {
+            renderCustomers();
+          }
+
+          updateStats();
+
+          return;
+        }
+
+        /* Migration lỗi => giữ nguyên local cache. */
+        if (currentPage === "customers") {
+          renderCustomers();
+        }
+
+        updateStats();
+
+        return;
+      }
+
+      /* Cả local và cloud đều rỗng. */
+      setCustomersCache([]);
+
+      writeCustomerCache(
+        user.uid,
+        []
+      );
+
+      if (currentPage === "customers") {
+        renderCustomers();
+      }
+
+      updateStats();
+
+    } catch (error) {
+      if (
+        token ===
+        customersSyncToken
+      ) {
+        showCustomerSyncError(
+          error
+        );
+      }
+
+    } finally {
+      if (
+        token ===
+        customersSyncToken
+      ) {
+        customersSyncRunning = false;
+      }
+    }
   }
 
   /* =======================================================
@@ -2737,7 +3347,7 @@
 
   }
 
-  function saveCustomer() {
+  async function saveCustomer() {
 
     const name =
       $("#modalCustomerName")
@@ -2751,14 +3361,24 @@
       );
 
       return;
-
     }
 
     const customers =
       getCustomers();
 
-    const data = {
+    const existingCustomer =
+      modalEditId
+        ? customers.find(
+            (item) =>
+              item.id ===
+              modalEditId
+          )
+        : null;
 
+    const now =
+      nowISO();
+
+    const data = {
       name,
 
       phone:
@@ -2790,74 +3410,105 @@
         $("#modalCustomerNote")
           ?.value
           .trim() || ""
-
     };
 
-    if (modalEditId) {
+    const localCustomer =
+      modalEditId && existingCustomer
+        ? {
+            ...existingCustomer,
+            ...data,
+            updatedAt: now
+          }
+        : {
+            id: createId("KH"),
+            ...data,
+            createdAt: now,
+            updatedAt: now
+          };
 
-      const index =
-        customers.findIndex(
-          (item) =>
-            item.id ===
-            modalEditId
-        );
+    const saveButton =
+      $("#modalSave");
 
-      if (index >= 0) {
-
-        customers[index] = {
-
-          ...customers[index],
-
-          ...data,
-
-          updatedAt:
-            nowISO()
-
-        };
-
-      }
-
-      showToast(
-        "Đã cập nhật khách hàng."
-      );
-
-    } else {
-
-      customers.unshift({
-
-        id:
-          createId("KH"),
-
-        ...data,
-
-        createdAt:
-          nowISO(),
-
-        updatedAt:
-          nowISO()
-
-      });
-
-      showToast(
-        "Đã thêm khách hàng."
-      );
-
+    if (saveButton) {
+      saveButton.disabled = true;
+      saveButton.textContent = "Đang lưu...";
     }
 
-    writeStorage(
-      STORAGE.customers,
-      customers
-    );
+    try {
 
-    closeModal();
+      if (!currentUser) {
+        throw new Error(
+          "AUTH_REQUIRED"
+        );
+      }
 
-    renderCustomers();
+      const savedCustomer =
+        await writeCloudCustomer(
+          localCustomer,
+          currentUser,
+          !modalEditId
+        );
 
-    updateStats();
+      setCustomersCache([
+        ...customers.filter(
+          (item) =>
+            item.id !==
+            savedCustomer.id
+        ),
+        savedCustomer
+      ]);
 
+      writeCustomerCache(
+        currentUser.uid,
+        customersCache
+      );
+
+      closeModal();
+
+      renderCustomers();
+
+      updateStats();
+
+      showToast(
+        modalEditId
+          ? "Đã cập nhật khách hàng."
+          : "Đã thêm khách hàng."
+      );
+
+    } catch (error) {
+
+      console.error(
+        "GROVA DOCUMENT: saveCustomer failed.",
+        error
+      );
+
+      if (
+        error &&
+        error.message ===
+          "AUTH_REQUIRED"
+      ) {
+
+        showToast(
+          "Chưa đăng nhập. Không thể lưu khách hàng."
+        );
+
+      } else {
+
+        showToast(
+          "Không thể lưu khách hàng lên hệ thống. Dữ liệu cục bộ chưa bị thay đổi."
+        );
+      }
+
+    } finally {
+
+      if (saveButton) {
+        saveButton.disabled = false;
+        saveButton.textContent = "Lưu";
+      }
+    }
   }
 
-  function deleteCustomer(id) {
+  async function deleteCustomer(id) {
 
     const customers =
       getCustomers();
@@ -2881,22 +3532,66 @@
       return;
     }
 
-    writeStorage(
-      STORAGE.customers,
-      customers.filter(
-        (item) =>
-          item.id !== id
-      )
-    );
+    try {
 
-    renderCustomers();
+      if (!currentUser) {
+        throw new Error(
+          "AUTH_REQUIRED"
+        );
+      }
 
-    updateStats();
+      await deleteCloudCustomer(
+        id,
+        currentUser
+      );
 
-    showToast(
-      "Đã xóa khách hàng."
-    );
+      const updatedCustomers =
+        customers.filter(
+          (item) =>
+            item.id !== id
+        );
 
+      setCustomersCache(
+        updatedCustomers
+      );
+
+      writeCustomerCache(
+        currentUser.uid,
+        customersCache
+      );
+
+      renderCustomers();
+
+      updateStats();
+
+      showToast(
+        "Đã xóa khách hàng."
+      );
+
+    } catch (error) {
+
+      console.error(
+        "GROVA DOCUMENT: deleteCustomer failed.",
+        error
+      );
+
+      if (
+        error &&
+        error.message ===
+          "AUTH_REQUIRED"
+      ) {
+
+        showToast(
+          "Chưa đăng nhập. Không thể xóa khách hàng."
+        );
+
+      } else {
+
+        showToast(
+          "Không thể xóa khách hàng. Dữ liệu cục bộ chưa bị thay đổi."
+        );
+      }
+    }
   }
 
   /* =======================================================
@@ -3810,9 +4505,16 @@
         )
       );
 
+      localStorage.removeItem(
+        getCustomerCacheKey(
+          currentUser.uid
+        )
+      );
+
     }
 
     setProjectsCache([]);
+    setCustomersCache([]);
 
     renderDashboard();
 
@@ -4245,3 +4947,4 @@
   }
 
 })();
+
