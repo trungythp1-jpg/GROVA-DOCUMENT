@@ -440,12 +440,6 @@
       gap: 24px;
     }
 
-    /*
-      KHÔNG ÉP 1 TRANG.
-      Mỗi .paper có thể tự nhiên dài theo nội dung.
-      Khi in, nội dung sẽ tự động phân trang A4.
-    */
-
     .paper {
       width: 210mm;
       min-height: 297mm;
@@ -811,12 +805,6 @@
         display: block;
       }
 
-      /*
-        Không đặt height cố định.
-        Không đặt page-break để ép thành 1 trang.
-        Nội dung dài sẽ tự động sang trang tiếp theo.
-      */
-
       .paper {
         width: 210mm;
         min-height: 0;
@@ -856,6 +844,7 @@
 
   <header class="app-topbar">
     <div class="topbar-left">
+
       <button
         type="button"
         class="back-button"
@@ -869,6 +858,7 @@
         <strong>GROVA DOCUMENT</strong>
         <span>Biên bản xác nhận phát sinh</span>
       </div>
+
     </div>
 
     <div class="topbar-right">
@@ -897,15 +887,22 @@
       <section class="form-panel">
 
         <div class="form-header">
-          <span class="eyebrow">GROVA DOCUMENT</span>
 
-          <h1>Biên bản xác nhận phát sinh</h1>
+          <span class="eyebrow">
+            GROVA DOCUMENT
+          </span>
+
+          <h1>
+            Biên bản xác nhận phát sinh
+          </h1>
 
           <p>
             Nhập thông tin để cập nhật trực tiếp vào văn bản.
             Nội dung văn bản giữ nguyên theo mẫu gốc.
           </p>
+
         </div>
+
 
         <div class="form-body">
 
@@ -915,9 +912,11 @@
             Thông tin văn bản
           </div>
 
+
           <div class="two-col">
 
             <div class="field">
+
               <label for="documentNo">
                 Số biên bản
               </label>
@@ -926,9 +925,12 @@
                 id="documentNo"
                 type="text"
               >
+
             </div>
 
+
             <div class="field">
+
               <label for="documentDate">
                 Ngày lập biên bản
               </label>
@@ -937,12 +939,14 @@
                 id="documentDate"
                 type="date"
               >
+
             </div>
 
           </div>
 
 
           <div class="field">
+
             <label for="contractNo">
               Hợp đồng nguyên tắc số
             </label>
@@ -952,10 +956,12 @@
               type="text"
               value="01/2026/HĐNT"
             >
+
           </div>
 
 
           <div class="field">
+
             <label for="appendixNo">
               Phụ lục công trình số
             </label>
@@ -965,6 +971,7 @@
               type="text"
               placeholder="Nhập số phụ lục"
             >
+
           </div>
 
 
@@ -974,19 +981,24 @@
             Bên A
           </div>
 
+
           <div class="field">
-            <label>
+
+            <label for="partyACompany">
               Tên công ty
             </label>
 
             <input
+              id="partyACompany"
               type="text"
-              value="CÔNG TY CỔ PHẦN GROVA HOLDINGS"
               readonly
             >
+
           </div>
 
+
           <div class="field">
+
             <label for="partyARepresentative">
               Đại diện
             </label>
@@ -995,9 +1007,12 @@
               id="partyARepresentative"
               type="text"
             >
+
           </div>
 
+
           <div class="field">
+
             <label for="partyAPosition">
               Chức vụ
             </label>
@@ -1006,6 +1021,7 @@
               id="partyAPosition"
               type="text"
             >
+
           </div>
 
 
@@ -1015,7 +1031,9 @@
             Bên B
           </div>
 
+
           <div class="field">
+
             <label for="partyBCompany">
               Tên công ty
             </label>
@@ -1024,9 +1042,12 @@
               id="partyBCompany"
               type="text"
             >
+
           </div>
 
+
           <div class="field">
+
             <label for="partyBRepresentative">
               Đại diện
             </label>
@@ -1035,9 +1056,12 @@
               id="partyBRepresentative"
               type="text"
             >
+
           </div>
 
+
           <div class="field">
+
             <label for="partyBPosition">
               Chức vụ
             </label>
@@ -1046,6 +1070,7 @@
               id="partyBPosition"
               type="text"
             >
+
           </div>
 
 
@@ -1055,7 +1080,9 @@
             I. Thông tin công trình
           </div>
 
+
           <div class="field">
+
             <label for="projectName">
               Tên công trình
             </label>
@@ -1064,9 +1091,12 @@
               id="projectName"
               type="text"
             >
+
           </div>
 
+
           <div class="field">
+
             <label for="projectAddress">
               Địa chỉ
             </label>
@@ -1075,6 +1105,7 @@
               id="projectAddress"
               type="text"
             >
+
           </div>
 
 
@@ -1084,96 +1115,153 @@
             II. Nội dung phát sinh
           </div>
 
+
           <div class="field">
+
             <label>
               Lý do phát sinh
             </label>
 
+
             <div class="check-list">
 
               <label class="check-item">
+
                 <input
                   type="checkbox"
                   value="Hố thang sai kích thước"
                   class="reason"
                 >
-                <span>Hố thang sai kích thước</span>
+
+                <span>
+                  Hố thang sai kích thước
+                </span>
+
               </label>
 
+
               <label class="check-item">
+
                 <input
                   type="checkbox"
                   value="Đục phá bê tông"
                   class="reason"
                 >
-                <span>Đục phá bê tông</span>
+
+                <span>
+                  Đục phá bê tông
+                </span>
+
               </label>
 
+
               <label class="check-item">
+
                 <input
                   type="checkbox"
                   value="Gia công bổ sung"
                   class="reason"
                 >
-                <span>Gia công bổ sung</span>
+
+                <span>
+                  Gia công bổ sung
+                </span>
+
               </label>
 
+
               <label class="check-item">
+
                 <input
                   type="checkbox"
                   value="Thay đổi thiết kế"
                   class="reason"
                 >
-                <span>Thay đổi thiết kế</span>
+
+                <span>
+                  Thay đổi thiết kế
+                </span>
+
               </label>
 
+
               <label class="check-item">
+
                 <input
                   type="checkbox"
                   value="Tăng số stop"
                   class="reason"
                 >
-                <span>Tăng số stop</span>
+
+                <span>
+                  Tăng số stop
+                </span>
+
               </label>
 
+
               <label class="check-item">
+
                 <input
                   type="checkbox"
                   value="Thi công ban đêm"
                   class="reason"
                 >
-                <span>Thi công ban đêm</span>
+
+                <span>
+                  Thi công ban đêm
+                </span>
+
               </label>
 
+
               <label class="check-item">
+
                 <input
                   type="checkbox"
                   value="Chờ việc theo yêu cầu của công trình"
                   class="reason"
                 >
-                <span>Chờ việc theo yêu cầu của công trình</span>
+
+                <span>
+                  Chờ việc theo yêu cầu của công trình
+                </span>
+
               </label>
 
+
               <label class="check-item">
+
                 <input
                   type="checkbox"
                   value="Điều động nhân sự nhiều lần"
                   class="reason"
                 >
-                <span>Điều động nhân sự nhiều lần</span>
+
+                <span>
+                  Điều động nhân sự nhiều lần
+                </span>
+
               </label>
 
+
               <label class="check-item">
+
                 <input
                   type="checkbox"
                   value="Khác"
                   class="reason"
                   id="reasonOther"
                 >
-                <span>Khác:</span>
+
+                <span>
+                  Khác:
+                </span>
+
               </label>
 
             </div>
+
           </div>
 
 
@@ -1182,6 +1270,7 @@
             id="otherReasonField"
             style="display:none;"
           >
+
             <label for="otherReason">
               Nội dung khác
             </label>
@@ -1190,10 +1279,12 @@
               id="otherReason"
               type="text"
             >
+
           </div>
 
 
           <div class="field">
+
             <label for="detailDescription">
               Mô tả chi tiết
             </label>
@@ -1202,6 +1293,7 @@
               id="detailDescription"
               rows="5"
             ></textarea>
+
           </div>
 
 
@@ -1211,25 +1303,51 @@
             III. Giá trị phát sinh
           </div>
 
+
           <div class="expense-form">
 
             <table>
 
               <thead>
+
                 <tr>
-                  <th>STT</th>
-                  <th>Nội dung</th>
-                  <th>ĐVT</th>
-                  <th>Khối lượng</th>
-                  <th>Đơn giá</th>
-                  <th>Thành tiền</th>
+
+                  <th>
+                    STT
+                  </th>
+
+                  <th>
+                    Nội dung
+                  </th>
+
+                  <th>
+                    ĐVT
+                  </th>
+
+                  <th>
+                    Khối lượng
+                  </th>
+
+                  <th>
+                    Đơn giá
+                  </th>
+
+                  <th>
+                    Thành tiền
+                  </th>
+
                 </tr>
+
               </thead>
+
 
               <tbody>
 
                 <tr>
-                  <td>1</td>
+
+                  <td>
+                    1
+                  </td>
 
                   <td>
                     <input
@@ -1270,11 +1388,15 @@
                       readonly
                     >
                   </td>
+
                 </tr>
 
 
                 <tr>
-                  <td>2</td>
+
+                  <td>
+                    2
+                  </td>
 
                   <td>
                     <input
@@ -1314,13 +1436,16 @@
                       type="text"
                       readonly
                     >
-                  >
                   </td>
+
                 </tr>
 
 
                 <tr>
-                  <td>3</td>
+
+                  <td>
+                    3
+                  </td>
 
                   <td>
                     <input
@@ -1361,6 +1486,7 @@
                       readonly
                     >
                   </td>
+
                 </tr>
 
               </tbody>
@@ -1373,17 +1499,25 @@
           <div class="total-box">
 
             <div class="total-box-row">
-              <strong>TỔNG GIÁ TRỊ PHÁT SINH</strong>
+
+              <strong>
+                TỔNG GIÁ TRỊ PHÁT SINH
+              </strong>
 
               <span id="formTotal">
                 0 VNĐ
               </span>
+
             </div>
 
           </div>
 
 
-          <div class="field" style="margin-top:10px;">
+          <div
+            class="field"
+            style="margin-top:10px;"
+          >
+
             <label for="amountInWords">
               Bằng chữ
             </label>
@@ -1392,6 +1526,7 @@
               id="amountInWords"
               rows="2"
             ></textarea>
+
           </div>
 
 
@@ -1401,7 +1536,9 @@
             IV. Thời gian thực hiện
           </div>
 
+
           <div class="field">
+
             <label for="executionDate">
               Ngày thực hiện phát sinh
             </label>
@@ -1410,9 +1547,12 @@
               id="executionDate"
               type="date"
             >
+
           </div>
 
+
           <div class="field">
+
             <label for="delayDays">
               Thời gian ảnh hưởng tiến độ (nếu có)
             </label>
@@ -1423,6 +1563,7 @@
               min="0"
               step="1"
             >
+
           </div>
 
 
@@ -1432,44 +1573,69 @@
             V. Xác nhận
           </div>
 
+
           <div class="check-list">
 
             <label class="check-item">
+
               <input
                 id="confirmContent"
                 type="checkbox"
               >
-              <span>Bên B đồng ý nội dung phát sinh.</span>
+
+              <span>
+                Bên B đồng ý nội dung phát sinh.
+              </span>
+
             </label>
 
+
             <label class="check-item">
+
               <input
                 id="confirmValue"
                 type="checkbox"
               >
-              <span>Bên B đồng ý giá trị phát sinh.</span>
+
+              <span>
+                Bên B đồng ý giá trị phát sinh.
+              </span>
+
             </label>
 
+
             <label class="check-item">
+
               <input
                 id="confirmPayment"
                 type="checkbox"
               >
-              <span>Bên B đồng ý thanh toán cùng đợt nghiệm thu.</span>
+
+              <span>
+                Bên B đồng ý thanh toán cùng đợt nghiệm thu.
+              </span>
+
             </label>
 
+
             <label class="check-item">
+
               <input
                 id="confirmProgress"
                 type="checkbox"
               >
-              <span>Bên B đồng ý điều chỉnh tiến độ (nếu có).</span>
+
+              <span>
+                Bên B đồng ý điều chỉnh tiến độ (nếu có).
+              </span>
+
             </label>
 
           </div>
 
 
           <div class="field">
+
             <label for="notes">
               Ghi chú
             </label>
@@ -1478,6 +1644,7 @@
               id="notes"
               rows="4"
             ></textarea>
+
           </div>
 
 
@@ -1493,6 +1660,7 @@
               Xóa nhập
             </button>
 
+
             <button
               type="button"
               class="btn btn-primary"
@@ -1504,6 +1672,7 @@
           </div>
 
         </div>
+
       </section>
 
 
@@ -1516,10 +1685,15 @@
         <div class="preview-toolbar">
 
           <div>
-            <h2>Xem trước văn bản</h2>
+
+            <h2>
+              Xem trước văn bản
+            </h2>
+
             <span>
               Khổ A4 – nội dung tự động phân trang
             </span>
+
           </div>
 
         </div>
@@ -1539,12 +1713,15 @@
               <div class="doc-header">
 
                 <div class="doc-logo-box">
+
                   <img
                     src="../data/grova_logo.png"
                     class="doc-logo"
                     alt="GROVA HOLDINGS"
                   >
+
                 </div>
+
 
                 <div class="national-header">
 
@@ -1571,10 +1748,13 @@
 
 
               <div class="doc-number">
+
                 Số:
+
                 <span id="previewDocumentNo">
                   01/BBPS/2026
                 </span>
+
               </div>
 
 
@@ -1583,17 +1763,24 @@
               <div class="doc-bases">
 
                 <div>
+
                   Căn cứ Hợp đồng nguyên tắc số:
+
                   <span id="previewContractNo">
                     01/2026/HĐNT
                   </span>
+
                 </div>
 
+
                 <div>
+
                   Căn cứ Phụ lục công trình số:
+
                   <span id="previewAppendixNo">
                     ....../PLHĐ/20......
                   </span>
+
                 </div>
 
               </div>
@@ -1602,19 +1789,27 @@
               <!-- DATE -->
 
               <div class="doc-date">
+
                 Hôm nay, ngày
+
                 <span id="previewDay">
                   ......
                 </span>
+
                 tháng
+
                 <span id="previewMonth">
                   ......
                 </span>
+
                 năm
+
                 <span id="previewYear">
                   20......
                 </span>,
+
                 chúng tôi gồm:
+
               </div>
 
 
@@ -1624,22 +1819,35 @@
                 BÊN A (ĐƠN VỊ THI CÔNG)
               </div>
 
-              <div class="party-line">
-                <strong>CÔNG TY CỔ PHẦN GROVA HOLDINGS</strong>
-              </div>
 
               <div class="party-line">
+
+                <strong id="previewCompanyName">
+                  CÔNG TY CỔ PHẦN GROVA HOLDINGS
+                </strong>
+
+              </div>
+
+
+              <div class="party-line">
+
                 Đại diện:
+
                 <span id="previewPartyARepresentative">
                   ..........................................................
                 </span>
+
               </div>
 
+
               <div class="party-line">
+
                 Chức vụ:
+
                 <span id="previewPartyAPosition">
                   ..........................................................
                 </span>
+
               </div>
 
 
@@ -1654,25 +1862,37 @@
                 BÊN B (ĐƠN VỊ THUÊ THI CÔNG)
               </div>
 
+
               <div class="party-line">
+
                 Tên công ty:
+
                 <span id="previewPartyBCompany">
                   ..........................................................
                 </span>
+
               </div>
 
+
               <div class="party-line">
+
                 Đại diện:
+
                 <span id="previewPartyBRepresentative">
                   ..........................................................
                 </span>
+
               </div>
 
+
               <div class="party-line">
+
                 Chức vụ:
+
                 <span id="previewPartyBPosition">
                   ..........................................................
                 </span>
+
               </div>
 
 
@@ -1682,18 +1902,26 @@
                 I. THÔNG TIN CÔNG TRÌNH
               </div>
 
+
               <div class="party-line">
+
                 Tên công trình:
+
                 <span id="previewProjectName">
                   ..........................................................
                 </span>
+
               </div>
 
+
               <div class="party-line">
+
                 Địa chỉ:
+
                 <span id="previewProjectAddress">
                   ..........................................................
                 </span>
+
               </div>
 
 
@@ -1703,9 +1931,11 @@
                 II. NỘI DUNG PHÁT SINH
               </div>
 
+
               <div class="party-line">
                 Lý do phát sinh:
               </div>
+
 
               <ul class="reason-list">
 
@@ -1750,11 +1980,15 @@
                 </li>
 
                 <li>
+
                   <span id="checkReason9">☐</span>
+
                   Khác:
+
                   <span id="previewOtherReason">
                     ..........................................................
                   </span>
+
                 </li>
 
               </ul>
@@ -1763,6 +1997,7 @@
               <div class="party-line">
                 Mô tả chi tiết:
               </div>
+
 
               <div class="detail-lines">
 
@@ -1824,6 +2059,7 @@
                   </tr>
 
                 </thead>
+
 
                 <tbody>
 
@@ -1946,6 +2182,7 @@
               <div class="amount-text">
 
                 (Bằng chữ:
+
                 <span id="previewAmountInWords">
                   ....................................................................
                 </span>)
@@ -1959,22 +2196,33 @@
                 IV. THỜI GIAN THỰC HIỆN
               </div>
 
+
               <div class="party-line">
+
                 Ngày thực hiện phát sinh:
+
                 <span id="previewExecutionDate">
                   ...... / ...... / 20......
                 </span>
+
               </div>
 
+
               <div class="party-line">
+
                 Thời gian ảnh hưởng tiến độ (nếu có):
+
                 <span id="previewDelayDays">
                   .............. ngày
                 </span>
+
               </div>
 
+
               <div class="party-line">
+
                 Các bên thống nhất phần phát sinh nêu trên sẽ được cộng vào giá trị thanh toán của công trình.
+
               </div>
 
 
@@ -1988,23 +2236,46 @@
               <div class="confirmation-list">
 
                 <div class="confirmation-line">
-                  <span id="confirmContentMark">☐</span>
+
+                  <span id="confirmContentMark">
+                    ☐
+                  </span>
+
                   Bên B đồng ý nội dung phát sinh.
+
                 </div>
 
+
                 <div class="confirmation-line">
-                  <span id="confirmValueMark">☐</span>
+
+                  <span id="confirmValueMark">
+                    ☐
+                  </span>
+
                   Bên B đồng ý giá trị phát sinh.
+
                 </div>
 
+
                 <div class="confirmation-line">
-                  <span id="confirmPaymentMark">☐</span>
+
+                  <span id="confirmPaymentMark">
+                    ☐
+                  </span>
+
                   Bên B đồng ý thanh toán cùng đợt nghiệm thu.
+
                 </div>
 
+
                 <div class="confirmation-line">
-                  <span id="confirmProgressMark">☐</span>
+
+                  <span id="confirmProgressMark">
+                    ☐
+                  </span>
+
                   Bên B đồng ý điều chỉnh tiến độ (nếu có).
+
                 </div>
 
               </div>
@@ -2013,6 +2284,7 @@
               <div class="party-line">
                 Ghi chú:
               </div>
+
 
               <div class="note-lines">
 
@@ -2055,9 +2327,14 @@
                     ĐẠI DIỆN BÊN A
                   </div>
 
-                  <div class="signature-company">
+
+                  <div
+                    class="signature-company"
+                    id="previewSignatureCompany"
+                  >
                     CÔNG TY CỔ PHẦN GROVA HOLDINGS
                   </div>
+
 
                   <div class="signature-note">
                     (Ký, ghi rõ họ tên)
@@ -2071,6 +2348,7 @@
                   <div class="signature-title">
                     ĐẠI DIỆN BÊN B
                   </div>
+
 
                   <div class="signature-note">
                     (Ký, ghi rõ họ tên, đóng dấu)
@@ -2096,6 +2374,8 @@
   <script>
     /* =========================================
        GROVA DOCUMENT – TEMPLATE 04
+       Đồng bộ thông tin công ty từ
+       GROVA_SETTINGS_V1
     ========================================= */
 
     const STORAGE_KEY =
@@ -2104,105 +2384,412 @@
     const COUNTER_KEY =
       "grova_bbps_counter";
 
+    const SETTINGS_KEY =
+      "GROVA_SETTINGS_V1";
+
+
+    /* =========================================
+       THÔNG TIN MẶC ĐỊNH GROVA
+    ========================================= */
+
+    const DEFAULT_SETTINGS = {
+
+      companyName:
+        "CÔNG TY CỔ PHẦN GROVA HOLDINGS",
+
+      taxCode:
+        "0202328361",
+
+      address:
+        "49A/348 Trần Nguyên Hãn, Phường An Biên, Thành phố Hải Phòng",
+
+      representative:
+        "PHẠM VĂN HỌC",
+
+      position:
+        "Giám Đốc"
+
+    };
+
+
+    /* =========================================
+       ĐỌC CÀI ĐẶT GROVA
+    ========================================= */
+
+    function getGrovaSettings() {
+
+      try {
+
+        const raw =
+          localStorage.getItem(
+            SETTINGS_KEY
+          );
+
+
+        if (!raw) {
+
+          return {
+            ...DEFAULT_SETTINGS
+          };
+
+        }
+
+
+        const saved =
+          JSON.parse(raw);
+
+
+        return {
+          ...DEFAULT_SETTINGS,
+          ...(saved || {})
+        };
+
+
+      } catch (error) {
+
+        console.warn(
+          "Không thể đọc GROVA_SETTINGS_V1:",
+          error
+        );
+
+
+        return {
+          ...DEFAULT_SETTINGS
+        };
+
+      }
+
+    }
+
+
+    function safeSetting(
+      value,
+      fallback
+    ) {
+
+      const text =
+        String(
+          value ?? ""
+        ).trim();
+
+
+      return text || fallback;
+
+    }
+
+
+    /* =========================================
+       ĐỒNG BỘ THÔNG TIN CÔNG TY
+    ========================================= */
+
+    function applyCompanySettingsToForm() {
+
+      const settings =
+        getGrovaSettings();
+
+
+      const companyName =
+        safeSetting(
+          settings.companyName,
+          DEFAULT_SETTINGS.companyName
+        );
+
+
+      const representative =
+        safeSetting(
+          settings.representative,
+          DEFAULT_SETTINGS.representative
+        );
+
+
+      const position =
+        safeSetting(
+          settings.position,
+          DEFAULT_SETTINGS.position
+        );
+
+
+      const companyInput =
+        $("partyACompany");
+
+
+      if (companyInput) {
+
+        companyInput.value =
+          companyName;
+
+      }
+
+
+      /*
+        Người đại diện và chức vụ Bên A
+        lấy trực tiếp từ phần Cài đặt.
+        Khi người dùng đã nhập riêng trong
+        biểu mẫu, không ghi đè trong lúc
+        đang gõ.
+      */
+
+      const representativeInput =
+        $("partyARepresentative");
+
+
+      if (
+        representativeInput &&
+        !representativeInput.value.trim()
+      ) {
+
+        representativeInput.value =
+          representative;
+
+      }
+
+
+      const positionInput =
+        $("partyAPosition");
+
+
+      if (
+        positionInput &&
+        !positionInput.value.trim()
+      ) {
+
+        positionInput.value =
+          position;
+
+      }
+
+    }
+
+
+    function updateCompanyInformation() {
+
+      const settings =
+        getGrovaSettings();
+
+
+      const companyName =
+        safeSetting(
+          settings.companyName,
+          DEFAULT_SETTINGS.companyName
+        );
+
+
+      const representative =
+        safeSetting(
+          settings.representative,
+          DEFAULT_SETTINGS.representative
+        );
+
+
+      const position =
+        safeSetting(
+          settings.position,
+          DEFAULT_SETTINGS.position
+        );
+
+
+      setText(
+        "previewCompanyName",
+        companyName,
+        DEFAULT_SETTINGS.companyName
+      );
+
+
+      setText(
+        "previewSignatureCompany",
+        companyName,
+        DEFAULT_SETTINGS.companyName
+      );
+
+
+      /*
+        Nếu ô đại diện / chức vụ đang trống
+        thì tự lấy từ Cài đặt.
+      */
+
+      const representativeInput =
+        $("partyARepresentative");
+
+
+      if (
+        representativeInput &&
+        !representativeInput.value.trim()
+      ) {
+
+        representativeInput.value =
+          representative;
+
+      }
+
+
+      const positionInput =
+        $("partyAPosition");
+
+
+      if (
+        positionInput &&
+        !positionInput.value.trim()
+      ) {
+
+        positionInput.value =
+          position;
+
+      }
+
+    }
+
+
+    /* =========================================
+       DANH SÁCH FIELD
+    ========================================= */
+
     const inputIds = [
+
       "documentNo",
       "documentDate",
       "contractNo",
       "appendixNo",
+
       "partyARepresentative",
       "partyAPosition",
+
       "partyBCompany",
       "partyBRepresentative",
       "partyBPosition",
+
       "projectName",
       "projectAddress",
+
       "otherReason",
       "detailDescription",
+
       "item1Content",
       "item1Unit",
       "item1Qty",
       "item1Price",
+
       "item2Content",
       "item2Unit",
       "item2Qty",
       "item2Price",
+
       "item3Content",
       "item3Unit",
       "item3Qty",
       "item3Price",
+
       "amountInWords",
       "executionDate",
       "delayDays",
       "notes"
+
     ];
 
 
     const checkboxIds = [
+
       "reasonOther",
+
       "confirmContent",
       "confirmValue",
       "confirmPayment",
       "confirmProgress"
+
     ];
 
 
+    /* =========================================
+       HELPER
+    ========================================= */
+
     function $(id) {
+
       return document.getElementById(id);
+
     }
 
 
     function formatMoney(value) {
 
-      const number = Number(value) || 0;
+      const number =
+        Number(value) || 0;
+
 
       return new Intl.NumberFormat(
         "vi-VN"
       ).format(number);
+
     }
 
 
     function getCurrentYear() {
+
       return new Date().getFullYear();
+
     }
 
 
+    /* =========================================
+       SỐ BIÊN BẢN
+    ========================================= */
+
     function createDocumentNumber() {
 
-      const year = getCurrentYear();
+      const year =
+        getCurrentYear();
+
 
       const key =
         COUNTER_KEY + "_" + year;
 
+
       let counter =
-        Number(localStorage.getItem(key)) || 0;
+        Number(
+          localStorage.getItem(key)
+        ) || 0;
+
 
       counter += 1;
+
 
       localStorage.setItem(
         key,
         counter
       );
 
+
       return (
         String(counter).padStart(2, "0")
         + "/BBPS/"
         + year
       );
+
     }
 
+
+    /* =========================================
+       NGÀY
+    ========================================= */
 
     function formatDateVN(value) {
 
       if (!value) {
+
         return "...... / ...... / 20......";
+
       }
+
 
       const parts =
         value.split("-");
 
+
       if (parts.length !== 3) {
+
         return value;
+
       }
+
 
       return (
         parts[2]
@@ -2211,55 +2798,92 @@
         + " / "
         + parts[0]
       );
+
     }
 
 
     function getDateParts(value) {
 
       if (!value) {
+
         return {
+
           day: "......",
           month: "......",
           year: "20......"
+
         };
+
       }
+
 
       const parts =
         value.split("-");
 
+
       if (parts.length !== 3) {
+
         return {
+
           day: "......",
           month: "......",
           year: "20......"
+
         };
+
       }
 
+
       return {
+
         day: parts[2],
         month: parts[1],
         year: parts[0]
+
       };
+
     }
 
 
-    function setText(id, value, fallback = "") {
+    /* =========================================
+       SET TEXT AN TOÀN
+    ========================================= */
 
-      const el = $(id);
+    function setText(
+      id,
+      value,
+      fallback = ""
+    ) {
+
+      const el =
+        $(id);
+
 
       if (!el) return;
+
 
       if (
         value === undefined ||
         value === null ||
         String(value).trim() === ""
       ) {
-        el.textContent = fallback;
+
+        el.textContent =
+          fallback;
+
       } else {
-        el.textContent = value;
+
+        el.textContent =
+          value;
+
       }
+
     }
 
+
+    /* =========================================
+       LÝ DO PHÁT SINH
+    ========================================= */
 
     function updateReasonPreview() {
 
@@ -2268,18 +2892,22 @@
           ".reason"
         );
 
+
       reasonCheckboxes.forEach(
         (checkbox, index) => {
 
           const target =
             $("checkReason" + (index + 1));
 
+
           if (!target) return;
+
 
           target.textContent =
             checkbox.checked
               ? "☑"
               : "☐";
+
         }
       );
 
@@ -2287,46 +2915,65 @@
       const otherField =
         $("otherReasonField");
 
+
       if ($("reasonOther").checked) {
+
         otherField.style.display =
           "block";
+
       } else {
+
         otherField.style.display =
           "none";
+
       }
 
 
       const otherText =
-        $("otherReason").value.trim();
+        $("otherReason")
+          .value
+          .trim();
+
 
       setText(
         "previewOtherReason",
         otherText,
         ".........................................................."
       );
+
     }
 
+
+    /* =========================================
+       XÁC NHẬN
+    ========================================= */
 
     function updateConfirmationPreview() {
 
       const pairs = [
+
         [
           "confirmContent",
           "confirmContentMark"
         ],
+
         [
           "confirmValue",
           "confirmValueMark"
         ],
+
         [
           "confirmPayment",
           "confirmPaymentMark"
         ],
+
         [
           "confirmProgress",
           "confirmProgressMark"
         ]
+
       ];
+
 
       pairs.forEach(
         ([inputId, previewId]) => {
@@ -2335,31 +2982,46 @@
             $(inputId).checked
               ? "☑"
               : "☐";
+
         }
       );
+
     }
 
+
+    /* =========================================
+       TÍNH GIÁ TRỊ
+    ========================================= */
 
     function calculateItems() {
 
       let total = 0;
 
-      for (let i = 1; i <= 3; i++) {
+
+      for (
+        let i = 1;
+        i <= 3;
+        i++
+      ) {
 
         const qty =
           Number(
             $("item" + i + "Qty").value
           ) || 0;
 
+
         const price =
           Number(
             $("item" + i + "Price").value
           ) || 0;
 
+
         const amount =
           qty * price;
 
+
         total += amount;
+
 
         $("item" + i + "Amount").value =
           amount
@@ -2372,15 +3034,18 @@
           $("item" + i + "Content").value
         );
 
+
         setText(
           "previewItem" + i + "Unit",
           $("item" + i + "Unit").value
         );
 
+
         setText(
           "previewItem" + i + "Qty",
           $("item" + i + "Qty").value
         );
+
 
         setText(
           "previewItem" + i + "Price",
@@ -2391,12 +3056,14 @@
             : ""
         );
 
+
         setText(
           "previewItem" + i + "Amount",
           amount
             ? formatMoney(amount)
             : ""
         );
+
       }
 
 
@@ -2405,10 +3072,16 @@
         formatMoney(total) + " VNĐ"
       );
 
+
       $("formTotal").textContent =
         formatMoney(total) + " VNĐ";
+
     }
 
+
+    /* =========================================
+       MÔ TẢ CHI TIẾT
+    ========================================= */
 
     function updateDetailLines() {
 
@@ -2417,20 +3090,32 @@
           .value
           .trim();
 
+
       const lines =
         value
           ? value.split(/\r?\n/)
           : [];
 
-      for (let i = 1; i <= 3; i++) {
+
+      for (
+        let i = 1;
+        i <= 3;
+        i++
+      ) {
 
         setText(
           "previewDetail" + i,
           lines[i - 1] || ""
         );
+
       }
+
     }
 
+
+    /* =========================================
+       GHI CHÚ
+    ========================================= */
 
     function updateNoteLines() {
 
@@ -2439,22 +3124,42 @@
           .value
           .trim();
 
+
       const lines =
         value
           ? value.split(/\r?\n/)
           : [];
 
-      for (let i = 1; i <= 2; i++) {
+
+      for (
+        let i = 1;
+        i <= 2;
+        i++
+      ) {
 
         setText(
           "previewNote" + i,
           lines[i - 1] || ""
         );
+
       }
+
     }
 
 
+    /* =========================================
+       UPDATE PREVIEW
+    ========================================= */
+
     function updatePreview() {
+
+      /*
+        Luôn cập nhật thông tin công ty
+        trước khi cập nhật preview.
+      */
+
+      updateCompanyInformation();
+
 
       setText(
         "previewDocumentNo",
@@ -2482,15 +3187,18 @@
           $("documentDate").value
         );
 
+
       setText(
         "previewDay",
         dateParts.day
       );
 
+
       setText(
         "previewMonth",
         dateParts.month
       );
+
 
       setText(
         "previewYear",
@@ -2549,13 +3257,18 @@
 
       updateReasonPreview();
 
+
       updateDetailLines();
+
 
       calculateItems();
 
 
       const amountInWords =
-        $("amountInWords").value.trim();
+        $("amountInWords")
+          .value
+          .trim();
+
 
       setText(
         "previewAmountInWords",
@@ -2573,7 +3286,10 @@
 
 
       const delay =
-        $("delayDays").value.trim();
+        $("delayDays")
+          .value
+          .trim();
+
 
       setText(
         "previewDelayDays",
@@ -2585,41 +3301,64 @@
 
       updateConfirmationPreview();
 
+
       updateNoteLines();
 
 
       saveDraft();
+
     }
 
+
+    /* =========================================
+       SAVE DRAFT
+    ========================================= */
 
     function saveDraft() {
 
       const data = {
+
         fields: {},
+
         checkboxes: {}
+
       };
 
 
-      inputIds.forEach(id => {
+      inputIds.forEach(
+        id => {
 
-        const el = $(id);
+          const el =
+            $(id);
 
-        if (el) {
-          data.fields[id] =
-            el.value;
+
+          if (el) {
+
+            data.fields[id] =
+              el.value;
+
+          }
+
         }
-      });
+      );
 
 
-      checkboxIds.forEach(id => {
+      checkboxIds.forEach(
+        id => {
 
-        const el = $(id);
+          const el =
+            $(id);
 
-        if (el) {
-          data.checkboxes[id] =
-            el.checked;
+
+          if (el) {
+
+            data.checkboxes[id] =
+              el.checked;
+
+          }
+
         }
-      });
+      );
 
 
       localStorage.setItem(
@@ -2631,12 +3370,20 @@
       const status =
         $("saveStatus");
 
+
       if (status) {
+
         status.textContent =
           "Đã lưu nháp";
+
       }
+
     }
 
+
+    /* =========================================
+       LOAD DRAFT
+    ========================================= */
 
     function loadDraft() {
 
@@ -2644,6 +3391,7 @@
         localStorage.getItem(
           STORAGE_KEY
         );
+
 
       if (!raw) return false;
 
@@ -2661,14 +3409,20 @@
           ).forEach(
             ([id, value]) => {
 
-              const el = $(id);
+              const el =
+                $(id);
+
 
               if (el) {
+
                 el.value =
                   value ?? "";
+
               }
+
             }
           );
+
         }
 
 
@@ -2679,18 +3433,25 @@
           ).forEach(
             ([id, value]) => {
 
-              const el = $(id);
+              const el =
+                $(id);
+
 
               if (el) {
+
                 el.checked =
                   Boolean(value);
+
               }
+
             }
           );
+
         }
 
 
         return true;
+
 
       } catch (error) {
 
@@ -2699,10 +3460,17 @@
           error
         );
 
+
         return false;
+
       }
+
     }
 
+
+    /* =========================================
+       XÓA NHẬP
+    ========================================= */
 
     function clearDraft() {
 
@@ -2711,8 +3479,11 @@
           "Xóa toàn bộ dữ liệu đang nhập?"
         );
 
+
       if (!confirmed) {
+
         return;
+
       }
 
 
@@ -2743,44 +3514,80 @@
         "";
 
 
-      inputIds.forEach(id => {
+      inputIds.forEach(
+        id => {
 
-        if (
-          id !== "documentNo" &&
-          id !== "documentDate" &&
-          id !== "contractNo"
-        ) {
+          if (
+            id !== "documentNo" &&
+            id !== "documentDate" &&
+            id !== "contractNo"
+          ) {
 
-          const el = $(id);
+            const el =
+              $(id);
+
+
+            if (el) {
+
+              el.value =
+                "";
+
+            }
+
+          }
+
+        }
+      );
+
+
+      checkboxIds.forEach(
+        id => {
+
+          const el =
+            $(id);
+
 
           if (el) {
-            el.value = "";
+
+            el.checked =
+              false;
+
           }
+
         }
-      });
+      );
 
 
-      checkboxIds.forEach(id => {
+      /*
+        Sau khi xóa nhập,
+        đưa thông tin Bên A
+        về đúng Cài đặt GROVA.
+      */
 
-        const el = $(id);
-
-        if (el) {
-          el.checked = false;
-        }
-      });
+      applyCompanySettingsToForm();
 
 
       updatePreview();
+
     }
 
+
+    /* =========================================
+       IN / XUẤT PDF
+    ========================================= */
 
     function printDocument() {
 
       updatePreview();
 
       window.print();
+
     }
 
+
+    /* =========================================
+       QUAY LẠI
+    ========================================= */
 
     function goBack() {
 
@@ -2797,41 +3604,60 @@
 
         window.location.href =
           "../index.html";
+
       }
+
     }
 
 
+    /* =========================================
+       BIND INPUT
+    ========================================= */
+
     function bindInputs() {
 
-      inputIds.forEach(id => {
+      inputIds.forEach(
+        id => {
 
-        const el = $(id);
-
-        if (!el) return;
-
-        el.addEventListener(
-          "input",
-          updatePreview
-        );
-
-        el.addEventListener(
-          "change",
-          updatePreview
-        );
-      });
+          const el =
+            $(id);
 
 
-      checkboxIds.forEach(id => {
+          if (!el) return;
 
-        const el = $(id);
 
-        if (!el) return;
+          el.addEventListener(
+            "input",
+            updatePreview
+          );
 
-        el.addEventListener(
-          "change",
-          updatePreview
-        );
-      });
+
+          el.addEventListener(
+            "change",
+            updatePreview
+          );
+
+        }
+      );
+
+
+      checkboxIds.forEach(
+        id => {
+
+          const el =
+            $(id);
+
+
+          if (!el) return;
+
+
+          el.addEventListener(
+            "change",
+            updatePreview
+          );
+
+        }
+      );
 
 
       document
@@ -2843,10 +3669,39 @@
               "change",
               updatePreview
             );
+
           }
         );
+
     }
 
+
+    /* =========================================
+       THEO DÕI THAY ĐỔI CÀI ĐẶT
+    ========================================= */
+
+    window.addEventListener(
+      "storage",
+      function(event) {
+
+        if (
+          event.key === SETTINGS_KEY ||
+          event.key === null
+        ) {
+
+          applyCompanySettingsToForm();
+
+          updatePreview();
+
+        }
+
+      }
+    );
+
+
+    /* =========================================
+       INIT
+    ========================================= */
 
     function init() {
 
@@ -2859,16 +3714,29 @@
         $("documentNo").value =
           createDocumentNumber();
 
+
         $("documentDate").value =
           new Date()
             .toISOString()
             .slice(0, 10);
+
       }
+
+
+      /*
+        Sau khi đọc bản nháp,
+        đồng bộ lại thông tin công ty
+        theo Cài đặt GROVA.
+      */
+
+      applyCompanySettingsToForm();
 
 
       bindInputs();
 
+
       updatePreview();
+
     }
 
 
