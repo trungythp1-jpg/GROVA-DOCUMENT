@@ -398,11 +398,6 @@
     .paper {
       width: 210mm;
 
-      /*
-       * Không ép chiều cao 297mm.
-       * Nội dung tự quyết định chiều cao để tránh trang trắng.
-       */
-
       min-height: 0;
 
       margin: 0 auto;
@@ -727,7 +722,7 @@
 
 
     /* =====================================================
-       PRINT — SỬA LỖI TRANG 2 TRẮNG
+       PRINT — KHÔNG TẠO TRANG TRẮNG
     ===================================================== */
 
     @media print {
@@ -790,12 +785,6 @@
 
         overflow: visible;
       }
-
-      /*
-       * QUAN TRỌNG:
-       * Không đặt height/min-height = 297mm khi in.
-       * Đây là phần xử lý trang trắng thứ 2.
-       */
 
       .paper {
         display: block;
@@ -1297,11 +1286,17 @@
 
           <section class="company-block">
 
-            <p class="company-name">
+            <p
+              class="company-name"
+              id="previewCompanyName"
+            >
               CÔNG TY CỔ PHẦN GROVA HOLDINGS
             </p>
 
-            <p class="company-address">
+            <p
+              class="company-address"
+              id="previewCompanyAddress"
+            >
               Địa chỉ: 49A/348 Trần Nguyên Hãn, Phường An Biên, Thành phố Hải Phòng
             </p>
 
@@ -1524,6 +1519,10 @@
 
   <script>
 
+    /* =====================================================
+       CẤU HÌNH
+    ===================================================== */
+
     const YEAR =
       new Date().getFullYear();
 
@@ -1533,6 +1532,47 @@
     const DRAFT_KEY =
       "grova_document_template_03";
 
+    /*
+     * Dùng chung với trang Cài đặt của GROVA DOCUMENT.
+     *
+     * app.js hiện đang lưu:
+     * GROVA_SETTINGS_V1
+     *
+     * Mẫu này đọc trực tiếp dữ liệu đó.
+     */
+    const SETTINGS_KEY =
+      "GROVA_SETTINGS_V1";
+
+
+    /* =====================================================
+       GIÁ TRỊ MẶC ĐỊNH
+       Nếu chưa có cài đặt thì vẫn dùng thông tin GROVA
+       hiện tại để văn bản không bị trống.
+    ===================================================== */
+
+    const DEFAULT_SETTINGS = {
+
+      companyName:
+        "CÔNG TY CỔ PHẦN GROVA HOLDINGS",
+
+      taxCode:
+        "0202328361",
+
+      address:
+        "49A/348 Trần Nguyên Hãn, Phường An Biên, Thành phố Hải Phòng",
+
+      representative:
+        "PHẠM VĂN HỌC",
+
+      position:
+        "Giám Đốc"
+
+    };
+
+
+    /* =====================================================
+       FIELDS
+    ===================================================== */
 
     const fields = [
 
@@ -1556,6 +1596,119 @@
 
     ];
 
+
+    /* =====================================================
+       SETTINGS
+    ===================================================== */
+
+    function getGrovaSettings() {
+
+      try {
+
+        const raw =
+          localStorage.getItem(
+            SETTINGS_KEY
+          );
+
+        if (!raw) {
+
+          return {
+            ...DEFAULT_SETTINGS
+          };
+
+        }
+
+        const saved =
+          JSON.parse(raw);
+
+        return {
+
+          ...DEFAULT_SETTINGS,
+
+          ...(saved || {})
+
+        };
+
+      } catch (error) {
+
+        console.warn(
+          "Không thể đọc GROVA_SETTINGS_V1:",
+          error
+        );
+
+        return {
+          ...DEFAULT_SETTINGS
+        };
+
+      }
+
+    }
+
+
+    function safeText(value, fallback) {
+
+      const text =
+        String(value ?? "")
+          .trim();
+
+      return text || fallback;
+
+    }
+
+
+    function updateCompanyInformation() {
+
+      const settings =
+        getGrovaSettings();
+
+
+      const companyName =
+        safeText(
+          settings.companyName,
+          DEFAULT_SETTINGS.companyName
+        );
+
+
+      const address =
+        safeText(
+          settings.address,
+          DEFAULT_SETTINGS.address
+        );
+
+
+      const companyNameElement =
+        document.getElementById(
+          "previewCompanyName"
+        );
+
+
+      if (companyNameElement) {
+
+        companyNameElement.textContent =
+          companyName;
+
+      }
+
+
+      const addressElement =
+        document.getElementById(
+          "previewCompanyAddress"
+        );
+
+
+      if (addressElement) {
+
+        addressElement.textContent =
+          "Địa chỉ: " + address;
+
+      }
+
+    }
+
+
+    /* =====================================================
+       HELPERS
+    ===================================================== */
 
     function pad2(value) {
 
@@ -1686,6 +1839,10 @@
 
     }
 
+
+    /* =====================================================
+       DRAFT
+    ===================================================== */
 
     function getDraft() {
 
@@ -1824,7 +1981,20 @@
     }
 
 
+    /* =====================================================
+       PREVIEW
+    ===================================================== */
+
     function updatePreview() {
+
+      /*
+       * Đồng bộ thông tin công ty trước.
+       *
+       * Phần này đọc:
+       * localStorage.GROVA_SETTINGS_V1
+       */
+      updateCompanyInformation();
+
 
       const values = {
 
@@ -2060,6 +2230,10 @@
     }
 
 
+    /* =====================================================
+       RESET
+    ===================================================== */
+
     function resetDraft() {
 
       const confirmed =
@@ -2115,6 +2289,10 @@
     }
 
 
+    /* =====================================================
+       BACK
+    ===================================================== */
+
     function goBack() {
 
       if (
@@ -2138,6 +2316,10 @@
 
     }
 
+
+    /* =====================================================
+       INIT
+    ===================================================== */
 
     document.addEventListener(
 
@@ -2179,6 +2361,27 @@
 
       }
 
+    );
+
+
+    /* =====================================================
+       ĐỒNG BỘ SETTINGS NẾU CÀI ĐẶT THAY ĐỔI
+       Ở TAB/WINDOW KHÁC
+    ===================================================== */
+
+    window.addEventListener(
+      "storage",
+      function(event) {
+
+        if (
+          event.key === SETTINGS_KEY
+        ) {
+
+          updateCompanyInformation();
+
+        }
+
+      }
     );
 
   </script>
