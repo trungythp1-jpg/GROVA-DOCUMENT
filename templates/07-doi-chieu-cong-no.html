@@ -323,7 +323,6 @@
 
     .section {
       margin-top: 4mm;
-
       break-inside: auto;
       page-break-inside: auto;
     }
@@ -333,11 +332,6 @@
       font-size: 12pt;
       font-weight: 700;
 
-      /*
-        Quan trọng:
-        giữ tiêu đề với nội dung kế tiếp,
-        tránh tình trạng tiêu đề nằm cuối trang.
-      */
       break-after: avoid-page;
       page-break-after: avoid;
       break-inside: avoid;
@@ -541,14 +535,6 @@
        SIGNATURE
     ========================= */
 
-    /*
-      Đây là phần sửa lỗi chính.
-
-      Không để bảng chữ ký bị cắt giữa trang.
-      Không dùng khoảng trống quá lớn khiến dòng ký
-      rơi sang trang 3.
-    */
-
     .signature-table {
       width: 100%;
       border-collapse: collapse;
@@ -585,11 +571,6 @@
       font-weight: 700;
     }
 
-    /*
-      Giảm khoảng trống ký vừa đủ.
-      Không cần 28mm vì chính nó làm dòng ký
-      bị đẩy sang trang 3.
-    */
     .signature-space {
       height: 18mm;
     }
@@ -701,10 +682,6 @@
         line-height: 1.36;
       }
 
-      /*
-        Không để trình duyệt tạo một trang riêng
-        chỉ cho phần chữ ký.
-      */
       .signature-table {
         break-inside: avoid;
         page-break-inside: avoid;
@@ -921,6 +898,54 @@
         <div class="section-title">
           Bên A
         </div>
+
+        <div class="field">
+
+          <label>
+            Tên công ty
+          </label>
+
+          <input
+            id="partyACompany"
+            class="readonly"
+            type="text"
+            readonly
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            MST
+          </label>
+
+          <input
+            id="partyATax"
+            class="readonly"
+            type="text"
+            readonly
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Địa chỉ
+          </label>
+
+          <input
+            id="partyAAddress"
+            class="readonly"
+            type="text"
+            readonly
+          >
+
+        </div>
+
 
         <div class="field">
 
@@ -1365,17 +1390,23 @@
               I. BÊN A
             </h2>
 
-            <p>
+            <p id="previewPartyACompany">
               CÔNG TY CỔ PHẦN GROVA HOLDINGS
             </p>
 
             <p>
-              MST: 0202328361
+              MST:
+              <span id="previewATax">
+                0202328361
+              </span>
             </p>
 
             <p>
-              Địa chỉ: 49A/348 Trần Nguyên Hãn,
-              Phường An Biên, Thành phố Hải Phòng
+              Địa chỉ:
+              <span id="previewAAddress">
+                49A/348 Trần Nguyên Hãn,
+                Phường An Biên, Thành phố Hải Phòng
+              </span>
             </p>
 
             <p>
@@ -1797,11 +1828,11 @@
                   ĐẠI DIỆN BÊN A
                 </div>
 
-                <div class="signature-company">
-
-                  CÔNG TY CỔ PHẦN GROVA<br>
-                  HOLDINGS
-
+                <div
+                  class="signature-company"
+                  id="previewSignatureCompany"
+                >
+                  CÔNG TY CỔ PHẦN GROVA HOLDINGS
                 </div>
 
                 <div class="signature-space"></div>
@@ -1848,10 +1879,268 @@
 
 <script>
 
+  /* =========================
+     STORAGE
+  ========================= */
+
   const STORAGE_KEY =
     "grova_document_template_07";
 
+  const SETTINGS_KEY =
+    "GROVA_SETTINGS_V1";
+
   const PROJECT_COUNT = 5;
+
+
+  /* =========================
+     GROVA SETTINGS
+  ========================= */
+
+  const DEFAULT_SETTINGS = {
+
+    companyName:
+      "CÔNG TY CỔ PHẦN GROVA HOLDINGS",
+
+    taxCode:
+      "0202328361",
+
+    address:
+      "49A/348 Trần Nguyên Hãn, Phường An Biên, Thành phố Hải Phòng",
+
+    representative:
+      "PHẠM VĂN HỌC",
+
+    position:
+      "Giám Đốc"
+
+  };
+
+
+  function getGrovaSettings() {
+
+    try {
+
+      const raw =
+        localStorage.getItem(
+          SETTINGS_KEY
+        );
+
+
+      if (!raw) {
+
+        return {
+          ...DEFAULT_SETTINGS
+        };
+
+      }
+
+
+      const saved =
+        JSON.parse(raw);
+
+
+      return {
+        ...DEFAULT_SETTINGS,
+        ...(saved || {})
+      };
+
+    } catch (error) {
+
+      console.warn(
+        "Không thể đọc GROVA_SETTINGS_V1:",
+        error
+      );
+
+
+      return {
+        ...DEFAULT_SETTINGS
+      };
+
+    }
+
+  }
+
+
+  function safeText(
+    value,
+    fallback
+  ) {
+
+    const text =
+      String(
+        value ?? ""
+      ).trim();
+
+
+    return text || fallback;
+
+  }
+
+
+  function applyCompanySettingsToForm() {
+
+    const settings =
+      getGrovaSettings();
+
+
+    const companyName =
+      safeText(
+        settings.companyName,
+        DEFAULT_SETTINGS.companyName
+      );
+
+
+    const taxCode =
+      safeText(
+        settings.taxCode,
+        DEFAULT_SETTINGS.taxCode
+      );
+
+
+    const address =
+      safeText(
+        settings.address,
+        DEFAULT_SETTINGS.address
+      );
+
+
+    const representative =
+      safeText(
+        settings.representative,
+        DEFAULT_SETTINGS.representative
+      );
+
+
+    const position =
+      safeText(
+        settings.position,
+        DEFAULT_SETTINGS.position
+      );
+
+
+    const companyInput =
+      document.getElementById(
+        "partyACompany"
+      );
+
+
+    if (companyInput) {
+
+      companyInput.value =
+        companyName;
+
+    }
+
+
+    const taxInput =
+      document.getElementById(
+        "partyATax"
+      );
+
+
+    if (taxInput) {
+
+      taxInput.value =
+        taxCode;
+
+    }
+
+
+    const addressInput =
+      document.getElementById(
+        "partyAAddress"
+      );
+
+
+    if (addressInput) {
+
+      addressInput.value =
+        address;
+
+    }
+
+
+    const repInput =
+      document.getElementById(
+        "partyARepresentative"
+      );
+
+
+    if (repInput) {
+
+      repInput.value =
+        representative;
+
+    }
+
+
+    const posInput =
+      document.getElementById(
+        "partyAPosition"
+      );
+
+
+    if (posInput) {
+
+      posInput.value =
+        position;
+
+    }
+
+  }
+
+
+  function updateCompanyInformation() {
+
+    const settings =
+      getGrovaSettings();
+
+
+    const companyName =
+      safeText(
+        settings.companyName,
+        DEFAULT_SETTINGS.companyName
+      );
+
+
+    const taxCode =
+      safeText(
+        settings.taxCode,
+        DEFAULT_SETTINGS.taxCode
+      );
+
+
+    const address =
+      safeText(
+        settings.address,
+        DEFAULT_SETTINGS.address
+      );
+
+
+    setText(
+      "previewPartyACompany",
+      companyName
+    );
+
+
+    setText(
+      "previewATax",
+      taxCode
+    );
+
+
+    setText(
+      "previewAAddress",
+      address
+    );
+
+
+    setText(
+      "previewSignatureCompany",
+      companyName
+    );
+
+  }
 
 
   /* =========================
@@ -1860,12 +2149,28 @@
 
   function getTodayISO() {
 
-    const d = new Date();
+    const d =
+      new Date();
+
 
     return [
+
       d.getFullYear(),
-      String(d.getMonth() + 1).padStart(2, "0"),
-      String(d.getDate()).padStart(2, "0")
+
+      String(
+        d.getMonth() + 1
+      ).padStart(
+        2,
+        "0"
+      ),
+
+      String(
+        d.getDate()
+      ).padStart(
+        2,
+        "0"
+      )
+
     ].join("-");
 
   }
@@ -1874,17 +2179,40 @@
   function formatDateVN(value) {
 
     if (!value) {
+
       return "...... / ...... / 20......";
+
     }
+
 
     const d =
-      new Date(value + "T00:00:00");
+      new Date(
+        value + "T00:00:00"
+      );
 
-    if (Number.isNaN(d.getTime())) {
+
+    if (
+      Number.isNaN(
+        d.getTime()
+      )
+    ) {
+
       return "...... / ...... / 20......";
+
     }
 
-    return `${String(d.getDate()).padStart(2, "0")} / ${String(d.getMonth() + 1).padStart(2, "0")} / ${d.getFullYear()}`;
+
+    return `${String(
+      d.getDate()
+    ).padStart(
+      2,
+      "0"
+    )} / ${String(
+      d.getMonth() + 1
+    ).padStart(
+      2,
+      "0"
+    )} / ${d.getFullYear()}`;
 
   }
 
@@ -1896,7 +2224,10 @@
   function formatMoney(value) {
 
     const number =
-      Number(value || 0);
+      Number(
+        value || 0
+      );
+
 
     return new Intl.NumberFormat(
       "vi-VN",
@@ -1917,22 +2248,34 @@
     const year =
       new Date().getFullYear();
 
+
     const key =
       `grova_bbdocn_counter_${year}`;
 
+
     let counter =
       Number(
-        localStorage.getItem(key) || 0
+        localStorage.getItem(
+          key
+        ) || 0
       );
 
+
     counter += 1;
+
 
     localStorage.setItem(
       key,
       String(counter)
     );
 
-    return `${String(counter).padStart(2, "0")}/BBĐCCN/${year}`;
+
+    return `${String(
+      counter
+    ).padStart(
+      2,
+      "0"
+    )}/BBĐCCN/${year}`;
 
   }
 
@@ -1948,9 +2291,13 @@
   ) {
 
     const el =
-      document.getElementById(id);
+      document.getElementById(
+        id
+      );
+
 
     if (!el) return;
+
 
     el.textContent =
       value || fallback;
@@ -1969,6 +2316,7 @@
         "projectEditors"
       );
 
+
     container.innerHTML = "";
 
 
@@ -1979,7 +2327,10 @@
     ) {
 
       const box =
-        document.createElement("div");
+        document.createElement(
+          "div"
+        );
+
 
       box.className =
         "project-editor";
@@ -2077,7 +2428,9 @@
       `;
 
 
-      container.appendChild(box);
+      container.appendChild(
+        box
+      );
 
     }
 
@@ -2089,29 +2442,42 @@
     ) {
 
       [
+
         `project${i}Name`,
+
         `project${i}Appendix`,
+
         `project${i}Date`,
+
         `project${i}Value`,
+
         `project${i}Paid`
-      ].forEach(id => {
 
-        const el =
-          document.getElementById(id);
+      ].forEach(
+        id => {
 
-        if (!el) return;
+          const el =
+            document.getElementById(
+              id
+            );
 
-        el.addEventListener(
-          "input",
-          updatePreview
-        );
 
-        el.addEventListener(
-          "change",
-          updatePreview
-        );
+          if (!el) return;
 
-      });
+
+          el.addEventListener(
+            "input",
+            updatePreview
+          );
+
+
+          el.addEventListener(
+            "change",
+            updatePreview
+          );
+
+        }
+      );
 
     }
 
@@ -2185,6 +2551,7 @@
         "previewDebtRows"
       );
 
+
     tbody.innerHTML = "";
 
 
@@ -2193,7 +2560,10 @@
 
 
     projects.forEach(
-      (project, index) => {
+      (
+        project,
+        index
+      ) => {
 
         const debt =
           project.value -
@@ -2201,7 +2571,9 @@
 
 
         const tr =
-          document.createElement("tr");
+          document.createElement(
+            "tr"
+          );
 
 
         tr.innerHTML = `
@@ -2253,7 +2625,9 @@
         `;
 
 
-        tbody.appendChild(tr);
+        tbody.appendChild(
+          tr
+        );
 
       }
     );
@@ -2271,24 +2645,33 @@
       getProjectData();
 
 
-    let totalPerformed = 0;
-    let totalPaid = 0;
-    let totalDebt = 0;
+    let totalPerformed =
+      0;
+
+    let totalPaid =
+      0;
+
+    let totalDebt =
+      0;
 
 
-    projects.forEach(project => {
+    projects.forEach(
+      project => {
 
-      totalPerformed +=
-        project.value;
+        totalPerformed +=
+          project.value;
 
-      totalPaid +=
-        project.paid;
 
-      totalDebt +=
-        project.value -
-        project.paid;
+        totalPaid +=
+          project.paid;
 
-    });
+
+        totalDebt +=
+          project.value -
+          project.paid;
+
+      }
+    );
 
 
     document.getElementById(
@@ -2359,7 +2742,10 @@
   ) {
 
     const el =
-      document.getElementById(id);
+      document.getElementById(
+        id
+      );
+
 
     if (!el) return;
 
@@ -2371,11 +2757,16 @@
         id.slice(1)
       );
 
+
     if (!preview) return;
 
 
     preview.textContent =
-      (el.checked ? "☑ " : "☐ ") +
+      (
+        el.checked
+          ? "☑ "
+          : "☐ "
+      ) +
       label;
 
   }
@@ -2387,16 +2778,31 @@
 
   function updatePreview() {
 
+    /* =========================
+       GROVA COMPANY SETTINGS
+    ========================= */
+
+    updateCompanyInformation();
+
+
+    /* =========================
+       DOCUMENT NUMBER
+    ========================= */
+
     setText(
       "previewDocumentNo",
+
       document.getElementById(
         "documentNo"
       ).value,
+
       "....../BBĐCCN/20......"
     );
 
 
-    /* DATE */
+    /* =========================
+       DATE
+    ========================= */
 
     const date =
       document.getElementById(
@@ -2414,24 +2820,34 @@
 
       setText(
         "previewDate",
+
         `Hôm nay, ngày ${String(
           d.getDate()
-        ).padStart(2, "0")} tháng ${String(
+        ).padStart(
+          2,
+          "0"
+        )} tháng ${String(
           d.getMonth() + 1
-        ).padStart(2, "0")} năm ${d.getFullYear()}, chúng tôi gồm:`
+        ).padStart(
+          2,
+          "0"
+        )} năm ${d.getFullYear()}, chúng tôi gồm:`
       );
 
     } else {
 
       setText(
         "previewDate",
+
         "Hôm nay, ngày ...... tháng ...... năm 20......, chúng tôi gồm:"
       );
 
     }
 
 
-    /* PERIOD */
+    /* =========================
+       PERIOD
+    ========================= */
 
     const monthChecked =
       document.getElementById(
@@ -2475,84 +2891,106 @@
 
     setText(
       "previewMonth",
+
       `${monthChecked ? "☒" : "☐"} Tháng ${month} năm ${monthYear}`
     );
 
 
     setText(
       "previewQuarter",
+
       `${quarterChecked ? "☒" : "☐"} Quý ${quarter} năm ${quarterYear}`
     );
 
 
-    /* PARTY A */
+    /* =========================
+       PARTY A
+    ========================= */
 
     setText(
       "previewARepresentative",
+
       document.getElementById(
         "partyARepresentative"
       ).value,
+
       "......................................................"
     );
 
 
     setText(
       "previewAPosition",
+
       document.getElementById(
         "partyAPosition"
       ).value,
+
       "......................................................"
     );
 
 
-    /* PARTY B */
+    /* =========================
+       PARTY B
+    ========================= */
 
     setText(
       "previewBCompany",
+
       document.getElementById(
         "partyBCompany"
       ).value,
+
       "......................................................"
     );
 
 
     setText(
       "previewBTax",
+
       document.getElementById(
         "partyBTax"
       ).value,
+
       ".............................................................."
     );
 
 
     setText(
       "previewBAddress",
+
       document.getElementById(
         "partyBAddress"
       ).value,
+
       ".........................................................."
     );
 
 
     setText(
       "previewBRepresentative",
+
       document.getElementById(
         "partyBRepresentative"
       ).value,
+
       "......................................................"
     );
 
 
     setText(
       "previewBPosition",
+
       document.getElementById(
         "partyBPosition"
       ).value,
+
       "......................................................"
     );
 
 
-    /* DEBT DATE */
+    /* =========================
+       DEBT DATE
+    ========================= */
 
     const debtUntilDate =
       document.getElementById(
@@ -2562,6 +3000,7 @@
 
     setText(
       "previewDebtUntil",
+
       debtUntilDate
         ? formatDateVN(
             debtUntilDate
@@ -2570,18 +3009,24 @@
     );
 
 
-    /* WORDS */
+    /* =========================
+       WORDS
+    ========================= */
 
     setText(
       "previewDebtWords",
+
       document.getElementById(
         "debtWords"
       ).value,
+
       "..........................................................................."
     );
 
 
-    /* CONFIRMATION */
+    /* =========================
+       CONFIRMATION
+    ========================= */
 
     updateCheck(
       "confirm1",
@@ -2607,7 +3052,9 @@
     );
 
 
-    /* PAYMENT DEADLINE */
+    /* =========================
+       PAYMENT DEADLINE
+    ========================= */
 
     const paymentDeadline =
       document.getElementById(
@@ -2617,6 +3064,7 @@
 
     setText(
       "previewPaymentDeadline",
+
       paymentDeadline
         ? formatDateVN(
             paymentDeadline
@@ -2625,27 +3073,35 @@
     );
 
 
-    /* NOTES */
+    /* =========================
+       NOTES
+    ========================= */
 
     setText(
       "previewNote1",
+
       document.getElementById(
         "note1"
       ).value,
+
       "...................................................................."
     );
 
 
     setText(
       "previewNote2",
+
       document.getElementById(
         "note2"
       ).value,
+
       "...................................................................."
     );
 
 
-    /* CONCLUSION DATE */
+    /* =========================
+       CONCLUSION DATE
+    ========================= */
 
     const conclusionDate =
       document.getElementById(
@@ -2655,6 +3111,7 @@
 
     setText(
       "previewConclusionDate",
+
       conclusionDate
         ? formatDateVN(
             conclusionDate
@@ -2665,15 +3122,27 @@
 
     setText(
       "previewConclusionWords",
+
       document.getElementById(
         "conclusionWords"
       ).value,
+
       "..........................................................................."
     );
 
 
+    /* =========================
+       DEBT
+    ========================= */
+
     updateDebtTable();
+
     updateTotals();
+
+
+    /* =========================
+       SAVE
+    ========================= */
 
     saveDraft();
 
@@ -2726,17 +3195,19 @@
       .querySelectorAll(
         ".form-body input"
       )
-      .forEach(el => {
+      .forEach(
+        el => {
 
-        if (!el.id) return;
+          if (!el.id) return;
 
 
-        data[el.id] =
-          el.type === "checkbox"
-            ? el.checked
-            : el.value;
+          data[el.id] =
+            el.type === "checkbox"
+              ? el.checked
+              : el.value;
 
-      });
+        }
+      );
 
 
     return data;
@@ -2753,10 +3224,13 @@
     try {
 
       localStorage.setItem(
+
         STORAGE_KEY,
+
         JSON.stringify(
           collectData()
         )
+
       );
 
     } catch (error) {
@@ -2789,39 +3263,44 @@
 
 
       const data =
-        JSON.parse(raw);
+        JSON.parse(
+          raw
+        );
 
 
-      Object.entries(data)
-        .forEach(
-          ([id, value]) => {
+      Object.entries(
+        data
+      ).forEach(
+        ([id, value]) => {
 
-            const el =
-              document.getElementById(
-                id
+          const el =
+            document.getElementById(
+              id
+            );
+
+
+          if (!el) return;
+
+
+          if (
+            el.type ===
+            "checkbox"
+          ) {
+
+            el.checked =
+              Boolean(
+                value
               );
 
+          } else {
 
-            if (!el) return;
-
-
-            if (
-              el.type ===
-              "checkbox"
-            ) {
-
-              el.checked =
-                Boolean(value);
-
-            } else {
-
-              el.value =
-                value;
-
-            }
+            el.value =
+              value;
 
           }
-        );
+
+        }
+      );
 
     } catch (error) {
 
@@ -2836,12 +3315,36 @@
 
 
   /* =========================
+     SETTINGS CHANGE
+    ========================= */
+
+  window.addEventListener(
+    "storage",
+    function(event) {
+
+      if (
+        event.key === SETTINGS_KEY ||
+        event.key === null
+      ) {
+
+        applyCompanySettingsToForm();
+
+        updatePreview();
+
+      }
+
+    }
+  );
+
+
+  /* =========================
      INIT
   ========================= */
 
   function init() {
 
     createProjectEditors();
+
 
     loadDraft();
 
@@ -2872,7 +3375,9 @@
       );
 
 
-    if (!documentDate.value) {
+    if (
+      !documentDate.value
+    ) {
 
       documentDate.value =
         today;
@@ -2886,7 +3391,9 @@
       );
 
 
-    if (!debtUntilDate.value) {
+    if (
+      !debtUntilDate.value
+    ) {
 
       debtUntilDate.value =
         today;
@@ -2900,7 +3407,9 @@
       );
 
 
-    if (!conclusionDate.value) {
+    if (
+      !conclusionDate.value
+    ) {
 
       conclusionDate.value =
         today;
@@ -2908,24 +3417,42 @@
     }
 
 
+    /* =========================
+       APPLY GROVA SETTINGS
+    ========================= */
+
+    applyCompanySettingsToForm();
+
+
+    /* =========================
+       BIND INPUTS
+    ========================= */
+
     document
       .querySelectorAll(
         ".form-body input"
       )
-      .forEach(el => {
+      .forEach(
+        el => {
 
-        el.addEventListener(
-          "input",
-          updatePreview
-        );
+          el.addEventListener(
+            "input",
+            updatePreview
+          );
 
-        el.addEventListener(
-          "change",
-          updatePreview
-        );
 
-      });
+          el.addEventListener(
+            "change",
+            updatePreview
+          );
 
+        }
+      );
+
+
+    /* =========================
+       FIRST PREVIEW
+    ========================= */
 
     updatePreview();
 
