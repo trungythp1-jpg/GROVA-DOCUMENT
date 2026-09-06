@@ -352,9 +352,6 @@ body{
     Times,
     serif;
 
-  /*
-    Giảm 1 cỡ so với bản trước
-  */
   font-size:12.5pt;
 
   line-height:1.42;
@@ -720,18 +717,6 @@ li{
 
     font-size:12.5pt !important;
   }
-
-
-  /*
-    KHÔNG:
-    - height
-    - min-height
-    - page-break-after
-    - page-break-before
-    - transform
-
-    Văn bản tự phân trang.
-  */
 
 
   .section{
@@ -1166,27 +1151,41 @@ li{
 
 
         <div class="party-line">
-          CÔNG TY CỔ PHẦN GROVA HOLDINGS
+          <span id="previewCompanyName">
+            CÔNG TY CỔ PHẦN GROVA HOLDINGS
+          </span>
         </div>
 
 
         <div class="party-line">
-          Mã số thuế: 0202328361
+          Mã số thuế:
+          <span id="previewCompanyTaxCode">
+            0202328361
+          </span>
         </div>
 
 
         <div class="party-line">
-          Địa chỉ: 49A/348 Trần Nguyên Hãn, Phường An Biên, Thành phố Hải Phòng
+          Địa chỉ:
+          <span id="previewCompanyAddress">
+            49A/348 Trần Nguyên Hãn, Phường An Biên, Thành phố Hải Phòng
+          </span>
         </div>
 
 
         <div class="party-line">
-          Đại diện: PHẠM VĂN HỌC
+          Đại diện:
+          <span id="previewCompanyRepresentative">
+            PHẠM VĂN HỌC
+          </span>
         </div>
 
 
         <div class="party-line">
-          Chức vụ: Giám Đốc
+          Chức vụ:
+          <span id="previewCompanyPosition">
+            Giám Đốc
+          </span>
         </div>
 
 
@@ -2112,7 +2111,10 @@ li{
           </div>
 
 
-          <div class="signature-company">
+          <div
+            class="signature-company"
+            id="previewSignatureCompany"
+          >
             CÔNG TY CỔ PHẦN GROVA HOLDINGS
           </div>
 
@@ -2174,6 +2176,42 @@ const DRAFT_KEY =
 
 
 /* =========================================================
+   GROVA SETTINGS
+========================================================= */
+
+const SETTINGS_KEY =
+  "GROVA_SETTINGS_V1";
+
+
+/*
+  Thông tin mặc định.
+
+  Nếu người dùng chưa lưu Cài đặt trong
+  GROVA DOCUMENT thì template vẫn sử dụng
+  các thông tin GROVA hiện tại.
+*/
+
+const DEFAULT_GROVA_SETTINGS = {
+
+  companyName:
+    "CÔNG TY CỔ PHẦN GROVA HOLDINGS",
+
+  taxCode:
+    "0202328361",
+
+  address:
+    "49A/348 Trần Nguyên Hãn, Phường An Biên, Thành phố Hải Phòng",
+
+  representative:
+    "PHẠM VĂN HỌC",
+
+  position:
+    "Giám Đốc"
+
+};
+
+
+/* =========================================================
    HELPER
 ========================================================= */
 
@@ -2200,6 +2238,203 @@ function value(
   return (
     el.value || ""
   ).trim() || fallback;
+
+}
+
+
+/* =========================================================
+   READ GROVA SETTINGS
+========================================================= */
+
+function getGrovaSettings(){
+
+  try{
+
+    const raw =
+      localStorage.getItem(
+        SETTINGS_KEY
+      );
+
+
+    if(!raw){
+
+      return {
+        ...DEFAULT_GROVA_SETTINGS
+      };
+
+    }
+
+
+    const saved =
+      JSON.parse(raw);
+
+
+    if(
+      !saved ||
+      typeof saved !== "object"
+    ){
+
+      return {
+        ...DEFAULT_GROVA_SETTINGS
+      };
+
+    }
+
+
+    return {
+
+      ...DEFAULT_GROVA_SETTINGS,
+
+      ...saved
+
+    };
+
+  }catch(error){
+
+    console.warn(
+      "GROVA DOCUMENT: Không thể đọc cài đặt công ty.",
+      error
+    );
+
+
+    return {
+      ...DEFAULT_GROVA_SETTINGS
+    };
+
+  }
+
+}
+
+
+/* =========================================================
+   UPDATE COMPANY INFORMATION
+========================================================= */
+
+function updateCompanyInformation(){
+
+  const settings =
+    getGrovaSettings();
+
+
+  /*
+    TÊN CÔNG TY
+  */
+
+  const companyName =
+    settings.companyName ||
+    DEFAULT_GROVA_SETTINGS.companyName;
+
+
+  const companyNameElement =
+    $("previewCompanyName");
+
+
+  if(companyNameElement){
+
+    companyNameElement.textContent =
+      companyName;
+
+  }
+
+
+  /*
+    MÃ SỐ THUẾ
+  */
+
+  const taxCode =
+    settings.taxCode ||
+    DEFAULT_GROVA_SETTINGS.taxCode;
+
+
+  const taxCodeElement =
+    $("previewCompanyTaxCode");
+
+
+  if(taxCodeElement){
+
+    taxCodeElement.textContent =
+      taxCode;
+
+  }
+
+
+  /*
+    ĐỊA CHỈ
+  */
+
+  const address =
+    settings.address ||
+    DEFAULT_GROVA_SETTINGS.address;
+
+
+  const addressElement =
+    $("previewCompanyAddress");
+
+
+  if(addressElement){
+
+    addressElement.textContent =
+      address;
+
+  }
+
+
+  /*
+    NGƯỜI ĐẠI DIỆN
+  */
+
+  const representative =
+    settings.representative ||
+    DEFAULT_GROVA_SETTINGS.representative;
+
+
+  const representativeElement =
+    $("previewCompanyRepresentative");
+
+
+  if(representativeElement){
+
+    representativeElement.textContent =
+      representative;
+
+  }
+
+
+  /*
+    CHỨC VỤ
+  */
+
+  const position =
+    settings.position ||
+    DEFAULT_GROVA_SETTINGS.position;
+
+
+  const positionElement =
+    $("previewCompanyPosition");
+
+
+  if(positionElement){
+
+    positionElement.textContent =
+      position;
+
+  }
+
+
+  /*
+    TÊN CÔNG TY PHẦN KÝ
+  */
+
+  const signatureCompanyElement =
+    $("previewSignatureCompany");
+
+
+  if(signatureCompanyElement){
+
+    signatureCompanyElement.textContent =
+      companyName;
+
+  }
 
 }
 
@@ -2269,12 +2504,28 @@ function initializeNumber(){
     getCurrentNumber();
 
 
-  $("contractNumberDisplay")
-    .textContent = number;
+  const numberDisplay =
+    $("contractNumberDisplay");
 
 
-  $("previewContractNumber")
-    .textContent = number;
+  if(numberDisplay){
+
+    numberDisplay.textContent =
+      number;
+
+  }
+
+
+  const previewNumber =
+    $("previewContractNumber");
+
+
+  if(previewNumber){
+
+    previewNumber.textContent =
+      number;
+
+  }
 
 }
 
@@ -2287,6 +2538,14 @@ function updatePreview(){
 
 
   /* -----------------------------------------
+     COMPANY INFORMATION
+  ----------------------------------------- */
+
+  updateCompanyInformation();
+
+
+
+  /* -----------------------------------------
      NUMBER
   ----------------------------------------- */
 
@@ -2294,14 +2553,28 @@ function updatePreview(){
     getCurrentNumber();
 
 
-  $("contractNumberDisplay")
-    .textContent =
-    contractNumber;
+  const numberDisplay =
+    $("contractNumberDisplay");
 
 
-  $("previewContractNumber")
-    .textContent =
-    contractNumber;
+  if(numberDisplay){
+
+    numberDisplay.textContent =
+      contractNumber;
+
+  }
+
+
+  const previewNumber =
+    $("previewContractNumber");
+
+
+  if(previewNumber){
+
+    previewNumber.textContent =
+      contractNumber;
+
+  }
 
 
 
@@ -2309,20 +2582,34 @@ function updatePreview(){
      DATE
   ----------------------------------------- */
 
-  $("previewSignDay")
-    .textContent =
-    value(
-      "signDay",
-      "......"
-    );
+  const previewDay =
+    $("previewSignDay");
 
 
-  $("previewSignMonth")
-    .textContent =
-    value(
-      "signMonth",
-      "......"
-    );
+  if(previewDay){
+
+    previewDay.textContent =
+      value(
+        "signDay",
+        "......"
+      );
+
+  }
+
+
+  const previewMonth =
+    $("previewSignMonth");
+
+
+  if(previewMonth){
+
+    previewMonth.textContent =
+      value(
+        "signMonth",
+        "......"
+      );
+
+  }
 
 
 
@@ -2330,12 +2617,19 @@ function updatePreview(){
      PARTY A PHONE
   ----------------------------------------- */
 
-  $("previewPartyAPhone")
-    .textContent =
-    value(
-      "partyAPhone",
-      "........................................"
-    );
+  const previewPartyAPhone =
+    $("previewPartyAPhone");
+
+
+  if(previewPartyAPhone){
+
+    previewPartyAPhone.textContent =
+      value(
+        "partyAPhone",
+        "........................................"
+      );
+
+  }
 
 
 
@@ -2343,52 +2637,94 @@ function updatePreview(){
      PARTY B
   ----------------------------------------- */
 
-  $("previewPartyBName")
-    .textContent =
-    value(
-      "partyBName",
-      "..........................................................................................................................."
-    );
+  const previewPartyBName =
+    $("previewPartyBName");
 
 
-  $("previewPartyBTax")
-    .textContent =
-    value(
-      "partyBTax",
-      ".........................................."
-    );
+  if(previewPartyBName){
+
+    previewPartyBName.textContent =
+      value(
+        "partyBName",
+        "..........................................................................................................................."
+      );
+
+  }
 
 
-  $("previewPartyBAddress")
-    .textContent =
-    value(
-      "partyBAddress",
-      ".............................................."
-    );
+  const previewPartyBTax =
+    $("previewPartyBTax");
 
 
-  $("previewPartyBRepresentative")
-    .textContent =
-    value(
-      "partyBRepresentative",
-      "............................................"
-    );
+  if(previewPartyBTax){
+
+    previewPartyBTax.textContent =
+      value(
+        "partyBTax",
+        ".........................................."
+      );
+
+  }
 
 
-  $("previewPartyBPosition")
-    .textContent =
-    value(
-      "partyBPosition",
-      "............................................"
-    );
+  const previewPartyBAddress =
+    $("previewPartyBAddress");
 
 
-  $("previewPartyBPhone")
-    .textContent =
-    value(
-      "partyBPhone",
-      ".........................................."
-    );
+  if(previewPartyBAddress){
+
+    previewPartyBAddress.textContent =
+      value(
+        "partyBAddress",
+        ".............................................."
+      );
+
+  }
+
+
+  const previewPartyBRepresentative =
+    $("previewPartyBRepresentative");
+
+
+  if(previewPartyBRepresentative){
+
+    previewPartyBRepresentative.textContent =
+      value(
+        "partyBRepresentative",
+        "............................................"
+      );
+
+  }
+
+
+  const previewPartyBPosition =
+    $("previewPartyBPosition");
+
+
+  if(previewPartyBPosition){
+
+    previewPartyBPosition.textContent =
+      value(
+        "partyBPosition",
+        "............................................"
+      );
+
+  }
+
+
+  const previewPartyBPhone =
+    $("previewPartyBPhone");
+
+
+  if(previewPartyBPhone){
+
+    previewPartyBPhone.textContent =
+      value(
+        "partyBPhone",
+        ".........................................."
+      );
+
+  }
 
 
 
@@ -2424,10 +2760,21 @@ function saveDraft(){
     );
 
 
-  localStorage.setItem(
-    DRAFT_KEY,
-    JSON.stringify(data)
-  );
+  try{
+
+    localStorage.setItem(
+      DRAFT_KEY,
+      JSON.stringify(data)
+    );
+
+  }catch(error){
+
+    console.warn(
+      "Không thể lưu bản nháp:",
+      error
+    );
+
+  }
 
 }
 
@@ -2438,10 +2785,26 @@ function saveDraft(){
 
 function loadDraft(){
 
-  const raw =
-    localStorage.getItem(
-      DRAFT_KEY
+  let raw = null;
+
+
+  try{
+
+    raw =
+      localStorage.getItem(
+        DRAFT_KEY
+      );
+
+  }catch(error){
+
+    console.warn(
+      "Không thể đọc bản nháp:",
+      error
     );
+
+    return;
+
+  }
 
 
   if(!raw){
@@ -2455,6 +2818,16 @@ function loadDraft(){
 
     const data =
       JSON.parse(raw);
+
+
+    if(
+      !data ||
+      typeof data !== "object"
+    ){
+
+      return;
+
+    }
 
 
     Object.keys(data)
@@ -2519,6 +2892,32 @@ function bindEvents(){
     );
 
 }
+
+
+/* =========================================================
+   SETTINGS STORAGE EVENT
+========================================================= */
+
+/*
+  Nếu GROVA DOCUMENT đang mở ở một tab khác
+  và Cài đặt được thay đổi, template sẽ tự
+  cập nhật khi trình duyệt phát sinh storage event.
+*/
+
+window.addEventListener(
+  "storage",
+  function(event){
+
+    if(
+      event.key === SETTINGS_KEY
+    ){
+
+      updateCompanyInformation();
+
+    }
+
+  }
+);
 
 
 /* =========================================================
