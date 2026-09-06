@@ -1,7 +1,7 @@
 /* =========================================================
    GROVA DOCUMENT
-   APP.JS — VERSION 205
-   FIRESTORE PHASE 2 — PROJECTS + CUSTOMERS
+   APP.JS — VERSION 206
+   FIRESTORE PHASE 3 — PROJECTS + CUSTOMERS + EMPLOYEES
 ========================================================= */
 
 (() => {
@@ -27,6 +27,7 @@
 
   const PROJECT_CACHE_PREFIX = "GROVA_PROJECTS_V2_";
   const CUSTOMER_CACHE_PREFIX = "GROVA_CUSTOMERS_V2_";
+  const EMPLOYEE_CACHE_PREFIX = "GROVA_EMPLOYEES_V2_";
 
   const PAGE_INFO = {
     dashboard: {
@@ -370,8 +371,97 @@
     );
   }
 
+  function getEmployeeCacheKey(uid) {
+    return (
+      EMPLOYEE_CACHE_PREFIX +
+      String(uid || "")
+    );
+  }
+
+  function readEmployeeCache(uid) {
+    if (!uid) {
+      return [];
+    }
+
+    return readStorage(
+      getEmployeeCacheKey(uid),
+      []
+    );
+  }
+
+  function writeEmployeeCache(uid, employees) {
+    if (!uid) {
+      return false;
+    }
+
+    return writeStorage(
+      getEmployeeCacheKey(uid),
+      Array.isArray(employees)
+        ? employees
+        : []
+    );
+  }
+
+  function normalizeEmployees(employees) {
+    if (!Array.isArray(employees)) {
+      return [];
+    }
+
+    return employees
+      .filter(
+        (employee) =>
+          employee &&
+          employee.id
+      )
+      .map(
+        (employee) => ({
+          ...employee,
+          id: String(employee.id)
+        })
+      )
+      .sort(
+        (a, b) =>
+          String(b.updatedAt || b.createdAt || "")
+            .localeCompare(
+              String(a.updatedAt || a.createdAt || "")
+            )
+      );
+  }
+
+  function setEmployeesCache(employees) {
+    employeesCache =
+      normalizeEmployees(employees);
+  }
+
+  function getBestLocalEmployees(uid) {
+    const scopedCache =
+      normalizeEmployees(
+        readEmployeeCache(uid)
+      );
+
+    if (scopedCache.length) {
+      return scopedCache;
+    }
+
+    return normalizeEmployees(
+      readStorage(
+        STORAGE.employees,
+        []
+      )
+    );
+  }
+
   function getEmployees() {
-    return readStorage(STORAGE.employees, []);
+    if (currentUser) {
+      return employeesCache.slice();
+    }
+
+    return normalizeEmployees(
+      readStorage(
+        STORAGE.employees,
+        []
+      )
+    );
   }
 
   function getHistory() {
@@ -1109,6 +1199,7 @@
 
     projectsSyncToken++;
     customersSyncToken++;
+    employeesSyncToken++;
 
     currentUser =
       user || null;
@@ -1117,11 +1208,16 @@
 
       setProjectsCache([]);
       setCustomersCache([]);
+      setEmployeesCache([]);
 
       renderProjectViews();
 
       if (currentPage === "customers") {
         renderCustomers();
+      }
+
+      if (currentPage === "employees") {
+        renderEmployees();
       }
 
       updateStats();
@@ -1148,10 +1244,23 @@
       cachedCustomers
     );
 
+    const cachedEmployees =
+      getBestLocalEmployees(
+        user.uid
+      );
+
+    setEmployeesCache(
+      cachedEmployees
+    );
+
     renderProjectViews();
 
     if (currentPage === "customers") {
       renderCustomers();
+    }
+
+    if (currentPage === "employees") {
+      renderEmployees();
     }
 
     syncProjectsFromCloud(
@@ -1159,6 +1268,10 @@
     );
 
     syncCustomersFromCloud(
+      user
+    );
+
+    syncEmployeesFromCloud(
       user
     );
 
@@ -1674,6 +1787,497 @@
         customersSyncToken
       ) {
         customersSyncRunning = false;
+      }
+    }
+  }
+
+  /* =======================================================
+     FIRESTORE SERVICE — EMPLOYEES
+  ======================================================= */
+
+  function getEmployeesCollection() {
+    if (!firestoreDb) {
+      return null;
+    }
+
+    return firestoreDb.collection("employees");
+  }
+
+  function buildEmployeeData(employee, user, isCreate = false) {
+    const now =
+      nowISO();
+
+    const uid =
+      user?.uid || "";
+
+    return {
+      id:
+        String(employee.id),
+
+      name:
+        employee.name || "",
+
+      position:
+        employee.position || "",
+
+      department:
+        employee.department || "",
+
+      phone:
+        employee.phone || "",
+
+      email:
+        employee.email || "",
+
+      startDate:
+        employee.startDate || "",
+
+      note:
+        employee.note || "",
+
+      createdAt:
+        employee.createdAt ||
+        now,
+
+      updatedAt:
+        employee.updatedAt ||
+        now,
+
+      createdBy:
+        employee.createdBy ||
+        uid,
+
+      updatedBy:
+        uid
+    };
+  }
+
+  function mapFirestoreEmployee(doc) {
+    const data =
+      doc.data() || {};
+
+    return {
+      ...data,
+      id:
+        String(doc.id)
+    };
+  }
+
+  async function readCloudEmployees() {
+    if (!currentUser) {
+      return null;
+    }
+
+    if (!initializeFirestore()) {
+      return null;
+    }
+
+    await waitForFirestore();
+
+    const collection =
+      getEmployeesCollection();
+
+    if (!collection) {
+      return null;
+    }
+
+    const snapshot =
+      await collection.get();
+
+    return normalizeEmployees(
+      snapshot.docs.map(
+        mapFirestoreEmployee
+      )
+    );
+  }
+
+  async function writeCloudEmployee(employee, user, isCreate = false) {
+    if (!user) {
+      throw new Error(
+        "AUTH_REQUIRED"
+      );
+    }
+
+    if (!initializeFirestore()) {
+      throw new Error(
+        "FIRESTORE_UNAVAILABLE"
+      );
+    }
+
+    await waitForFirestore();
+
+    const data =
+      buildEmployeeData(
+        employee,
+        user,
+        isCreate
+      );
+
+    const reference =
+      getEmployeesCollection()
+        .doc(String(employee.id));
+
+    await reference.set(
+      data,
+      {
+        merge: true
+      }
+    );
+
+    const verification =
+      await reference.get();
+
+    if (!verification.exists) {
+      throw new Error(
+        "WRITE_VERIFICATION_FAILED"
+      );
+    }
+
+    return mapFirestoreEmployee(
+      verification
+    );
+  }
+
+  async function deleteCloudEmployee(id, user) {
+    if (!user) {
+      throw new Error(
+        "AUTH_REQUIRED"
+      );
+    }
+
+    if (!initializeFirestore()) {
+      throw new Error(
+        "FIRESTORE_UNAVAILABLE"
+      );
+    }
+
+    await waitForFirestore();
+
+    const reference =
+      getEmployeesCollection()
+        .doc(String(id));
+
+    await reference.delete();
+
+    const verification =
+      await reference.get();
+
+    if (verification.exists) {
+      throw new Error(
+        "DELETE_VERIFICATION_FAILED"
+      );
+    }
+
+    return true;
+  }
+
+  function employeeIds(employees) {
+    return normalizeEmployees(employees)
+      .map(
+        (employee) =>
+          String(employee.id)
+      )
+      .sort();
+  }
+
+  function sameEmployeeIdSet(a, b) {
+    const left =
+      employeeIds(a);
+
+    const right =
+      employeeIds(b);
+
+    if (
+      left.length !==
+      right.length
+    ) {
+      return false;
+    }
+
+    return left.every(
+      (id, index) =>
+        id === right[index]
+    );
+  }
+
+  async function verifyEmployeeMigration(expectedEmployees) {
+    const cloud =
+      await readCloudEmployees();
+
+    if (!cloud) {
+      return false;
+    }
+
+    const expected =
+      normalizeEmployees(
+        expectedEmployees
+      );
+
+    if (
+      cloud.length !==
+      expected.length
+    ) {
+      return false;
+    }
+
+    return sameEmployeeIdSet(
+      cloud,
+      expected
+    );
+  }
+
+  function showEmployeeSyncError(error) {
+    console.error(
+      "GROVA DOCUMENT: Employee Firestore error.",
+      error
+    );
+
+    showToast(
+      "Không thể đồng bộ nhân sự. Ứng dụng vẫn đang dùng dữ liệu cục bộ."
+    );
+  }
+
+  async function migrateLocalEmployeesIfNeeded(
+    user,
+    localEmployees
+  ) {
+    if (!user) {
+      return false;
+    }
+
+    const sourceEmployees =
+      normalizeEmployees(
+        localEmployees
+      );
+
+    if (!sourceEmployees.length) {
+      return false;
+    }
+
+    try {
+      if (!initializeFirestore()) {
+        throw new Error(
+          "FIRESTORE_UNAVAILABLE"
+        );
+      }
+
+      await waitForFirestore();
+
+      const collection =
+        getEmployeesCollection();
+
+      if (!collection) {
+        throw new Error(
+          "FIRESTORE_UNAVAILABLE"
+        );
+      }
+
+      for (
+        const employee of sourceEmployees
+      ) {
+        const data =
+          buildEmployeeData(
+            employee,
+            user,
+            !employee.createdBy
+          );
+
+        await collection
+          .doc(String(employee.id))
+          .set(
+            data,
+            {
+              merge: true
+            }
+          );
+      }
+
+      const verified =
+        await verifyEmployeeMigration(
+          sourceEmployees
+        );
+
+      if (!verified) {
+        throw new Error(
+          "MIGRATION_VERIFICATION_FAILED"
+        );
+      }
+
+      const migratedCloud =
+        await readCloudEmployees();
+
+      if (!migratedCloud) {
+        throw new Error(
+          "MIGRATION_READBACK_FAILED"
+        );
+      }
+
+      setEmployeesCache(
+        migratedCloud
+      );
+
+      writeEmployeeCache(
+        user.uid,
+        migratedCloud
+      );
+
+      showToast(
+        "Đã đồng bộ nhân sự cũ lên Firestore."
+      );
+
+      return true;
+
+    } catch (error) {
+      showEmployeeSyncError(
+        error
+      );
+
+      return false;
+    }
+  }
+
+  async function syncEmployeesFromCloud(user) {
+    if (!user) {
+      return;
+    }
+
+    const token =
+      ++employeesSyncToken;
+
+    employeesSyncRunning = true;
+
+    try {
+      const initialized =
+        initializeFirestore();
+
+      if (!initialized) {
+        return;
+      }
+
+      const localEmployees =
+        getBestLocalEmployees(
+          user.uid
+        );
+
+      if (localEmployees.length) {
+        setEmployeesCache(
+          localEmployees
+        );
+
+        if (currentPage === "employees") {
+          renderEmployees();
+        }
+
+        updateStats();
+      }
+
+      const cloud =
+        await readCloudEmployees();
+
+      if (
+        token !==
+          employeesSyncToken ||
+        currentUser?.uid !==
+          user.uid
+      ) {
+        return;
+      }
+
+      if (!cloud) {
+        return;
+      }
+
+      /* Cloud có dữ liệu => Cloud thắng. */
+      if (cloud.length > 0) {
+        setEmployeesCache(
+          cloud
+        );
+
+        writeEmployeeCache(
+          user.uid,
+          cloud
+        );
+
+        if (currentPage === "employees") {
+          renderEmployees();
+        }
+
+        updateStats();
+
+        return;
+      }
+
+      /*
+        Cloud đang rỗng:
+        chỉ migrate nếu local thật sự có dữ liệu.
+        Không bao giờ xóa cache chỉ vì cloud rỗng.
+      */
+      if (localEmployees.length) {
+        const migrated =
+          await migrateLocalEmployeesIfNeeded(
+            user,
+            localEmployees
+          );
+
+        if (
+          token !==
+            employeesSyncToken ||
+          currentUser?.uid !==
+            user.uid
+        ) {
+          return;
+        }
+
+        if (migrated) {
+          if (currentPage === "employees") {
+            renderEmployees();
+          }
+
+          updateStats();
+
+          return;
+        }
+
+        /* Migration lỗi => giữ nguyên local cache. */
+        if (currentPage === "employees") {
+          renderEmployees();
+        }
+
+        updateStats();
+
+        return;
+      }
+
+      /* Cả local và cloud đều rỗng. */
+      setEmployeesCache([]);
+
+      writeEmployeeCache(
+        user.uid,
+        []
+      );
+
+      if (currentPage === "employees") {
+        renderEmployees();
+      }
+
+      updateStats();
+
+    } catch (error) {
+      if (
+        token ===
+        employeesSyncToken
+      ) {
+        showEmployeeSyncError(
+          error
+        );
+      }
+
+    } finally {
+      if (
+        token ===
+        employeesSyncToken
+      ) {
+        employeesSyncRunning = false;
       }
     }
   }
@@ -3837,7 +4441,7 @@
 
   }
 
-  function saveEmployee() {
+  async function saveEmployee() {
 
     const name =
       $("#modalEmployeeName")
@@ -3856,6 +4460,18 @@
 
     const employees =
       getEmployees();
+
+    const existingEmployee =
+      modalEditId
+        ? employees.find(
+            (item) =>
+              item.id ===
+              modalEditId
+          )
+        : null;
+
+    const now =
+      nowISO();
 
     const data = {
 
@@ -3892,71 +4508,103 @@
 
     };
 
-    if (modalEditId) {
+    const localEmployee =
+      modalEditId && existingEmployee
+        ? {
+            ...existingEmployee,
+            ...data,
+            updatedAt: now
+          }
+        : {
+            id: createId("NS"),
+            ...data,
+            createdAt: now,
+            updatedAt: now
+          };
 
-      const index =
-        employees.findIndex(
-          (item) =>
-            item.id ===
-            modalEditId
-        );
+    const saveButton =
+      $("#modalSave");
 
-      if (index >= 0) {
-
-        employees[index] = {
-
-          ...employees[index],
-
-          ...data,
-
-          updatedAt:
-            nowISO()
-
-        };
-
-      }
-
-      showToast(
-        "Đã cập nhật nhân sự."
-      );
-
-    } else {
-
-      employees.unshift({
-
-        id:
-          createId("NS"),
-
-        ...data,
-
-        createdAt:
-          nowISO(),
-
-        updatedAt:
-          nowISO()
-
-      });
-
-      showToast(
-        "Đã thêm nhân sự."
-      );
-
+    if (saveButton) {
+      saveButton.disabled = true;
+      saveButton.textContent = "Đang lưu...";
     }
 
-    writeStorage(
-      STORAGE.employees,
-      employees
-    );
+    try {
 
-    closeModal();
+      if (!currentUser) {
+        throw new Error(
+          "AUTH_REQUIRED"
+        );
+      }
 
-    renderEmployees();
+      const savedEmployee =
+        await writeCloudEmployee(
+          localEmployee,
+          currentUser,
+          !modalEditId
+        );
 
-    updateStats();
+      setEmployeesCache([
+        ...employees.filter(
+          (item) =>
+            item.id !==
+            savedEmployee.id
+        ),
+        savedEmployee
+      ]);
 
+      writeEmployeeCache(
+        currentUser.uid,
+        employeesCache
+      );
+
+      closeModal();
+
+      renderEmployees();
+
+      updateStats();
+
+      showToast(
+        modalEditId
+          ? "Đã cập nhật nhân sự."
+          : "Đã thêm nhân sự."
+      );
+
+    } catch (error) {
+
+      console.error(
+        "GROVA DOCUMENT: saveEmployee failed.",
+        error
+      );
+
+      if (
+        error &&
+        error.message ===
+          "AUTH_REQUIRED"
+      ) {
+
+        showToast(
+          "Chưa đăng nhập. Không thể lưu nhân sự."
+        );
+
+      } else {
+
+        showToast(
+          "Không thể lưu nhân sự lên hệ thống. Dữ liệu cục bộ chưa bị thay đổi."
+        );
+      }
+
+    } finally {
+
+      if (saveButton) {
+        saveButton.disabled = false;
+        saveButton.textContent = "Lưu";
+      }
+    }
   }
 
-  function deleteEmployee(id) {
+  async function deleteEmployee(id) {
 
     const employees =
       getEmployees();
@@ -3980,22 +4628,66 @@
       return;
     }
 
-    writeStorage(
-      STORAGE.employees,
-      employees.filter(
-        (item) =>
-          item.id !== id
-      )
-    );
+    try {
 
-    renderEmployees();
+      if (!currentUser) {
+        throw new Error(
+          "AUTH_REQUIRED"
+        );
+      }
 
-    updateStats();
+      await deleteCloudEmployee(
+        id,
+        currentUser
+      );
 
-    showToast(
-      "Đã xóa nhân sự."
-    );
+      const updatedEmployees =
+        employees.filter(
+          (item) =>
+            item.id !== id
+        );
 
+      setEmployeesCache(
+        updatedEmployees
+      );
+
+      writeEmployeeCache(
+        currentUser.uid,
+        employeesCache
+      );
+
+      renderEmployees();
+
+      updateStats();
+
+      showToast(
+        "Đã xóa nhân sự."
+      );
+
+    } catch (error) {
+
+      console.error(
+        "GROVA DOCUMENT: deleteEmployee failed.",
+        error
+      );
+
+      if (
+        error &&
+        error.message ===
+          "AUTH_REQUIRED"
+      ) {
+
+        showToast(
+          "Chưa đăng nhập. Không thể xóa nhân sự."
+        );
+
+      } else {
+
+        showToast(
+          "Không thể xóa nhân sự. Dữ liệu cục bộ chưa bị thay đổi."
+        );
+      }
+    }
   }
 
   /* =======================================================
@@ -4511,10 +5203,17 @@
         )
       );
 
+      localStorage.removeItem(
+        getEmployeeCacheKey(
+          currentUser.uid
+        )
+      );
+
     }
 
     setProjectsCache([]);
     setCustomersCache([]);
+    setEmployeesCache([]);
 
     renderDashboard();
 
@@ -4947,4 +5646,3 @@
   }
 
 })();
-
