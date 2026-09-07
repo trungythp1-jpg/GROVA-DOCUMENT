@@ -7,7 +7,7 @@ const APP_SHELL = [
   "./style.css?v=202",
   "./auth.css?v=202",
 
-  "./app.js?v=210",
+  "./app.js?v=220",
   "./auth.js?v=202",
 
   "./data/data.js?v=202",
