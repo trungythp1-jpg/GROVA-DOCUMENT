@@ -1,6 +1,106 @@
 <!DOCTYPE html>
+<html lang="vi">
+<head>
 
-GROVA DOCUMENT
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
+
+  <!-- =====================================================
+       PWA / APP CONFIGURATION
+  ====================================================== -->
+
+  <meta
+    name="theme-color"
+    content="#0b7a5a"
+  >
+
+  <meta
+    name="application-name"
+    content="GROVA DOCUMENT"
+  >
+
+  <meta
+    name="apple-mobile-web-app-capable"
+    content="yes"
+  >
+
+  <meta
+    name="mobile-web-app-capable"
+    content="yes"
+  >
+
+  <meta
+    name="apple-mobile-web-app-status-bar-style"
+    content="default"
+  >
+
+  <meta
+    name="apple-mobile-web-app-title"
+    content="GROVA DOCUMENT"
+  >
+
+  <meta
+    name="format-detection"
+    content="telephone=no"
+  >
+
+  <!-- =====================================================
+       TITLE
+  ====================================================== -->
+
+  <title>GROVA DOCUMENT</title>
+
+  <!-- =====================================================
+       PWA MANIFEST
+  ====================================================== -->
+
+  <link
+    rel="manifest"
+    href="./manifest.json?v=202"
+  >
+
+  <!-- =====================================================
+       ICON
+  ====================================================== -->
+
+  <link
+    rel="icon"
+    type="image/png"
+    href="./data/grova_logo.png"
+  >
+
+  <link
+    rel="apple-touch-icon"
+    href="./data/grova_logo.png"
+  >
+
+  <!-- =====================================================
+       MAIN STYLESHEET
+  ====================================================== -->
+
+  <link
+    rel="stylesheet"
+    href="./style.css?v=202"
+  >
+
+  <!-- =====================================================
+       AUTHENTICATION STYLESHEET
+  ====================================================== -->
+
+  <link
+    rel="stylesheet"
+    href="./auth.css?v=202"
+  >
+
+</head>
+
+<body class="auth-loading">
+
+  <div class="app-shell">
 
     <!-- =====================================================
          SIDEBAR
@@ -884,6 +984,18 @@ GROVA DOCUMENT
 
     </main>
 
+  </div>
+
+  <!-- =====================================================
+       MODAL
+  ====================================================== -->
+
+  <div
+    id="modal"
+    class="modal hidden"
+    aria-hidden="true"
+  >
+
     <div class="modal-card">
 
       <div class="modal-head">
@@ -934,3 +1046,88 @@ GROVA DOCUMENT
       </div>
 
     </div>
+
+  </div>
+
+  <!-- =====================================================
+       FIREBASE
+       ===================================================== -->
+
+  <script
+    src="https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js"
+  ></script>
+
+  <script
+    src="https://www.gstatic.com/firebasejs/12.18.0/firebase-auth-compat.js"
+  ></script>
+  <script
+  src="https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore-compat.js"
+></script>
+
+  <!-- =====================================================
+       GROVA AUTHENTICATION
+       ===================================================== -->
+
+  <script
+    src="./auth.js?v=202"
+  ></script>
+
+  <!-- =====================================================
+       DATA
+       ===================================================== -->
+
+  <script
+    src="./data/data.js?v=202"
+  ></script>
+
+  <!-- =====================================================
+       APPLICATION
+       ===================================================== -->
+
+  <script
+    src="./app.js?v=220"
+  ></script>
+  <!-- =====================================================
+       SERVICE WORKER
+       ===================================================== -->
+
+  <script>
+
+    if ("serviceWorker" in navigator) {
+
+      window.addEventListener(
+        "load",
+        function () {
+
+          navigator.serviceWorker
+            .register("./sw.js", {
+              scope: "./"
+            })
+
+            .then(function (registration) {
+
+              console.log(
+                "GROVA DOCUMENT: Service Worker registered.",
+                registration.scope
+              );
+
+            })
+
+            .catch(function (error) {
+
+              console.error(
+                "GROVA DOCUMENT: Service Worker registration failed.",
+                error
+              );
+
+            });
+
+        }
+      );
+
+    }
+
+  </script>
+
+</body>
+</html>
