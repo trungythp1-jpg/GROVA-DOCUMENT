@@ -1,7 +1,7 @@
 /* =========================================================
    GROVA DOCUMENT
-   APP.JS — VERSION 213
-   FIRESTORE PHASE 4 — HISTORY + PHASE 5A PERMISSION CORE + PHASE 5B.3 ACCOUNT PROFILE BRIDGE
+   APP.JS — VERSION 214
+   FIRESTORE PHASE 4 — HISTORY + PHASE 5A PERMISSION CORE + PHASE 5B.4 ACCOUNT MANAGEMENT UI
    PROJECTS + CUSTOMERS + EMPLOYEES + HISTORY
    CLEAN BASE FROM LOCKED VERSION 209
 ========================================================= */
@@ -150,6 +150,14 @@
 
   let currentUserProfile = null;
   let userProfileSyncToken = 0;
+
+  /* =======================================================
+     PHASE 5B.4 — ACCOUNT MANAGEMENT UI STATE
+  ======================================================= */
+  let accountUsers = [];
+  let accountUsersLoading = false;
+  let accountUsersPageToken = null;
+  let accountUsersLoadedOnce = false;
 
   function clonePermissions(value) {
     return JSON.parse(JSON.stringify(value || {}));
@@ -5232,6 +5240,595 @@
 
   }
 
+
+  /* =======================================================
+     PHASE 5B.4 — ACCOUNT MANAGEMENT UI
+  ======================================================= */
+
+  const ACCOUNT_PERMISSION_META = {
+    projects: {
+      label: "Công trình",
+      actions: [["view", "Xem"], ["create", "Thêm"], ["edit", "Sửa"], ["delete", "Xóa"]]
+    },
+    customers: {
+      label: "Khách hàng",
+      actions: [["view", "Xem"], ["create", "Thêm"], ["edit", "Sửa"], ["delete", "Xóa"]]
+    },
+    employees: {
+      label: "Nhân sự",
+      actions: [["view", "Xem"], ["create", "Thêm"], ["edit", "Sửa"], ["delete", "Xóa"]]
+    },
+    documents: {
+      label: "Văn bản",
+      actions: [["view", "Xem"], ["create", "Thêm"], ["edit", "Sửa"], ["delete", "Xóa"], ["export", "Xuất"]]
+    },
+    history: {
+      label: "Lịch sử",
+      actions: [["view", "Xem"]]
+    },
+    users: {
+      label: "Tài khoản",
+      actions: [["view", "Xem"], ["create", "Tạo"], ["edit", "Sửa"], ["lock", "Khóa / mở khóa"], ["managePermissions", "Quản lý quyền"]]
+    },
+    settings: {
+      label: "Cài đặt",
+      actions: [["view", "Xem"], ["edit", "Sửa"]]
+    }
+  };
+
+  function accountPermissionMatrixFromProfile(profile) {
+    const source = profile?.permissions || {};
+    const matrix = clonePermissions(source);
+
+    Object.keys(DEFAULT_PERMISSIONS).forEach((group) => {
+      if (!matrix[group]) matrix[group] = {};
+      Object.keys(DEFAULT_PERMISSIONS[group]).forEach((action) => {
+        matrix[group][action] = Boolean(matrix[group][action]);
+      });
+    });
+
+    return matrix;
+  }
+
+  function backendErrorMessage(error, fallback) {
+    const code = String(error?.code || "");
+    const known = {
+      "functions/unauthenticated": "Phiên đăng nhập không hợp lệ. Vui lòng đăng nhập lại.",
+      "functions/permission-denied": "Bạn không có quyền thực hiện thao tác này.",
+      "functions/not-found": "Cloud Functions chưa được triển khai hoặc không tìm thấy chức năng.",
+      "functions/unavailable": "Cloud Functions hiện chưa khả dụng.",
+      "functions/failed-precondition": error?.message || "Điều kiện hệ thống chưa đáp ứng.",
+      "functions/invalid-argument": error?.message || "Thông tin gửi lên không hợp lệ.",
+      "functions/already-exists": error?.message || "Tài khoản đã tồn tại.",
+      "functions/internal": error?.message || "Máy chủ không thể hoàn tất thao tác."
+    };
+    return known[code] || error?.message || fallback;
+  }
+
+  async function callAccountFunction(name, payload = {}) {
+    const functions = getFunctionsObject();
+
+    if (!functions || typeof functions.httpsCallable !== "function") {
+      const error = new Error("FUNCTIONS_UNAVAILABLE");
+      error.code = "functions/not-found";
+      throw error;
+    }
+
+    return (await functions.httpsCallable(name)(payload))?.data || {};
+  }
+
+  function formatAccountDate(value) {
+    if (!value) return "";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return String(value);
+
+    return date.toLocaleString("vi-VN", {
+      dateStyle: "short",
+      timeStyle: "short"
+    });
+  }
+
+  function renderAccountManagement() {
+    const container = $("#accountManagementSection");
+    if (!container) return;
+
+    if (!hasPermission("users", "view")) {
+      container.innerHTML = "";
+      return;
+    }
+
+    const canCreate = hasPermission("users", "create");
+    const canEdit = hasPermission("users", "edit");
+    const canLock = hasPermission("users", "lock");
+
+    const rows = accountUsers.map((item) => {
+      const profile = item?.profile || {};
+      const name = profile.name || item.displayName || "Chưa đặt tên";
+      const role = ROLE_LABELS[profile.role] || "Chưa phân quyền";
+      const status =
+        item.disabled || profile.status === "disabled"
+          ? "disabled"
+          : "active";
+      const email = item.email || profile.email || "";
+      const lastSignIn = item.lastSignInTime
+        ? formatAccountDate(item.lastSignInTime)
+        : "Chưa đăng nhập";
+      const isProtected = item.uid === ADMIN_UID;
+      const actions = [];
+
+      if (canEdit) {
+        actions.push(`
+          <button class="secondary" type="button"
+            data-action="edit-user"
+            data-id="${escapeHTML(item.uid)}">
+            Sửa
+          </button>
+        `);
+      }
+
+      if (canLock && !isProtected && item.uid !== currentUser?.uid) {
+        actions.push(`
+          <button class="secondary" type="button"
+            data-action="toggle-user-status"
+            data-id="${escapeHTML(item.uid)}"
+            data-status="${status === "active" ? "disabled" : "active"}">
+            ${status === "active" ? "Khóa" : "Mở khóa"}
+          </button>
+        `);
+      }
+
+      return `
+        <tr>
+          <td>
+            <strong>${escapeHTML(name)}</strong>
+            ${isProtected ? `<div class="setting-note">Admin gốc</div>` : ""}
+          </td>
+          <td>${escapeHTML(email)}</td>
+          <td>${escapeHTML(role)}</td>
+          <td>${status === "active" ? "Đang hoạt động" : "Đã khóa"}</td>
+          <td>${escapeHTML(lastSignIn)}</td>
+          <td>
+            ${actions.length
+              ? `<div class="action-group">${actions.join("")}</div>`
+              : "—"}
+          </td>
+        </tr>
+      `;
+    }).join("");
+
+    container.innerHTML = `
+      <div class="form-card">
+        <div class="page-head">
+          <div>
+            <h3>Tài khoản người dùng</h3>
+            <p>
+              Quản lý tài khoản Firebase Authentication và hồ sơ
+              phân quyền GROVA.
+            </p>
+          </div>
+
+          <div class="action-group">
+            <button class="secondary" type="button"
+              data-action="refresh-users"
+              ${accountUsersLoading ? "disabled" : ""}>
+              ${accountUsersLoading ? "Đang tải..." : "Làm mới"}
+            </button>
+
+            ${canCreate ? `
+              <button class="primary" type="button"
+                data-action="new-user">
+                + Tạo tài khoản
+              </button>
+            ` : ""}
+          </div>
+        </div>
+
+        <div class="setting-note">
+          ${accountUsersLoading
+            ? "Đang tải danh sách tài khoản..."
+            : accountUsersLoadedOnce
+              ? "Danh sách tài khoản được lấy từ Firebase Authentication."
+              : "Chưa tải danh sách tài khoản. Bấm “Làm mới” để tải."}
+        </div>
+
+        ${accountUsers.length ? `
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Họ tên</th>
+                  <th>Email</th>
+                  <th>Vai trò</th>
+                  <th>Trạng thái</th>
+                  <th>Đăng nhập gần nhất</th>
+                  <th>Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+        ` : `
+          <div class="setting-note">
+            ${accountUsersLoading
+              ? "Đang lấy dữ liệu từ backend..."
+              : "Chưa có dữ liệu danh sách tài khoản."}
+          </div>
+        `}
+
+        <div class="setting-note">
+          Tạo, sửa, khóa và mở khóa tài khoản chỉ thực thi qua backend
+          bảo mật. Project đang ở Spark nên Cloud Functions production
+          chưa triển khai; giao diện đã sẵn sàng để kết nối khi cần.
+        </div>
+      </div>
+    `;
+  }
+
+  async function loadAccountUsers(options = {}) {
+    if (!hasPermission("users", "view")) return [];
+    if (accountUsersLoading) return accountUsers;
+
+    accountUsersLoading = true;
+    renderAccountManagement();
+
+    try {
+      const result = await callAccountFunction("grovaListUsers", {
+        pageToken: options.reset === false ? accountUsersPageToken : null,
+        maxResults: 1000
+      });
+
+      const users = Array.isArray(result.users) ? result.users : [];
+
+      accountUsers =
+        options.reset === false
+          ? [...accountUsers, ...users]
+          : users;
+
+      accountUsersPageToken = result.nextPageToken || null;
+      accountUsersLoadedOnce = true;
+      renderAccountManagement();
+      return accountUsers;
+    } catch (error) {
+      console.warn("GROVA DOCUMENT: loadAccountUsers failed.", error);
+      accountUsersLoadedOnce = true;
+      renderAccountManagement();
+      showToast(
+        backendErrorMessage(
+          error,
+          "Không thể tải danh sách tài khoản."
+        )
+      );
+      return [];
+    } finally {
+      accountUsersLoading = false;
+      renderAccountManagement();
+    }
+  }
+
+  function getAccountUser(uid) {
+    return accountUsers.find(
+      (item) => String(item?.uid || "") === String(uid || "")
+    ) || null;
+  }
+
+  function openUserModal(uid = null) {
+    const existing = uid ? getAccountUser(uid) : null;
+    const canEdit = hasPermission("users", "edit");
+    const canCreate = hasPermission("users", "create");
+    const canManagePermissions =
+      hasPermission("users", "managePermissions") || isAdminUser();
+
+    if (existing && !canEdit) {
+      showToast("Bạn không có quyền sửa tài khoản.");
+      return;
+    }
+
+    if (!existing && !canCreate) {
+      showToast("Bạn không có quyền tạo tài khoản.");
+      return;
+    }
+
+    modalMode = "user";
+    modalEditId = existing?.uid || null;
+
+    const profile = existing?.profile || {};
+    const role = profile.role || "employee";
+    const permissions = accountPermissionMatrixFromProfile(profile);
+    const protectedAdmin = existing?.uid === ADMIN_UID;
+
+    const roleOptions = [
+      ["employee", "Nhân viên"],
+      ["viewer", "Chỉ xem"],
+      ["manager", "Quản lý"],
+      ["custom", "Tùy chỉnh"],
+      ["admin", "Administrator"]
+    ];
+
+    const roleSelect = roleOptions.map(([value, label]) => `
+      <option value="${value}" ${role === value ? "selected" : ""}>
+        ${label}
+      </option>
+    `).join("");
+
+    const permissionRows = Object.entries(ACCOUNT_PERMISSION_META)
+      .map(([group, meta]) => {
+        const source = permissions[group] || {};
+        const cells = meta.actions.map(([action, label]) => `
+          <label>
+            <input
+              type="checkbox"
+              data-user-permission="${escapeHTML(group)}.${escapeHTML(action)}"
+              ${source[action] ? "checked" : ""}
+              ${role === "admin" ? "disabled" : ""}
+            >
+            ${escapeHTML(label)}
+          </label>
+        `).join("");
+
+        return `
+          <div class="form-card" style="padding:12px;margin-top:10px;">
+            <strong>${escapeHTML(meta.label)}</strong>
+            <div class="form-grid" style="margin-top:8px;">
+              ${cells}
+            </div>
+          </div>
+        `;
+      }).join("");
+
+    $("#modalEyebrow").textContent = "TÀI KHOẢN";
+    $("#modalTitle").textContent =
+      existing ? "Sửa tài khoản" : "Tạo tài khoản";
+
+    $("#modalBody").innerHTML = `
+      <div class="form-grid">
+        <label>
+          Họ tên
+          <input id="modalUserName" type="text"
+            value="${escapeHTML(existing?.displayName || profile.name || "")}"
+            placeholder="Họ tên người dùng...">
+        </label>
+
+        <label>
+          Email
+          <input id="modalUserEmail" type="email"
+            value="${escapeHTML(existing?.email || profile.email || "")}"
+            placeholder="email@example.com">
+        </label>
+
+        <label>
+          Số điện thoại
+          <input id="modalUserPhone" type="tel"
+            value="${escapeHTML(existing?.phoneNumber || profile.phone || "")}"
+            placeholder="Số điện thoại...">
+        </label>
+
+        <label>
+          ${existing
+            ? "Mật khẩu mới (để trống nếu không đổi)"
+            : "Mật khẩu"}
+          <input id="modalUserPassword" type="password"
+            autocomplete="new-password"
+            placeholder="Tối thiểu 6 ký tự">
+        </label>
+
+        <label>
+          Vai trò
+          <select id="modalUserRole"
+            ${(!canManagePermissions || protectedAdmin) ? "disabled" : ""}>
+            ${roleSelect}
+          </select>
+        </label>
+      </div>
+
+      ${protectedAdmin ? `
+        <div class="setting-note">
+          Tài khoản Admin gốc được bảo vệ. Không thể hạ quyền,
+          khóa hoặc mở khóa tài khoản này.
+        </div>
+      ` : ""}
+
+      <div style="margin-top:16px;">
+        <h3>Phân quyền</h3>
+        <div class="setting-note">
+          ${canManagePermissions
+            ? "Thiết lập quyền chi tiết cho tài khoản."
+            : "Quyền chi tiết do Administrator quản lý."}
+        </div>
+        ${permissionRows}
+      </div>
+    `;
+
+    if (!canManagePermissions || protectedAdmin) {
+      $$("#modalBody input[data-user-permission]").forEach(
+        (input) => { input.disabled = true; }
+      );
+    }
+
+    const roleElement = $("#modalUserRole");
+
+    if (roleElement) {
+      roleElement.addEventListener("change", () => {
+        const selected = roleElement.value;
+        const defaults = getDefaultPermissions(selected);
+
+        $$("#modalBody input[data-user-permission]").forEach((input) => {
+          const parts = String(
+            input.dataset.userPermission || ""
+          ).split(".");
+
+          input.checked =
+            Boolean(defaults?.[parts[0]]?.[parts[1]]);
+
+          input.disabled =
+            !canManagePermissions ||
+            protectedAdmin ||
+            selected === "admin";
+        });
+      });
+    }
+
+    $("#modalSave").style.display = "";
+    $("#modalSave").textContent =
+      existing ? "Lưu thay đổi" : "Tạo tài khoản";
+
+    openModal();
+  }
+
+  function readUserModalPermissions(role) {
+    if (role === "admin") return getDefaultPermissions("admin");
+
+    const permissions = getDefaultPermissions("custom");
+
+    $$("#modalBody input[data-user-permission]").forEach((input) => {
+      const parts = String(
+        input.dataset.userPermission || ""
+      ).split(".");
+
+      if (parts.length !== 2) return;
+
+      if (!permissions[parts[0]]) {
+        permissions[parts[0]] = {};
+      }
+
+      permissions[parts[0]][parts[1]] = Boolean(input.checked);
+    });
+
+    return permissions;
+  }
+
+  async function saveUser() {
+    const name = $("#modalUserName")?.value.trim() || "";
+    const email = $("#modalUserEmail")?.value.trim() || "";
+    const phone = $("#modalUserPhone")?.value.trim() || "";
+    const password = $("#modalUserPassword")?.value || "";
+    const role = $("#modalUserRole")?.value || "employee";
+
+    if (!email) {
+      showToast("Vui lòng nhập email.");
+      return;
+    }
+
+    if (!modalEditId && !password) {
+      showToast("Vui lòng nhập mật khẩu.");
+      return;
+    }
+
+    if (password && password.length < 6) {
+      showToast("Mật khẩu phải có ít nhất 6 ký tự.");
+      return;
+    }
+
+    const canManagePermissions =
+      hasPermission("users", "managePermissions") ||
+      isAdminUser();
+
+    const payload = {
+      name,
+      displayName: name,
+      email,
+      phoneNumber: phone
+    };
+
+    if (password) payload.password = password;
+
+    if (canManagePermissions) {
+      payload.role = role;
+      payload.permissions = readUserModalPermissions(role);
+    }
+
+    const saveButton = $("#modalSave");
+
+    if (saveButton) {
+      saveButton.disabled = true;
+      saveButton.textContent = "Đang lưu...";
+    }
+
+    try {
+      if (modalEditId) {
+        await callAccountFunction("grovaUpdateUser", {
+          uid: modalEditId,
+          ...payload
+        });
+        showToast("Đã cập nhật tài khoản.");
+      } else {
+        await callAccountFunction("grovaCreateUser", {
+          ...payload,
+          role: canManagePermissions ? role : "employee",
+          permissions: canManagePermissions
+            ? readUserModalPermissions(role)
+            : undefined
+        });
+        showToast("Đã tạo tài khoản.");
+      }
+
+      closeModal();
+      await loadAccountUsers({ reset: true });
+    } catch (error) {
+      console.error("GROVA DOCUMENT: saveUser failed.", error);
+      showToast(
+        backendErrorMessage(error, "Không thể lưu tài khoản.")
+      );
+    } finally {
+      if (saveButton) {
+        saveButton.disabled = false;
+        saveButton.textContent =
+          modalEditId ? "Lưu thay đổi" : "Tạo tài khoản";
+      }
+    }
+  }
+
+  async function toggleUserStatus(uid, status) {
+    if (!hasPermission("users", "lock")) {
+      showToast("Bạn không có quyền khóa / mở khóa tài khoản.");
+      return;
+    }
+
+    const target = getAccountUser(uid);
+
+    if (!target) {
+      showToast("Không tìm thấy tài khoản.");
+      return;
+    }
+
+    const label = status === "disabled" ? "khóa" : "mở khóa";
+    const name =
+      target.profile?.name ||
+      target.displayName ||
+      target.email ||
+      "tài khoản";
+
+    if (!confirm(`Bạn có chắc muốn ${label} tài khoản "${name}"?`)) {
+      return;
+    }
+
+    try {
+      await callAccountFunction("grovaSetUserStatus", {
+        uid,
+        status
+      });
+
+      showToast(
+        status === "disabled"
+          ? "Đã khóa tài khoản."
+          : "Đã mở khóa tài khoản."
+      );
+
+      await loadAccountUsers({ reset: true });
+    } catch (error) {
+      console.error(
+        "GROVA DOCUMENT: toggleUserStatus failed.",
+        error
+      );
+
+      showToast(
+        backendErrorMessage(
+          error,
+          "Không thể thay đổi trạng thái tài khoản."
+        )
+      );
+    }
+  }
+
   /* =======================================================
      SETTINGS
   ======================================================= */
@@ -5285,6 +5882,15 @@
     }
 
     updateUserDisplay();
+    renderAccountManagement();
+
+    if (
+      hasPermission("users", "view") &&
+      !accountUsersLoadedOnce &&
+      !accountUsersLoading
+    ) {
+      void loadAccountUsers({ reset: true });
+    }
 
   }
 
@@ -5701,6 +6307,25 @@
         resetData();
         break;
 
+      case "refresh-users":
+        void loadAccountUsers({ reset: true });
+        break;
+
+      case "new-user":
+        openUserModal();
+        break;
+
+      case "edit-user":
+        openUserModal(actionButton.dataset.id);
+        break;
+
+      case "toggle-user-status":
+        void toggleUserStatus(
+          actionButton.dataset.id,
+          actionButton.dataset.status
+        );
+        break;
+
     }
 
   }
@@ -5774,6 +6399,10 @@
 
       case "employee":
         saveEmployee();
+        break;
+
+      case "user":
+        saveUser();
         break;
 
     }
