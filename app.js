@@ -1,7 +1,7 @@
 /* =========================================================
    GROVA DOCUMENT
-   APP.JS — VERSION 211
-   FIRESTORE PHASE 4 — HISTORY
+   APP.JS — VERSION 212
+   FIRESTORE PHASE 4 — HISTORY + PHASE 5A PERMISSION CORE
    PROJECTS + CUSTOMERS + EMPLOYEES + HISTORY
    CLEAN BASE FROM LOCKED VERSION 209
 ========================================================= */
@@ -85,6 +85,182 @@
   ======================================================= */
 
   let currentUser = null;
+
+  /* =======================================================
+     PERMISSION CORE — PHASE 5A
+  ======================================================= */
+
+  const ADMIN_UID = "nJmKgjEILgVOEjWKYWTsuonxbO03";
+
+  const ROLE_LABELS = {
+    admin: "Administrator",
+    manager: "Quản lý",
+    employee: "Nhân viên",
+    viewer: "Chỉ xem",
+    custom: "Tùy chỉnh"
+  };
+
+  const DEFAULT_PERMISSIONS = {
+    admin: {
+      projects: { view: true, create: true, edit: true, delete: true },
+      customers: { view: true, create: true, edit: true, delete: true },
+      employees: { view: true, create: true, edit: true, delete: true },
+      documents: { view: true, create: true, edit: true, delete: true, export: true },
+      history: { view: true },
+      users: { view: true, create: true, edit: true, lock: true, managePermissions: true },
+      settings: { view: true, edit: true }
+    },
+    manager: {
+      projects: { view: true, create: true, edit: true, delete: true },
+      customers: { view: true, create: true, edit: true, delete: true },
+      employees: { view: true, create: true, edit: true, delete: true },
+      documents: { view: true, create: true, edit: true, delete: true, export: true },
+      history: { view: true },
+      users: { view: false, create: false, edit: false, lock: false, managePermissions: false },
+      settings: { view: true, edit: true }
+    },
+    employee: {
+      projects: { view: true, create: true, edit: true, delete: false },
+      customers: { view: true, create: true, edit: true, delete: false },
+      employees: { view: true, create: false, edit: false, delete: false },
+      documents: { view: true, create: true, edit: false, delete: false, export: true },
+      history: { view: true },
+      users: { view: false, create: false, edit: false, lock: false, managePermissions: false },
+      settings: { view: false, edit: false }
+    },
+    viewer: {
+      projects: { view: true, create: false, edit: false, delete: false },
+      customers: { view: true, create: false, edit: false, delete: false },
+      employees: { view: true, create: false, edit: false, delete: false },
+      documents: { view: true, create: false, edit: false, delete: false, export: false },
+      history: { view: true },
+      users: { view: false, create: false, edit: false, lock: false, managePermissions: false },
+      settings: { view: false, edit: false }
+    },
+    custom: {
+      projects: { view: false, create: false, edit: false, delete: false },
+      customers: { view: false, create: false, edit: false, delete: false },
+      employees: { view: false, create: false, edit: false, delete: false },
+      documents: { view: false, create: false, edit: false, delete: false, export: false },
+      history: { view: false },
+      users: { view: false, create: false, edit: false, lock: false, managePermissions: false },
+      settings: { view: false, edit: false }
+    }
+  };
+
+  let currentUserProfile = null;
+  let userProfileSyncToken = 0;
+
+  function clonePermissions(value) {
+    return JSON.parse(JSON.stringify(value || {}));
+  }
+
+  function getDefaultPermissions(role = "employee") {
+    return clonePermissions(
+      DEFAULT_PERMISSIONS[role] || DEFAULT_PERMISSIONS.employee
+    );
+  }
+
+  function normalizeUserProfile(profile, user) {
+    const role = profile?.role || (user?.uid === ADMIN_UID ? "admin" : "employee");
+    const permissions = profile?.permissions || getDefaultPermissions(role);
+
+    return {
+      uid: String(user?.uid || profile?.uid || ""),
+      name: String(profile?.name || user?.displayName || ""),
+      email: String(profile?.email || user?.email || ""),
+      role,
+      status: profile?.status === "disabled" ? "disabled" : "active",
+      permissions: clonePermissions(permissions),
+      createdAt: profile?.createdAt || nowISO(),
+      updatedAt: profile?.updatedAt || nowISO(),
+      createdBy: profile?.createdBy || user?.uid || "",
+      updatedBy: profile?.updatedBy || user?.uid || ""
+    };
+  }
+
+  function isAdminUser(user = currentUser) {
+    return Boolean(user?.uid && user.uid === ADMIN_UID);
+  }
+
+  function hasPermission(group, action) {
+    if (isAdminUser()) return true;
+    if (!currentUserProfile || currentUserProfile.status !== "active") return false;
+    return Boolean(currentUserProfile.permissions?.[group]?.[action]);
+  }
+
+  function getCurrentUserProfile() {
+    return currentUserProfile ? {
+      ...currentUserProfile,
+      permissions: clonePermissions(currentUserProfile.permissions)
+    } : null;
+  }
+
+  function getUsersCollection() {
+    if (!firestoreDb) return null;
+    return firestoreDb.collection("users");
+  }
+
+  async function syncCurrentUserProfile(user) {
+    const token = ++userProfileSyncToken;
+    currentUserProfile = null;
+
+    if (!user) {
+      updateUserDisplay();
+      return null;
+    }
+
+    if (!initializeFirestore()) {
+      currentUserProfile = normalizeUserProfile(null, user);
+      updateUserDisplay();
+      return currentUserProfile;
+    }
+
+    try {
+      await waitForFirestore();
+      const reference = getUsersCollection()?.doc(String(user.uid));
+      if (!reference) throw new Error("FIRESTORE_UNAVAILABLE");
+
+      let snapshot = await reference.get();
+
+      if (!snapshot.exists && isAdminUser(user)) {
+        const now = nowISO();
+        const adminProfile = {
+          uid: user.uid,
+          name: user.displayName || getSettings().userName || "Quản trị viên",
+          email: user.email || "",
+          role: "admin",
+          status: "active",
+          permissions: getDefaultPermissions("admin"),
+          createdAt: now,
+          updatedAt: now,
+          createdBy: user.uid,
+          updatedBy: user.uid
+        };
+
+        await reference.set(adminProfile, { merge: false });
+        snapshot = await reference.get();
+      }
+
+      if (token !== userProfileSyncToken) return null;
+
+      currentUserProfile = normalizeUserProfile(
+        snapshot.exists ? snapshot.data() : null,
+        user
+      );
+
+      updateUserDisplay();
+      return currentUserProfile;
+    } catch (error) {
+      console.warn("GROVA DOCUMENT: user profile sync unavailable.", error);
+
+      if (token !== userProfileSyncToken) return null;
+
+      currentUserProfile = normalizeUserProfile(null, user);
+      updateUserDisplay();
+      return currentUserProfile;
+    }
+  }
 
   let authReadyPromise = null;
 
@@ -1311,6 +1487,8 @@
 
     currentUser =
       user || null;
+
+    void syncCurrentUserProfile(currentUser);
 
     if (!user) {
 
@@ -5082,12 +5260,26 @@
     const settings =
       getSettings();
 
+    const profileName =
+      currentUserProfile?.name ||
+      currentUser?.displayName ||
+      settings.userName ||
+      "Quản trị viên";
+
+    const profileRole =
+      ROLE_LABELS[currentUserProfile?.role] ||
+      (isAdminUser() ? ROLE_LABELS.admin : "Administrator");
+
     if ($("#userName")) {
+      $("#userName").textContent = profileName;
+    }
 
-      $("#userName").textContent =
-        settings.userName ||
-        "Quản trị viên";
+    if ($("#currentUserName")) {
+      $("#currentUserName").textContent = profileName;
+    }
 
+    if ($("#currentUserRole")) {
+      $("#currentUserRole").textContent = profileRole;
     }
 
     const avatar =
@@ -5097,12 +5289,8 @@
 
     if (avatar) {
 
-      const name =
-        settings.userName ||
-        "Quản trị viên";
-
       avatar.textContent =
-        name
+        profileName
           .trim()
           .charAt(0)
           .toUpperCase() ||
@@ -5673,6 +5861,19 @@
     registerServiceWorker();
 
   }
+
+  /* =======================================================
+     PHASE 5A PUBLIC PERMISSION BRIDGE
+  ======================================================= */
+
+  window.GROVA_PERMISSIONS = {
+    getCurrentUserProfile,
+    getDefaultPermissions,
+    hasPermission,
+    isAdminUser,
+    ROLE_LABELS,
+    DEFAULT_PERMISSIONS
+  };
 
   /* =======================================================
      START
