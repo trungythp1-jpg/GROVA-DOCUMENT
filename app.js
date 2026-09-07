@@ -1,7 +1,7 @@
 /* =========================================================
    GROVA DOCUMENT
-   APP.JS — VERSION 215
-   FIRESTORE PHASE 4 — HISTORY + PHASE 5A PERMISSION CORE + PHASE 5B.4 ACCOUNT MANAGEMENT UI + PHASE 5B.5 ACCOUNT PROFILE UI
+   APP.JS — VERSION 216
+   FIRESTORE PHASE 4 — HISTORY + PHASE 5A PERMISSION CORE + PHASE 5B.4 ACCOUNT MANAGEMENT UI + PHASE 5B.5 ACCOUNT PROFILE UI + PHASE 5B.6 ACCOUNT MANAGEMENT HARDENING
    PROJECTS + CUSTOMERS + EMPLOYEES + HISTORY
    CLEAN BASE FROM LOCKED VERSION 209
 ========================================================= */
@@ -5243,6 +5243,8 @@
 
   /* =======================================================
      PHASE 5B.4 — ACCOUNT MANAGEMENT UI
+     PHASE 5B.5 — ACCOUNT PROFILE UI
+     PHASE 5B.6 — ACCOUNT MANAGEMENT HARDENING
   ======================================================= */
 
   const ACCOUNT_PERMISSION_META = {
@@ -5328,13 +5330,47 @@
     });
   }
 
+  /* =======================================================
+     PHASE 5B.6 — ACCOUNT MANAGEMENT HARDENING
+  ======================================================= */
+
+  function isCurrentAccount(uid) {
+    return Boolean(
+      uid &&
+      currentUser?.uid &&
+      String(uid) === String(currentUser.uid)
+    );
+  }
+
+  function isProtectedAccount(uid) {
+    return Boolean(
+      uid &&
+      String(uid) === String(ADMIN_UID)
+    );
+  }
+
+  function getAccountStatus(item) {
+    if (!item) return "unknown";
+    return item.disabled || item.profile?.status === "disabled"
+      ? "disabled"
+      : "active";
+  }
+
+  function accountStatusLabel(status) {
+    if (status === "active") return "Đang hoạt động";
+    if (status === "disabled") return "Đã khóa";
+    return "Chưa xác định";
+  }
+
   function renderAccountManagement() {
     const container = $("#accountManagementSection");
     if (!container) return;
 
     const profile = getCurrentUserProfile();
     const profileRole = ROLE_LABELS[profile?.role] || (isAdminUser() ? ROLE_LABELS.admin : "Chưa phân quyền");
-    const profileStatus = profile?.status === "disabled" ? "Đã khóa" : "Đang hoạt động";
+    const profileStatus = profile
+      ? accountStatusLabel(profile.status === "disabled" ? "disabled" : "active")
+      : "Chưa có hồ sơ";
     const profileEmail = profile?.email || currentUser?.email || "";
     const profileName = profile?.name || currentUser?.displayName || "Chưa đặt tên";
     const profileUid = profile?.uid || currentUser?.uid || "";
@@ -5405,15 +5441,13 @@
       const profile = item?.profile || {};
       const name = profile.name || item.displayName || "Chưa đặt tên";
       const role = ROLE_LABELS[profile.role] || "Chưa phân quyền";
-      const status =
-        item.disabled || profile.status === "disabled"
-          ? "disabled"
-          : "active";
+      const status = getAccountStatus(item);
       const email = item.email || profile.email || "";
       const lastSignIn = item.lastSignInTime
         ? formatAccountDate(item.lastSignInTime)
         : "Chưa đăng nhập";
-      const isProtected = item.uid === ADMIN_UID;
+      const isProtected = isProtectedAccount(item.uid);
+      const isSelf = isCurrentAccount(item.uid);
       const actions = [];
 
       if (canEdit) {
@@ -5426,7 +5460,7 @@
         `);
       }
 
-      if (canLock && !isProtected && item.uid !== currentUser?.uid) {
+      if (canLock && !isProtected && !isSelf) {
         actions.push(`
           <button class="secondary" type="button"
             data-action="toggle-user-status"
@@ -5442,10 +5476,11 @@
           <td>
             <strong>${escapeHTML(name)}</strong>
             ${isProtected ? `<div class="setting-note">Admin gốc</div>` : ""}
+            ${isSelf && !isProtected ? `<div class="setting-note">Tài khoản đang đăng nhập</div>` : ""}
           </td>
           <td>${escapeHTML(email)}</td>
           <td>${escapeHTML(role)}</td>
-          <td>${status === "active" ? "Đang hoạt động" : "Đã khóa"}</td>
+          <td>${escapeHTML(accountStatusLabel(status))}</td>
           <td>${escapeHTML(lastSignIn)}</td>
           <td>
             ${actions.length
@@ -5514,6 +5549,16 @@
               : "Chưa có dữ liệu danh sách tài khoản."}
           </div>
         `}
+
+        ${accountUsersPageToken ? `
+          <div class="action-group" style="margin-top:12px;">
+            <button class="secondary" type="button"
+              data-action="load-more-users"
+              ${accountUsersLoading ? "disabled" : ""}>
+              ${accountUsersLoading ? "Đang tải..." : "Tải thêm tài khoản"}
+            </button>
+          </div>
+        ` : ""}
 
         <div class="setting-note">
           Tạo, sửa, khóa và mở khóa tài khoản chỉ thực thi qua backend
@@ -5594,7 +5639,9 @@
     const profile = existing?.profile || {};
     const role = profile.role || "employee";
     const permissions = accountPermissionMatrixFromProfile(profile);
-    const protectedAdmin = existing?.uid === ADMIN_UID;
+    const protectedAdmin = isProtectedAccount(existing?.uid);
+    const selfAccount = isCurrentAccount(existing?.uid);
+    const restrictRoleAndPermissions = protectedAdmin || selfAccount;
 
     const roleOptions = [
       ["employee", "Nhân viên"],
@@ -5619,7 +5666,7 @@
               type="checkbox"
               data-user-permission="${escapeHTML(group)}.${escapeHTML(action)}"
               ${source[action] ? "checked" : ""}
-              ${role === "admin" ? "disabled" : ""}
+              ${role === "admin" || restrictRoleAndPermissions ? "disabled" : ""}
             >
             ${escapeHTML(label)}
           </label>
@@ -5674,7 +5721,7 @@
         <label>
           Vai trò
           <select id="modalUserRole"
-            ${(!canManagePermissions || protectedAdmin) ? "disabled" : ""}>
+            ${(!canManagePermissions || restrictRoleAndPermissions) ? "disabled" : ""}>
             ${roleSelect}
           </select>
         </label>
@@ -5684,6 +5731,11 @@
         <div class="setting-note">
           Tài khoản Admin gốc được bảo vệ. Không thể hạ quyền,
           khóa hoặc mở khóa tài khoản này.
+        </div>
+      ` : selfAccount ? `
+        <div class="setting-note">
+          Đây là tài khoản đang đăng nhập. Không thể tự thay đổi
+          vai trò hoặc quyền của chính mình tại màn hình này.
         </div>
       ` : ""}
 
@@ -5698,7 +5750,7 @@
       </div>
     `;
 
-    if (!canManagePermissions || protectedAdmin) {
+    if (!canManagePermissions || restrictRoleAndPermissions) {
       $$("#modalBody input[data-user-permission]").forEach(
         (input) => { input.disabled = true; }
       );
@@ -5721,7 +5773,7 @@
 
           input.disabled =
             !canManagePermissions ||
-            protectedAdmin ||
+            restrictRoleAndPermissions ||
             selected === "admin";
         });
       });
@@ -5782,6 +5834,18 @@
       hasPermission("users", "managePermissions") ||
       isAdminUser();
 
+    const targetProtected = modalEditId
+      ? isProtectedAccount(modalEditId)
+      : false;
+    const targetSelf = modalEditId
+      ? isCurrentAccount(modalEditId)
+      : false;
+
+    if (modalEditId && targetProtected && !isAdminUser()) {
+      showToast("Tài khoản Admin gốc được bảo vệ.");
+      return;
+    }
+
     const payload = {
       name,
       displayName: name,
@@ -5791,7 +5855,7 @@
 
     if (password) payload.password = password;
 
-    if (canManagePermissions) {
+    if (canManagePermissions && !targetProtected && !targetSelf) {
       payload.role = role;
       payload.permissions = readUserModalPermissions(role);
     }
@@ -5843,10 +5907,25 @@
       return;
     }
 
+    if (status !== "active" && status !== "disabled") {
+      showToast("Trạng thái tài khoản không hợp lệ.");
+      return;
+    }
+
     const target = getAccountUser(uid);
 
     if (!target) {
       showToast("Không tìm thấy tài khoản.");
+      return;
+    }
+
+    if (isProtectedAccount(uid)) {
+      showToast("Tài khoản Admin gốc được bảo vệ.");
+      return;
+    }
+
+    if (isCurrentAccount(uid)) {
+      showToast("Không thể tự khóa hoặc mở khóa tài khoản đang đăng nhập.");
       return;
     }
 
@@ -6369,6 +6448,10 @@
 
       case "refresh-users":
         void loadAccountUsers({ reset: true });
+        break;
+
+      case "load-more-users":
+        void loadAccountUsers({ reset: false });
         break;
 
       case "new-user":
