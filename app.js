@@ -1,7 +1,7 @@
 /* =========================================================
    GROVA DOCUMENT
-   APP.JS — VERSION 217
-   FIRESTORE PHASE 4 — HISTORY + PHASE 5A PERMISSION CORE + PHASE 5B.4 ACCOUNT MANAGEMENT UI + PHASE 5B.5 ACCOUNT PROFILE UI + PHASE 5B.6 ACCOUNT MANAGEMENT HARDENING + PHASE 5B.7 ACCOUNT PROFILE UI SYNC
+   APP.JS — VERSION 218
+   FIRESTORE PHASE 4 — HISTORY + PHASE 5A PERMISSION CORE + PHASE 5B.4 ACCOUNT MANAGEMENT UI + PHASE 5B.5 ACCOUNT PROFILE UI + PHASE 5B.6 ACCOUNT MANAGEMENT HARDENING + PHASE 5B.7 ACCOUNT PROFILE UI SYNC + AUTH TOKEN READINESS
    PROJECTS + CUSTOMERS + EMPLOYEES + HISTORY
    CLEAN BASE FROM LOCKED VERSION 209
 ========================================================= */
@@ -260,14 +260,34 @@
     }
 
     /*
-      PHASE 5B.3:
-      The trusted backend is now the preferred source for the current
-      account profile. The client never creates a users/{uid} profile.
+      PHASE 5B.3 / 5B.7 HARDENING:
+      The trusted backend remains the preferred source. Before calling a
+      callable function, make sure the current Firebase Auth user has had
+      an opportunity to refresh its ID token. This prevents a one-time
+      auth-readiness race from leaving the profile permanently empty until
+      the next login.
 
-      During the transition period before Cloud Functions is deployed,
-      Firestore read remains a temporary compatibility fallback so the
-      already-working application does not stop loading.
+      While Cloud Functions is not deployed on Spark, the existing
+      Firestore read-only compatibility fallback remains available. The
+      client never creates or modifies users/{uid}.
     */
+    const auth = getAuthObject();
+    if (
+      auth?.currentUser?.uid === user.uid &&
+      typeof user.getIdToken === "function"
+    ) {
+      try {
+        await user.getIdToken();
+      } catch (error) {
+        console.warn(
+          "GROVA DOCUMENT: Firebase Auth token readiness warning.",
+          error
+        );
+      }
+    }
+
+    if (token !== userProfileSyncToken) return null;
+
     const functions = getFunctionsObject();
 
     if (functions && typeof functions.httpsCallable === "function") {
