@@ -1,4 +1,4 @@
-const CACHE_NAME = "grova-document-v6";
+const CACHE_NAME = "grova-document-v7";
 
 const APP_SHELL = [
   "./",
@@ -7,7 +7,7 @@ const APP_SHELL = [
   "./style.css?v=202",
   "./auth.css?v=202",
 
-  "./app.js?v=202",
+  "./app.js?v=210",
   "./auth.js?v=202",
 
   "./data/data.js?v=202",
@@ -21,26 +21,21 @@ const APP_SHELL = [
 /* =====================================================
    INSTALL
 ===================================================== */
-
 self.addEventListener("install", (event) => {
 
   event.waitUntil(
-
     caches
       .open(CACHE_NAME)
-
       .then((cache) => {
 
         return cache.addAll(APP_SHELL);
 
       })
-
       .then(() => {
 
         return self.skipWaiting();
 
       })
-
   );
 
 });
@@ -48,21 +43,17 @@ self.addEventListener("install", (event) => {
 
 /* =====================================================
    ACTIVATE
+   Xóa toàn bộ cache GROVA cũ khi v7 kích hoạt.
 ===================================================== */
-
 self.addEventListener("activate", (event) => {
 
   event.waitUntil(
-
     caches
       .keys()
-
       .then((cacheNames) => {
 
         return Promise.all(
-
           cacheNames
-
             .filter((name) => {
 
               return (
@@ -71,23 +62,19 @@ self.addEventListener("activate", (event) => {
               );
 
             })
-
             .map((name) => {
 
               return caches.delete(name);
 
             })
-
         );
 
       })
-
       .then(() => {
 
         return self.clients.claim();
 
       })
-
   );
 
 });
@@ -95,9 +82,8 @@ self.addEventListener("activate", (event) => {
 
 /* =====================================================
    MESSAGE
-   Cho phép app yêu cầu cập nhật ngay
+   Cho phép app yêu cầu cập nhật ngay.
 ===================================================== */
-
 self.addEventListener("message", (event) => {
 
   if (
@@ -115,7 +101,6 @@ self.addEventListener("message", (event) => {
 /* =====================================================
    FETCH
 ===================================================== */
-
 self.addEventListener("fetch", (event) => {
 
   const request = event.request;
@@ -124,7 +109,6 @@ self.addEventListener("fetch", (event) => {
   /* ===================================================
      Chỉ xử lý GET
   =================================================== */
-
   if (request.method !== "GET") {
 
     return;
@@ -139,7 +123,6 @@ self.addEventListener("fetch", (event) => {
   /* ===================================================
      Chỉ xử lý tài nguyên cùng website
   =================================================== */
-
   if (
     url.origin !== self.location.origin
   ) {
@@ -151,13 +134,8 @@ self.addEventListener("fetch", (event) => {
 
   /* ===================================================
      HTML / NAVIGATION
-
-     Ưu tiên mạng để luôn lấy phiên bản mới.
-
-     Nếu mất mạng:
-     → dùng bản đã cache.
+     Network First.
   =================================================== */
-
   if (
     request.mode === "navigate" ||
     request.destination === "document" ||
@@ -179,10 +157,8 @@ self.addEventListener("fetch", (event) => {
               response.clone();
 
             event.waitUntil(
-
               caches
                 .open(CACHE_NAME)
-
                 .then((cache) => {
 
                   return cache.put(
@@ -191,7 +167,6 @@ self.addEventListener("fetch", (event) => {
                   );
 
                 })
-
             );
 
           }
@@ -204,7 +179,6 @@ self.addEventListener("fetch", (event) => {
 
           return caches
             .match(request)
-
             .then((cachedResponse) => {
 
               if (cachedResponse) {
@@ -212,7 +186,6 @@ self.addEventListener("fetch", (event) => {
                 return cachedResponse;
 
               }
-
 
               return caches.match(
                 "./index.html"
@@ -231,17 +204,8 @@ self.addEventListener("fetch", (event) => {
 
   /* ===================================================
      JAVASCRIPT / CSS / JSON
-
      Network First.
-
-     Online:
-     → lấy phiên bản mới
-     → cập nhật cache.
-
-     Offline:
-     → dùng cache.
   =================================================== */
-
   if (
     url.pathname.endsWith(".js") ||
     url.pathname.endsWith(".css") ||
@@ -263,10 +227,8 @@ self.addEventListener("fetch", (event) => {
               response.clone();
 
             event.waitUntil(
-
               caches
                 .open(CACHE_NAME)
-
                 .then((cache) => {
 
                   return cache.put(
@@ -275,7 +237,6 @@ self.addEventListener("fetch", (event) => {
                   );
 
                 })
-
             );
 
           }
@@ -299,17 +260,8 @@ self.addEventListener("fetch", (event) => {
 
   /* ===================================================
      ẢNH / ICON / FILE KHÁC
-
      Cache First.
-
-     Có cache:
-     → dùng cache.
-
-     Chưa có:
-     → lấy mạng.
-     → lưu vào cache.
   =================================================== */
-
   event.respondWith(
 
     caches
@@ -344,10 +296,8 @@ self.addEventListener("fetch", (event) => {
 
 
             event.waitUntil(
-
               caches
                 .open(CACHE_NAME)
-
                 .then((cache) => {
 
                   return cache.put(
@@ -356,7 +306,6 @@ self.addEventListener("fetch", (event) => {
                   );
 
                 })
-
             );
 
 
