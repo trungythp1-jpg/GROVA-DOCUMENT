@@ -1,6 +1,6 @@
 /* =========================================================
    GROVA DOCUMENT
-   APP.JS — VERSION 210
+   APP.JS — VERSION 211
    FIRESTORE PHASE 4 — HISTORY
    PROJECTS + CUSTOMERS + EMPLOYEES + HISTORY
    CLEAN BASE FROM LOCKED VERSION 209
@@ -2541,7 +2541,7 @@
 
   }
 
-  async function openTemplate(id) {
+  function openTemplate(id) {
 
     const template =
       findTemplate(id);
@@ -2556,20 +2556,25 @@
 
     }
 
-    await addHistory(template);
+    if (!template.file) {
 
-    if (template.file) {
-
-      window.location.href =
-        template.file;
+      showToast(
+        "Mẫu văn bản chưa được cấu hình đường dẫn."
+      );
 
       return;
 
     }
 
-    showToast(
-      "Mẫu văn bản chưa được cấu hình đường dẫn."
-    );
+    /*
+      Không chờ Firestore trước khi mở văn bản.
+      History được cập nhật local trước, còn đồng bộ cloud
+      chạy nền để không làm kẹt luồng mở văn bản sau khi Back.
+    */
+    void addHistory(template);
+
+    window.location.href =
+      template.file;
 
   }
 
@@ -3058,9 +3063,12 @@
   }
 
   async function addHistory(template) {
+
     if (!template) return false;
 
-    const history = getHistory();
+    const history =
+      getHistory();
+
     const item = {
       id: createId("HIS"),
       templateId: String(template.id),
@@ -3070,27 +3078,54 @@
       openedAt: nowISO()
     };
 
-    const filtered = history.filter(
-      (oldItem) =>
-        String(oldItem.templateId) !==
-        String(template.id)
-    );
+    const filtered =
+      history.filter(
+        (oldItem) =>
+          String(oldItem.templateId) !==
+          String(template.id)
+      );
 
-    const nextHistory = normalizeHistory([
-      item,
-      ...filtered
-    ]);
+    const nextHistory =
+      normalizeHistory([
+        item,
+        ...filtered
+      ]);
 
-    if (!currentUser) {
-      writeStorage(
-        STORAGE.history,
+    /*
+      Cập nhật local ngay lập tức.
+      Việc mở văn bản không được phụ thuộc vào Firebase.
+    */
+    setHistoryCache(nextHistory);
+
+    if (currentUser?.uid) {
+      writeHistoryCache(
+        currentUser.uid,
         nextHistory
       );
-      updateStats();
+    }
+
+    writeStorage(
+      STORAGE.history,
+      nextHistory
+    );
+
+    updateStats();
+    renderRecentDocuments();
+
+    if (currentPage === "history") {
+      renderHistory();
+    }
+
+    if (!currentUser) {
       return true;
     }
 
+    /*
+      Đồng bộ Firestore chạy nền.
+      openTemplate() không await hàm này.
+    */
     try {
+
       const authUser =
         await getActiveAuthUser();
 
@@ -3104,8 +3139,11 @@
           authUser
         );
 
+      const latestHistory =
+        getHistory();
+
       const withoutTemplate =
-        history.filter(
+        latestHistory.filter(
           (oldItem) =>
             String(oldItem.templateId) !==
             String(template.id)
@@ -3118,47 +3156,41 @@
         ]);
 
       setHistoryCache(finalHistory);
+
       writeHistoryCache(
         authUser.uid,
         finalHistory
       );
 
+      writeStorage(
+        STORAGE.history,
+        finalHistory
+      );
+
       updateStats();
       renderRecentDocuments();
+
       if (currentPage === "history") {
         renderHistory();
       }
 
       return true;
+
     } catch (error) {
+
       console.error(
-        "GROVA DOCUMENT: addHistory failed.",
+        "GROVA DOCUMENT: addHistory background sync failed.",
         error
       );
 
       /*
-        Lịch sử không được phép chặn việc mở mẫu văn bản.
-        Nếu Firestore lỗi, giữ local fallback cho phiên này.
+        Không showToast ở đây vì trang có thể đã chuyển sang
+        văn bản. History local vẫn được giữ lại.
       */
-      setHistoryCache(nextHistory);
-      writeHistoryCache(
-        currentUser?.uid,
-        nextHistory
-      );
-      writeStorage(
-        STORAGE.history,
-        nextHistory
-      );
-
-      updateStats();
-      renderRecentDocuments();
-
-      showToast(
-        "Không đồng bộ được lịch sử lên hệ thống. Mẫu văn bản vẫn sẽ được mở."
-      );
-
       return false;
+
     }
+
   }
 
   function renderHistory() {
