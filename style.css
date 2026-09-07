@@ -1439,3 +1439,146 @@ textarea {
   }
 
 }
+/* =========================================================
+   GROVA DOCUMENT — iPHONE MODAL / SAFARI FIX
+   PURPOSE:
+   - Prevent project/customer form fields from being pushed
+     above the visible iPhone viewport.
+   - Prevent Safari bottom browser UI from covering actions.
+   - Keep modal header/footer fixed while only modal body scrolls.
+   - Do NOT change data, Firestore, authentication or templates.
+   ========================================================= */
+
+/* Modal becomes a controlled flex column.
+   The old version put overflow-y:auto on the entire card.
+   On iPhone Safari, this can preserve/shift scroll position
+   and, together with 100vh, push the first fields off-screen. */
+.modal-card {
+  display: flex;
+  flex-direction: column;
+
+  width: min(680px, 100%);
+
+  max-height:
+    min(
+      850px,
+      calc(
+        100dvh
+        - env(safe-area-inset-top)
+        - env(safe-area-inset-bottom)
+        - 40px
+      )
+    );
+
+  overflow: hidden;
+}
+
+/* Only the form area scrolls.
+   Because #modalBody is rebuilt whenever a new project/customer
+   modal opens, its scroll position starts at the top. */
+#modalBody {
+  min-height: 0;
+  flex: 1 1 auto;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+
+  padding-bottom: max(
+    22px,
+    env(safe-area-inset-bottom)
+  );
+}
+
+/* Header and action buttons must never become part of the
+   scrolling form area. */
+.modal-head,
+.modal-foot {
+  flex: 0 0 auto;
+}
+
+/* =========================================================
+   iPHONE / MOBILE
+   ========================================================= */
+
+@media (max-width: 560px) {
+
+  .modal {
+    padding:
+      max(10px, env(safe-area-inset-top))
+      10px
+      max(10px, env(safe-area-inset-bottom));
+
+    align-items: flex-end;
+  }
+
+  .modal-card {
+    width: 100%;
+
+    max-height:
+      calc(
+        100dvh
+        - env(safe-area-inset-top)
+        - env(safe-area-inset-bottom)
+        - 20px
+      );
+
+    border-radius: 18px 18px 10px 10px;
+  }
+
+  .modal-head {
+    padding-top: 18px;
+  }
+
+  #modalBody {
+    padding:
+      18px 18px
+      max(22px, env(safe-area-inset-bottom));
+  }
+
+  .modal-foot {
+    padding:
+      12px 18px
+      max(15px, env(safe-area-inset-bottom));
+  }
+
+  /* Make the two action buttons comfortable on iPhone. */
+  .modal-foot .secondary,
+  .modal-foot .primary {
+    min-height: 48px;
+  }
+}
+
+/* iOS versions with dynamic viewport support */
+@supports (height: 100dvh) {
+  @media (max-width: 560px) {
+
+    .modal-card {
+      max-height:
+        calc(
+          100dvh
+          - env(safe-area-inset-top)
+          - env(safe-area-inset-bottom)
+          - 20px
+        );
+    }
+  }
+}
+
+/* Older Safari fallback */
+@supports not (height: 100dvh) {
+  @media (max-width: 560px) {
+
+    .modal-card {
+      max-height:
+        calc(
+          100vh
+          - env(safe-area-inset-top)
+          - env(safe-area-inset-bottom)
+          - 20px
+        );
+    }
+  }
+}
