@@ -1,7 +1,7 @@
 /* =========================================================
    GROVA DOCUMENT
-   APP.JS — VERSION 212
-   FIRESTORE PHASE 4 — HISTORY + PHASE 5A PERMISSION CORE
+   APP.JS — VERSION 213
+   FIRESTORE PHASE 4 — HISTORY + PHASE 5A PERMISSION CORE + PHASE 5B.3 ACCOUNT PROFILE BRIDGE
    PROJECTS + CUSTOMERS + EMPLOYEES + HISTORY
    CLEAN BASE FROM LOCKED VERSION 209
 ========================================================= */
@@ -201,6 +201,39 @@
     return firestoreDb.collection("users");
   }
 
+  function getFunctionsObject() {
+    if (
+      window.GROVA_AUTH &&
+      window.GROVA_AUTH.firebase &&
+      typeof window.GROVA_AUTH.firebase.functions === "function"
+    ) {
+      try {
+        return window.GROVA_AUTH.firebase.functions();
+      } catch (error) {
+        console.warn(
+          "GROVA DOCUMENT: Firebase Functions unavailable.",
+          error
+        );
+      }
+    }
+
+    if (
+      window.firebase &&
+      typeof firebase.functions === "function"
+    ) {
+      try {
+        return firebase.functions();
+      } catch (error) {
+        console.warn(
+          "GROVA DOCUMENT: Firebase Functions unavailable.",
+          error
+        );
+      }
+    }
+
+    return null;
+  }
+
   async function syncCurrentUserProfile(user) {
     const token = ++userProfileSyncToken;
     currentUserProfile = null;
@@ -210,10 +243,71 @@
       return null;
     }
 
+    /*
+      PHASE 5B.3:
+      The trusted backend is now the preferred source for the current
+      account profile. The client never creates a users/{uid} profile.
+
+      During the transition period before Cloud Functions is deployed,
+      Firestore read remains a temporary compatibility fallback so the
+      already-working application does not stop loading.
+    */
+    const functions = getFunctionsObject();
+
+    if (functions && typeof functions.httpsCallable === "function") {
+      try {
+        const getMyProfile =
+          functions.httpsCallable("grovaGetMyProfile");
+
+        const result = await getMyProfile({});
+        const profile = result?.data?.profile || null;
+
+        if (token !== userProfileSyncToken) return null;
+
+        if (!profile) {
+          currentUserProfile = null;
+          updateUserDisplay();
+          return null;
+        }
+
+        currentUserProfile = normalizeUserProfile(
+          profile,
+          user
+        );
+
+        updateUserDisplay();
+        return currentUserProfile;
+      } catch (error) {
+        const code = String(error?.code || "");
+        const backendUnavailable =
+          code === "functions/not-found" ||
+          code === "functions/unavailable" ||
+          code === "functions/failed-precondition";
+
+        if (!backendUnavailable) {
+          console.warn(
+            "GROVA DOCUMENT: account profile rejected by backend.",
+            error
+          );
+
+          if (token !== userProfileSyncToken) return null;
+
+          currentUserProfile = null;
+          updateUserDisplay();
+          return null;
+        }
+
+        console.warn(
+          "GROVA DOCUMENT: Cloud Functions not available yet; using Firestore read-only compatibility fallback.",
+          error
+        );
+      }
+    }
+
     if (!initializeFirestore()) {
-      currentUserProfile = normalizeUserProfile(null, user);
+      currentUserProfile = null;
       updateUserDisplay();
-      return currentUserProfile;
+      return null;
     }
 
     try {
@@ -221,44 +315,33 @@
       const reference = getUsersCollection()?.doc(String(user.uid));
       if (!reference) throw new Error("FIRESTORE_UNAVAILABLE");
 
-      let snapshot = await reference.get();
-
-      if (!snapshot.exists && isAdminUser(user)) {
-        const now = nowISO();
-        const adminProfile = {
-          uid: user.uid,
-          name: user.displayName || getSettings().userName || "Quản trị viên",
-          email: user.email || "",
-          role: "admin",
-          status: "active",
-          permissions: getDefaultPermissions("admin"),
-          createdAt: now,
-          updatedAt: now,
-          createdBy: user.uid,
-          updatedBy: user.uid
-        };
-
-        await reference.set(adminProfile, { merge: false });
-        snapshot = await reference.get();
-      }
+      const snapshot = await reference.get();
 
       if (token !== userProfileSyncToken) return null;
 
-      currentUserProfile = normalizeUserProfile(
-        snapshot.exists ? snapshot.data() : null,
-        user
-      );
+      /*
+        IMPORTANT:
+        No client-side bootstrap/create is allowed in Phase 5B.3.
+        If the profile is missing, leave it missing and let the trusted
+        backend decide whether bootstrap is permitted.
+      */
+      currentUserProfile = snapshot.exists
+        ? normalizeUserProfile(snapshot.data(), user)
+        : null;
 
       updateUserDisplay();
       return currentUserProfile;
     } catch (error) {
-      console.warn("GROVA DOCUMENT: user profile sync unavailable.", error);
+      console.warn(
+        "GROVA DOCUMENT: user profile sync unavailable.",
+        error
+      );
 
       if (token !== userProfileSyncToken) return null;
 
-      currentUserProfile = normalizeUserProfile(null, user);
+      currentUserProfile = null;
       updateUserDisplay();
-      return currentUserProfile;
+      return null;
     }
   }
 
@@ -5268,7 +5351,7 @@
 
     const profileRole =
       ROLE_LABELS[currentUserProfile?.role] ||
-      (isAdminUser() ? ROLE_LABELS.admin : "Administrator");
+      (isAdminUser() ? ROLE_LABELS.admin : ROLE_LABELS.employee);
 
     if ($("#userName")) {
       $("#userName").textContent = profileName;
