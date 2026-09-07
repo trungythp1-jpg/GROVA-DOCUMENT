@@ -1,6 +1,6 @@
 /**
- * GROVA DOCUMENT — PHASE 5B.2
- * Secure Account API
+ * GROVA DOCUMENT — PHASE 5B.3
+ * Account Profile Bridge + Secure Account API
  *
  * Purpose:
  * - Keep Firebase Admin SDK on the trusted server side.
@@ -8,7 +8,8 @@
  * - Enforce GROVA users.* permissions before changing Firebase Auth or users/{uid}.
  * - Provide create/list/update/lock/unlock operations for the future account UI.
  *
- * This phase does NOT connect the API to app.js yet.
+ * This phase connects only the current-account profile bridge to app.js.
+ * Account-management UI remains a later phase.
  * It also does NOT hard-delete Firebase Auth accounts.
  */
 
@@ -228,10 +229,77 @@ exports.grovaBackendStatus = onCall((request) => {
   return {
     ok: true,
     service: "GROVA DOCUMENT",
-    phase: "5B.2",
+    phase: "5B.3",
     backend: "cloud-functions-2nd-gen",
     callerUid: request.auth.uid,
     isBootstrapAdmin: request.auth.uid === BOOTSTRAP_ADMIN_UID
+  };
+});
+
+exports.grovaGetMyProfile = onCall(async (request) => {
+  if (!request.auth || !request.auth.uid) {
+    throw new HttpsError(
+      "unauthenticated",
+      "Bạn phải đăng nhập để lấy hồ sơ tài khoản."
+    );
+  }
+
+  const uid = request.auth.uid;
+  let profile = await getUserProfile(uid);
+
+  /*
+    Only the immutable bootstrap Admin UID may be bootstrapped here.
+    Ordinary users are never promoted or assigned a default role by the
+    client or by this read bridge.
+  */
+  if (!profile && isBootstrapAdmin(uid)) {
+    const userRecord = await auth.getUser(uid);
+    const now = FieldValue.serverTimestamp();
+
+    const adminProfile = {
+      uid,
+      name: userRecord.displayName || "Quản trị viên",
+      email: userRecord.email || "",
+      role: "admin",
+      status: "active",
+      permissions: makeAdminPermissions(),
+      createdAt: now,
+      updatedAt: now,
+      createdBy: uid,
+      updatedBy: uid
+    };
+
+    await db.collection(USERS_COLLECTION).doc(uid).set(adminProfile, { merge: false });
+    profile = await getUserProfile(uid);
+  }
+
+  if (!profile) {
+    throw new HttpsError(
+      "permission-denied",
+      "Tài khoản chưa có hồ sơ GROVA. Vui lòng liên hệ Administrator."
+    );
+  }
+
+  if (profile.status !== "active") {
+    throw new HttpsError(
+      "permission-denied",
+      "Tài khoản đang bị khóa."
+    );
+  }
+
+  if (profile.uid && profile.uid !== uid) {
+    throw new HttpsError(
+      "failed-precondition",
+      "Hồ sơ tài khoản không khớp UID Firebase Authentication."
+    );
+  }
+
+  return {
+    ok: true,
+    profile: {
+      ...profile,
+      uid
+    }
   };
 });
 
