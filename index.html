@@ -96,6 +96,13 @@
     href="./auth.css?v=202"
   >
 
+
+<style>
+  .print-list-btn { white-space: nowrap; }
+  @media (max-width: 720px) {
+    .print-list-btn { width: 100%; }
+  }
+</style>
 </head>
 
 <body class="auth-loading">
@@ -632,6 +639,22 @@
 
             </select>
 
+            <button
+              class="secondary print-list-btn"
+              type="button"
+              data-action="print-projects-filtered"
+            >
+              🖨 In kết quả
+            </button>
+
+            <button
+              class="secondary print-list-btn"
+              type="button"
+              data-action="print-projects-all"
+            >
+              🖨 In toàn bộ
+            </button>
+
           </div>
 
           <div
@@ -687,6 +710,22 @@
               autocomplete="off"
             >
 
+            <button
+              class="secondary print-list-btn"
+              type="button"
+              data-action="print-customers-filtered"
+            >
+              🖨 In kết quả
+            </button>
+
+            <button
+              class="secondary print-list-btn"
+              type="button"
+              data-action="print-customers-all"
+            >
+              🖨 In toàn bộ
+            </button>
+
           </div>
 
           <div
@@ -741,6 +780,22 @@
               placeholder="Tìm nhân sự..."
               autocomplete="off"
             >
+
+            <button
+              class="secondary print-list-btn"
+              type="button"
+              data-action="print-employees-filtered"
+            >
+              🖨 In kết quả
+            </button>
+
+            <button
+              class="secondary print-list-btn"
+              type="button"
+              data-action="print-employees-all"
+            >
+              🖨 In toàn bộ
+            </button>
 
           </div>
 
@@ -1085,7 +1140,7 @@
        ===================================================== -->
 
   <script
-    src="./app.js?v=223"
+    src="./app.js?v=224"
   ></script>
   <!-- =====================================================
        SERVICE WORKER
