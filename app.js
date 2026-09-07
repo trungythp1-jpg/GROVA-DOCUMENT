@@ -1,6 +1,6 @@
 /* =========================================================
    GROVA DOCUMENT
-   APP.JS — VERSION 223
+   APP.JS — VERSION 225
    FIRESTORE PHASE 4 — HISTORY + PHASE 5A PERMISSION CORE + PHASE 5B.4 ACCOUNT MANAGEMENT UI + PHASE 5B.5 ACCOUNT PROFILE UI + PHASE 5B.6 ACCOUNT MANAGEMENT HARDENING + PHASE 5B.7 ACCOUNT PROFILE UI SYNC + SPARK ACCOUNT PROFILE MANAGEMENT + FULL VIEW/CREATE/EDIT/DELETE PERMISSION ENFORCEMENT
    PROJECTS + CUSTOMERS + EMPLOYEES + HISTORY
    CLEAN BASE FROM LOCKED VERSION 209
@@ -3880,7 +3880,7 @@
 </body>
 </html>`;
 
-    const printWindow = window.open("", "_blank", "noopener,noreferrer");
+    const printWindow = window.open("", "_blank");
 
     if (!printWindow) {
       showToast("Trình duyệt đã chặn cửa sổ in. Hãy cho phép mở cửa sổ mới rồi thử lại.");
@@ -3891,12 +3891,31 @@
     printWindow.document.write(html);
     printWindow.document.close();
 
-    printWindow.addEventListener("load", () => {
+    // Safari/iPad có thể không phát sinh load event ổn định sau document.write().
+    // Chờ DOM + logo tải xong rồi mới gọi print(), tránh mở trang trắng.
+    const triggerPrint = () => {
       setTimeout(() => {
-        printWindow.focus();
-        printWindow.print();
-      }, 350);
-    }, { once: true });
+        try {
+          printWindow.focus();
+          printWindow.print();
+        } catch (error) {
+          console.error("GROVA DOCUMENT: Không thể mở hộp thoại in.", error);
+        }
+      }, 500);
+    };
+
+    try {
+      const logo = printWindow.document.querySelector("img.logo");
+      if (logo && !logo.complete) {
+        logo.addEventListener("load", triggerPrint, { once: true });
+        logo.addEventListener("error", triggerPrint, { once: true });
+        setTimeout(triggerPrint, 1500);
+      } else {
+        triggerPrint();
+      }
+    } catch (error) {
+      triggerPrint();
+    }
   }
 
   function getProjectPrintRows(useFiltered = true) {
