@@ -1,7 +1,7 @@
 /* =========================================================
    GROVA DOCUMENT
-   APP.JS — VERSION 214
-   FIRESTORE PHASE 4 — HISTORY + PHASE 5A PERMISSION CORE + PHASE 5B.4 ACCOUNT MANAGEMENT UI
+   APP.JS — VERSION 215
+   FIRESTORE PHASE 4 — HISTORY + PHASE 5A PERMISSION CORE + PHASE 5B.4 ACCOUNT MANAGEMENT UI + PHASE 5B.5 ACCOUNT PROFILE UI
    PROJECTS + CUSTOMERS + EMPLOYEES + HISTORY
    CLEAN BASE FROM LOCKED VERSION 209
 ========================================================= */
@@ -5332,8 +5332,68 @@
     const container = $("#accountManagementSection");
     if (!container) return;
 
+    const profile = getCurrentUserProfile();
+    const profileRole = ROLE_LABELS[profile?.role] || (isAdminUser() ? ROLE_LABELS.admin : "Chưa phân quyền");
+    const profileStatus = profile?.status === "disabled" ? "Đã khóa" : "Đang hoạt động";
+    const profileEmail = profile?.email || currentUser?.email || "";
+    const profileName = profile?.name || currentUser?.displayName || "Chưa đặt tên";
+    const profileUid = profile?.uid || currentUser?.uid || "";
+
+    const profileGroups = Object.entries(ACCOUNT_PERMISSION_META)
+      .map(([group, meta]) => {
+        const source = profile?.permissions?.[group] || {};
+        const granted = meta.actions
+          .filter(([action]) => Boolean(source[action]))
+          .map(([, label]) => label);
+
+        if (!granted.length) return "";
+
+        return `<div class="setting-note"><strong>${escapeHTML(meta.label)}:</strong> ${escapeHTML(granted.join(", "))}</div>`;
+      })
+      .filter(Boolean)
+      .join("");
+
+    const profileCard = `
+      <div class="form-card">
+        <div class="page-head">
+          <div>
+            <h3>Tài khoản hiện tại</h3>
+            <p>Thông tin đăng nhập và quyền đang áp dụng cho tài khoản này.</p>
+          </div>
+          <span class="setting-note">${escapeHTML(profileStatus)}</span>
+        </div>
+
+        <div class="form-grid">
+          <label>
+            Họ tên
+            <input type="text" value="${escapeHTML(profileName)}" readonly>
+          </label>
+
+          <label>
+            Email
+            <input type="email" value="${escapeHTML(profileEmail)}" readonly>
+          </label>
+
+          <label>
+            Vai trò
+            <input type="text" value="${escapeHTML(profileRole)}" readonly>
+          </label>
+
+          <label>
+            UID Firebase
+            <input type="text" value="${escapeHTML(profileUid)}" readonly>
+          </label>
+        </div>
+
+        <div style="margin-top:16px;">
+          <h3>Quyền đang được cấp</h3>
+          ${profileGroups || `<div class="setting-note">Tài khoản hiện chưa được cấp quyền thao tác.</div>`}
+        </div>
+      </div>
+    `;
+
     if (!hasPermission("users", "view")) {
-      container.innerHTML = "";
+      container.innerHTML = profileCard;
       return;
     }
 
@@ -5396,7 +5456,7 @@
       `;
     }).join("");
 
-    container.innerHTML = `
+    container.innerHTML = profileCard + `
       <div class="form-card">
         <div class="page-head">
           <div>
