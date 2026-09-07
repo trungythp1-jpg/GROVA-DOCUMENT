@@ -1,320 +1,95 @@
-const CACHE_NAME = "grova-document-v7";
+const CACHE_NAME = "grova-document-v11";
 
 const APP_SHELL = [
   "./",
   "./index.html",
-
   "./style.css?v=202",
   "./auth.css?v=202",
-
-  "./app.js?v=223",
+  "./app.js?v=224",
   "./auth.js?v=202",
-
   "./data/data.js?v=202",
-
   "./manifest.json?v=202",
-
   "./data/grova_logo.png"
 ];
 
-
 /* =====================================================
    INSTALL
+   Cache đúng bộ tài nguyên hiện tại.
 ===================================================== */
 self.addEventListener("install", (event) => {
-
   event.waitUntil(
-    caches
-      .open(CACHE_NAME)
-      .then((cache) => {
-
-        return cache.addAll(APP_SHELL);
-
-      })
-      .then(() => {
-
-        return self.skipWaiting();
-
-      })
+    caches.open(CACHE_NAME)
+      .then((cache) => cache.addAll(APP_SHELL))
+      .then(() => self.skipWaiting())
   );
-
 });
-
 
 /* =====================================================
    ACTIVATE
-   Xóa toàn bộ cache GROVA cũ khi v7 kích hoạt.
+   Xóa toàn bộ cache GROVA cũ.
 ===================================================== */
 self.addEventListener("activate", (event) => {
-
   event.waitUntil(
-    caches
-      .keys()
-      .then((cacheNames) => {
-
-        return Promise.all(
-          cacheNames
-            .filter((name) => {
-
-              return (
-                name.startsWith("grova-document-") &&
-                name !== CACHE_NAME
-              );
-
-            })
-            .map((name) => {
-
-              return caches.delete(name);
-
-            })
-        );
-
-      })
-      .then(() => {
-
-        return self.clients.claim();
-
-      })
+    caches.keys()
+      .then((cacheNames) => Promise.all(
+        cacheNames
+          .filter((name) => name.startsWith("grova-document-") && name !== CACHE_NAME)
+          .map((name) => caches.delete(name))
+      ))
+      .then(() => self.clients.claim())
   );
-
 });
-
 
 /* =====================================================
    MESSAGE
-   Cho phép app yêu cầu cập nhật ngay.
 ===================================================== */
 self.addEventListener("message", (event) => {
-
-  if (
-    event.data &&
-    event.data.type === "SKIP_WAITING"
-  ) {
-
+  if (event.data && event.data.type === "SKIP_WAITING") {
     self.skipWaiting();
-
   }
-
 });
-
 
 /* =====================================================
    FETCH
+   Network First để GitHub Pages luôn lấy bản mới;
+   cache chỉ làm fallback khi mất mạng.
 ===================================================== */
 self.addEventListener("fetch", (event) => {
-
   const request = event.request;
 
+  if (request.method !== "GET") return;
 
-  /* ===================================================
-     Chỉ xử lý GET
-  =================================================== */
-  if (request.method !== "GET") {
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin) return;
 
-    return;
-
-  }
-
-
-  const url =
-    new URL(request.url);
-
-
-  /* ===================================================
-     Chỉ xử lý tài nguyên cùng website
-  =================================================== */
-  if (
-    url.origin !== self.location.origin
-  ) {
-
-    return;
-
-  }
-
-
-  /* ===================================================
-     HTML / NAVIGATION
-     Network First.
-  =================================================== */
-  if (
-    request.mode === "navigate" ||
-    request.destination === "document" ||
-    url.pathname.endsWith(".html")
-  ) {
-
+  if (request.mode === "navigate" || request.destination === "document" || url.pathname.endsWith(".html")) {
     event.respondWith(
-
       fetch(request)
-
         .then((response) => {
-
-          if (
-            response &&
-            response.status === 200
-          ) {
-
-            const clone =
-              response.clone();
-
+          if (response && response.status === 200) {
             event.waitUntil(
-              caches
-                .open(CACHE_NAME)
-                .then((cache) => {
-
-                  return cache.put(
-                    request,
-                    clone
-                  );
-
-                })
+              caches.open(CACHE_NAME).then((cache) => cache.put(request, response.clone()))
             );
-
           }
-
           return response;
-
         })
-
-        .catch(() => {
-
-          return caches
-            .match(request)
-            .then((cachedResponse) => {
-
-              if (cachedResponse) {
-
-                return cachedResponse;
-
-              }
-
-              return caches.match(
-                "./index.html"
-              );
-
-            });
-
-        })
-
+        .catch(() => caches.match(request).then((cached) => cached || caches.match("./index.html")))
     );
-
     return;
-
   }
 
-
-  /* ===================================================
-     JAVASCRIPT / CSS / JSON
-     Network First.
-  =================================================== */
-  if (
-    url.pathname.endsWith(".js") ||
-    url.pathname.endsWith(".css") ||
-    url.pathname.endsWith(".json")
-  ) {
-
+  if (url.pathname.endsWith(".js") || url.pathname.endsWith(".css") || url.pathname.endsWith(".json")) {
     event.respondWith(
-
       fetch(request)
-
         .then((response) => {
-
-          if (
-            response &&
-            response.status === 200
-          ) {
-
-            const clone =
-              response.clone();
-
+          if (response && response.status === 200) {
             event.waitUntil(
-              caches
-                .open(CACHE_NAME)
-                .then((cache) => {
-
-                  return cache.put(
-                    request,
-                    clone
-                  );
-
-                })
+              caches.open(CACHE_NAME).then((cache) => cache.put(request, response.clone()))
             );
-
           }
-
           return response;
-
         })
-
-        .catch(() => {
-
-          return caches.match(request);
-
-        })
-
+        .catch(() => caches.match(request))
     );
-
-    return;
-
   }
-
-
-  /* ===================================================
-     ẢNH / ICON / FILE KHÁC
-     Cache First.
-  =================================================== */
-  event.respondWith(
-
-    caches
-      .match(request)
-
-      .then((cachedResponse) => {
-
-        if (cachedResponse) {
-
-          return cachedResponse;
-
-        }
-
-
-        return fetch(request)
-
-          .then((response) => {
-
-            if (
-              !response ||
-              response.status !== 200 ||
-              response.type === "opaque"
-            ) {
-
-              return response;
-
-            }
-
-
-            const clone =
-              response.clone();
-
-
-            event.waitUntil(
-              caches
-                .open(CACHE_NAME)
-                .then((cache) => {
-
-                  return cache.put(
-                    request,
-                    clone
-                  );
-
-                })
-            );
-
-
-            return response;
-
-          });
-
-      })
-
-  );
-
 });
