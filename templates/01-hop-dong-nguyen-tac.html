@@ -186,6 +186,15 @@ body{
 .party-line:nth-child(6),
 .party-line:nth-child(7){grid-column:2;}
 .party-line span{overflow-wrap:anywhere;}
+/* BÊN B: giữ nhãn và dòng chấm cùng một hàng, tránh tự xuống dòng */
+.party + .party{
+  grid-template-columns:minmax(0,55%) minmax(0,45%);
+  column-gap:12px;
+}
+.party + .party .party-line span{
+  white-space:nowrap;
+  overflow-wrap:normal;
+}
 .center-line{text-align:center;font-weight:700;color:var(--green-dark);margin:8px 0;}
 .section{margin-top:12px;}
 .section-title{font-weight:700;text-transform:uppercase;margin-bottom:5px;}
