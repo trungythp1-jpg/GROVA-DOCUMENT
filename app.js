@@ -3607,6 +3607,436 @@
   }
 
   /* =======================================================
+     LIST PRINTING — VERSION 224
+     Bản in danh sách A4 chuyên nghiệp, có logo GROVA,
+     đầy đủ tiêu đề, phạm vi dữ liệu, điều kiện tìm kiếm/lọc
+     và bảng dữ liệu. Không thay đổi dữ liệu, không cấp số.
+  ======================================================= */
+
+  function printListDocument(title, columns, rows, scopeLabel, description = "") {
+
+    if (!Array.isArray(rows) || !rows.length) {
+      showToast("Không có dữ liệu để in.");
+      return;
+    }
+
+    const now = new Date();
+    const printedAt = now.toLocaleString("vi-VN", {
+      dateStyle: "long",
+      timeStyle: "short"
+    });
+
+    const settings = readStorage(STORAGE.settings) || {};
+    const companyName =
+      settings.companyName ||
+      "CÔNG TY CỔ PHẦN GROVA HOLDINGS";
+    const companyTaxCode = settings.taxCode || "";
+    const logoUrl = new URL(
+      "./data/grova_logo.png",
+      window.location.href
+    ).href;
+
+    const head = columns
+      .map((column) => `<th>${escapeHTML(column.label)}</th>`)
+      .join("");
+
+    const body = rows
+      .map((row, index) => `
+        <tr>
+          <td class="stt">${index + 1}</td>
+          ${columns.map((column) => `
+            <td>${escapeHTML(row[column.key] ?? "")}</td>
+          `).join("")}
+        </tr>
+      `)
+      .join("");
+
+    const taxLine = companyTaxCode
+      ? `<div class="company-tax">Mã số thuế: ${escapeHTML(companyTaxCode)}</div>`
+      : "";
+
+    const descriptionHtml = description
+      ? `<p class="description">${escapeHTML(description)}</p>`
+      : "";
+
+    const html = `<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${escapeHTML(title)}</title>
+<style>
+  @page { size: A4 landscape; margin: 13mm 12mm 14mm; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    color: #171717;
+    background: #fff;
+    font-size: 11px;
+    line-height: 1.45;
+  }
+  .document {
+    width: 100%;
+    margin: 0 auto;
+  }
+  .letterhead {
+    display: grid;
+    grid-template-columns: 78px 1fr auto;
+    gap: 14px;
+    align-items: center;
+    padding-bottom: 9px;
+    border-bottom: 2px solid #222;
+  }
+  .logo-wrap {
+    width: 68px;
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .logo {
+    max-width: 68px;
+    max-height: 68px;
+    object-fit: contain;
+  }
+  .company-name {
+    font-size: 16px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .15px;
+  }
+  .company-sub {
+    margin-top: 3px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .7px;
+    text-transform: uppercase;
+  }
+  .company-tax {
+    margin-top: 3px;
+    font-size: 9.5px;
+  }
+  .print-meta {
+    text-align: right;
+    font-size: 9.5px;
+    line-height: 1.55;
+    white-space: nowrap;
+  }
+  .print-meta strong { color: #111; }
+  .title-block {
+    text-align: center;
+    padding: 15px 0 10px;
+  }
+  h1 {
+    margin: 0;
+    font-size: 18px;
+    line-height: 1.25;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .2px;
+  }
+  .title-rule {
+    width: 70px;
+    margin: 7px auto 0;
+    border-top: 2px solid #222;
+  }
+  .description {
+    margin: 8px 0 4px;
+    text-align: center;
+    font-size: 10.5px;
+  }
+  .scope-box {
+    margin: 7px 0 12px;
+    padding: 7px 10px;
+    border: 1px solid #bdbdbd;
+    background: #fafafa;
+    font-size: 10px;
+  }
+  .scope-label {
+    font-weight: 700;
+    margin-right: 5px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: auto;
+  }
+  thead { display: table-header-group; }
+  tr { page-break-inside: avoid; }
+  th, td {
+    border: 1px solid #777;
+    padding: 6px 7px;
+    vertical-align: middle;
+    overflow-wrap: anywhere;
+  }
+  th {
+    background: #eeeeee;
+    font-weight: 800;
+    text-align: center;
+    line-height: 1.3;
+  }
+  td { line-height: 1.4; }
+  td.stt, th:first-child {
+    width: 42px;
+    min-width: 42px;
+    text-align: center;
+  }
+  .summary {
+    margin-top: 9px;
+    padding-top: 7px;
+    border-top: 1px solid #777;
+    font-size: 10.5px;
+  }
+  .summary strong { font-size: 11px; }
+  .closing {
+    margin-top: 18px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    page-break-inside: avoid;
+  }
+  .closing-box {
+    min-height: 68px;
+    text-align: center;
+    font-size: 10px;
+  }
+  .closing-box strong {
+    display: block;
+    font-size: 10.5px;
+    text-transform: uppercase;
+  }
+  .signature-space { height: 42px; }
+  .footer {
+    margin-top: 12px;
+    padding-top: 6px;
+    border-top: 1px solid #bbb;
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    color: #555;
+    font-size: 8.5px;
+  }
+  @media print {
+    .no-print { display: none !important; }
+  }
+</style>
+</head>
+<body>
+  <main class="document">
+    <header class="letterhead">
+      <div class="logo-wrap">
+        <img class="logo" src="${escapeHTML(logoUrl)}" alt="GROVA HOLDINGS">
+      </div>
+      <div>
+        <div class="company-name">${escapeHTML(companyName)}</div>
+        <div class="company-sub">GROVA DOCUMENT</div>
+        ${taxLine}
+      </div>
+      <div class="print-meta">
+        <div><strong>Ngày in</strong></div>
+        <div>${escapeHTML(printedAt)}</div>
+      </div>
+    </header>
+
+    <section class="title-block">
+      <h1>${escapeHTML(title)}</h1>
+      <div class="title-rule"></div>
+      ${descriptionHtml}
+    </section>
+
+    <div class="scope-box">
+      <span class="scope-label">Phạm vi dữ liệu:</span>
+      <span>${escapeHTML(scopeLabel)}</span>
+    </div>
+
+    <table>
+      <thead>
+        <tr><th>STT</th>${head}</tr>
+      </thead>
+      <tbody>${body}</tbody>
+    </table>
+
+    <div class="summary">
+      Tổng số bản ghi trong danh sách: <strong>${rows.length}</strong>
+    </div>
+
+    <section class="closing">
+      <div class="closing-box">
+        <strong>Đơn vị lập danh sách</strong>
+        <div class="signature-space"></div>
+      </div>
+      <div class="closing-box">
+        <strong>${escapeHTML(companyName)}</strong>
+        <div class="signature-space"></div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <span>GROVA DOCUMENT</span>
+      <span>Danh sách được in từ dữ liệu hiện tại trên hệ thống.</span>
+    </footer>
+  </main>
+</body>
+</html>`;
+
+    const printWindow = window.open("", "_blank", "noopener,noreferrer");
+
+    if (!printWindow) {
+      showToast("Trình duyệt đã chặn cửa sổ in. Hãy cho phép mở cửa sổ mới rồi thử lại.");
+      return;
+    }
+
+    printWindow.document.open();
+    printWindow.document.write(html);
+    printWindow.document.close();
+
+    printWindow.addEventListener("load", () => {
+      setTimeout(() => {
+        printWindow.focus();
+        printWindow.print();
+      }, 350);
+    }, { once: true });
+  }
+
+  function getProjectPrintRows(useFiltered = true) {
+    const projects = getProjects();
+    if (!useFiltered) return projects;
+
+    const search = $("#projectSearch")?.value || "";
+    const status = $("#projectStatus")?.value || "";
+    const query = search.trim().toLowerCase();
+
+    return projects.filter((project) => {
+      const text = [project.name, project.customer, project.address, project.code, project.note]
+        .join(" ").toLowerCase();
+      return (!query || text.includes(query)) && (!status || project.status === status);
+    });
+  }
+
+  function getCustomerPrintRows(useFiltered = true) {
+    const customers = getCustomers();
+    if (!useFiltered) return customers;
+
+    const search = $("#customerSearch")?.value || "";
+    const query = search.trim().toLowerCase();
+
+    return customers.filter((customer) => {
+      const text = [customer.name, customer.phone, customer.taxCode, customer.address, customer.email, customer.note]
+        .join(" ").toLowerCase();
+      return !query || text.includes(query);
+    });
+  }
+
+  function getEmployeePrintRows(useFiltered = true) {
+    const employees = getEmployees();
+    if (!useFiltered) return employees;
+
+    const search = $("#employeeSearch")?.value || "";
+    const query = search.trim().toLowerCase();
+
+    return employees.filter((employee) => {
+      const text = [employee.name, employee.phone, employee.position, employee.department, employee.email, employee.note]
+        .join(" ").toLowerCase();
+      return !query || text.includes(query);
+    });
+  }
+
+  function printProjects(useFiltered = true) {
+    if (!hasPermission("projects", "view")) {
+      showToast(permissionDeniedMessage("projects"));
+      return;
+    }
+    const rows = getProjectPrintRows(useFiltered).map((project) => ({
+      name: project.name || "",
+      code: project.code || "",
+      customer: project.customer || "",
+      address: project.address || "",
+      status: project.status || "Chuẩn bị"
+    }));
+    const search = $("#projectSearch")?.value?.trim() || "";
+    const status = $("#projectStatus")?.value || "";
+    const scope = useFiltered
+      ? `Kết quả tìm kiếm/lọc hiện tại${search ? ` — Từ khóa tìm kiếm: “${search}”` : ""}${status ? ` — Trạng thái: ${status}` : ""}`
+      : "Toàn bộ danh sách công trình đang được lưu trên hệ thống";
+    printListDocument(
+      "DANH SÁCH CÔNG TRÌNH",
+      [
+        { key:"name", label:"Tên công trình" },
+        { key:"code", label:"Mã công trình" },
+        { key:"customer", label:"Tên khách hàng" },
+        { key:"address", label:"Địa chỉ công trình" },
+        { key:"status", label:"Trạng thái" }
+      ],
+      rows,
+      scope,
+      "Danh sách công trình được tổng hợp từ dữ liệu quản lý công trình trên hệ thống GROVA DOCUMENT."
+    );
+  }
+
+  function printCustomers(useFiltered = true) {
+    if (!hasPermission("customers", "view")) {
+      showToast(permissionDeniedMessage("customers"));
+      return;
+    }
+    const rows = getCustomerPrintRows(useFiltered).map((customer) => ({
+      name: customer.name || "",
+      taxCode: customer.taxCode || "",
+      phone: customer.phone || "",
+      email: customer.email || "",
+      address: customer.address || ""
+    }));
+    const search = $("#customerSearch")?.value?.trim() || "";
+    const scope = useFiltered
+      ? `Kết quả tìm kiếm hiện tại${search ? ` — Từ khóa tìm kiếm: “${search}”` : ""}`
+      : "Toàn bộ danh sách khách hàng đang được lưu trên hệ thống";
+    printListDocument(
+      "DANH SÁCH KHÁCH HÀNG",
+      [
+        { key:"name", label:"Tên khách hàng" },
+        { key:"taxCode", label:"Mã số thuế" },
+        { key:"phone", label:"Số điện thoại" },
+        { key:"email", label:"Địa chỉ thư điện tử" },
+        { key:"address", label:"Địa chỉ" }
+      ],
+      rows,
+      scope,
+      "Danh sách khách hàng được tổng hợp từ dữ liệu khách hàng trên hệ thống GROVA DOCUMENT."
+    );
+  }
+
+  function printEmployees(useFiltered = true) {
+    if (!hasPermission("employees", "view")) {
+      showToast(permissionDeniedMessage("employees"));
+      return;
+    }
+    const rows = getEmployeePrintRows(useFiltered).map((employee) => ({
+      name: employee.name || "",
+      position: employee.position || "",
+      department: employee.department || "",
+      phone: employee.phone || "",
+      email: employee.email || ""
+    }));
+    const search = $("#employeeSearch")?.value?.trim() || "";
+    const scope = useFiltered
+      ? `Kết quả tìm kiếm hiện tại${search ? ` — Từ khóa tìm kiếm: “${search}”` : ""}`
+      : "Toàn bộ danh sách nhân sự đang được lưu trên hệ thống";
+    printListDocument(
+      "DANH SÁCH NHÂN SỰ",
+      [
+        { key:"name", label:"Họ và tên" },
+        { key:"position", label:"Chức vụ" },
+        { key:"department", label:"Bộ phận" },
+        { key:"phone", label:"Số điện thoại" },
+        { key:"email", label:"Địa chỉ thư điện tử" }
+      ],
+      rows,
+      scope,
+      "Danh sách nhân sự được tổng hợp từ dữ liệu quản lý nhân sự trên hệ thống GROVA DOCUMENT."
+    );
+  }
+
+  /* =======================================================
      PROJECTS
   ======================================================= */
 
@@ -6589,6 +7019,14 @@
         );
         break;
 
+      case "print-projects-filtered":
+        printProjects(true);
+        break;
+
+      case "print-projects-all":
+        printProjects(false);
+        break;
+
       case "new-customer":
         openCustomerModal();
         break;
@@ -6605,6 +7043,14 @@
         );
         break;
 
+      case "print-customers-filtered":
+        printCustomers(true);
+        break;
+
+      case "print-customers-all":
+        printCustomers(false);
+        break;
+
       case "new-employee":
         openEmployeeModal();
         break;
@@ -6619,6 +7065,14 @@
         deleteEmployee(
           actionButton.dataset.id
         );
+        break;
+
+      case "print-employees-filtered":
+        printEmployees(true);
+        break;
+
+      case "print-employees-all":
+        printEmployees(false);
         break;
 
       case "clear-history":
