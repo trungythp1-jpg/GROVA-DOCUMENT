@@ -1,8 +1,9 @@
 /* =========================================================
    GROVA DOCUMENT
-   APP.JS — VERSION 209
-   FIRESTORE PHASE 3 — PROJECTS + CUSTOMERS + EMPLOYEES
-   CLEAN BASE FROM STABLE VERSION 206
+   APP.JS — VERSION 210
+   FIRESTORE PHASE 4 — HISTORY
+   PROJECTS + CUSTOMERS + EMPLOYEES + HISTORY
+   CLEAN BASE FROM LOCKED VERSION 209
 ========================================================= */
 
 (() => {
@@ -108,6 +109,16 @@
   let employeesSyncToken = 0;
 
   let employeesSyncRunning = false;
+
+  /* =======================================================
+     HISTORY FIRESTORE STATE
+  ======================================================= */
+
+  let historyCache = [];
+
+  let historySyncToken = 0;
+
+  let historySyncRunning = false;
 
   /* =======================================================
      DATA
@@ -416,8 +427,85 @@
     return normalizeEmployees(readStorage(STORAGE.employees, []));
   }
 
+  function getHistoryCacheKey(uid) {
+    return "GROVA_HISTORY_V2_" + String(uid || "");
+  }
+
+  function readHistoryCache(uid) {
+    if (!uid) return [];
+    return readStorage(getHistoryCacheKey(uid), []);
+  }
+
+  function writeHistoryCache(uid, history) {
+    if (!uid) return false;
+    return writeStorage(
+      getHistoryCacheKey(uid),
+      Array.isArray(history) ? history : []
+    );
+  }
+
+  function normalizeHistory(history) {
+    if (!Array.isArray(history)) return [];
+
+    const seenTemplates = new Set();
+
+    return history
+      .filter((item) => item && item.templateId)
+      .map((item) => ({
+        ...item,
+        id: String(item.id || createId("HIS")),
+        templateId: String(item.templateId),
+        code: item.code || "",
+        name: item.name || "",
+        icon: item.icon || "📄",
+        openedAt: item.openedAt || nowISO(),
+        createdBy: item.createdBy || ""
+      }))
+      .sort((a, b) =>
+        String(b.openedAt || "").localeCompare(
+          String(a.openedAt || "")
+        )
+      )
+      .filter((item) => {
+        if (seenTemplates.has(item.templateId)) {
+          return false;
+        }
+        seenTemplates.add(item.templateId);
+        return true;
+      })
+      .slice(0, 100);
+  }
+
+  function setHistoryCache(history) {
+    historyCache = normalizeHistory(history);
+  }
+
+  function getBestLocalHistory(uid) {
+    const scopedCache = normalizeHistory(
+      readHistoryCache(uid)
+    );
+
+    if (scopedCache.length) {
+      return scopedCache;
+    }
+
+    return normalizeHistory(
+      readStorage(STORAGE.history, [])
+    );
+  }
+
+  function clearLegacyHistoryStorage() {
+    localStorage.removeItem(STORAGE.history);
+  }
+
   function getHistory() {
-    return readStorage(STORAGE.history, []);
+    if (currentUser) {
+      return historyCache.slice();
+    }
+
+    return normalizeHistory(
+      readStorage(STORAGE.history, [])
+    );
   }
 
   function getSettings() {
@@ -1219,6 +1307,7 @@
     projectsSyncToken++;
     customersSyncToken++;
     employeesSyncToken++;
+    historySyncToken++;
 
     currentUser =
       user || null;
@@ -1228,6 +1317,7 @@
       setProjectsCache([]);
       setCustomersCache([]);
       setEmployeesCache([]);
+      setHistoryCache([]);
 
       renderProjectViews();
 
@@ -1257,6 +1347,10 @@
       getBestLocalEmployees(user.uid);
     setEmployeesCache(cachedEmployees);
 
+    const cachedHistory =
+      getBestLocalHistory(user.uid);
+    setHistoryCache(cachedHistory);
+
     renderProjectViews();
 
     if (currentPage === "customers") {
@@ -1267,9 +1361,15 @@
       renderEmployees();
     }
 
+    renderRecentDocuments();
+    if (currentPage === "history") {
+      renderHistory();
+    }
+
     syncProjectsFromCloud(user);
     syncCustomersFromCloud(user);
     syncEmployeesFromCloud(user);
+    syncHistoryFromCloud(user);
 
   }
 
@@ -2441,7 +2541,7 @@
 
   }
 
-  function openTemplate(id) {
+  async function openTemplate(id) {
 
     const template =
       findTemplate(id);
@@ -2456,7 +2556,7 @@
 
     }
 
-    addHistory(template);
+    await addHistory(template);
 
     if (template.file) {
 
@@ -2636,143 +2736,492 @@
   }
 
   /* =======================================================
-     HISTORY
+     HISTORY — FIRESTORE PHASE 4
   ======================================================= */
 
-  function addHistory(template) {
+  function getHistoryCollection() {
+    if (!firestoreDb) return null;
+    return firestoreDb.collection("history");
+  }
 
-    const history =
-      getHistory();
+  function buildHistoryData(item, user) {
+    const now = nowISO();
+    const uid = user?.uid || "";
 
-    const item = {
-
-      id: createId("HIS"),
-
-      templateId:
-        template.id,
-
-      code:
-        template.code || "",
-
-      name:
-        template.name ||
-        template.title ||
-        "",
-
-      icon:
-        template.icon ||
-        "📄",
-
-      openedAt:
-        nowISO()
-
+    return {
+      id: String(item.id),
+      templateId: String(item.templateId),
+      code: item.code || "",
+      name: item.name || "",
+      icon: item.icon || "📄",
+      openedAt: item.openedAt || now,
+      createdAt: item.createdAt || now,
+      updatedAt: now,
+      createdBy: item.createdBy || uid,
+      updatedBy: uid,
+      type: "document_open"
     };
+  }
 
-    const filtered =
-      history.filter(
-        (oldItem) =>
-          oldItem.templateId !==
-          template.id
-      );
+  function mapFirestoreHistory(doc) {
+    return {
+      ...(doc.data() || {}),
+      id: String(doc.id)
+    };
+  }
 
-    filtered.unshift(item);
+  async function readCloudHistory(user = currentUser) {
+    if (!user) return null;
+    if (!initializeFirestore()) return null;
+    await waitForFirestore();
 
-    writeStorage(
-      STORAGE.history,
-      filtered.slice(0, 100)
+    const collection = getHistoryCollection();
+    if (!collection) return null;
+
+    const snapshot = await collection
+      .where("createdBy", "==", user.uid)
+      .get();
+
+    return normalizeHistory(
+      snapshot.docs.map(mapFirestoreHistory)
+    );
+  }
+
+  function getHistoryDocumentId(item, user) {
+    return (
+      "HIS_" +
+      encodeURIComponent(String(user?.uid || "")) +
+      "_" +
+      encodeURIComponent(String(item?.templateId || ""))
+    );
+  }
+
+  async function writeCloudHistory(item, user) {
+    if (!user) throw new Error("AUTH_REQUIRED");
+    if (!initializeFirestore()) {
+      throw new Error("FIRESTORE_UNAVAILABLE");
+    }
+
+    await waitForFirestore();
+
+    const reference = getHistoryCollection().doc(
+      getHistoryDocumentId(item, user)
     );
 
-    updateStats();
+    await reference.set(
+      buildHistoryData(item, user),
+      { merge: true }
+    );
 
+    const verification = await reference.get();
+    if (!verification.exists) {
+      throw new Error("WRITE_VERIFICATION_FAILED");
+    }
+
+    return mapFirestoreHistory(verification);
+  }
+
+  async function clearCloudHistory(user) {
+    if (!user) throw new Error("AUTH_REQUIRED");
+    if (!initializeFirestore()) {
+      throw new Error("FIRESTORE_UNAVAILABLE");
+    }
+
+    await waitForFirestore();
+
+    const collection = getHistoryCollection();
+    const snapshot = await collection
+      .where("createdBy", "==", user.uid)
+      .get();
+
+    for (const doc of snapshot.docs) {
+      await doc.ref.delete();
+    }
+
+    const verification = await collection
+      .where("createdBy", "==", user.uid)
+      .get();
+
+    if (!verification.empty) {
+      throw new Error("CLEAR_VERIFICATION_FAILED");
+    }
+
+    return true;
+  }
+
+  async function verifyHistoryMigration(expectedHistory, user) {
+    const cloud = await readCloudHistory(user);
+    if (!cloud) return false;
+
+    const expected = normalizeHistory(expectedHistory);
+    if (cloud.length !== expected.length) return false;
+
+    const expectedIds = expected
+      .map((item) => String(item.id))
+      .sort();
+
+    const cloudIds = cloud
+      .map((item) => String(item.id))
+      .sort();
+
+    return expectedIds.every(
+      (id, index) => id === cloudIds[index]
+    );
+  }
+
+  function showHistorySyncError(error) {
+    console.error(
+      "GROVA DOCUMENT: History Firestore error.",
+      error
+    );
+
+    showToast(
+      "Không thể đồng bộ lịch sử. Ứng dụng vẫn đang dùng dữ liệu cục bộ."
+    );
+  }
+
+  async function migrateLocalHistoryIfNeeded(
+    user,
+    localHistory
+  ) {
+    if (!user) return false;
+
+    const sourceHistory =
+      normalizeHistory(localHistory)
+        .map((item) => ({
+          ...item,
+          createdBy: user.uid
+        }));
+
+    if (!sourceHistory.length) return false;
+
+    const cloud = await readCloudHistory(user);
+    if (!cloud) return false;
+
+    if (cloud.length > 0) {
+      setHistoryCache(cloud);
+      writeHistoryCache(user.uid, cloud);
+      clearLegacyHistoryStorage();
+      return false;
+    }
+
+    try {
+      for (const item of sourceHistory) {
+        await getHistoryCollection()
+          .doc(getHistoryDocumentId(item, user))
+          .set(buildHistoryData(item, user));
+      }
+
+      if (
+        !(await verifyHistoryMigration(
+          sourceHistory,
+          user
+        ))
+      ) {
+        throw new Error(
+          "MIGRATION_VERIFICATION_FAILED"
+        );
+      }
+
+      const migratedCloud =
+        await readCloudHistory(user);
+
+      if (!migratedCloud) {
+        throw new Error(
+          "MIGRATION_READBACK_FAILED"
+        );
+      }
+
+      setHistoryCache(migratedCloud);
+      writeHistoryCache(
+        user.uid,
+        migratedCloud
+      );
+      clearLegacyHistoryStorage();
+
+      showToast(
+        "Đã đồng bộ lịch sử cũ lên Firestore."
+      );
+
+      return true;
+    } catch (error) {
+      showHistorySyncError(error);
+      return false;
+    }
+  }
+
+  async function syncHistoryFromCloud(user) {
+    if (!user) return;
+
+    const token = ++historySyncToken;
+    historySyncRunning = true;
+
+    try {
+      if (!initializeFirestore()) return;
+
+      const localHistory =
+        getBestLocalHistory(user.uid);
+
+      if (localHistory.length) {
+        setHistoryCache(localHistory);
+        writeHistoryCache(
+          user.uid,
+          localHistory
+        );
+        renderRecentDocuments();
+        if (currentPage === "history") {
+          renderHistory();
+        }
+        updateStats();
+      }
+
+      const cloud =
+        await readCloudHistory(user);
+
+      if (
+        token !== historySyncToken ||
+        currentUser?.uid !== user.uid
+      ) {
+        return;
+      }
+
+      if (!cloud) return;
+
+      /* Cloud có dữ liệu => Cloud thắng. */
+      if (cloud.length > 0) {
+        setHistoryCache(cloud);
+        writeHistoryCache(user.uid, cloud);
+        clearLegacyHistoryStorage();
+        renderRecentDocuments();
+        if (currentPage === "history") {
+          renderHistory();
+        }
+        updateStats();
+        return;
+      }
+
+      /*
+        Cloud đang rỗng: chỉ migrate nếu local thật sự có dữ liệu.
+        Không xóa local chỉ vì cloud rỗng.
+      */
+      if (localHistory.length) {
+        const migrated =
+          await migrateLocalHistoryIfNeeded(
+            user,
+            localHistory
+          );
+
+        if (
+          token !== historySyncToken ||
+          currentUser?.uid !== user.uid
+        ) {
+          return;
+        }
+
+        if (migrated) {
+          renderRecentDocuments();
+          if (currentPage === "history") {
+            renderHistory();
+          }
+          updateStats();
+          return;
+        }
+
+        /* Migration lỗi => giữ nguyên local cache. */
+        renderRecentDocuments();
+        if (currentPage === "history") {
+          renderHistory();
+        }
+        updateStats();
+        return;
+      }
+
+      /* Cả local và cloud đều rỗng. */
+      setHistoryCache([]);
+      writeHistoryCache(user.uid, []);
+      clearLegacyHistoryStorage();
+      renderRecentDocuments();
+      if (currentPage === "history") {
+        renderHistory();
+      }
+      updateStats();
+
+    } catch (error) {
+      if (token === historySyncToken) {
+        showHistorySyncError(error);
+      }
+    } finally {
+      if (token === historySyncToken) {
+        historySyncRunning = false;
+      }
+    }
+  }
+
+  async function addHistory(template) {
+    if (!template) return false;
+
+    const history = getHistory();
+    const item = {
+      id: createId("HIS"),
+      templateId: String(template.id),
+      code: template.code || "",
+      name: template.name || template.title || "",
+      icon: template.icon || "📄",
+      openedAt: nowISO()
+    };
+
+    const filtered = history.filter(
+      (oldItem) =>
+        String(oldItem.templateId) !==
+        String(template.id)
+    );
+
+    const nextHistory = normalizeHistory([
+      item,
+      ...filtered
+    ]);
+
+    if (!currentUser) {
+      writeStorage(
+        STORAGE.history,
+        nextHistory
+      );
+      updateStats();
+      return true;
+    }
+
+    try {
+      const authUser =
+        await getActiveAuthUser();
+
+      if (!authUser) {
+        throw new Error("AUTH_REQUIRED");
+      }
+
+      const savedItem =
+        await writeCloudHistory(
+          item,
+          authUser
+        );
+
+      const withoutTemplate =
+        history.filter(
+          (oldItem) =>
+            String(oldItem.templateId) !==
+            String(template.id)
+        );
+
+      const finalHistory =
+        normalizeHistory([
+          savedItem,
+          ...withoutTemplate
+        ]);
+
+      setHistoryCache(finalHistory);
+      writeHistoryCache(
+        authUser.uid,
+        finalHistory
+      );
+
+      updateStats();
+      renderRecentDocuments();
+      if (currentPage === "history") {
+        renderHistory();
+      }
+
+      return true;
+    } catch (error) {
+      console.error(
+        "GROVA DOCUMENT: addHistory failed.",
+        error
+      );
+
+      /*
+        Lịch sử không được phép chặn việc mở mẫu văn bản.
+        Nếu Firestore lỗi, giữ local fallback cho phiên này.
+      */
+      setHistoryCache(nextHistory);
+      writeHistoryCache(
+        currentUser?.uid,
+        nextHistory
+      );
+      writeStorage(
+        STORAGE.history,
+        nextHistory
+      );
+
+      updateStats();
+      renderRecentDocuments();
+
+      showToast(
+        "Không đồng bộ được lịch sử lên hệ thống. Mẫu văn bản vẫn sẽ được mở."
+      );
+
+      return false;
+    }
   }
 
   function renderHistory() {
-
     const container =
       $("#historyList");
 
-    if (!container) {
-      return;
-    }
+    if (!container) return;
 
-    const history =
-      getHistory();
+    const history = getHistory();
 
     if (!history.length) {
-
       container.innerHTML =
         emptyState(
           "Chưa có hoạt động",
           "Các mẫu văn bản bạn mở sẽ xuất hiện ở đây.",
           "◷"
         );
-
       return;
-
     }
 
     container.innerHTML =
       history
         .map(
           (item) => `
-
             <div class="history-item">
-
               <div class="history-icon">
                 ${escapeHTML(item.icon || "📄")}
               </div>
-
               <div class="history-content">
-
                 <b>
                   ${escapeHTML(item.name || "")}
                 </b>
-
                 <span>
                   ${escapeHTML(item.code || "")}
                 </span>
-
               </div>
-
               <div class="history-time">
                 ${escapeHTML(
-                  formatDateTime(
-                    item.openedAt
-                  )
+                  formatDateTime(item.openedAt)
                 )}
               </div>
-
             </div>
-
           `
         )
         .join("");
-
   }
 
   function renderRecentDocuments() {
-
     const container =
       $("#recentDocuments");
 
-    if (!container) {
-      return;
-    }
+    if (!container) return;
 
-    const history =
-      getHistory();
+    const history = getHistory();
 
     if (!history.length) {
-
       container.innerHTML =
         emptyState(
           "Chưa có hoạt động gần đây",
           "Hãy mở một mẫu văn bản để bắt đầu.",
           "◷"
         );
-
       return;
-
     }
 
     container.innerHTML =
@@ -2780,80 +3229,78 @@
         .slice(0, 5)
         .map(
           (item) => `
-
             <div class="history-item">
-
               <div class="history-icon">
                 ${escapeHTML(item.icon || "📄")}
               </div>
-
               <div class="history-content">
-
                 <b>
                   ${escapeHTML(item.name || "")}
                 </b>
-
                 <span>
                   ${escapeHTML(item.code || "")}
                 </span>
-
               </div>
-
               <div class="history-time">
                 ${escapeHTML(
-                  formatDateTime(
-                    item.openedAt
-                  )
+                  formatDateTime(item.openedAt)
                 )}
               </div>
-
             </div>
-
           `
         )
         .join("");
-
   }
 
-  function clearHistory() {
-
-    const history =
-      getHistory();
+  async function clearHistory() {
+    const history = getHistory();
 
     if (!history.length) {
-
-      showToast(
-        "Lịch sử đang trống."
-      );
-
-      return;
-
-    }
-
-    const ok =
-      confirm(
-        "Bạn có chắc muốn xóa toàn bộ lịch sử hoạt động?"
-      );
-
-    if (!ok) {
+      showToast("Lịch sử đang trống.");
       return;
     }
 
-    writeStorage(
-      STORAGE.history,
-      []
+    const ok = confirm(
+      "Bạn có chắc muốn xóa toàn bộ lịch sử hoạt động?"
     );
 
-    renderHistory();
+    if (!ok) return;
 
-    renderRecentDocuments();
+    try {
+      const authUser =
+        await getActiveAuthUser();
 
-    updateStats();
+      if (!authUser) {
+        throw new Error("AUTH_REQUIRED");
+      }
 
-    showToast(
-      "Đã xóa lịch sử."
-    );
+      await clearCloudHistory(authUser);
 
+      setHistoryCache([]);
+      writeHistoryCache(authUser.uid, []);
+      writeStorage(STORAGE.history, []);
+
+      renderHistory();
+      renderRecentDocuments();
+      updateStats();
+
+      showToast("Đã xóa lịch sử.");
+    } catch (error) {
+      console.error(
+        "GROVA DOCUMENT: clearHistory failed.",
+        error
+      );
+
+      if (error?.message === "AUTH_REQUIRED") {
+        showToast(
+          "Chưa đăng nhập. Không thể xóa lịch sử."
+        );
+      } else {
+        showToast(
+          "Không thể xóa lịch sử trên hệ thống. Dữ liệu chưa bị thay đổi."
+        );
+      }
+    }
   }
 
   /* =======================================================
@@ -4750,6 +5197,7 @@
     projectsSyncToken++;
     customersSyncToken++;
     employeesSyncToken++;
+    historySyncToken++;
 
     if (currentUser) {
 
@@ -4771,11 +5219,18 @@
         )
       );
 
+      localStorage.removeItem(
+        getHistoryCacheKey(
+          currentUser.uid
+        )
+      );
+
     }
 
     setProjectsCache([]);
     setCustomersCache([]);
     setEmployeesCache([]);
+    setHistoryCache([]);
 
     renderDashboard();
 
