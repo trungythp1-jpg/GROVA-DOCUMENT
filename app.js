@@ -1,7 +1,7 @@
 /* =========================================================
    GROVA DOCUMENT
-   APP.JS — VERSION 220
-   FIRESTORE PHASE 4 — HISTORY + PHASE 5A PERMISSION CORE + PHASE 5B.4 ACCOUNT MANAGEMENT UI + PHASE 5B.5 ACCOUNT PROFILE UI + PHASE 5B.6 ACCOUNT MANAGEMENT HARDENING + PHASE 5B.7 ACCOUNT PROFILE UI SYNC + SPARK ACCOUNT PROFILE MANAGEMENT
+   APP.JS — VERSION 223
+   FIRESTORE PHASE 4 — HISTORY + PHASE 5A PERMISSION CORE + PHASE 5B.4 ACCOUNT MANAGEMENT UI + PHASE 5B.5 ACCOUNT PROFILE UI + PHASE 5B.6 ACCOUNT MANAGEMENT HARDENING + PHASE 5B.7 ACCOUNT PROFILE UI SYNC + SPARK ACCOUNT PROFILE MANAGEMENT + FULL VIEW/CREATE/EDIT/DELETE PERMISSION ENFORCEMENT
    PROJECTS + CUSTOMERS + EMPLOYEES + HISTORY
    CLEAN BASE FROM LOCKED VERSION 209
 ========================================================= */
@@ -230,6 +230,7 @@
     if (!initializeFirestore()) {
       currentUserProfile = null;
       refreshAccountProfileUI();
+      refreshPermissionUI();
       return null;
     }
 
@@ -246,6 +247,10 @@
         : null;
 
       refreshAccountProfileUI();
+      refreshPermissionUI();
+      if (currentPage !== "dashboard" && !canViewPage(currentPage)) {
+        showPage("dashboard");
+      }
       return currentUserProfile;
     } catch (error) {
       console.warn(
@@ -1069,6 +1074,10 @@
 
   async function writeCloudProject(project, user, isCreate = false) {
 
+    if (!hasPermission("projects", isCreate ? "create" : "edit")) {
+      throw new Error("PERMISSION_DENIED");
+    }
+
     if (!user) {
       throw new Error(
         "AUTH_REQUIRED"
@@ -1119,6 +1128,10 @@
   }
 
   async function deleteCloudProject(id, user) {
+
+    if (!hasPermission("projects", "delete")) {
+      throw new Error("PERMISSION_DENIED");
+    }
 
     if (!user) {
       throw new Error(
@@ -1686,6 +1699,9 @@
   }
 
   async function writeCloudCustomer(customer, user, isCreate = false) {
+    if (!hasPermission("customers", isCreate ? "create" : "edit")) {
+      throw new Error("PERMISSION_DENIED");
+    }
     if (!user) {
       throw new Error(
         "AUTH_REQUIRED"
@@ -1733,6 +1749,9 @@
   }
 
   async function deleteCloudCustomer(id, user) {
+    if (!hasPermission("customers", "delete")) {
+      throw new Error("PERMISSION_DENIED");
+    }
     if (!user) {
       throw new Error(
         "AUTH_REQUIRED"
@@ -2115,6 +2134,10 @@
   }
 
   async function writeCloudEmployee(employee, user) {
+    const isCreate = !employee?.createdAt;
+    if (!hasPermission("employees", isCreate ? "create" : "edit")) {
+      throw new Error("PERMISSION_DENIED");
+    }
     if (!user) throw new Error("AUTH_REQUIRED");
     if (!initializeFirestore()) throw new Error("FIRESTORE_UNAVAILABLE");
     await waitForFirestore();
@@ -2126,6 +2149,9 @@
   }
 
   async function deleteCloudEmployee(id, user) {
+    if (!hasPermission("employees", "delete")) {
+      throw new Error("PERMISSION_DENIED");
+    }
     if (!user) throw new Error("AUTH_REQUIRED");
     if (!initializeFirestore()) throw new Error("FIRESTORE_UNAVAILABLE");
     await waitForFirestore();
@@ -2378,9 +2404,68 @@
      NAVIGATION
   ======================================================= */
 
+  function getPagePermission(page) {
+    const map = {
+      documents: ["documents", "view"],
+      projects: ["projects", "view"],
+      customers: ["customers", "view"],
+      employees: ["employees", "view"],
+      history: ["history", "view"],
+      reports: ["reports", "view"],
+      settings: ["settings", "view"]
+    };
+    return map[page] || null;
+  }
+
+  function canViewPage(page) {
+    const required = getPagePermission(page);
+    if (!required) return true;
+    return hasPermission(required[0], required[1]);
+  }
+
+  function permissionDeniedMessage(page) {
+    const labels = {
+      documents: "Văn bản",
+      projects: "Công trình",
+      customers: "Khách hàng",
+      employees: "Nhân sự",
+      history: "Lịch sử",
+      reports: "Báo cáo",
+      settings: "Cài đặt"
+    };
+    return `Bạn không có quyền xem ${labels[page] || "nội dung này"}.`;
+  }
+
+  function refreshPermissionUI() {
+    $$(".nav-item[data-page]").forEach((button) => {
+      const page = button.dataset.page;
+      const allowed = canViewPage(page);
+      button.style.display = allowed ? "" : "none";
+      button.setAttribute("aria-hidden", allowed ? "false" : "true");
+    });
+
+    if (currentUserProfile?.status !== "active" && !isAdminUser()) {
+      $$(".nav-item[data-page]").forEach((button) => {
+        const page = button.dataset.page;
+        if (page !== "dashboard") button.style.display = "none";
+      });
+    }
+  }
+
+  function showPermissionDenied(page) {
+    showToast(permissionDeniedMessage(page));
+    return false;
+  }
+
   function showPage(page) {
 
     if (!PAGE_INFO[page]) {
+      page = "dashboard";
+    }
+
+    if (page !== "dashboard" && !canViewPage(page)) {
+      refreshPermissionUI();
+      showPermissionDenied(page);
       page = "dashboard";
     }
 
@@ -2572,6 +2657,11 @@
   }
 
   function renderDocuments() {
+
+    if (!hasPermission("documents", "view")) {
+      showPermissionDenied("documents");
+      return;
+    }
 
     const templates = getTemplates();
 
@@ -3370,6 +3460,11 @@
   }
 
   function renderHistory() {
+
+    if (!hasPermission("history", "view")) {
+      showPermissionDenied("history");
+      return;
+    }
     const container =
       $("#historyList");
 
@@ -3517,6 +3612,20 @@
 
   function renderProjects() {
 
+    if (!hasPermission("projects", "view")) {
+      const deniedContainer =
+        $("#projectsList");
+      if (deniedContainer) {
+        deniedContainer.innerHTML =
+          emptyState(
+            "Không có quyền xem",
+            permissionDeniedMessage("projects"),
+            "🔒"
+          );
+      }
+      return;
+    }
+
     const container =
       $("#projectsList");
 
@@ -3625,6 +3734,7 @@
 
               <div class="data-actions">
 
+                ${hasPermission("projects", "edit") ? `
                 <button
                   type="button"
                   class="small-btn"
@@ -3633,7 +3743,9 @@
                 >
                   Sửa
                 </button>
+                ` : ""}
 
+                ${hasPermission("projects", "delete") ? `
                 <button
                   type="button"
                   class="small-btn delete"
@@ -3642,6 +3754,7 @@
                 >
                   Xóa
                 </button>
+                ` : ""}
 
               </div>
 
@@ -3654,6 +3767,25 @@
   }
 
   function openProjectModal(id = null) {
+
+    const requiredAction = id ? "edit" : "create";
+    if (!hasPermission("projects", requiredAction)) {
+      showToast(
+        id
+          ? "Bạn không có quyền sửa công trình."
+          : "Bạn không có quyền thêm công trình."
+      );
+      return;
+    }
+
+    if (id && !hasPermission("projects", "edit")) {
+      showToast("Bạn không có quyền sửa công trình.");
+      return;
+    }
+    if (!id && !hasPermission("projects", "create")) {
+      showToast("Bạn không có quyền thêm công trình.");
+      return;
+    }
 
     modalMode = "project";
 
@@ -3786,6 +3918,11 @@
   }
 
   async function saveProject() {
+
+    if (!hasPermission("projects", modalEditId ? "edit" : "create")) {
+      showToast(modalEditId ? "Bạn không có quyền sửa công trình." : "Bạn không có quyền thêm công trình.");
+      return;
+    }
 
     const name =
       $("#modalProjectName")
@@ -3956,6 +4093,16 @@
 
   async function deleteProject(id) {
 
+    if (!hasPermission("projects", "delete")) {
+      showToast("Bạn không có quyền xóa công trình.");
+      return;
+    }
+
+    if (!hasPermission("projects", "delete")) {
+      showToast("Bạn không có quyền xóa công trình.");
+      return;
+    }
+
     const projects =
       getProjects();
 
@@ -4052,6 +4199,20 @@
 
   function renderCustomers() {
 
+    if (!hasPermission("customers", "view")) {
+      const deniedContainer =
+        $("#customersList");
+      if (deniedContainer) {
+        deniedContainer.innerHTML =
+          emptyState(
+            "Không có quyền xem",
+            permissionDeniedMessage("customers"),
+            "🔒"
+          );
+      }
+      return;
+    }
+
     const container =
       $("#customersList");
 
@@ -4142,6 +4303,7 @@
 
               <div class="data-actions">
 
+                ${hasPermission("customers", "edit") ? `
                 <button
                   type="button"
                   class="small-btn"
@@ -4150,7 +4312,9 @@
                 >
                   Sửa
                 </button>
+                ` : ""}
 
+                ${hasPermission("customers", "delete") ? `
                 <button
                   type="button"
                   class="small-btn delete"
@@ -4159,6 +4323,7 @@
                 >
                   Xóa
                 </button>
+                ` : ""}
 
               </div>
 
@@ -4171,6 +4336,25 @@
   }
 
   function openCustomerModal(id = null) {
+
+    const requiredAction = id ? "edit" : "create";
+    if (!hasPermission("customers", requiredAction)) {
+      showToast(
+        id
+          ? "Bạn không có quyền sửa khách hàng."
+          : "Bạn không có quyền thêm khách hàng."
+      );
+      return;
+    }
+
+    if (id && !hasPermission("customers", "edit")) {
+      showToast("Bạn không có quyền sửa khách hàng.");
+      return;
+    }
+    if (!id && !hasPermission("customers", "create")) {
+      showToast("Bạn không có quyền thêm khách hàng.");
+      return;
+    }
 
     modalMode = "customer";
 
@@ -4285,6 +4469,21 @@
   }
 
   async function saveCustomer() {
+
+    if (!hasPermission("customers", modalEditId ? "edit" : "create")) {
+      showToast(
+        modalEditId
+          ? "Bạn không có quyền sửa khách hàng."
+          : "Bạn không có quyền thêm khách hàng."
+      );
+      closeModal();
+      return;
+    }
+
+    if (!hasPermission("customers", modalEditId ? "edit" : "create")) {
+      showToast(modalEditId ? "Bạn không có quyền sửa khách hàng." : "Bạn không có quyền thêm khách hàng.");
+      return;
+    }
 
     const name =
       $("#modalCustomerName")
@@ -4450,6 +4649,11 @@
 
   async function deleteCustomer(id) {
 
+    if (!hasPermission("customers", "delete")) {
+      showToast("Bạn không có quyền xóa khách hàng.");
+      return;
+    }
+
     const customers =
       getCustomers();
 
@@ -4542,6 +4746,20 @@
   ======================================================= */
 
   function renderEmployees() {
+
+    if (!hasPermission("employees", "view")) {
+      const deniedContainer =
+        $("#employeesList");
+      if (deniedContainer) {
+        deniedContainer.innerHTML =
+          emptyState(
+            "Không có quyền xem",
+            permissionDeniedMessage("employees"),
+            "🔒"
+          );
+      }
+      return;
+    }
 
     const container =
       $("#employeesList");
@@ -4637,6 +4855,7 @@
 
               <div class="data-actions">
 
+                ${hasPermission("employees", "edit") ? `
                 <button
                   type="button"
                   class="small-btn"
@@ -4645,7 +4864,9 @@
                 >
                   Sửa
                 </button>
+                ` : ""}
 
+                ${hasPermission("employees", "delete") ? `
                 <button
                   type="button"
                   class="small-btn delete"
@@ -4654,6 +4875,7 @@
                 >
                   Xóa
                 </button>
+                ` : ""}
 
               </div>
 
@@ -4666,6 +4888,25 @@
   }
 
   function openEmployeeModal(id = null) {
+
+    const requiredAction = id ? "edit" : "create";
+    if (!hasPermission("employees", requiredAction)) {
+      showToast(
+        id
+          ? "Bạn không có quyền sửa nhân sự."
+          : "Bạn không có quyền thêm nhân sự."
+      );
+      return;
+    }
+
+    if (id && !hasPermission("employees", "edit")) {
+      showToast("Bạn không có quyền sửa nhân sự.");
+      return;
+    }
+    if (!id && !hasPermission("employees", "create")) {
+      showToast("Bạn không có quyền thêm nhân sự.");
+      return;
+    }
 
     modalMode = "employee";
 
@@ -4782,6 +5023,21 @@
 
   async function saveEmployee() {
 
+    if (!hasPermission("employees", modalEditId ? "edit" : "create")) {
+      showToast(
+        modalEditId
+          ? "Bạn không có quyền sửa nhân sự."
+          : "Bạn không có quyền thêm nhân sự."
+      );
+      closeModal();
+      return;
+    }
+
+    if (!hasPermission("employees", modalEditId ? "edit" : "create")) {
+      showToast(modalEditId ? "Bạn không có quyền sửa nhân sự." : "Bạn không có quyền thêm nhân sự.");
+      return;
+    }
+
     const name =
       $("#modalEmployeeName")?.value.trim();
 
@@ -4866,6 +5122,11 @@
   }
 
   async function deleteEmployee(id) {
+
+    if (!hasPermission("employees", "delete")) {
+      showToast("Bạn không có quyền xóa nhân sự.");
+      return;
+    }
 
     const employees = getEmployees();
     const employee = employees.find((item) => item.id === id);
@@ -4970,6 +5231,11 @@
   ======================================================= */
 
   function renderReports() {
+
+    if (!hasPermission("reports", "view")) {
+      showPermissionDenied("reports");
+      return;
+    }
 
     const projects =
       getProjects();
@@ -5897,6 +6163,11 @@
   ======================================================= */
 
   function renderSettings() {
+
+    if (!hasPermission("settings", "view")) {
+      showPermissionDenied("settings");
+      return;
+    }
 
     const settings =
       getSettings();
