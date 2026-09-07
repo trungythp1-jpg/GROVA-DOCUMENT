@@ -1,40 +1,29 @@
-/* =========================================================
-   GROVA DOCUMENT
-   APP.JS — VERSION 218
-   FIRESTORE PHASE 4 — HISTORY + PHASE 5A PERMISSION CORE + PHASE 5B.4 ACCOUNT MANAGEMENT UI + PHASE 5B.5 ACCOUNT PROFILE UI + PHASE 5B.6 ACCOUNT MANAGEMENT HARDENING + PHASE 5B.7 ACCOUNT PROFILE UI SYNC + AUTH TOKEN READINESS
-   PROJECTS + CUSTOMERS + EMPLOYEES + HISTORY
-   CLEAN BASE FROM LOCKED VERSION 209
+/* ========================================================= GROVA
+DOCUMENT APP.JS — VERSION 220 FIRESTORE PHASE 4 — HISTORY + PHASE 5A
+PERMISSION CORE + PHASE 5B.4 ACCOUNT MANAGEMENT UI + PHASE 5B.5 ACCOUNT
+PROFILE UI + PHASE 5B.6 ACCOUNT MANAGEMENT HARDENING + PHASE 5B.7
+ACCOUNT PROFILE UI SYNC + SPARK ACCOUNT PROFILE MANAGEMENT PROJECTS +
+CUSTOMERS + EMPLOYEES + HISTORY CLEAN BASE FROM LOCKED VERSION 209
 ========================================================= */
 
-(() => {
-  "use strict";
+(() => { “use strict”;
 
-  /* =======================================================
-     BASIC HELPERS
-  ======================================================= */
+/* ======================================================= BASIC HELPERS
+======================================================= */
 
-  const $ = (selector) => document.querySelector(selector);
+const $ = (selector) => document.querySelector(selector);
 
-  const $$ = (selector) => [
-    ...document.querySelectorAll(selector)
-  ];
+const $$ = (selector) => [ …document.querySelectorAll(selector) ];
 
-  const STORAGE = {
-    projects: "GROVA_PROJECTS_V1",
-    customers: "GROVA_CUSTOMERS_V1",
-    employees: "GROVA_EMPLOYEES_V1",
-    history: "GROVA_HISTORY_V1",
-    settings: "GROVA_SETTINGS_V1"
-  };
+const STORAGE = { projects: “GROVA_PROJECTS_V1”, customers:
+“GROVA_CUSTOMERS_V1”, employees: “GROVA_EMPLOYEES_V1”, history:
+“GROVA_HISTORY_V1”, settings: “GROVA_SETTINGS_V1” };
 
-  const PROJECT_CACHE_PREFIX = "GROVA_PROJECTS_V2_";
-  const CUSTOMER_CACHE_PREFIX = "GROVA_CUSTOMERS_V2_";
+const PROJECT_CACHE_PREFIX = “GROVA_PROJECTS_V2_”; const
+CUSTOMER_CACHE_PREFIX = “GROVA_CUSTOMERS_V2_”;
 
-  const PAGE_INFO = {
-    dashboard: {
-      title: "Tổng quan",
-      subtitle: "Hệ thống quản lý hồ sơ và văn bản"
-    },
+const PAGE_INFO = { dashboard: { title: “Tổng quan”, subtitle: “Hệ thống
+quản lý hồ sơ và văn bản” },
 
     documents: {
       title: "Văn bản",
@@ -70,108 +59,84 @@
       title: "Cài đặt",
       subtitle: "Cấu hình hệ thống"
     }
-  };
 
-  let currentPage = "dashboard";
+};
 
-  let modalMode = "";
+let currentPage = “dashboard”;
 
-  let modalEditId = null;
+let modalMode = ““;
 
-  let toastTimer = null;
+let modalEditId = null;
 
-  /* =======================================================
-     PROJECT FIRESTORE STATE
-  ======================================================= */
+let toastTimer = null;
 
-  let currentUser = null;
+/* ======================================================= PROJECT
+FIRESTORE STATE =======================================================
+*/
 
-  /* =======================================================
-     PERMISSION CORE — PHASE 5A
-  ======================================================= */
+let currentUser = null;
 
-  const ADMIN_UID = "nJmKgjEILgVOEjWKYWTsuonxbO03";
+/* ======================================================= PERMISSION
+CORE — PHASE 5A =======================================================
+*/
 
-  const ROLE_LABELS = {
-    admin: "Administrator",
-    manager: "Quản lý",
-    employee: "Nhân viên",
-    viewer: "Chỉ xem",
-    custom: "Tùy chỉnh"
-  };
+const ADMIN_UID = “nJmKgjEILgVOEjWKYWTsuonxbO03”;
 
-  const DEFAULT_PERMISSIONS = {
-    admin: {
-      projects: { view: true, create: true, edit: true, delete: true },
-      customers: { view: true, create: true, edit: true, delete: true },
-      employees: { view: true, create: true, edit: true, delete: true },
-      documents: { view: true, create: true, edit: true, delete: true, export: true },
-      history: { view: true },
-      users: { view: true, create: true, edit: true, lock: true, managePermissions: true },
-      settings: { view: true, edit: true }
-    },
-    manager: {
-      projects: { view: true, create: true, edit: true, delete: true },
-      customers: { view: true, create: true, edit: true, delete: true },
-      employees: { view: true, create: true, edit: true, delete: true },
-      documents: { view: true, create: true, edit: true, delete: true, export: true },
-      history: { view: true },
-      users: { view: false, create: false, edit: false, lock: false, managePermissions: false },
-      settings: { view: true, edit: true }
-    },
-    employee: {
-      projects: { view: true, create: true, edit: true, delete: false },
-      customers: { view: true, create: true, edit: true, delete: false },
-      employees: { view: true, create: false, edit: false, delete: false },
-      documents: { view: true, create: true, edit: false, delete: false, export: true },
-      history: { view: true },
-      users: { view: false, create: false, edit: false, lock: false, managePermissions: false },
-      settings: { view: false, edit: false }
-    },
-    viewer: {
-      projects: { view: true, create: false, edit: false, delete: false },
-      customers: { view: true, create: false, edit: false, delete: false },
-      employees: { view: true, create: false, edit: false, delete: false },
-      documents: { view: true, create: false, edit: false, delete: false, export: false },
-      history: { view: true },
-      users: { view: false, create: false, edit: false, lock: false, managePermissions: false },
-      settings: { view: false, edit: false }
-    },
-    custom: {
-      projects: { view: false, create: false, edit: false, delete: false },
-      customers: { view: false, create: false, edit: false, delete: false },
-      employees: { view: false, create: false, edit: false, delete: false },
-      documents: { view: false, create: false, edit: false, delete: false, export: false },
-      history: { view: false },
-      users: { view: false, create: false, edit: false, lock: false, managePermissions: false },
-      settings: { view: false, edit: false }
-    }
-  };
+const ROLE_LABELS = { admin: “Administrator”, manager: “Quản lý”,
+employee: “Nhân viên”, viewer: “Chỉ xem”, custom: “Tùy chỉnh” };
 
-  let currentUserProfile = null;
-  let userProfileSyncToken = 0;
+const DEFAULT_PERMISSIONS = { admin: { projects: { view: true, create:
+true, edit: true, delete: true }, customers: { view: true, create: true,
+edit: true, delete: true }, employees: { view: true, create: true, edit:
+true, delete: true }, documents: { view: true, create: true, edit: true,
+delete: true, export: true }, history: { view: true }, users: { view:
+true, create: true, edit: true, lock: true, managePermissions: true },
+settings: { view: true, edit: true } }, manager: { projects: { view:
+true, create: true, edit: true, delete: true }, customers: { view: true,
+create: true, edit: true, delete: true }, employees: { view: true,
+create: true, edit: true, delete: true }, documents: { view: true,
+create: true, edit: true, delete: true, export: true }, history: { view:
+true }, users: { view: false, create: false, edit: false, lock: false,
+managePermissions: false }, settings: { view: true, edit: true } },
+employee: { projects: { view: true, create: true, edit: true, delete:
+false }, customers: { view: true, create: true, edit: true, delete:
+false }, employees: { view: true, create: false, edit: false, delete:
+false }, documents: { view: true, create: true, edit: false, delete:
+false, export: true }, history: { view: true }, users: { view: false,
+create: false, edit: false, lock: false, managePermissions: false },
+settings: { view: false, edit: false } }, viewer: { projects: { view:
+true, create: false, edit: false, delete: false }, customers: { view:
+true, create: false, edit: false, delete: false }, employees: { view:
+true, create: false, edit: false, delete: false }, documents: { view:
+true, create: false, edit: false, delete: false, export: false },
+history: { view: true }, users: { view: false, create: false, edit:
+false, lock: false, managePermissions: false }, settings: { view: false,
+edit: false } }, custom: { projects: { view: false, create: false, edit:
+false, delete: false }, customers: { view: false, create: false, edit:
+false, delete: false }, employees: { view: false, create: false, edit:
+false, delete: false }, documents: { view: false, create: false, edit:
+false, delete: false, export: false }, history: { view: false }, users:
+{ view: false, create: false, edit: false, lock: false,
+managePermissions: false }, settings: { view: false, edit: false } } };
 
-  /* =======================================================
-     PHASE 5B.4 — ACCOUNT MANAGEMENT UI STATE
-  ======================================================= */
-  let accountUsers = [];
-  let accountUsersLoading = false;
-  let accountUsersPageToken = null;
-  let accountUsersLoadedOnce = false;
+let currentUserProfile = null; let userProfileSyncToken = 0;
 
-  function clonePermissions(value) {
-    return JSON.parse(JSON.stringify(value || {}));
-  }
+/* ======================================================= PHASE 5B.4 —
+ACCOUNT MANAGEMENT UI STATE
+======================================================= */ let
+accountUsers = []; let accountUsersLoading = false; let
+accountUsersPageToken = null; let accountUsersLoadedOnce = false;
 
-  function getDefaultPermissions(role = "employee") {
-    return clonePermissions(
-      DEFAULT_PERMISSIONS[role] || DEFAULT_PERMISSIONS.employee
-    );
-  }
+function clonePermissions(value) { return
+JSON.parse(JSON.stringify(value || {})); }
 
-  function normalizeUserProfile(profile, user) {
-    const role = profile?.role || (user?.uid === ADMIN_UID ? "admin" : "employee");
-    const permissions = profile?.permissions || getDefaultPermissions(role);
+function getDefaultPermissions(role = “employee”) { return
+clonePermissions( DEFAULT_PERMISSIONS[role] ||
+DEFAULT_PERMISSIONS.employee ); }
+
+function normalizeUserProfile(profile, user) { const role =
+profile?.role || (user?.uid === ADMIN_UID ? “admin” : “employee”); const
+permissions = profile?.permissions || getDefaultPermissions(role);
 
     return {
       uid: String(user?.uid || profile?.uid || ""),
@@ -185,159 +150,38 @@
       createdBy: profile?.createdBy || user?.uid || "",
       updatedBy: profile?.updatedBy || user?.uid || ""
     };
-  }
 
-  function isAdminUser(user = currentUser) {
-    return Boolean(user?.uid && user.uid === ADMIN_UID);
-  }
+}
 
-  function hasPermission(group, action) {
-    if (isAdminUser()) return true;
-    if (!currentUserProfile || currentUserProfile.status !== "active") return false;
-    return Boolean(currentUserProfile.permissions?.[group]?.[action]);
-  }
+function isAdminUser(user = currentUser) { return Boolean(user?.uid &&
+user.uid === ADMIN_UID); }
 
-  function getCurrentUserProfile() {
-    return currentUserProfile ? {
-      ...currentUserProfile,
-      permissions: clonePermissions(currentUserProfile.permissions)
-    } : null;
-  }
+function hasPermission(group, action) { if (isAdminUser()) return true;
+if (!currentUserProfile || currentUserProfile.status !== “active”)
+return false; return
+Boolean(currentUserProfile.permissions?.[group]?.[action]); }
 
-  function getUsersCollection() {
-    if (!firestoreDb) return null;
-    return firestoreDb.collection("users");
-  }
+function getCurrentUserProfile() { return currentUserProfile ? {
+…currentUserProfile, permissions:
+clonePermissions(currentUserProfile.permissions) } : null; }
 
-  function getFunctionsObject() {
-    if (
-      window.GROVA_AUTH &&
-      window.GROVA_AUTH.firebase &&
-      typeof window.GROVA_AUTH.firebase.functions === "function"
-    ) {
-      try {
-        return window.GROVA_AUTH.firebase.functions();
-      } catch (error) {
-        console.warn(
-          "GROVA DOCUMENT: Firebase Functions unavailable.",
-          error
-        );
-      }
-    }
+function getUsersCollection() { if (!firestoreDb) return null; return
+firestoreDb.collection(“users”); }
 
-    if (
-      window.firebase &&
-      typeof firebase.functions === "function"
-    ) {
-      try {
-        return firebase.functions();
-      } catch (error) {
-        console.warn(
-          "GROVA DOCUMENT: Firebase Functions unavailable.",
-          error
-        );
-      }
-    }
-
-    return null;
-  }
-
-  function refreshAccountProfileUI() {
-    updateUserDisplay();
+function refreshAccountProfileUI() { updateUserDisplay();
 
     if (currentPage === "settings") {
       renderAccountManagement();
     }
-  }
 
-  async function syncCurrentUserProfile(user) {
-    const token = ++userProfileSyncToken;
-    currentUserProfile = null;
+}
+
+async function syncCurrentUserProfile(user) { const token =
+++userProfileSyncToken; currentUserProfile = null;
 
     if (!user) {
       refreshAccountProfileUI();
       return null;
-    }
-
-    /*
-      PHASE 5B.3 / 5B.7 HARDENING:
-      The trusted backend remains the preferred source. Before calling a
-      callable function, make sure the current Firebase Auth user has had
-      an opportunity to refresh its ID token. This prevents a one-time
-      auth-readiness race from leaving the profile permanently empty until
-      the next login.
-
-      While Cloud Functions is not deployed on Spark, the existing
-      Firestore read-only compatibility fallback remains available. The
-      client never creates or modifies users/{uid}.
-    */
-    const auth = getAuthObject();
-    if (
-      auth?.currentUser?.uid === user.uid &&
-      typeof user.getIdToken === "function"
-    ) {
-      try {
-        await user.getIdToken();
-      } catch (error) {
-        console.warn(
-          "GROVA DOCUMENT: Firebase Auth token readiness warning.",
-          error
-        );
-      }
-    }
-
-    if (token !== userProfileSyncToken) return null;
-
-    const functions = getFunctionsObject();
-
-    if (functions && typeof functions.httpsCallable === "function") {
-      try {
-        const getMyProfile =
-          functions.httpsCallable("grovaGetMyProfile");
-
-        const result = await getMyProfile({});
-        const profile = result?.data?.profile || null;
-
-        if (token !== userProfileSyncToken) return null;
-
-        if (!profile) {
-          currentUserProfile = null;
-          refreshAccountProfileUI();
-          return null;
-        }
-
-        currentUserProfile = normalizeUserProfile(
-          profile,
-          user
-        );
-
-        refreshAccountProfileUI();
-        return currentUserProfile;
-      } catch (error) {
-        const code = String(error?.code || "");
-        const backendUnavailable =
-          code === "functions/not-found" ||
-          code === "functions/unavailable" ||
-          code === "functions/failed-precondition";
-
-        if (!backendUnavailable) {
-          console.warn(
-            "GROVA DOCUMENT: account profile rejected by backend.",
-            error
-          );
-
-          if (token !== userProfileSyncToken) return null;
-
-          currentUserProfile = null;
-          refreshAccountProfileUI();
-          return null;
-        }
-
-        console.warn(
-          "GROVA DOCUMENT: Cloud Functions not available yet; using Firestore read-only compatibility fallback.",
-          error
-        );
-      }
     }
 
     if (!initializeFirestore()) {
@@ -352,15 +196,8 @@
       if (!reference) throw new Error("FIRESTORE_UNAVAILABLE");
 
       const snapshot = await reference.get();
-
       if (token !== userProfileSyncToken) return null;
 
-      /*
-        IMPORTANT:
-        No client-side bootstrap/create is allowed in Phase 5B.3.
-        If the profile is missing, leave it missing and let the trusted
-        backend decide whether bootstrap is permitted.
-      */
       currentUserProfile = snapshot.exists
         ? normalizeUserProfile(snapshot.data(), user)
         : null;
@@ -374,56 +211,52 @@
       );
 
       if (token !== userProfileSyncToken) return null;
-
       currentUserProfile = null;
       refreshAccountProfileUI();
       return null;
     }
-  }
 
-  let authReadyPromise = null;
+}
 
-  let projectsCache = [];
+let authReadyPromise = null;
 
-  let firestoreDb = null;
+let projectsCache = [];
 
-  let firestoreReadyPromise = null;
+let firestoreDb = null;
 
-  let projectsSyncToken = 0;
+let firestoreReadyPromise = null;
 
-  let firestoreSyncRunning = false;
+let projectsSyncToken = 0;
 
-  let customersCache = [];
+let firestoreSyncRunning = false;
 
-  let customersSyncToken = 0;
+let customersCache = [];
 
-  let customersSyncRunning = false;
+let customersSyncToken = 0;
 
-  let employeesCache = [];
+let customersSyncRunning = false;
 
-  let employeesSyncToken = 0;
+let employeesCache = [];
 
-  let employeesSyncRunning = false;
+let employeesSyncToken = 0;
 
-  /* =======================================================
-     HISTORY FIRESTORE STATE
-  ======================================================= */
+let employeesSyncRunning = false;
 
-  let historyCache = [];
+/* ======================================================= HISTORY
+FIRESTORE STATE =======================================================
+*/
 
-  let historySyncToken = 0;
+let historyCache = [];
 
-  let historySyncRunning = false;
+let historySyncToken = 0;
 
-  /* =======================================================
-     DATA
-  ======================================================= */
+let historySyncRunning = false;
 
-  const DATA = window.GROVA_DATA || {
-    app: {
-      name: "GROVA DOCUMENT",
-      shortName: "GROVA DOC"
-    },
+/* ======================================================= DATA
+======================================================= */
+
+const DATA = window.GROVA_DATA || { app: { name: “GROVA DOCUMENT”,
+shortName: “GROVA DOC” },
 
     company: {
       name: "",
@@ -434,13 +267,13 @@
     },
 
     templates: []
-  };
 
-  /* =======================================================
-     STORAGE HELPERS
-  ======================================================= */
+};
 
-  function readStorage(key, fallback = []) {
+/* ======================================================= STORAGE
+HELPERS ======================================================= */
+
+function readStorage(key, fallback = []) {
 
     try {
 
@@ -465,9 +298,9 @@
 
     }
 
-  }
+}
 
-  function writeStorage(key, value) {
+function writeStorage(key, value) {
 
     try {
 
@@ -493,18 +326,18 @@
 
     }
 
-  }
+}
 
-  function getProjectCacheKey(uid) {
+function getProjectCacheKey(uid) {
 
     return (
       PROJECT_CACHE_PREFIX +
       String(uid || "")
     );
 
-  }
+}
 
-  function readProjectCache(uid) {
+function readProjectCache(uid) {
 
     if (!uid) {
       return [];
@@ -515,9 +348,9 @@
       []
     );
 
-  }
+}
 
-  function writeProjectCache(uid, projects) {
+function writeProjectCache(uid, projects) {
 
     if (!uid) {
       return false;
@@ -530,9 +363,9 @@
         : []
     );
 
-  }
+}
 
-  function getBestLocalProjects(uid) {
+function getBestLocalProjects(uid) {
 
     const scopedCache =
       normalizeProjects(
@@ -549,9 +382,10 @@
         []
       )
     );
-  }
 
-  function normalizeProjects(projects) {
+}
+
+function normalizeProjects(projects) {
 
     if (!Array.isArray(projects)) {
       return [];
@@ -577,43 +411,35 @@
             )
       );
 
-  }
+}
 
-  function setProjectsCache(projects) {
+function setProjectsCache(projects) {
 
     projectsCache =
       normalizeProjects(projects);
 
-  }
+}
 
-  function getProjects() {
+function getProjects() {
 
     return projectsCache.slice();
 
-  }
+}
 
-  function getCustomerCacheKey(uid) {
-    return (
-      CUSTOMER_CACHE_PREFIX +
-      String(uid || "")
-    );
-  }
+function getCustomerCacheKey(uid) { return ( CUSTOMER_CACHE_PREFIX +
+String(uid || ““) ); }
 
-  function readCustomerCache(uid) {
-    if (!uid) {
-      return [];
-    }
+function readCustomerCache(uid) { if (!uid) { return []; }
 
     return readStorage(
       getCustomerCacheKey(uid),
       []
     );
-  }
 
-  function writeCustomerCache(uid, customers) {
-    if (!uid) {
-      return false;
-    }
+}
+
+function writeCustomerCache(uid, customers) { if (!uid) { return false;
+}
 
     return writeStorage(
       getCustomerCacheKey(uid),
@@ -621,12 +447,11 @@
         ? customers
         : []
     );
-  }
 
-  function normalizeCustomers(customers) {
-    if (!Array.isArray(customers)) {
-      return [];
-    }
+}
+
+function normalizeCustomers(customers) { if (!Array.isArray(customers))
+{ return []; }
 
     return customers
       .filter(
@@ -647,18 +472,14 @@
               String(a.updatedAt || a.createdAt || "")
             )
       );
-  }
 
-  function setCustomersCache(customers) {
-    customersCache =
-      normalizeCustomers(customers);
-  }
+}
 
-  function getBestLocalCustomers(uid) {
-    const scopedCache =
-      normalizeCustomers(
-        readCustomerCache(uid)
-      );
+function setCustomersCache(customers) { customersCache =
+normalizeCustomers(customers); }
+
+function getBestLocalCustomers(uid) { const scopedCache =
+normalizeCustomers( readCustomerCache(uid) );
 
     if (scopedCache.length) {
       return scopedCache;
@@ -670,12 +491,11 @@
         []
       )
     );
-  }
 
-  function getCustomers() {
-    if (currentUser) {
-      return customersCache.slice();
-    }
+}
+
+function getCustomers() { if (currentUser) { return
+customersCache.slice(); }
 
     return normalizeCustomers(
       readStorage(
@@ -683,64 +503,49 @@
         []
       )
     );
-  }
 
-  function getEmployeeCacheKey(uid) {
-    return "GROVA_EMPLOYEES_V2_" + String(uid || "");
-  }
+}
 
-  function readEmployeeCache(uid) {
-    if (!uid) return [];
-    return readStorage(getEmployeeCacheKey(uid), []);
-  }
+function getEmployeeCacheKey(uid) { return “GROVA_EMPLOYEES_V2_” +
+String(uid || ““); }
 
-  function writeEmployeeCache(uid, employees) {
-    if (!uid) return false;
-    return writeStorage(getEmployeeCacheKey(uid), Array.isArray(employees) ? employees : []);
-  }
+function readEmployeeCache(uid) { if (!uid) return []; return
+readStorage(getEmployeeCacheKey(uid), []); }
 
-  function normalizeEmployees(employees) {
-    if (!Array.isArray(employees)) return [];
-    return employees
-      .filter((employee) => employee && employee.id)
-      .map((employee) => ({ ...employee, id: String(employee.id) }))
-      .sort((a, b) => String(b.updatedAt || b.createdAt || "").localeCompare(String(a.updatedAt || a.createdAt || "")));
-  }
+function writeEmployeeCache(uid, employees) { if (!uid) return false;
+return writeStorage(getEmployeeCacheKey(uid), Array.isArray(employees) ?
+employees : []); }
 
-  function setEmployeesCache(employees) {
-    employeesCache = normalizeEmployees(employees);
-  }
+function normalizeEmployees(employees) { if (!Array.isArray(employees))
+return []; return employees .filter((employee) => employee &&
+employee.id) .map((employee) => ({ …employee, id: String(employee.id)
+})) .sort((a, b) => String(b.updatedAt || b.createdAt ||
+““).localeCompare(String(a.updatedAt || a.createdAt ||”“))); }
 
-  function getBestLocalEmployees(uid) {
-    const scopedCache = normalizeEmployees(readEmployeeCache(uid));
-    if (scopedCache.length) return scopedCache;
-    return normalizeEmployees(readStorage(STORAGE.employees, []));
-  }
+function setEmployeesCache(employees) { employeesCache =
+normalizeEmployees(employees); }
 
-  function getEmployees() {
-    if (currentUser) return employeesCache.slice();
-    return normalizeEmployees(readStorage(STORAGE.employees, []));
-  }
+function getBestLocalEmployees(uid) { const scopedCache =
+normalizeEmployees(readEmployeeCache(uid)); if (scopedCache.length)
+return scopedCache; return
+normalizeEmployees(readStorage(STORAGE.employees, [])); }
 
-  function getHistoryCacheKey(uid) {
-    return "GROVA_HISTORY_V2_" + String(uid || "");
-  }
+function getEmployees() { if (currentUser) return
+employeesCache.slice(); return
+normalizeEmployees(readStorage(STORAGE.employees, [])); }
 
-  function readHistoryCache(uid) {
-    if (!uid) return [];
-    return readStorage(getHistoryCacheKey(uid), []);
-  }
+function getHistoryCacheKey(uid) { return “GROVA_HISTORY_V2_” +
+String(uid || ““); }
 
-  function writeHistoryCache(uid, history) {
-    if (!uid) return false;
-    return writeStorage(
-      getHistoryCacheKey(uid),
-      Array.isArray(history) ? history : []
-    );
-  }
+function readHistoryCache(uid) { if (!uid) return []; return
+readStorage(getHistoryCacheKey(uid), []); }
 
-  function normalizeHistory(history) {
-    if (!Array.isArray(history)) return [];
+function writeHistoryCache(uid, history) { if (!uid) return false;
+return writeStorage( getHistoryCacheKey(uid), Array.isArray(history) ?
+history : [] ); }
+
+function normalizeHistory(history) { if (!Array.isArray(history)) return
+[];
 
     const seenTemplates = new Set();
 
@@ -769,16 +574,14 @@
         return true;
       })
       .slice(0, 100);
-  }
 
-  function setHistoryCache(history) {
-    historyCache = normalizeHistory(history);
-  }
+}
 
-  function getBestLocalHistory(uid) {
-    const scopedCache = normalizeHistory(
-      readHistoryCache(uid)
-    );
+function setHistoryCache(history) { historyCache =
+normalizeHistory(history); }
+
+function getBestLocalHistory(uid) { const scopedCache =
+normalizeHistory( readHistoryCache(uid) );
 
     if (scopedCache.length) {
       return scopedCache;
@@ -787,23 +590,22 @@
     return normalizeHistory(
       readStorage(STORAGE.history, [])
     );
-  }
 
-  function clearLegacyHistoryStorage() {
-    localStorage.removeItem(STORAGE.history);
-  }
+}
 
-  function getHistory() {
-    if (currentUser) {
-      return historyCache.slice();
-    }
+function clearLegacyHistoryStorage() {
+localStorage.removeItem(STORAGE.history); }
+
+function getHistory() { if (currentUser) { return historyCache.slice();
+}
 
     return normalizeHistory(
       readStorage(STORAGE.history, [])
     );
-  }
 
-  function getSettings() {
+}
+
+function getSettings() {
 
     const defaults = {
       companyName: DATA.company?.name || "",
@@ -824,13 +626,13 @@
       ...(saved || {})
     };
 
-  }
+}
 
-  /* =======================================================
-     FIRESTORE SERVICE — PROJECTS + CUSTOMERS
-  ======================================================= */
+/* ======================================================= FIRESTORE
+SERVICE — PROJECTS + CUSTOMERS
+======================================================= */
 
-  function getAuthObject() {
+function getAuthObject() {
 
     if (
       window.GROVA_AUTH &&
@@ -857,9 +659,9 @@
 
     return null;
 
-  }
+}
 
-  function getFirebaseApp() {
+function getFirebaseApp() {
 
     if (
       window.GROVA_AUTH &&
@@ -886,9 +688,9 @@
 
     return null;
 
-  }
+}
 
-  async function getActiveAuthUser() {
+async function getActiveAuthUser() {
 
     if (currentUser) {
       return currentUser;
@@ -953,9 +755,9 @@
 
     return null;
 
-  }
+}
 
-  function initializeFirestore() {
+function initializeFirestore() {
 
     if (firestoreDb) {
       return true;
@@ -1044,9 +846,9 @@
 
     }
 
-  }
+}
 
-  async function waitForFirestore() {
+async function waitForFirestore() {
 
     if (!firestoreDb) {
       return false;
@@ -1067,9 +869,9 @@
 
     return true;
 
-  }
+}
 
-  function getProjectsCollection() {
+function getProjectsCollection() {
 
     if (!firestoreDb) {
       return null;
@@ -1077,9 +879,9 @@
 
     return firestoreDb.collection("projects");
 
-  }
+}
 
-  function buildProjectData(project, user, isCreate = false) {
+function buildProjectData(project, user, isCreate = false) {
 
     const now =
       nowISO();
@@ -1140,9 +942,9 @@
 
     };
 
-  }
+}
 
-  function mapFirestoreProject(doc) {
+function mapFirestoreProject(doc) {
 
     const data =
       doc.data() || {};
@@ -1156,9 +958,9 @@
 
     };
 
-  }
+}
 
-  async function readCloudProjects() {
+async function readCloudProjects() {
 
     if (!currentUser) {
       return null;
@@ -1186,9 +988,9 @@
       )
     );
 
-  }
+}
 
-  async function writeCloudProject(project, user, isCreate = false) {
+async function writeCloudProject(project, user, isCreate = false) {
 
     if (!user) {
       throw new Error(
@@ -1237,9 +1039,9 @@
       verification
     );
 
-  }
+}
 
-  async function deleteCloudProject(id, user) {
+async function deleteCloudProject(id, user) {
 
     if (!user) {
       throw new Error(
@@ -1274,9 +1076,9 @@
 
     return true;
 
-  }
+}
 
-  function projectIds(projects) {
+function projectIds(projects) {
 
     return normalizeProjects(projects)
       .map(
@@ -1285,9 +1087,9 @@
       )
       .sort();
 
-  }
+}
 
-  function sameIdSet(a, b) {
+function sameIdSet(a, b) {
 
     const left =
       projectIds(a);
@@ -1307,9 +1109,9 @@
         id === right[index]
     );
 
-  }
+}
 
-  async function verifyMigration(expectedProjects) {
+async function verifyMigration(expectedProjects) {
 
     const cloud =
       await readCloudProjects();
@@ -1335,9 +1137,9 @@
       expected
     );
 
-  }
+}
 
-  function renderProjectViews() {
+function renderProjectViews() {
 
     updateStats();
 
@@ -1353,9 +1155,9 @@
       renderReports();
     }
 
-  }
+}
 
-  function showProjectSyncError(error) {
+function showProjectSyncError(error) {
 
     console.error(
       "GROVA DOCUMENT: Project Firestore error.",
@@ -1366,12 +1168,9 @@
       "Không thể đồng bộ công trình. Ứng dụng vẫn đang dùng dữ liệu cục bộ."
     );
 
-  }
+}
 
-  async function migrateLocalProjectsIfNeeded(
-    user,
-    localProjects
-  ) {
+async function migrateLocalProjectsIfNeeded( user, localProjects ) {
 
     if (!user) {
       return false;
@@ -1465,9 +1264,10 @@
 
       return false;
     }
-  }
 
-  async function syncProjectsFromCloud(user) {
+}
+
+async function syncProjectsFromCloud(user) {
 
     if (!user) {
       return;
@@ -1595,9 +1395,10 @@
         firestoreSyncRunning = false;
       }
     }
-  }
 
-  function handleAuthUser(user) {
+}
+
+function handleAuthUser(user) {
 
     projectsSyncToken++;
     customersSyncToken++;
@@ -1668,9 +1469,9 @@
     syncEmployeesFromCloud(user);
     syncHistoryFromCloud(user);
 
-  }
+}
 
-  function initFirestoreAuthBridge() {
+function initFirestoreAuthBridge() {
 
     const auth =
       getAuthObject();
@@ -1704,23 +1505,20 @@
 
     });
 
-  }
+}
 
-  /* =======================================================
-     FIRESTORE SERVICE — CUSTOMERS
-  ======================================================= */
+/* ======================================================= FIRESTORE
+SERVICE — CUSTOMERS
+======================================================= */
 
-  function getCustomersCollection() {
-    if (!firestoreDb) {
-      return null;
-    }
+function getCustomersCollection() { if (!firestoreDb) { return null; }
 
     return firestoreDb.collection("customers");
-  }
 
-  function buildCustomerData(customer, user, isCreate = false) {
-    const now =
-      nowISO();
+}
+
+function buildCustomerData(customer, user, isCreate = false) { const now
+= nowISO();
 
     const uid =
       user?.uid || "";
@@ -1765,23 +1563,20 @@
       updatedBy:
         uid
     };
-  }
 
-  function mapFirestoreCustomer(doc) {
-    const data =
-      doc.data() || {};
+}
+
+function mapFirestoreCustomer(doc) { const data = doc.data() || {};
 
     return {
       ...data,
       id:
         String(doc.id)
     };
-  }
 
-  async function readCloudCustomers() {
-    if (!currentUser) {
-      return null;
-    }
+}
+
+async function readCloudCustomers() { if (!currentUser) { return null; }
 
     if (!initializeFirestore()) {
       return null;
@@ -1804,14 +1599,11 @@
         mapFirestoreCustomer
       )
     );
-  }
 
-  async function writeCloudCustomer(customer, user, isCreate = false) {
-    if (!user) {
-      throw new Error(
-        "AUTH_REQUIRED"
-      );
-    }
+}
+
+async function writeCloudCustomer(customer, user, isCreate = false) { if
+(!user) { throw new Error( “AUTH_REQUIRED” ); }
 
     if (!initializeFirestore()) {
       throw new Error(
@@ -1851,14 +1643,11 @@
     return mapFirestoreCustomer(
       verification
     );
-  }
 
-  async function deleteCloudCustomer(id, user) {
-    if (!user) {
-      throw new Error(
-        "AUTH_REQUIRED"
-      );
-    }
+}
+
+async function deleteCloudCustomer(id, user) { if (!user) { throw new
+Error( “AUTH_REQUIRED” ); }
 
     if (!initializeFirestore()) {
       throw new Error(
@@ -1884,20 +1673,13 @@
     }
 
     return true;
-  }
 
-  function customerIds(customers) {
-    return normalizeCustomers(customers)
-      .map(
-        (customer) =>
-          String(customer.id)
-      )
-      .sort();
-  }
+}
 
-  function sameCustomerIdSet(a, b) {
-    const left =
-      customerIds(a);
+function customerIds(customers) { return normalizeCustomers(customers)
+.map( (customer) => String(customer.id) ) .sort(); }
+
+function sameCustomerIdSet(a, b) { const left = customerIds(a);
 
     const right =
       customerIds(b);
@@ -1913,11 +1695,11 @@
       (id, index) =>
         id === right[index]
     );
-  }
 
-  async function verifyCustomerMigration(expectedCustomers) {
-    const cloud =
-      await readCloudCustomers();
+}
+
+async function verifyCustomerMigration(expectedCustomers) { const cloud
+= await readCloudCustomers();
 
     if (!cloud) {
       return false;
@@ -1939,26 +1721,20 @@
       cloud,
       expected
     );
-  }
 
-  function showCustomerSyncError(error) {
-    console.error(
-      "GROVA DOCUMENT: Customer Firestore error.",
-      error
-    );
+}
+
+function showCustomerSyncError(error) { console.error( “GROVA DOCUMENT:
+Customer Firestore error.”, error );
 
     showToast(
       "Không thể đồng bộ khách hàng. Ứng dụng vẫn đang dùng dữ liệu cục bộ."
     );
-  }
 
-  async function migrateLocalCustomersIfNeeded(
-    user,
-    localCustomers
-  ) {
-    if (!user) {
-      return false;
-    }
+}
+
+async function migrateLocalCustomersIfNeeded( user, localCustomers ) {
+if (!user) { return false; }
 
     const sourceCustomers =
       normalizeCustomers(
@@ -2045,12 +1821,10 @@
 
       return false;
     }
-  }
 
-  async function syncCustomersFromCloud(user) {
-    if (!user) {
-      return;
-    }
+}
+
+async function syncCustomersFromCloud(user) { if (!user) { return; }
 
     const token =
       ++customersSyncToken;
@@ -2191,171 +1965,108 @@
         customersSyncRunning = false;
       }
     }
-  }
 
-  /* =======================================================
-     FIRESTORE SERVICE — EMPLOYEES
-  ======================================================= */
+}
 
-  function getEmployeesCollection() {
-    if (!firestoreDb) return null;
-    return firestoreDb.collection("employees");
-  }
+/* ======================================================= FIRESTORE
+SERVICE — EMPLOYEES
+======================================================= */
 
-  function buildEmployeeData(employee, user) {
-    const now = nowISO();
-    const uid = user?.uid || "";
-    return {
-      id: String(employee.id),
-      name: employee.name || "",
-      position: employee.position || "",
-      department: employee.department || "",
-      phone: employee.phone || "",
-      email: employee.email || "",
-      startDate: employee.startDate || "",
-      note: employee.note || "",
-      createdAt: employee.createdAt || now,
-      updatedAt: now,
-      createdBy: employee.createdBy || uid,
-      updatedBy: uid
-    };
-  }
+function getEmployeesCollection() { if (!firestoreDb) return null;
+return firestoreDb.collection(“employees”); }
 
-  function mapFirestoreEmployee(doc) {
-    return { ...(doc.data() || {}), id: String(doc.id) };
-  }
+function buildEmployeeData(employee, user) { const now = nowISO(); const
+uid = user?.uid || ““; return { id: String(employee.id), name:
+employee.name ||”“, position: employee.position ||”“, department:
+employee.department ||”“, phone: employee.phone ||”“, email:
+employee.email ||”“, startDate: employee.startDate ||”“, note:
+employee.note ||”“, createdAt: employee.createdAt || now, updatedAt:
+now, createdBy: employee.createdBy || uid, updatedBy: uid }; }
 
-  async function readCloudEmployees(user = currentUser) {
-    if (!user) return null;
-    if (!initializeFirestore()) return null;
-    await waitForFirestore();
-    const collection = getEmployeesCollection();
-    if (!collection) return null;
-    const snapshot = await collection.get();
-    return normalizeEmployees(snapshot.docs.map(mapFirestoreEmployee));
-  }
+function mapFirestoreEmployee(doc) { return { …(doc.data() || {}), id:
+String(doc.id) }; }
 
-  async function writeCloudEmployee(employee, user) {
-    if (!user) throw new Error("AUTH_REQUIRED");
-    if (!initializeFirestore()) throw new Error("FIRESTORE_UNAVAILABLE");
-    await waitForFirestore();
-    const reference = getEmployeesCollection().doc(String(employee.id));
-    await reference.set(buildEmployeeData(employee, user), { merge: true });
-    const verification = await reference.get();
-    if (!verification.exists) throw new Error("WRITE_VERIFICATION_FAILED");
-    return mapFirestoreEmployee(verification);
-  }
+async function readCloudEmployees(user = currentUser) { if (!user)
+return null; if (!initializeFirestore()) return null; await
+waitForFirestore(); const collection = getEmployeesCollection(); if
+(!collection) return null; const snapshot = await collection.get();
+return normalizeEmployees(snapshot.docs.map(mapFirestoreEmployee)); }
 
-  async function deleteCloudEmployee(id, user) {
-    if (!user) throw new Error("AUTH_REQUIRED");
-    if (!initializeFirestore()) throw new Error("FIRESTORE_UNAVAILABLE");
-    await waitForFirestore();
-    const reference = getEmployeesCollection().doc(String(id));
-    await reference.delete();
-    const verification = await reference.get();
-    if (verification.exists) throw new Error("DELETE_VERIFICATION_FAILED");
-    return true;
-  }
+async function writeCloudEmployee(employee, user) { if (!user) throw new
+Error(“AUTH_REQUIRED”); if (!initializeFirestore()) throw new
+Error(“FIRESTORE_UNAVAILABLE”); await waitForFirestore(); const
+reference = getEmployeesCollection().doc(String(employee.id)); await
+reference.set(buildEmployeeData(employee, user), { merge: true }); const
+verification = await reference.get(); if (!verification.exists) throw
+new Error(“WRITE_VERIFICATION_FAILED”); return
+mapFirestoreEmployee(verification); }
 
-  function employeeIds(employees) {
-    return normalizeEmployees(employees).map((employee) => String(employee.id)).sort();
-  }
+async function deleteCloudEmployee(id, user) { if (!user) throw new
+Error(“AUTH_REQUIRED”); if (!initializeFirestore()) throw new
+Error(“FIRESTORE_UNAVAILABLE”); await waitForFirestore(); const
+reference = getEmployeesCollection().doc(String(id)); await
+reference.delete(); const verification = await reference.get(); if
+(verification.exists) throw new Error(“DELETE_VERIFICATION_FAILED”);
+return true; }
 
-  function sameEmployeeIdSet(a, b) {
-    const left = employeeIds(a);
-    const right = employeeIds(b);
-    if (left.length !== right.length) return false;
-    return left.every((id, index) => id === right[index]);
-  }
+function employeeIds(employees) { return
+normalizeEmployees(employees).map((employee) =>
+String(employee.id)).sort(); }
 
-  async function verifyEmployeeMigration(expectedEmployees, user) {
-    const cloud = await readCloudEmployees(user);
-    if (!cloud) return false;
-    const expected = normalizeEmployees(expectedEmployees);
-    if (cloud.length !== expected.length) return false;
-    return sameEmployeeIdSet(cloud, expected);
-  }
+function sameEmployeeIdSet(a, b) { const left = employeeIds(a); const
+right = employeeIds(b); if (left.length !== right.length) return false;
+return left.every((id, index) => id === right[index]); }
 
-  function showEmployeeSyncError(error) {
-    console.error("GROVA DOCUMENT: Employee Firestore error.", error);
-    showToast("Không thể đồng bộ nhân sự. Ứng dụng vẫn đang dùng dữ liệu cục bộ.");
-  }
+async function verifyEmployeeMigration(expectedEmployees, user) { const
+cloud = await readCloudEmployees(user); if (!cloud) return false; const
+expected = normalizeEmployees(expectedEmployees); if (cloud.length !==
+expected.length) return false; return sameEmployeeIdSet(cloud,
+expected); }
 
-  async function migrateLocalEmployeesIfNeeded(user, localEmployees) {
-    if (!user) return false;
-    const sourceEmployees = normalizeEmployees(localEmployees);
-    if (!sourceEmployees.length) return false;
-    const cloud = await readCloudEmployees(user);
-    if (!cloud) return false;
-    if (cloud.length > 0) {
-      setEmployeesCache(cloud);
-      writeEmployeeCache(user.uid, cloud);
-      return false;
-    }
-    try {
-      for (const employee of sourceEmployees) {
-        await getEmployeesCollection().doc(String(employee.id)).set(buildEmployeeData(employee, user));
-      }
-      if (!await verifyEmployeeMigration(sourceEmployees, user)) {
-        throw new Error("MIGRATION_VERIFICATION_FAILED");
-      }
-      const migratedCloud = await readCloudEmployees(user);
-      if (!migratedCloud) throw new Error("MIGRATION_READBACK_FAILED");
-      setEmployeesCache(migratedCloud);
-      writeEmployeeCache(user.uid, migratedCloud);
-      showToast("Đã đồng bộ nhân sự cũ lên Firestore.");
-      return true;
-    } catch (error) {
-      showEmployeeSyncError(error);
-      return false;
-    }
-  }
+function showEmployeeSyncError(error) { console.error(“GROVA DOCUMENT:
+Employee Firestore error.”, error); showToast(“Không thể đồng bộ nhân
+sự. Ứng dụng vẫn đang dùng dữ liệu cục bộ.”); }
 
-  async function syncEmployeesFromCloud(user) {
-    if (!user) return;
-    const token = ++employeesSyncToken;
-    employeesSyncRunning = true;
-    try {
-      if (!initializeFirestore()) return;
-      const localEmployees = getBestLocalEmployees(user.uid);
-      if (localEmployees.length) {
-        setEmployeesCache(localEmployees);
-        if (currentPage === "employees") renderEmployees();
-        updateStats();
-      }
-      const cloud = await readCloudEmployees(user);
-      if (token !== employeesSyncToken || currentUser?.uid !== user.uid) return;
-      if (!cloud) return;
-      if (cloud.length > 0) {
-        setEmployeesCache(cloud);
-        writeEmployeeCache(user.uid, cloud);
-        if (currentPage === "employees") renderEmployees();
-        updateStats();
-        return;
-      }
-      if (localEmployees.length) {
-        const migrated = await migrateLocalEmployeesIfNeeded(user, localEmployees);
-        if (token !== employeesSyncToken || currentUser?.uid !== user.uid) return;
-        if (currentPage === "employees") renderEmployees();
-        updateStats();
-        return;
-      }
-      setEmployeesCache([]);
-      writeEmployeeCache(user.uid, []);
-      if (currentPage === "employees") renderEmployees();
-      updateStats();
-    } catch (error) {
-      if (token === employeesSyncToken) showEmployeeSyncError(error);
-    } finally {
-      if (token === employeesSyncToken) employeesSyncRunning = false;
-    }
-  }
+async function migrateLocalEmployeesIfNeeded(user, localEmployees) { if
+(!user) return false; const sourceEmployees =
+normalizeEmployees(localEmployees); if (!sourceEmployees.length) return
+false; const cloud = await readCloudEmployees(user); if (!cloud) return
+false; if (cloud.length > 0) { setEmployeesCache(cloud);
+writeEmployeeCache(user.uid, cloud); return false; } try { for (const
+employee of sourceEmployees) { await
+getEmployeesCollection().doc(String(employee.id)).set(buildEmployeeData(employee,
+user)); } if (!await verifyEmployeeMigration(sourceEmployees, user)) {
+throw new Error(“MIGRATION_VERIFICATION_FAILED”); } const migratedCloud
+= await readCloudEmployees(user); if (!migratedCloud) throw new
+Error(“MIGRATION_READBACK_FAILED”); setEmployeesCache(migratedCloud);
+writeEmployeeCache(user.uid, migratedCloud); showToast(“Đã đồng bộ nhân
+sự cũ lên Firestore.”); return true; } catch (error) {
+showEmployeeSyncError(error); return false; } }
 
-  /* =======================================================
-     ID / DATE
-  ======================================================= */
+async function syncEmployeesFromCloud(user) { if (!user) return; const
+token = ++employeesSyncToken; employeesSyncRunning = true; try { if
+(!initializeFirestore()) return; const localEmployees =
+getBestLocalEmployees(user.uid); if (localEmployees.length) {
+setEmployeesCache(localEmployees); if (currentPage === “employees”)
+renderEmployees(); updateStats(); } const cloud = await
+readCloudEmployees(user); if (token !== employeesSyncToken ||
+currentUser?.uid !== user.uid) return; if (!cloud) return; if
+(cloud.length > 0) { setEmployeesCache(cloud);
+writeEmployeeCache(user.uid, cloud); if (currentPage === “employees”)
+renderEmployees(); updateStats(); return; } if (localEmployees.length) {
+const migrated = await migrateLocalEmployeesIfNeeded(user,
+localEmployees); if (token !== employeesSyncToken || currentUser?.uid
+!== user.uid) return; if (currentPage === “employees”)
+renderEmployees(); updateStats(); return; } setEmployeesCache([]);
+writeEmployeeCache(user.uid, []); if (currentPage === “employees”)
+renderEmployees(); updateStats(); } catch (error) { if (token ===
+employeesSyncToken) showEmployeeSyncError(error); } finally { if (token
+=== employeesSyncToken) employeesSyncRunning = false; } }
 
-  function createId(prefix = "GROVA") {
+/* ======================================================= ID / DATE
+======================================================= */
+
+function createId(prefix = “GROVA”) {
 
     return (
       prefix +
@@ -2367,13 +2078,11 @@
         .substring(2, 8)
     );
 
-  }
+}
 
-  function nowISO() {
-    return new Date().toISOString();
-  }
+function nowISO() { return new Date().toISOString(); }
 
-  function formatDate(value) {
+function formatDate(value) {
 
     if (!value) {
       return "";
@@ -2394,9 +2103,9 @@
       }
     );
 
-  }
+}
 
-  function formatDateTime(value) {
+function formatDateTime(value) {
 
     if (!value) {
       return "";
@@ -2419,13 +2128,12 @@
       }
     );
 
-  }
+}
 
-  /* =======================================================
-     ESCAPE HTML
-  ======================================================= */
+/* ======================================================= ESCAPE HTML
+======================================================= */
 
-  function escapeHTML(value) {
+function escapeHTML(value) {
 
     return String(value ?? "")
       .replace(/&/g, "&amp;")
@@ -2434,9 +2142,9 @@
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#039;");
 
-  }
+}
 
-  function slugStatus(value) {
+function slugStatus(value) {
 
     return String(value || "")
       .normalize("NFD")
@@ -2444,13 +2152,12 @@
       .toLowerCase()
       .replace(/\s+/g, "-");
 
-  }
+}
 
-  /* =======================================================
-     TOAST
-  ======================================================= */
+/* ======================================================= TOAST
+======================================================= */
 
-  function showToast(message) {
+function showToast(message) {
 
     let container =
       document.querySelector(
@@ -2493,13 +2200,12 @@
 
     }, 2600);
 
-  }
+}
 
-  /* =======================================================
-     NAVIGATION
-  ======================================================= */
+/* ======================================================= NAVIGATION
+======================================================= */
 
-  function showPage(page) {
+function showPage(page) {
 
     if (!PAGE_INFO[page]) {
       page = "dashboard";
@@ -2567,9 +2273,9 @@
       renderSettings();
     }
 
-  }
+}
 
-  function openSidebar() {
+function openSidebar() {
 
     const sidebar = $("#sidebar");
 
@@ -2581,9 +2287,9 @@
 
     ensureSidebarOverlay();
 
-  }
+}
 
-  function closeSidebar() {
+function closeSidebar() {
 
     const sidebar = $("#sidebar");
 
@@ -2600,9 +2306,9 @@
       overlay.classList.remove("show");
     }
 
-  }
+}
 
-  function ensureSidebarOverlay() {
+function ensureSidebarOverlay() {
 
     let overlay =
       document.querySelector(
@@ -2630,13 +2336,12 @@
 
     overlay.classList.add("show");
 
-  }
+}
 
-  /* =======================================================
-     DOCUMENT TEMPLATES
-  ======================================================= */
+/* ======================================================= DOCUMENT
+TEMPLATES ======================================================= */
 
-  function getTemplates() {
+function getTemplates() {
 
     return Array.isArray(DATA.templates)
       ? DATA.templates.filter(
@@ -2644,9 +2349,9 @@
         )
       : [];
 
-  }
+}
 
-  function renderDocumentCard(template) {
+function renderDocumentCard(template) {
 
     return `
       <article class="doc-card">
@@ -2690,9 +2395,9 @@
       </article>
     `;
 
-  }
+}
 
-  function renderDocuments() {
+function renderDocuments() {
 
     const templates = getTemplates();
 
@@ -2761,9 +2466,9 @@
         html;
     }
 
-  }
+}
 
-  function initDocumentCategories() {
+function initDocumentCategories() {
 
     const select =
       $("#documentCategory");
@@ -2826,9 +2531,9 @@
         ? current
         : "";
 
-  }
+}
 
-  function findTemplate(id) {
+function findTemplate(id) {
 
     return getTemplates().find(
       (template) =>
@@ -2836,9 +2541,9 @@
         String(id)
     );
 
-  }
+}
 
-  function openTemplate(id) {
+function openTemplate(id) {
 
     const template =
       findTemplate(id);
@@ -2873,13 +2578,12 @@
     window.location.href =
       template.file;
 
-  }
+}
 
-  /* =======================================================
-     NEW DOCUMENT MODAL
-  ======================================================= */
+/* ======================================================= NEW DOCUMENT
+MODAL ======================================================= */
 
-  function openTemplatePicker() {
+function openTemplatePicker() {
 
     const templates =
       getTemplates();
@@ -2958,13 +2662,12 @@
 
     openModal();
 
-  }
+}
 
-  /* =======================================================
-     MODAL
-  ======================================================= */
+/* ======================================================= MODAL
+======================================================= */
 
-  function openModal() {
+function openModal() {
 
     const modal = $("#modal");
 
@@ -2979,9 +2682,9 @@
       "false"
     );
 
-  }
+}
 
-  function closeModal() {
+function closeModal() {
 
     const modal = $("#modal");
 
@@ -3005,17 +2708,12 @@
         "";
     }
 
-  }
+}
 
-  /* =======================================================
-     EMPTY STATE
-  ======================================================= */
+/* ======================================================= EMPTY STATE
+======================================================= */
 
-  function emptyState(
-    title,
-    description,
-    icon = "📁"
-  ) {
+function emptyState( title, description, icon = “📁” ) {
 
     return `
       <div class="empty-state">
@@ -3035,20 +2733,17 @@
       </div>
     `;
 
-  }
+}
 
-  /* =======================================================
-     HISTORY — FIRESTORE PHASE 4
-  ======================================================= */
+/* ======================================================= HISTORY —
+FIRESTORE PHASE 4
+======================================================= */
 
-  function getHistoryCollection() {
-    if (!firestoreDb) return null;
-    return firestoreDb.collection("history");
-  }
+function getHistoryCollection() { if (!firestoreDb) return null; return
+firestoreDb.collection(“history”); }
 
-  function buildHistoryData(item, user) {
-    const now = nowISO();
-    const uid = user?.uid || "";
+function buildHistoryData(item, user) { const now = nowISO(); const uid
+= user?.uid || ““;
 
     return {
       id: String(item.id),
@@ -3063,19 +2758,14 @@
       updatedBy: uid,
       type: "document_open"
     };
-  }
 
-  function mapFirestoreHistory(doc) {
-    return {
-      ...(doc.data() || {}),
-      id: String(doc.id)
-    };
-  }
+}
 
-  async function readCloudHistory(user = currentUser) {
-    if (!user) return null;
-    if (!initializeFirestore()) return null;
-    await waitForFirestore();
+function mapFirestoreHistory(doc) { return { …(doc.data() || {}), id:
+String(doc.id) }; }
+
+async function readCloudHistory(user = currentUser) { if (!user) return
+null; if (!initializeFirestore()) return null; await waitForFirestore();
 
     const collection = getHistoryCollection();
     if (!collection) return null;
@@ -3087,22 +2777,16 @@
     return normalizeHistory(
       snapshot.docs.map(mapFirestoreHistory)
     );
-  }
 
-  function getHistoryDocumentId(item, user) {
-    return (
-      "HIS_" +
-      encodeURIComponent(String(user?.uid || "")) +
-      "_" +
-      encodeURIComponent(String(item?.templateId || ""))
-    );
-  }
+}
 
-  async function writeCloudHistory(item, user) {
-    if (!user) throw new Error("AUTH_REQUIRED");
-    if (!initializeFirestore()) {
-      throw new Error("FIRESTORE_UNAVAILABLE");
-    }
+function getHistoryDocumentId(item, user) { return ( “HIS_” +
+encodeURIComponent(String(user?.uid || ““)) +”_” +
+encodeURIComponent(String(item?.templateId || ““)) ); }
+
+async function writeCloudHistory(item, user) { if (!user) throw new
+Error(“AUTH_REQUIRED”); if (!initializeFirestore()) { throw new
+Error(“FIRESTORE_UNAVAILABLE”); }
 
     await waitForFirestore();
 
@@ -3121,13 +2805,12 @@
     }
 
     return mapFirestoreHistory(verification);
-  }
 
-  async function clearCloudHistory(user) {
-    if (!user) throw new Error("AUTH_REQUIRED");
-    if (!initializeFirestore()) {
-      throw new Error("FIRESTORE_UNAVAILABLE");
-    }
+}
+
+async function clearCloudHistory(user) { if (!user) throw new
+Error(“AUTH_REQUIRED”); if (!initializeFirestore()) { throw new
+Error(“FIRESTORE_UNAVAILABLE”); }
 
     await waitForFirestore();
 
@@ -3149,11 +2832,11 @@
     }
 
     return true;
-  }
 
-  async function verifyHistoryMigration(expectedHistory, user) {
-    const cloud = await readCloudHistory(user);
-    if (!cloud) return false;
+}
+
+async function verifyHistoryMigration(expectedHistory, user) { const
+cloud = await readCloudHistory(user); if (!cloud) return false;
 
     const expected = normalizeHistory(expectedHistory);
     if (cloud.length !== expected.length) return false;
@@ -3169,24 +2852,20 @@
     return expectedIds.every(
       (id, index) => id === cloudIds[index]
     );
-  }
 
-  function showHistorySyncError(error) {
-    console.error(
-      "GROVA DOCUMENT: History Firestore error.",
-      error
-    );
+}
+
+function showHistorySyncError(error) { console.error( “GROVA DOCUMENT:
+History Firestore error.”, error );
 
     showToast(
       "Không thể đồng bộ lịch sử. Ứng dụng vẫn đang dùng dữ liệu cục bộ."
     );
-  }
 
-  async function migrateLocalHistoryIfNeeded(
-    user,
-    localHistory
-  ) {
-    if (!user) return false;
+}
+
+async function migrateLocalHistoryIfNeeded( user, localHistory ) { if
+(!user) return false;
 
     const sourceHistory =
       normalizeHistory(localHistory)
@@ -3250,10 +2929,10 @@
       showHistorySyncError(error);
       return false;
     }
-  }
 
-  async function syncHistoryFromCloud(user) {
-    if (!user) return;
+}
+
+async function syncHistoryFromCloud(user) { if (!user) return;
 
     const token = ++historySyncToken;
     historySyncRunning = true;
@@ -3357,9 +3036,10 @@
         historySyncRunning = false;
       }
     }
-  }
 
-  async function addHistory(template) {
+}
+
+async function addHistory(template) {
 
     if (!template) return false;
 
@@ -3488,11 +3168,9 @@
 
     }
 
-  }
+}
 
-  function renderHistory() {
-    const container =
-      $("#historyList");
+function renderHistory() { const container = $(“#historyList”);
 
     if (!container) return;
 
@@ -3533,11 +3211,11 @@
           `
         )
         .join("");
-  }
 
-  function renderRecentDocuments() {
-    const container =
-      $("#recentDocuments");
+}
+
+function renderRecentDocuments() { const container =
+$(“#recentDocuments”);
 
     if (!container) return;
 
@@ -3579,10 +3257,10 @@
           `
         )
         .join("");
-  }
 
-  async function clearHistory() {
-    const history = getHistory();
+}
+
+async function clearHistory() { const history = getHistory();
 
     if (!history.length) {
       showToast("Lịch sử đang trống.");
@@ -3630,13 +3308,13 @@
         );
       }
     }
-  }
 
-  /* =======================================================
-     PROJECTS
-  ======================================================= */
+}
 
-  function renderProjects() {
+/* ======================================================= PROJECTS
+======================================================= */
+
+function renderProjects() {
 
     const container =
       $("#projectsList");
@@ -3772,9 +3450,9 @@
         )
         .join("");
 
-  }
+}
 
-  function openProjectModal(id = null) {
+function openProjectModal(id = null) {
 
     modalMode = "project";
 
@@ -3904,9 +3582,9 @@
 
     openModal();
 
-  }
+}
 
-  async function saveProject() {
+async function saveProject() {
 
     const name =
       $("#modalProjectName")
@@ -4073,9 +3751,9 @@
 
     }
 
-  }
+}
 
-  async function deleteProject(id) {
+async function deleteProject(id) {
 
     const projects =
       getProjects();
@@ -4165,13 +3843,12 @@
 
     }
 
-  }
+}
 
-  /* =======================================================
-     CUSTOMERS
-  ======================================================= */
+/* ======================================================= CUSTOMERS
+======================================================= */
 
-  function renderCustomers() {
+function renderCustomers() {
 
     const container =
       $("#customersList");
@@ -4289,9 +3966,9 @@
         )
         .join("");
 
-  }
+}
 
-  function openCustomerModal(id = null) {
+function openCustomerModal(id = null) {
 
     modalMode = "customer";
 
@@ -4403,9 +4080,9 @@
 
     openModal();
 
-  }
+}
 
-  async function saveCustomer() {
+async function saveCustomer() {
 
     const name =
       $("#modalCustomerName")
@@ -4567,9 +4244,10 @@
         saveButton.textContent = "Lưu";
       }
     }
-  }
 
-  async function deleteCustomer(id) {
+}
+
+async function deleteCustomer(id) {
 
     const customers =
       getCustomers();
@@ -4656,13 +4334,13 @@
         );
       }
     }
-  }
 
-  /* =======================================================
-     EMPLOYEES
-  ======================================================= */
+}
 
-  function renderEmployees() {
+/* ======================================================= EMPLOYEES
+======================================================= */
+
+function renderEmployees() {
 
     const container =
       $("#employeesList");
@@ -4784,9 +4462,9 @@
         )
         .join("");
 
-  }
+}
 
-  function openEmployeeModal(id = null) {
+function openEmployeeModal(id = null) {
 
     modalMode = "employee";
 
@@ -4899,9 +4577,9 @@
 
     openModal();
 
-  }
+}
 
-  async function saveEmployee() {
+async function saveEmployee() {
 
     const name =
       $("#modalEmployeeName")?.value.trim();
@@ -4984,9 +4662,9 @@
 
     }
 
-  }
+}
 
-  async function deleteEmployee(id) {
+async function deleteEmployee(id) {
 
     const employees = getEmployees();
     const employee = employees.find((item) => item.id === id);
@@ -5024,13 +4702,12 @@
 
     }
 
-  }
+}
 
-  /* =======================================================
-     DASHBOARD
-  ======================================================= */
+/* ======================================================= DASHBOARD
+======================================================= */
 
-  function updateStats() {
+function updateStats() {
 
     const projects =
       getProjects();
@@ -5072,9 +4749,9 @@
 
     }
 
-  }
+}
 
-  function renderDashboard() {
+function renderDashboard() {
 
     initDocumentCategories();
 
@@ -5084,13 +4761,12 @@
 
     updateStats();
 
-  }
+}
 
-  /* =======================================================
-     REPORTS
-  ======================================================= */
+/* ======================================================= REPORTS
+======================================================= */
 
-  function renderReports() {
+function renderReports() {
 
     const projects =
       getProjects();
@@ -5266,49 +4942,29 @@
 
     }
 
-  }
+}
 
+/* ======================================================= PHASE 5B.4 —
+ACCOUNT MANAGEMENT UI PHASE 5B.5 — ACCOUNT PROFILE UI PHASE 5B.6 —
+ACCOUNT MANAGEMENT HARDENING
+======================================================= */
 
-  /* =======================================================
-     PHASE 5B.4 — ACCOUNT MANAGEMENT UI
-     PHASE 5B.5 — ACCOUNT PROFILE UI
-     PHASE 5B.6 — ACCOUNT MANAGEMENT HARDENING
-  ======================================================= */
+const ACCOUNT_PERMISSION_META = { projects: { label: “Công trình”,
+actions: [[“view”, “Xem”], [“create”, “Thêm”], [“edit”, “Sửa”],
+[“delete”, “Xóa”]] }, customers: { label: “Khách hàng”, actions:
+[[“view”, “Xem”], [“create”, “Thêm”], [“edit”, “Sửa”], [“delete”,
+“Xóa”]] }, employees: { label: “Nhân sự”, actions: [[“view”, “Xem”],
+[“create”, “Thêm”], [“edit”, “Sửa”], [“delete”, “Xóa”]] }, documents: {
+label: “Văn bản”, actions: [[“view”, “Xem”], [“create”, “Thêm”],
+[“edit”, “Sửa”], [“delete”, “Xóa”], [“export”, “Xuất”]] }, history: {
+label: “Lịch sử”, actions: [[“view”, “Xem”]] }, users: { label: “Tài
+khoản”, actions: [[“view”, “Xem”], [“create”, “Tạo”], [“edit”, “Sửa”],
+[“lock”, “Khóa / mở khóa”], [“managePermissions”, “Quản lý quyền”]] },
+settings: { label: “Cài đặt”, actions: [[“view”, “Xem”], [“edit”,
+“Sửa”]] } };
 
-  const ACCOUNT_PERMISSION_META = {
-    projects: {
-      label: "Công trình",
-      actions: [["view", "Xem"], ["create", "Thêm"], ["edit", "Sửa"], ["delete", "Xóa"]]
-    },
-    customers: {
-      label: "Khách hàng",
-      actions: [["view", "Xem"], ["create", "Thêm"], ["edit", "Sửa"], ["delete", "Xóa"]]
-    },
-    employees: {
-      label: "Nhân sự",
-      actions: [["view", "Xem"], ["create", "Thêm"], ["edit", "Sửa"], ["delete", "Xóa"]]
-    },
-    documents: {
-      label: "Văn bản",
-      actions: [["view", "Xem"], ["create", "Thêm"], ["edit", "Sửa"], ["delete", "Xóa"], ["export", "Xuất"]]
-    },
-    history: {
-      label: "Lịch sử",
-      actions: [["view", "Xem"]]
-    },
-    users: {
-      label: "Tài khoản",
-      actions: [["view", "Xem"], ["create", "Tạo"], ["edit", "Sửa"], ["lock", "Khóa / mở khóa"], ["managePermissions", "Quản lý quyền"]]
-    },
-    settings: {
-      label: "Cài đặt",
-      actions: [["view", "Xem"], ["edit", "Sửa"]]
-    }
-  };
-
-  function accountPermissionMatrixFromProfile(profile) {
-    const source = profile?.permissions || {};
-    const matrix = clonePermissions(source);
+function accountPermissionMatrixFromProfile(profile) { const source =
+profile?.permissions || {}; const matrix = clonePermissions(source);
 
     Object.keys(DEFAULT_PERMISSIONS).forEach((group) => {
       if (!matrix[group]) matrix[group] = {};
@@ -5318,81 +4974,121 @@
     });
 
     return matrix;
-  }
 
-  function backendErrorMessage(error, fallback) {
-    const code = String(error?.code || "");
-    const known = {
-      "functions/unauthenticated": "Phiên đăng nhập không hợp lệ. Vui lòng đăng nhập lại.",
-      "functions/permission-denied": "Bạn không có quyền thực hiện thao tác này.",
-      "functions/not-found": "Cloud Functions chưa được triển khai hoặc không tìm thấy chức năng.",
-      "functions/unavailable": "Cloud Functions hiện chưa khả dụng.",
-      "functions/failed-precondition": error?.message || "Điều kiện hệ thống chưa đáp ứng.",
-      "functions/invalid-argument": error?.message || "Thông tin gửi lên không hợp lệ.",
-      "functions/already-exists": error?.message || "Tài khoản đã tồn tại.",
-      "functions/internal": error?.message || "Máy chủ không thể hoàn tất thao tác."
+}
+
+function backendErrorMessage(error, fallback) { const code =
+String(error?.code || ““); const known = {”functions/unauthenticated”:
+“Phiên đăng nhập không hợp lệ. Vui lòng đăng nhập lại.”,
+“functions/permission-denied”: “Bạn không có quyền thực hiện thao tác
+này.”, “functions/not-found”: “Cloud Functions chưa được triển khai hoặc
+không tìm thấy chức năng.”, “functions/unavailable”: “Cloud Functions
+hiện chưa khả dụng.”, “functions/failed-precondition”: error?.message ||
+“Điều kiện hệ thống chưa đáp ứng.”, “functions/invalid-argument”:
+error?.message || “Thông tin gửi lên không hợp lệ.”,
+“functions/already-exists”: error?.message || “Tài khoản đã tồn tại.”,
+“functions/internal”: error?.message || “Máy chủ không thể hoàn tất thao
+tác.” }; return known[code] || error?.message || fallback; }
+
+async function saveAccountProfile(uid, payload, options = {}) { if
+(!firestoreDb) throw new Error(“FIRESTORE_UNAVAILABLE”); const id =
+String(uid || ““).trim(); if (!id) throw new Error(”UID_REQUIRED”);
+
+    const reference = getUsersCollection()?.doc(id);
+    if (!reference) throw new Error("FIRESTORE_UNAVAILABLE");
+
+    const now = nowISO();
+    const existing = await reference.get();
+    const base = existing.exists ? existing.data() : {};
+
+    const profile = {
+      uid: id,
+      name: String(payload.name || base.name || "").trim(),
+      email: String(payload.email || base.email || "").trim(),
+      phone: String(payload.phone || base.phone || "").trim(),
+      role: String(payload.role || base.role || "employee"),
+      status: payload.status === "disabled" ? "disabled" : (base.status === "disabled" ? "disabled" : "active"),
+      permissions: clonePermissions(payload.permissions || base.permissions || getDefaultPermissions("employee")),
+      createdAt: base.createdAt || now,
+      updatedAt: now,
+      createdBy: base.createdBy || currentUser?.uid || "",
+      updatedBy: currentUser?.uid || ""
     };
-    return known[code] || error?.message || fallback;
-  }
 
-  async function callAccountFunction(name, payload = {}) {
-    const functions = getFunctionsObject();
-
-    if (!functions || typeof functions.httpsCallable !== "function") {
-      const error = new Error("FUNCTIONS_UNAVAILABLE");
-      error.code = "functions/not-found";
+    if (options.createOnly && existing.exists) {
+      const error = new Error("USER_PROFILE_EXISTS");
+      error.code = "already-exists";
       throw error;
     }
 
-    return (await functions.httpsCallable(name)(payload))?.data || {};
-  }
+    await reference.set(profile, { merge: false });
+    return profile;
 
-  function formatAccountDate(value) {
-    if (!value) return "";
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return String(value);
+}
+
+async function updateAccountProfile(uid, payload) { if (!firestoreDb)
+throw new Error(“FIRESTORE_UNAVAILABLE”); const id = String(uid ||
+““).trim(); const reference = getUsersCollection()?.doc(id); if
+(!reference) throw new Error(”FIRESTORE_UNAVAILABLE”);
+
+    const snapshot = await reference.get();
+    if (!snapshot.exists) {
+      const error = new Error("USER_PROFILE_NOT_FOUND");
+      error.code = "not-found";
+      throw error;
+    }
+
+    const existing = snapshot.data() || {};
+    const next = {
+      name: String(payload.name ?? existing.name ?? "").trim(),
+      email: String(payload.email ?? existing.email ?? "").trim(),
+      phone: String(payload.phone ?? existing.phone ?? "").trim(),
+      updatedAt: nowISO(),
+      updatedBy: currentUser?.uid || ""
+    };
+
+    if (payload.role) next.role = payload.role;
+    if (payload.permissions) next.permissions = clonePermissions(payload.permissions);
+    if (payload.status) next.status = payload.status === "disabled" ? "disabled" : "active";
+
+    await reference.set(next, { merge: true });
+    return { ...existing, ...next, uid: id };
+
+}
+
+async function setAccountProfileStatus(uid, status) { return
+updateAccountProfile(uid, { status }); }
+
+function formatAccountDate(value) { if (!value) return ““; const date =
+new Date(value); if (Number.isNaN(date.getTime())) return String(value);
 
     return date.toLocaleString("vi-VN", {
       dateStyle: "short",
       timeStyle: "short"
     });
-  }
 
-  /* =======================================================
-     PHASE 5B.6 — ACCOUNT MANAGEMENT HARDENING
-  ======================================================= */
+}
 
-  function isCurrentAccount(uid) {
-    return Boolean(
-      uid &&
-      currentUser?.uid &&
-      String(uid) === String(currentUser.uid)
-    );
-  }
+/* ======================================================= PHASE 5B.6 —
+ACCOUNT MANAGEMENT HARDENING
+======================================================= */
 
-  function isProtectedAccount(uid) {
-    return Boolean(
-      uid &&
-      String(uid) === String(ADMIN_UID)
-    );
-  }
+function isCurrentAccount(uid) { return Boolean( uid && currentUser?.uid
+&& String(uid) === String(currentUser.uid) ); }
 
-  function getAccountStatus(item) {
-    if (!item) return "unknown";
-    return item.disabled || item.profile?.status === "disabled"
-      ? "disabled"
-      : "active";
-  }
+function isProtectedAccount(uid) { return Boolean( uid && String(uid)
+=== String(ADMIN_UID) ); }
 
-  function accountStatusLabel(status) {
-    if (status === "active") return "Đang hoạt động";
-    if (status === "disabled") return "Đã khóa";
-    return "Chưa xác định";
-  }
+function getAccountStatus(item) { if (!item) return “unknown”; return
+item.disabled || item.profile?.status === “disabled” ? “disabled” :
+“active”; }
 
-  function renderAccountManagement() {
-    const container = $("#accountManagementSection");
-    if (!container) return;
+function accountStatusLabel(status) { if (status === “active”) return
+“Đang hoạt động”; if (status === “disabled”) return “Đã khóa”; return
+“Chưa xác định”; }
+
+function renderAccountManagement() { const container =
+$(“#accountManagementSection”); if (!container) return;
 
     const profile = getCurrentUserProfile();
     const profileRole = ROLE_LABELS[profile?.role] || (isAdminUser() ? ROLE_LABELS.admin : "Chưa phân quyền");
@@ -5456,7 +5152,7 @@
       </div>
     `;
 
-    if (!hasPermission("users", "view")) {
+    if (!isAdminUser() && currentUserProfile?.role !== "admin") {
       container.innerHTML = profileCard;
       return;
     }
@@ -5525,8 +5221,8 @@
           <div>
             <h3>Tài khoản người dùng</h3>
             <p>
-              Quản lý tài khoản Firebase Authentication và hồ sơ
-              phân quyền GROVA.
+              Quản lý hồ sơ tài khoản và phân quyền GROVA.
+              Tài khoản đăng nhập Firebase Authentication được tạo thủ công trong Firebase Console.
             </p>
           </div>
 
@@ -5540,7 +5236,7 @@
             ${canCreate ? `
               <button class="primary" type="button"
                 data-action="new-user">
-                + Tạo tài khoản
+                + Thêm hồ sơ tài khoản
               </button>
             ` : ""}
           </div>
@@ -5573,8 +5269,8 @@
         ` : `
           <div class="setting-note">
             ${accountUsersLoading
-              ? "Đang lấy dữ liệu từ backend..."
-              : "Chưa có dữ liệu danh sách tài khoản."}
+              ? "Đang lấy dữ liệu từ Firestore..."
+              : "Chưa có hồ sơ tài khoản trong Firestore users."}
           </div>
         `}
 
@@ -5589,35 +5285,52 @@
         ` : ""}
 
         <div class="setting-note">
-          Tạo, sửa, khóa và mở khóa tài khoản chỉ thực thi qua backend
-          bảo mật. Project đang ở Spark nên Cloud Functions production
-          chưa triển khai; giao diện đã sẵn sàng để kết nối khi cần.
+          Lưu ý: ứng dụng chỉ quản lý hồ sơ trong Firestore.
+          Tài khoản đăng nhập Firebase Authentication phải được tạo thủ công
+          trong Firebase Console; “Khóa” tại đây chỉ khóa trạng thái hồ sơ GROVA,
+          không vô hiệu hóa credential Firebase Authentication.
         </div>
       </div>
     `;
-  }
 
-  async function loadAccountUsers(options = {}) {
-    if (!hasPermission("users", "view")) return [];
-    if (accountUsersLoading) return accountUsers;
+}
+
+async function loadAccountUsers(options = {}) { if (!isAdminUser() &&
+currentUserProfile?.role !== “admin”) return []; if
+(accountUsersLoading) return accountUsers;
 
     accountUsersLoading = true;
     renderAccountManagement();
 
     try {
-      const result = await callAccountFunction("grovaListUsers", {
-        pageToken: options.reset === false ? accountUsersPageToken : null,
-        maxResults: 1000
+      if (!initializeFirestore()) throw new Error("FIRESTORE_UNAVAILABLE");
+      await waitForFirestore();
+
+      const snapshot = await getUsersCollection().get();
+      const users = snapshot.docs.map((doc) => {
+        const profile = doc.data() || {};
+        return {
+          uid: doc.id,
+          profile: normalizeUserProfile(profile, {
+            uid: doc.id,
+            displayName: profile.name || "",
+            email: profile.email || ""
+          }),
+          displayName: profile.name || "",
+          email: profile.email || "",
+          phoneNumber: profile.phone || "",
+          lastSignInTime: profile.lastSignInTime || ""
+        };
       });
 
-      const users = Array.isArray(result.users) ? result.users : [];
+      users.sort((a, b) => {
+        const an = String(a.profile?.name || a.email || a.uid || "").toLocaleLowerCase("vi");
+        const bn = String(b.profile?.name || b.email || b.uid || "").toLocaleLowerCase("vi");
+        return an.localeCompare(bn, "vi");
+      });
 
-      accountUsers =
-        options.reset === false
-          ? [...accountUsers, ...users]
-          : users;
-
-      accountUsersPageToken = result.nextPageToken || null;
+      accountUsers = users;
+      accountUsersPageToken = null;
       accountUsersLoadedOnce = true;
       renderAccountManagement();
       return accountUsers;
@@ -5626,38 +5339,33 @@
       accountUsersLoadedOnce = true;
       renderAccountManagement();
       showToast(
-        backendErrorMessage(
-          error,
-          "Không thể tải danh sách tài khoản."
-        )
+        error?.message === "FIRESTORE_UNAVAILABLE"
+          ? "Firestore chưa sẵn sàng."
+          : "Không thể tải danh sách hồ sơ tài khoản."
       );
       return [];
     } finally {
       accountUsersLoading = false;
       renderAccountManagement();
     }
-  }
 
-  function getAccountUser(uid) {
-    return accountUsers.find(
-      (item) => String(item?.uid || "") === String(uid || "")
-    ) || null;
-  }
+}
 
-  function openUserModal(uid = null) {
-    const existing = uid ? getAccountUser(uid) : null;
-    const canEdit = hasPermission("users", "edit");
-    const canCreate = hasPermission("users", "create");
-    const canManagePermissions =
-      hasPermission("users", "managePermissions") || isAdminUser();
+function getAccountUser(uid) { return accountUsers.find( (item) =>
+String(item?.uid || ““) === String(uid ||”“) ) || null; }
+
+function openUserModal(uid = null) { const existing = uid ?
+getAccountUser(uid) : null; const canEdit = hasPermission(“users”,
+“edit”); const canCreate = hasPermission(“users”, “create”); const
+canManagePermissions = hasPermission(“users”, “managePermissions”) ||
+isAdminUser();
 
     if (existing && !canEdit) {
-      showToast("Bạn không có quyền sửa tài khoản.");
+      showToast("Bạn không có quyền sửa hồ sơ tài khoản.");
       return;
     }
-
     if (!existing && !canCreate) {
-      showToast("Bạn không có quyền tạo tài khoản.");
+      showToast("Bạn không có quyền thêm hồ sơ tài khoản.");
       return;
     }
 
@@ -5680,42 +5388,41 @@
     ];
 
     const roleSelect = roleOptions.map(([value, label]) => `
-      <option value="${value}" ${role === value ? "selected" : ""}>
-        ${label}
-      </option>
+      <option value="${value}" ${role === value ? "selected" : ""}>${label}</option>
     `).join("");
 
-    const permissionRows = Object.entries(ACCOUNT_PERMISSION_META)
-      .map(([group, meta]) => {
-        const source = permissions[group] || {};
-        const cells = meta.actions.map(([action, label]) => `
-          <label>
-            <input
-              type="checkbox"
-              data-user-permission="${escapeHTML(group)}.${escapeHTML(action)}"
-              ${source[action] ? "checked" : ""}
-              ${role === "admin" || restrictRoleAndPermissions ? "disabled" : ""}
-            >
-            ${escapeHTML(label)}
-          </label>
-        `).join("");
+    const permissionRows = Object.entries(ACCOUNT_PERMISSION_META).map(([group, meta]) => {
+      const source = permissions[group] || {};
+      const cells = meta.actions.map(([action, label]) => `
+        <label>
+          <input type="checkbox"
+            data-user-permission="${escapeHTML(group)}.${escapeHTML(action)}"
+            ${source[action] ? "checked" : ""}
+            ${role === "admin" || restrictRoleAndPermissions || !canManagePermissions ? "disabled" : ""}>
+          ${escapeHTML(label)}
+        </label>
+      `).join("");
+      return `
+        <div class="form-card" style="padding:12px;margin-top:10px;">
+          <strong>${escapeHTML(meta.label)}</strong>
+          <div class="form-grid" style="margin-top:8px;">${cells}</div>
+        </div>
+      `;
+    }).join("");
 
-        return `
-          <div class="form-card" style="padding:12px;margin-top:10px;">
-            <strong>${escapeHTML(meta.label)}</strong>
-            <div class="form-grid" style="margin-top:8px;">
-              ${cells}
-            </div>
-          </div>
-        `;
-      }).join("");
-
-    $("#modalEyebrow").textContent = "TÀI KHOẢN";
-    $("#modalTitle").textContent =
-      existing ? "Sửa tài khoản" : "Tạo tài khoản";
+    $("#modalEyebrow").textContent = "HỒ SƠ TÀI KHOẢN";
+    $("#modalTitle").textContent = existing ? "Sửa hồ sơ tài khoản" : "Thêm hồ sơ tài khoản";
 
     $("#modalBody").innerHTML = `
       <div class="form-grid">
+        <label>
+          UID Firebase Authentication
+          <input id="modalUserUid" type="text"
+            value="${escapeHTML(existing?.uid || "")}" 
+            ${existing ? "readonly" : ""}
+            placeholder="Dán UID từ Firebase Console...">
+        </label>
+
         <label>
           Họ tên
           <input id="modalUserName" type="text"
@@ -5727,7 +5434,7 @@
           Email
           <input id="modalUserEmail" type="email"
             value="${escapeHTML(existing?.email || profile.email || "")}"
-            placeholder="email@example.com">
+            placeholder="Email của tài khoản Firebase...">
         </label>
 
         <label>
@@ -5738,84 +5445,65 @@
         </label>
 
         <label>
-          ${existing
-            ? "Mật khẩu mới (để trống nếu không đổi)"
-            : "Mật khẩu"}
-          <input id="modalUserPassword" type="password"
-            autocomplete="new-password"
-            placeholder="Tối thiểu 6 ký tự">
+          Vai trò
+          <select id="modalUserRole" ${(!canManagePermissions || restrictRoleAndPermissions) ? "disabled" : ""}>
+            ${roleSelect}
+          </select>
         </label>
 
         <label>
-          Vai trò
-          <select id="modalUserRole"
-            ${(!canManagePermissions || restrictRoleAndPermissions) ? "disabled" : ""}>
-            ${roleSelect}
+          Trạng thái hồ sơ
+          <select id="modalUserStatus" ${(protectedAdmin || !canManagePermissions) ? "disabled" : ""}>
+            <option value="active" ${profile.status !== "disabled" ? "selected" : ""}>Đang hoạt động</option>
+            <option value="disabled" ${profile.status === "disabled" ? "selected" : ""}>Đã khóa</option>
           </select>
         </label>
       </div>
 
       ${protectedAdmin ? `
         <div class="setting-note">
-          Tài khoản Admin gốc được bảo vệ. Không thể hạ quyền,
-          khóa hoặc mở khóa tài khoản này.
+          Tài khoản Admin gốc được bảo vệ. Không thể hạ quyền hoặc khóa hồ sơ này.
         </div>
       ` : selfAccount ? `
         <div class="setting-note">
-          Đây là tài khoản đang đăng nhập. Không thể tự thay đổi
-          vai trò hoặc quyền của chính mình tại màn hình này.
+          Đây là tài khoản đang đăng nhập. Không thể tự thay đổi vai trò hoặc quyền của chính mình tại màn hình này.
         </div>
-      ` : ""}
+      ` : `
+        <div class="setting-note" style="margin-top:12px;">
+          Firebase Authentication account phải được tạo thủ công trong Firebase Console. Màn hình này chỉ lưu hồ sơ users/{UID}.
+        </div>
+      `}
 
       <div style="margin-top:16px;">
         <h3>Phân quyền</h3>
         <div class="setting-note">
-          ${canManagePermissions
-            ? "Thiết lập quyền chi tiết cho tài khoản."
-            : "Quyền chi tiết do Administrator quản lý."}
+          ${canManagePermissions ? "Thiết lập quyền chi tiết cho hồ sơ tài khoản." : "Quyền chi tiết do Administrator quản lý."}
         </div>
         ${permissionRows}
       </div>
     `;
 
-    if (!canManagePermissions || restrictRoleAndPermissions) {
-      $$("#modalBody input[data-user-permission]").forEach(
-        (input) => { input.disabled = true; }
-      );
-    }
-
     const roleElement = $("#modalUserRole");
-
     if (roleElement) {
       roleElement.addEventListener("change", () => {
         const selected = roleElement.value;
         const defaults = getDefaultPermissions(selected);
-
         $$("#modalBody input[data-user-permission]").forEach((input) => {
-          const parts = String(
-            input.dataset.userPermission || ""
-          ).split(".");
-
-          input.checked =
-            Boolean(defaults?.[parts[0]]?.[parts[1]]);
-
-          input.disabled =
-            !canManagePermissions ||
-            restrictRoleAndPermissions ||
-            selected === "admin";
+          const parts = String(input.dataset.userPermission || "").split(".");
+          input.checked = Boolean(defaults?.[parts[0]]?.[parts[1]]);
+          input.disabled = !canManagePermissions || restrictRoleAndPermissions || selected === "admin";
         });
       });
     }
 
     $("#modalSave").style.display = "";
-    $("#modalSave").textContent =
-      existing ? "Lưu thay đổi" : "Tạo tài khoản";
-
+    $("#modalSave").textContent = existing ? "Lưu thay đổi" : "Thêm hồ sơ";
     openModal();
-  }
 
-  function readUserModalPermissions(role) {
-    if (role === "admin") return getDefaultPermissions("admin");
+}
+
+function readUserModalPermissions(role) { if (role === “admin”) return
+getDefaultPermissions(“admin”);
 
     const permissions = getDefaultPermissions("custom");
 
@@ -5834,173 +5522,136 @@
     });
 
     return permissions;
-  }
 
-  async function saveUser() {
-    const name = $("#modalUserName")?.value.trim() || "";
-    const email = $("#modalUserEmail")?.value.trim() || "";
-    const phone = $("#modalUserPhone")?.value.trim() || "";
-    const password = $("#modalUserPassword")?.value || "";
-    const role = $("#modalUserRole")?.value || "employee";
+}
 
+async function saveUser() { const uid = $(“#modalUserUid”)?.value.trim()
+|| ““; const name = $(”#modalUserName”)?.value.trim() || ““; const email
+= $(”#modalUserEmail”)?.value.trim() || ““; const phone =
+$(”#modalUserPhone”)?.value.trim() || ““; const role =
+$(”#modalUserRole”)?.value || “employee”; const status =
+$(“#modalUserStatus”)?.value || “active”;
+
+    if (!uid) {
+      showToast("Vui lòng nhập UID Firebase Authentication.");
+      return;
+    }
     if (!email) {
       showToast("Vui lòng nhập email.");
       return;
     }
 
-    if (!modalEditId && !password) {
-      showToast("Vui lòng nhập mật khẩu.");
-      return;
-    }
+    const canManagePermissions = hasPermission("users", "managePermissions") || isAdminUser();
+    const targetProtected = isProtectedAccount(uid);
+    const targetSelf = isCurrentAccount(uid);
 
-    if (password && password.length < 6) {
-      showToast("Mật khẩu phải có ít nhất 6 ký tự.");
-      return;
-    }
-
-    const canManagePermissions =
-      hasPermission("users", "managePermissions") ||
-      isAdminUser();
-
-    const targetProtected = modalEditId
-      ? isProtectedAccount(modalEditId)
-      : false;
-    const targetSelf = modalEditId
-      ? isCurrentAccount(modalEditId)
-      : false;
-
-    if (modalEditId && targetProtected && !isAdminUser()) {
+    if (targetProtected && !isAdminUser()) {
       showToast("Tài khoản Admin gốc được bảo vệ.");
       return;
     }
 
-    const payload = {
-      name,
-      displayName: name,
-      email,
-      phoneNumber: phone
-    };
-
-    if (password) payload.password = password;
-
+    const payload = { name, email, phone };
     if (canManagePermissions && !targetProtected && !targetSelf) {
       payload.role = role;
+      payload.status = status;
       payload.permissions = readUserModalPermissions(role);
     }
 
     const saveButton = $("#modalSave");
-
     if (saveButton) {
       saveButton.disabled = true;
       saveButton.textContent = "Đang lưu...";
     }
 
     try {
+      await waitForFirestore();
       if (modalEditId) {
-        await callAccountFunction("grovaUpdateUser", {
-          uid: modalEditId,
-          ...payload
-        });
-        showToast("Đã cập nhật tài khoản.");
+        await updateAccountProfile(modalEditId, payload);
+        showToast("Đã cập nhật hồ sơ tài khoản.");
       } else {
-        await callAccountFunction("grovaCreateUser", {
+        if (!hasPermission("users", "create")) {
+          showToast("Bạn không có quyền thêm hồ sơ tài khoản.");
+          return;
+        }
+        if (role === "admin" && !isAdminUser()) {
+          showToast("Chỉ Administrator mới có thể cấp vai trò Administrator.");
+          return;
+        }
+        await saveAccountProfile(uid, {
           ...payload,
           role: canManagePermissions ? role : "employee",
-          permissions: canManagePermissions
-            ? readUserModalPermissions(role)
-            : undefined
-        });
-        showToast("Đã tạo tài khoản.");
+          status: canManagePermissions ? status : "active",
+          permissions: canManagePermissions ? readUserModalPermissions(role) : getDefaultPermissions("employee")
+        }, { createOnly: true });
+        showToast("Đã thêm hồ sơ tài khoản.");
       }
 
       closeModal();
+      if (isCurrentAccount(uid)) {
+        await syncCurrentUserProfile(currentUser);
+      }
       await loadAccountUsers({ reset: true });
     } catch (error) {
       console.error("GROVA DOCUMENT: saveUser failed.", error);
+      const code = String(error?.code || "");
       showToast(
-        backendErrorMessage(error, "Không thể lưu tài khoản.")
+        code === "already-exists" ? "UID này đã có hồ sơ trong Firestore." :
+        code === "permission-denied" ? "Bạn không có quyền thay đổi hồ sơ tài khoản." :
+        code === "not-found" ? "Không tìm thấy hồ sơ tài khoản." :
+        "Không thể lưu hồ sơ tài khoản."
       );
     } finally {
       if (saveButton) {
         saveButton.disabled = false;
-        saveButton.textContent =
-          modalEditId ? "Lưu thay đổi" : "Tạo tài khoản";
+        saveButton.textContent = modalEditId ? "Lưu thay đổi" : "Thêm hồ sơ";
       }
     }
-  }
 
-  async function toggleUserStatus(uid, status) {
-    if (!hasPermission("users", "lock")) {
-      showToast("Bạn không có quyền khóa / mở khóa tài khoản.");
-      return;
-    }
+}
 
-    if (status !== "active" && status !== "disabled") {
-      showToast("Trạng thái tài khoản không hợp lệ.");
-      return;
-    }
+async function toggleUserStatus(uid, status) { if
+(!hasPermission(“users”, “lock”)) { showToast(“Bạn không có quyền khóa /
+mở khóa tài khoản.”); return; } if (status !== “active” && status !==
+“disabled”) { showToast(“Trạng thái hồ sơ không hợp lệ.”); return; }
 
     const target = getAccountUser(uid);
-
     if (!target) {
-      showToast("Không tìm thấy tài khoản.");
+      showToast("Không tìm thấy hồ sơ tài khoản.");
       return;
     }
-
     if (isProtectedAccount(uid)) {
       showToast("Tài khoản Admin gốc được bảo vệ.");
       return;
     }
-
     if (isCurrentAccount(uid)) {
-      showToast("Không thể tự khóa hoặc mở khóa tài khoản đang đăng nhập.");
+      showToast("Không thể tự khóa hồ sơ tài khoản đang đăng nhập.");
       return;
     }
 
     const label = status === "disabled" ? "khóa" : "mở khóa";
-    const name =
-      target.profile?.name ||
-      target.displayName ||
-      target.email ||
-      "tài khoản";
-
-    if (!confirm(`Bạn có chắc muốn ${label} tài khoản "${name}"?`)) {
-      return;
-    }
+    const name = target.profile?.name || target.email || "tài khoản";
+    if (!confirm(`Bạn có chắc muốn ${label} hồ sơ của "${name}"?`)) return;
 
     try {
-      await callAccountFunction("grovaSetUserStatus", {
-        uid,
-        status
-      });
-
-      showToast(
-        status === "disabled"
-          ? "Đã khóa tài khoản."
-          : "Đã mở khóa tài khoản."
-      );
-
+      await waitForFirestore();
+      await setAccountProfileStatus(uid, status);
+      showToast(status === "disabled" ? "Đã khóa hồ sơ tài khoản." : "Đã mở khóa hồ sơ tài khoản.");
       await loadAccountUsers({ reset: true });
     } catch (error) {
-      console.error(
-        "GROVA DOCUMENT: toggleUserStatus failed.",
-        error
-      );
-
+      console.error("GROVA DOCUMENT: toggleUserStatus failed.", error);
       showToast(
-        backendErrorMessage(
-          error,
-          "Không thể thay đổi trạng thái tài khoản."
-        )
+        error?.code === "permission-denied"
+          ? "Bạn không có quyền thay đổi trạng thái hồ sơ."
+          : "Không thể thay đổi trạng thái hồ sơ."
       );
     }
-  }
 
-  /* =======================================================
-     SETTINGS
-  ======================================================= */
+}
 
-  function renderSettings() {
+/* ======================================================= SETTINGS
+======================================================= */
+
+function renderSettings() {
 
     const settings =
       getSettings();
@@ -6059,9 +5710,9 @@
       void loadAccountUsers({ reset: true });
     }
 
-  }
+}
 
-  function saveSettings() {
+function saveSettings() {
 
     const settings = {
 
@@ -6109,9 +5760,9 @@
       "Đã lưu cài đặt."
     );
 
-  }
+}
 
-  function updateUserDisplay() {
+function updateUserDisplay() {
 
     const settings =
       getSettings();
@@ -6154,13 +5805,12 @@
 
     }
 
-  }
+}
 
-  /* =======================================================
-     EXPORT DATA
-  ======================================================= */
+/* ======================================================= EXPORT DATA
+======================================================= */
 
-  function exportData() {
+function exportData() {
 
     const payload = {
 
@@ -6243,13 +5893,12 @@
       "Đã xuất dữ liệu JSON."
     );
 
-  }
+}
 
-  /* =======================================================
-     RESET DATA
-  ======================================================= */
+/* ======================================================= RESET DATA
+======================================================= */
 
-  function resetData() {
+function resetData() {
 
     const ok =
       confirm(
@@ -6318,13 +5967,12 @@
       "Đã xóa dữ liệu cục bộ."
     );
 
-  }
+}
 
-  /* =======================================================
-     EVENT HANDLERS
-  ======================================================= */
+/* ======================================================= EVENT
+HANDLERS ======================================================= */
 
-  function handleClick(event) {
+function handleClick(event) {
 
     const navButton =
       event.target.closest(
@@ -6499,9 +6147,9 @@
 
     }
 
-  }
+}
 
-  function handleInput(event) {
+function handleInput(event) {
 
     const id =
       event.target.id;
@@ -6554,9 +6202,9 @@
 
     }
 
-  }
+}
 
-  function handleModalSave() {
+function handleModalSave() {
 
     switch (modalMode) {
 
@@ -6578,13 +6226,12 @@
 
     }
 
-  }
+}
 
-  /* =======================================================
-     KEYBOARD / MODAL
-  ======================================================= */
+/* ======================================================= KEYBOARD /
+MODAL ======================================================= */
 
-  function handleKeydown(event) {
+function handleKeydown(event) {
 
     if (
       event.key ===
@@ -6597,9 +6244,9 @@
 
     }
 
-  }
+}
 
-  function handleModalBackdrop(event) {
+function handleModalBackdrop(event) {
 
     if (
       event.target ===
@@ -6610,13 +6257,12 @@
 
     }
 
-  }
+}
 
-  /* =======================================================
-     SERVICE WORKER
-  ======================================================= */
+/* ======================================================= SERVICE
+WORKER ======================================================= */
 
-  function registerServiceWorker() {
+function registerServiceWorker() {
 
     if (
       "serviceWorker" in navigator
@@ -6646,13 +6292,12 @@
 
     }
 
-  }
+}
 
-  /* =======================================================
-     INIT
-  ======================================================= */
+/* ======================================================= INIT
+======================================================= */
 
-  function init() {
+function init() {
 
     $$(".nav-item").forEach(
       (button) => {
@@ -6743,41 +6388,30 @@
 
     registerServiceWorker();
 
-  }
+}
 
-  /* =======================================================
-     PHASE 5A PUBLIC PERMISSION BRIDGE
-  ======================================================= */
+/* ======================================================= PHASE 5A
+PUBLIC PERMISSION BRIDGE
+======================================================= */
 
-  window.GROVA_PERMISSIONS = {
-    getCurrentUserProfile,
-    getDefaultPermissions,
-    hasPermission,
-    isAdminUser,
-    ROLE_LABELS,
-    DEFAULT_PERMISSIONS
-  };
+window.GROVA_PERMISSIONS = { getCurrentUserProfile,
+getDefaultPermissions, hasPermission, isAdminUser, ROLE_LABELS,
+DEFAULT_PERMISSIONS };
 
-  /* =======================================================
-     START
-  ======================================================= */
+/* ======================================================= START
+======================================================= */
 
-  if (
-    document.readyState ===
-    "loading"
-  ) {
+if ( document.readyState === “loading” ) {
 
     document.addEventListener(
       "DOMContentLoaded",
       init
     );
 
-  } else {
+} else {
 
     init();
 
-  }
+}
 
 })();
-
-
