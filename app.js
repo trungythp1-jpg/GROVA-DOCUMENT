@@ -1,7 +1,7 @@
 /* =========================================================
    GROVA DOCUMENT
-   APP.JS — VERSION 216
-   FIRESTORE PHASE 4 — HISTORY + PHASE 5A PERMISSION CORE + PHASE 5B.4 ACCOUNT MANAGEMENT UI + PHASE 5B.5 ACCOUNT PROFILE UI + PHASE 5B.6 ACCOUNT MANAGEMENT HARDENING
+   APP.JS — VERSION 217
+   FIRESTORE PHASE 4 — HISTORY + PHASE 5A PERMISSION CORE + PHASE 5B.4 ACCOUNT MANAGEMENT UI + PHASE 5B.5 ACCOUNT PROFILE UI + PHASE 5B.6 ACCOUNT MANAGEMENT HARDENING + PHASE 5B.7 ACCOUNT PROFILE UI SYNC
    PROJECTS + CUSTOMERS + EMPLOYEES + HISTORY
    CLEAN BASE FROM LOCKED VERSION 209
 ========================================================= */
@@ -242,12 +242,20 @@
     return null;
   }
 
+  function refreshAccountProfileUI() {
+    updateUserDisplay();
+
+    if (currentPage === "settings") {
+      renderAccountManagement();
+    }
+  }
+
   async function syncCurrentUserProfile(user) {
     const token = ++userProfileSyncToken;
     currentUserProfile = null;
 
     if (!user) {
-      updateUserDisplay();
+      refreshAccountProfileUI();
       return null;
     }
 
@@ -274,7 +282,7 @@
 
         if (!profile) {
           currentUserProfile = null;
-          updateUserDisplay();
+          refreshAccountProfileUI();
           return null;
         }
 
@@ -283,7 +291,7 @@
           user
         );
 
-        updateUserDisplay();
+        refreshAccountProfileUI();
         return currentUserProfile;
       } catch (error) {
         const code = String(error?.code || "");
@@ -301,7 +309,7 @@
           if (token !== userProfileSyncToken) return null;
 
           currentUserProfile = null;
-          updateUserDisplay();
+          refreshAccountProfileUI();
           return null;
         }
 
@@ -314,7 +322,7 @@
 
     if (!initializeFirestore()) {
       currentUserProfile = null;
-      updateUserDisplay();
+      refreshAccountProfileUI();
       return null;
     }
 
@@ -337,7 +345,7 @@
         ? normalizeUserProfile(snapshot.data(), user)
         : null;
 
-      updateUserDisplay();
+      refreshAccountProfileUI();
       return currentUserProfile;
     } catch (error) {
       console.warn(
@@ -348,7 +356,7 @@
       if (token !== userProfileSyncToken) return null;
 
       currentUserProfile = null;
-      updateUserDisplay();
+      refreshAccountProfileUI();
       return null;
     }
   }
