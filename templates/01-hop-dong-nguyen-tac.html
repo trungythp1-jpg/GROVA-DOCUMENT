@@ -65,7 +65,8 @@ body{min-height:100vh}
 
   <button
     class="print-btn"
-    onclick="window.print()"
+    id="grovaPrintButton01"
+    onclick="if (window.GROVA_DOCUMENT_PERMISSION && !window.GROVA_DOCUMENT_PERMISSION.can("export")) { alert("Tài khoản của bạn không được cấp quyền Xuất/In mẫu văn bản này."); return false; } window.print(); return false;"
   >
     🖨 In văn bản
   </button>
