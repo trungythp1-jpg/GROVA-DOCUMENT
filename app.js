@@ -1,6 +1,6 @@
 /* =========================================================
    GROVA DOCUMENT
-   APP.JS — VERSION 228
+   APP.JS — VERSION 229
    FIRESTORE PHASE 4 — HISTORY + PHASE 5A PERMISSION CORE + PHASE 5B.4 ACCOUNT MANAGEMENT UI + PHASE 5B.5 ACCOUNT PROFILE UI + PHASE 5B.6 ACCOUNT MANAGEMENT HARDENING + PHASE 5B.7 ACCOUNT PROFILE UI SYNC + SPARK ACCOUNT PROFILE MANAGEMENT + FULL VIEW/CREATE/EDIT/DELETE PERMISSION ENFORCEMENT
    PROJECTS + CUSTOMERS + EMPLOYEES + HISTORY
    CLEAN BASE FROM LOCKED VERSION 209
@@ -1005,6 +1005,12 @@
 
       address:
         project.address || "",
+
+      latitude:
+        project.latitude || "",
+
+      longitude:
+        project.longitude || "",
 
       status:
         project.status || "Chuẩn bị",
@@ -4184,6 +4190,14 @@
                   )}
                 </p>
 
+                ${project.latitude && project.longitude ? `
+                <p class="sub" style="margin-top:6px;">
+                  <span style="display:inline-flex;align-items:center;gap:6px;">
+                    📍 Đã ghim vị trí
+                  </span>
+                </p>
+                ` : ""}
+
               </div>
 
               <div>
@@ -4198,6 +4212,18 @@
               </div>
 
               <div class="data-actions">
+
+                ${project.latitude && project.longitude ? `
+                <button
+                  type="button"
+                  class="small-btn"
+                  data-action="open-project-location"
+                  data-id="${escapeHTML(project.id)}"
+                  title="Mở vị trí công trình trên Google Maps"
+                >
+                  🗺 Vị trí
+                </button>
+                ` : ""}
 
                 ${hasPermission("projects", "edit") ? `
                 <button
@@ -4322,6 +4348,38 @@
 
         </label>
 
+        <div class="full" style="border:1px solid #dbe5df;border-radius:14px;padding:14px;background:#f8fbf9;">
+          <div style="font-weight:700;margin-bottom:8px;">📍 Vị trí công trình</div>
+          <div style="font-size:13px;color:#66756d;margin-bottom:12px;line-height:1.5;">
+            Dùng GPS của thiết bị để ghim đúng vị trí công trình. Tọa độ sẽ được lưu cùng công trình.
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+            <label style="margin:0;">
+              Vĩ độ
+              <input id="modalProjectLatitude" type="text" readonly value="${escapeHTML(project?.latitude || "")}" placeholder="Chưa ghim">
+            </label>
+            <label style="margin:0;">
+              Kinh độ
+              <input id="modalProjectLongitude" type="text" readonly value="${escapeHTML(project?.longitude || "")}" placeholder="Chưa ghim">
+            </label>
+          </div>
+
+          <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+            <button type="button" class="secondary" data-action="pin-project-location">
+              📍 Ghim vị trí hiện tại
+            </button>
+            ${project?.latitude && project?.longitude ? `
+              <button type="button" class="secondary" data-action="open-project-location">
+                🗺 Mở Google Maps
+              </button>
+            ` : ""}
+          </div>
+          <div id="projectLocationStatus" style="font-size:12px;color:#66756d;margin-top:9px;">
+            ${project?.latitude && project?.longitude ? "Đã có tọa độ. Bấm Lưu nếu anh vừa thay đổi vị trí." : "Chưa ghim vị trí."}
+          </div>
+        </div>
+
         <label>
           Trạng thái
 
@@ -4382,6 +4440,102 @@
 
   }
 
+  function openProjectLocation(id) {
+
+    const project =
+      getProjects().find(
+        (item) => item.id === id
+      );
+
+    if (!project) {
+      showToast("Không tìm thấy công trình.");
+      return;
+    }
+
+    const latitude =
+      Number(project.latitude);
+
+    const longitude =
+      Number(project.longitude);
+
+    if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+      showToast("Công trình chưa có tọa độ hợp lệ.");
+      return;
+    }
+
+    const url =
+      `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${latitude},${longitude}`)}`;
+
+    window.open(url, "_blank", "noopener,noreferrer");
+  }
+
+  function pinProjectLocation() {
+
+    const status =
+      $("#projectLocationStatus");
+
+    if (!navigator.geolocation) {
+      if (status) status.textContent = "Thiết bị/trình duyệt không hỗ trợ định vị.";
+      showToast("Thiết bị không hỗ trợ định vị GPS.");
+      return;
+    }
+
+    if (status) {
+      status.textContent = "Đang lấy vị trí hiện tại... Hãy cho phép trình duyệt truy cập vị trí nếu được hỏi.";
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const latitude =
+          Number(position.coords.latitude);
+        const longitude =
+          Number(position.coords.longitude);
+
+        if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+          if (status) status.textContent = "Không nhận được tọa độ hợp lệ.";
+          showToast("Không lấy được tọa độ GPS.");
+          return;
+        }
+
+        const lat = latitude.toFixed(6);
+        const lng = longitude.toFixed(6);
+
+        const latInput =
+          $("#modalProjectLatitude");
+        const lngInput =
+          $("#modalProjectLongitude");
+
+        if (latInput) latInput.value = lat;
+        if (lngInput) lngInput.value = lng;
+
+        if (status) {
+          status.textContent = `Đã ghim: ${lat}, ${lng}. Bấm “Lưu” để lưu vị trí vào công trình.`;
+        }
+
+        showToast("Đã lấy vị trí hiện tại. Hãy bấm Lưu để lưu công trình.");
+      },
+      (error) => {
+        let message = "Không thể lấy vị trí hiện tại.";
+
+        if (error?.code === 1) {
+          message = "Quyền truy cập vị trí đang bị từ chối. Hãy cho phép trình duyệt dùng vị trí.";
+        } else if (error?.code === 2) {
+          message = "Không xác định được vị trí hiện tại.";
+        } else if (error?.code === 3) {
+          message = "Lấy vị trí quá thời gian. Hãy thử lại.";
+        }
+
+        if (status) status.textContent = message;
+        showToast(message);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 0
+      }
+    );
+  }
+
   async function saveProject() {
 
     if (!hasPermission("projects", modalEditId ? "edit" : "create")) {
@@ -4435,6 +4589,16 @@
 
       address:
         $("#modalProjectAddress")
+          ?.value
+          .trim() || "",
+
+      latitude:
+        $("#modalProjectLatitude")
+          ?.value
+          .trim() || "",
+
+      longitude:
+        $("#modalProjectLongitude")
           ?.value
           .trim() || "",
 
@@ -6911,7 +7075,7 @@
      FULL SYSTEM BACKUP / RESTORE — VERSION 227
   ======================================================= */
 
-  const SYSTEM_BACKUP_VERSION = "228";
+  const SYSTEM_BACKUP_VERSION = "229";
 
   const SYSTEM_BACKUP_FILES = [
     "index.html", "app.js", "style.css", "auth.js", "auth.css", "sw.js",
@@ -7348,6 +7512,16 @@
         openProjectModal(
           actionButton.dataset.id
         );
+        break;
+
+      case "open-project-location":
+        openProjectLocation(
+          actionButton.dataset.id
+        );
+        break;
+
+      case "pin-project-location":
+        pinProjectLocation();
         break;
 
       case "delete-project":
