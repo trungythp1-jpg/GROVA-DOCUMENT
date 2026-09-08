@@ -1,6 +1,6 @@
 /* =========================================================
    GROVA DOCUMENT
-   DOCUMENT PERMISSION GUARD — VERSION 237
+   DOCUMENT PERMISSION GUARD — VERSION 238
    Shared permission layer for /templates/*.html
 
    Actions:
@@ -102,6 +102,7 @@
   }
 
   function showOverlay(title, message, denied) {
+    removeLoadingOverlay();
     if (document.documentElement) {
       document.documentElement.classList.remove("grova-permission-loading");
     }
@@ -173,9 +174,23 @@
     if (!document.getElementById("grovaDocumentPermissionStyle")) {
       var style = document.createElement("style");
       style.id = "grovaDocumentPermissionStyle";
-      style.textContent = "html.grova-permission-loading body{visibility:hidden!important;} body.grova-document-readonly .form-body input,body.grova-document-readonly .form-body textarea,body.grova-document-readonly .form-body select{background:#f6f8f7!important;color:#66726c!important;}";
+      style.textContent = "html.grova-permission-loading body{visibility:visible!important;} body.grova-document-readonly .form-body input,body.grova-document-readonly .form-body textarea,body.grova-document-readonly .form-body select{background:#f6f8f7!important;color:#66726c!important;}";
       (document.head || document.documentElement).appendChild(style);
     }
+  }
+
+  function showLoadingOverlay() {
+    if (document.getElementById("grovaDocumentPermissionLoading")) return;
+    var overlay = document.createElement("div");
+    overlay.id = "grovaDocumentPermissionLoading";
+    overlay.style.cssText = "position:fixed;inset:0;z-index:2147483646;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(238,243,241,.96);font-family:Arial,Helvetica,sans-serif;";
+    overlay.innerHTML = '<div style="background:#fff;border:1px solid #dce5e1;border-radius:18px;box-shadow:0 12px 40px rgba(20,38,31,.14);padding:24px 28px;text-align:center;color:#15382c;font-weight:700;">Đang kiểm tra quyền truy cập…</div>';
+    (document.body || document.documentElement).appendChild(overlay);
+  }
+
+  function removeLoadingOverlay() {
+    var overlay = document.getElementById("grovaDocumentPermissionLoading");
+    if (overlay) overlay.remove();
   }
 
   function getGroupPermission(profile, action) {
@@ -308,13 +323,20 @@
       user = await new Promise(function (resolve) {
         var settled = false;
         var unsubscribe = null;
+        var timeout = null;
 
         function finish(value) {
           if (settled) return;
           settled = true;
+          if (timeout) clearTimeout(timeout);
           if (typeof unsubscribe === "function") unsubscribe();
           resolve(value || null);
         }
+
+        timeout = setTimeout(function () {
+          console.warn("GROVA DOCUMENT: Auth state timeout.");
+          finish(null);
+        }, 12000);
 
         try {
           unsubscribe = auth.onAuthStateChanged(function (currentUser) {
@@ -385,6 +407,7 @@
       }
 
       state.ready = true;
+      removeLoadingOverlay();
       readyResolve(true);
 
       if (document.readyState !== "loading") {
@@ -405,6 +428,11 @@
   }
 
   addLoadingStyle();
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", showLoadingOverlay, { once: true });
+  } else {
+    showLoadingOverlay();
+  }
   blockUnauthorizedActions();
 
   window.GROVA_DOCUMENT_PERMISSION = {
