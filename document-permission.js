@@ -232,7 +232,7 @@
 
       var isSave = onclick.indexOf("savedraft") >= 0 || text.indexOf("lưu nháp") >= 0;
       var isDelete = onclick.indexOf("cleardraft") >= 0 || onclick.indexOf("resetdraft") >= 0 || text.indexOf("xóa") >= 0 || text.indexOf("xoá") >= 0 || text.indexOf("làm mới") >= 0;
-      var isExport = onclick.indexOf("window.print") >= 0 || onclick.indexOf("printdocument") >= 0 || text.indexOf("in /") >= 0 || text.indexOf("in văn bản") >= 0 || text.indexOf("in phiếu") >= 0 || text.indexOf("in hợp đồng") >= 0 || text.indexOf("xuất pdf") >= 0;
+      var isExport = button.id !== "grovaPrintButton01" && (onclick.indexOf("window.print") >= 0 || onclick.indexOf("printdocument") >= 0 || text.indexOf("in /") >= 0 || text.indexOf("in văn bản") >= 0 || text.indexOf("in phiếu") >= 0 || text.indexOf("in hợp đồng") >= 0 || text.indexOf("xuất pdf") >= 0);
 
       if (isSave) {
         button.disabled = !canEdit;
@@ -283,7 +283,7 @@
 
       var isSave = onclick.indexOf("savedraft") >= 0 || text.indexOf("lưu nháp") >= 0;
       var isDelete = onclick.indexOf("cleardraft") >= 0 || onclick.indexOf("resetdraft") >= 0 || text.indexOf("xóa") >= 0 || text.indexOf("xoá") >= 0 || text.indexOf("làm mới") >= 0;
-      var isExport = onclick.indexOf("window.print") >= 0 || onclick.indexOf("printdocument") >= 0 || text.indexOf("in /") >= 0 || text.indexOf("in văn bản") >= 0 || text.indexOf("in phiếu") >= 0 || text.indexOf("in hợp đồng") >= 0 || text.indexOf("xuất pdf") >= 0;
+      var isExport = target.id !== "grovaPrintButton01" && (onclick.indexOf("window.print") >= 0 || onclick.indexOf("printdocument") >= 0 || text.indexOf("in /") >= 0 || text.indexOf("in văn bản") >= 0 || text.indexOf("in phiếu") >= 0 || text.indexOf("in hợp đồng") >= 0 || text.indexOf("xuất pdf") >= 0);
 
       if ((isSave && !(state.permissions.create || state.permissions.edit)) ||
           (isDelete && !state.permissions.delete) ||
