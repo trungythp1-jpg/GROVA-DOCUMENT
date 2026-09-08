@@ -65,8 +65,7 @@ body{min-height:100vh}
 
   <button
     class="print-btn"
-    type="button"
-    onclick="return grovaPrintDocument(event)"
+    onclick="window.print()"
   >
     🖨 In văn bản
   </button>
@@ -2232,33 +2231,6 @@ function goBack(){
 
   }
 
-}
-
-
-/* =========================================================
-   PRINT — GROVA DOCUMENT V240
-   PRINT MUST RUN DIRECTLY FROM THE USER CLICK
-========================================================= */
-
-function grovaPrintDocument(event){
-
-  /* Keep the browser print call synchronous with the click.
-     Do not await Firebase/Auth and do not perform async work here. */
-  try {
-    if (window.GROVA_DOCUMENT_PERMISSION &&
-        typeof window.GROVA_DOCUMENT_PERMISSION.can === "function" &&
-        !window.GROVA_DOCUMENT_PERMISSION.can("export")) {
-      alert("Tài khoản của bạn không được cấp quyền Xuất/In mẫu văn bản này.");
-      return false;
-    }
-  } catch(error) {
-    /* Permission-check failure must never break the native print button. */
-    console.warn("GROVA DOCUMENT: Permission check for print failed.", error);
-  }
-
-  /* IMPORTANT: no updatePreview(), no setTimeout(), no Promise here. */
-  window.print();
-  return false;
 }
 
 
