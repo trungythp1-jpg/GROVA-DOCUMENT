@@ -1,6 +1,6 @@
 {
   "name": "grova-document-functions",
-  "description": "GROVA DOCUMENT — Phase 5B backend foundation",
+  "description": "GROVA DOCUMENT — Version 228 backend + GROVA AI",
   "private": true,
   "engines": {
     "node": "22"
