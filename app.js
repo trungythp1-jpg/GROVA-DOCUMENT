@@ -207,6 +207,44 @@
     return Boolean(currentUserProfile.permissions?.[group]?.[action]);
   }
 
+  /* =======================================================
+     DOCUMENT PERMISSION MATRIX — PHASE 5C / V236
+  ======================================================= */
+
+  function getDocumentTemplateIds() {
+    return getTemplates().map((template) => String(template?.id || "").trim()).filter(Boolean);
+  }
+
+  function getDocumentTemplatePermissionMap(profile = currentUserProfile) {
+    const source = profile?.permissions?.documents?.templates;
+    return source && typeof source === "object" ? clonePermissions(source) : {};
+  }
+
+  function getDocumentTemplatePermission(templateId, action, profile = currentUserProfile) {
+    const id = String(templateId || "").trim();
+    if (!id || !action) return false;
+    if (isAdminUser(currentUser)) return true;
+    const templateMap = getDocumentTemplatePermissionMap(profile);
+    const templatePermissions = templateMap[id];
+    if (templatePermissions && Object.prototype.hasOwnProperty.call(templatePermissions, action)) {
+      return Boolean(templatePermissions[action]);
+    }
+    return hasPermission("documents", action);
+  }
+
+  function hasDocumentTemplatePermission(templateId, action) {
+    return getDocumentTemplatePermission(templateId, action);
+  }
+
+  function getDefaultDocumentTemplatePermissions(role = "employee") {
+    const base = getDefaultPermissions(role)?.documents || {};
+    const map = {};
+    getDocumentTemplateIds().forEach((templateId) => {
+      map[templateId] = { view: Boolean(base.view), create: Boolean(base.create), edit: Boolean(base.edit), delete: Boolean(base.delete), export: Boolean(base.export) };
+    });
+    return map;
+  }
+
   function getCurrentUserProfile() {
     return currentUserProfile ? {
       ...currentUserProfile,
@@ -2455,6 +2493,17 @@
   }
 
   function refreshPermissionUI() {
+    const canCreateDocuments =
+      hasPermission("documents", "create");
+
+    $$('[data-action="new-document"]').forEach((button) => {
+      button.style.display = canCreateDocuments ? "" : "none";
+      button.setAttribute(
+        "aria-hidden",
+        canCreateDocuments ? "false" : "true"
+      );
+    });
+
     $$(".nav-item[data-page]").forEach((button) => {
       const page = button.dataset.page;
       const allowed = canViewPage(page);
@@ -2667,8 +2716,9 @@
             class="doc-open"
             type="button"
             data-template-id="${escapeHTML(template.id)}"
+            ${hasDocumentTemplatePermission(template.id, "create") ? "" : "disabled"}
           >
-            Mở mẫu →
+            ${hasDocumentTemplatePermission(template.id, "create") ? "Tạo văn bản →" : "Chỉ xem"}
           </button>
 
         </div>
@@ -2831,6 +2881,11 @@
 
   function openTemplate(id) {
 
+    if (!hasPermission("documents", "create")) {
+      showPermissionDenied("documents");
+      return;
+    }
+
     const template =
       findTemplate(id);
 
@@ -2842,6 +2897,11 @@
 
       return;
 
+    }
+
+    if (!hasDocumentTemplatePermission(template.id, "create")) {
+      showToast("Bạn chưa được cấp quyền tạo văn bản này.");
+      return;
     }
 
     if (!template.file) {
@@ -2872,8 +2932,13 @@
 
   function openTemplatePicker() {
 
+    if (!hasPermission("documents", "create")) {
+      showPermissionDenied("documents");
+      return;
+    }
+
     const templates =
-      getTemplates();
+      getTemplates().filter((template) => hasDocumentTemplatePermission(template.id, "create"));
 
     if (!templates.length) {
 
@@ -6656,6 +6721,30 @@
       `;
     }).join("");
 
+    const templatePermissionMap = getDocumentTemplatePermissionMap(profile);
+    const baseDocumentPermissions = permissions.documents || {};
+    const documentTemplatePermissionRows = getTemplates().map((template) => {
+      const templateId = String(template.id);
+      const source = templatePermissionMap[templateId] || {
+        view: Boolean(baseDocumentPermissions.view), create: Boolean(baseDocumentPermissions.create),
+        edit: Boolean(baseDocumentPermissions.edit), delete: Boolean(baseDocumentPermissions.delete), export: Boolean(baseDocumentPermissions.export)
+      };
+      const actions = [["view", "Xem"], ["create", "Tạo"], ["edit", "Sửa"], ["delete", "Xóa"], ["export", "Xuất"]];
+      const cells = actions.map(([action, label]) => `
+        <label>
+          <input type="checkbox" data-user-document-permission="${escapeHTML(templateId)}.${escapeHTML(action)}" ${source[action] ? "checked" : ""} ${role === "admin" || restrictRoleAndPermissions || !canManagePermissions ? "disabled" : ""}>
+          ${escapeHTML(label)}
+        </label>
+      `).join("");
+      return `
+        <div class="form-card" style="padding:12px;margin-top:10px;">
+          <strong>${escapeHTML(template.code || template.name || template.title || templateId)}</strong>
+          <div style="font-size:13px;opacity:.75;margin-top:3px;">${escapeHTML(template.name || template.title || "")}</div>
+          <div class="form-grid" style="margin-top:8px;">${cells}</div>
+        </div>
+      `;
+    }).join("");
+
     $("#modalEyebrow").textContent = "HỒ SƠ TÀI KHOẢN";
     $("#modalTitle").textContent = existing ? "Sửa hồ sơ tài khoản" : "Thêm hồ sơ tài khoản";
 
@@ -6726,6 +6815,12 @@
           ${canManagePermissions ? "Thiết lập quyền chi tiết cho hồ sơ tài khoản." : "Quyền chi tiết do Administrator quản lý."}
         </div>
         ${permissionRows}
+
+        <div style="margin-top:18px;">
+          <h3>Phân quyền từng mẫu văn bản</h3>
+          <div class="setting-note">Mỗi mẫu có thể cấp riêng quyền Xem, Tạo, Sửa, Xóa và Xuất. Nếu chưa cấu hình riêng, mẫu kế thừa quyền Văn bản chung.</div>
+          ${documentTemplatePermissionRows || '<div class="setting-note">Chưa có mẫu văn bản.</div>'}
+        </div>
       </div>
     `;
 
@@ -6737,6 +6832,14 @@
         $$("#modalBody input[data-user-permission]").forEach((input) => {
           const parts = String(input.dataset.userPermission || "").split(".");
           input.checked = Boolean(defaults?.[parts[0]]?.[parts[1]]);
+          input.disabled = !canManagePermissions || restrictRoleAndPermissions || selected === "admin";
+        });
+
+        const templateDefaults = getDefaultDocumentTemplatePermissions(selected);
+        $$("#modalBody input[data-user-document-permission]").forEach((input) => {
+          const parts = String(input.dataset.userDocumentPermission || "").split(".");
+          if (parts.length !== 2) return;
+          input.checked = Boolean(templateDefaults?.[parts[0]]?.[parts[1]]);
           input.disabled = !canManagePermissions || restrictRoleAndPermissions || selected === "admin";
         });
       });
@@ -6764,6 +6867,16 @@
       }
 
       permissions[parts[0]][parts[1]] = Boolean(input.checked);
+    });
+
+    if (!permissions.documents) permissions.documents = {};
+    permissions.documents.templates = {};
+    $$("#modalBody input[data-user-document-permission]").forEach((input) => {
+      const parts = String(input.dataset.userDocumentPermission || "").split(".");
+      if (parts.length !== 2) return;
+      const [templateId, action] = parts;
+      if (!permissions.documents.templates[templateId]) permissions.documents.templates[templateId] = {};
+      permissions.documents.templates[templateId][action] = Boolean(input.checked);
     });
 
     return permissions;
@@ -6897,7 +7010,7 @@
   }
 
   /* =======================================================
-     GROVA AI — VERSION 228 / READ-ONLY ASSISTANT
+     GROVA AI — VERSION 235 / READ-ONLY ASSISTANT
   ======================================================= */
 
   let grovaAiBusy = false;
