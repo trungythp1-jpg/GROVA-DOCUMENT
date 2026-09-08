@@ -1,6 +1,6 @@
 /* =========================================================
    GROVA DOCUMENT
-   APP.JS — VERSION 226
+   APP.JS — VERSION 227
    FIRESTORE PHASE 4 — HISTORY + PHASE 5A PERMISSION CORE + PHASE 5B.4 ACCOUNT MANAGEMENT UI + PHASE 5B.5 ACCOUNT PROFILE UI + PHASE 5B.6 ACCOUNT MANAGEMENT HARDENING + PHASE 5B.7 ACCOUNT PROFILE UI SYNC + SPARK ACCOUNT PROFILE MANAGEMENT + FULL VIEW/CREATE/EDIT/DELETE PERMISSION ENFORCEMENT
    PROJECTS + CUSTOMERS + EMPLOYEES + HISTORY
    CLEAN BASE FROM LOCKED VERSION 209
@@ -6773,6 +6773,189 @@
   }
 
   /* =======================================================
+     FULL SYSTEM BACKUP / RESTORE — VERSION 227
+  ======================================================= */
+
+  const SYSTEM_BACKUP_VERSION = "227";
+
+  const SYSTEM_BACKUP_FILES = [
+    "index.html", "app.js", "style.css", "auth.js", "auth.css", "sw.js",
+    "firestore.js", "firestore.rules", "firebase.json", ".firebaserc",
+    "manifest.json", "data/data.js", "data/grova_logo.png",
+    "assets/icon-192.png", "assets/icon-512.png",
+    "functions/index.js", "functions/package.json"
+  ];
+
+  const SYSTEM_BACKUP_TEMPLATE_FILES = [
+    "01-hop-dong-nguyen-tac.html", "02-phu-luc-hop-dong.html",
+    "03-de-nghi-thi-cong.html", "04-xac-nhan-phat-sinh.html",
+    "05-nghiem-thu-ban-giao.html", "06-de-nghi-thanh-toan.html",
+    "07-doi-chieu-cong-no.html", "08-hop-dong-lao-dong.html",
+    "09-thanh-ly-hop-dong.html"
+  ];
+
+  const SYSTEM_BACKUP_COLLECTIONS = [
+    "projects", "customers", "employees", "history", "users",
+    "documents", "document_counters"
+  ];
+
+  function downloadBackupBlob(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  function backupSafeJSON(value) {
+    return JSON.stringify(value, (key, item) => {
+      if (item && typeof item.toDate === "function") {
+        return { __grovaType: "timestamp", value: item.toDate().toISOString() };
+      }
+      if (item && typeof item.path === "string" && item.firestore) {
+        return { __grovaType: "reference", path: item.path };
+      }
+      if (item instanceof Uint8Array) {
+        return { __grovaType: "bytes", value: Array.from(item) };
+      }
+      return item;
+    }, 2);
+  }
+
+  function backupRestoreValue(value) {
+    if (Array.isArray(value)) return value.map(backupRestoreValue);
+    if (!value || typeof value !== "object") return value;
+    if (value.__grovaType === "timestamp") {
+      return window.firebase?.firestore?.Timestamp
+        ? firebase.firestore.Timestamp.fromDate(new Date(value.value))
+        : new Date(value.value);
+    }
+    if (value.__grovaType === "bytes") return new Uint8Array(value.value || []);
+    if (value.__grovaType === "reference") return value.path || "";
+    return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, backupRestoreValue(item)]));
+  }
+
+  async function fetchBackupFile(path) {
+    const response = await fetch(`./${path}?backup=${Date.now()}`, { cache: "no-store" });
+    if (!response.ok) throw new Error(`BACKUP_FILE_NOT_FOUND:${path}`);
+    return response.blob();
+  }
+
+  async function collectFirestoreBackup() {
+    if (!initializeFirestore()) throw new Error("FIRESTORE_UNAVAILABLE");
+    await waitForFirestore();
+    const result = {};
+    for (const collectionName of SYSTEM_BACKUP_COLLECTIONS) {
+      try {
+        const snapshot = await firestoreDb.collection(collectionName).get();
+        result[collectionName] = snapshot.docs.map((doc) => ({ id: doc.id, data: doc.data() }));
+      } catch (error) {
+        console.warn(`GROVA BACKUP: cannot read ${collectionName}.`, error);
+        result[collectionName] = [];
+        result.__errors = result.__errors || [];
+        result.__errors.push({ collection: collectionName, code: String(error?.code || "unknown"), message: String(error?.message || "") });
+      }
+    }
+    return result;
+  }
+
+  async function createFullSystemBackup() {
+    if (!isAdminUser()) {
+      showToast("Chỉ Administrator mới có thể tạo backup toàn hệ thống.");
+      return;
+    }
+    const button = document.querySelector('[data-action="backup-system"]');
+    if (button) { button.disabled = true; button.textContent = "Đang tạo backup..."; }
+    try {
+      if (!window.JSZip) throw new Error("JSZIP_UNAVAILABLE");
+      const now = new Date();
+      const stamp = now.toISOString().replace(/[:.]/g, "-").slice(0, 19);
+      const root = `GROVA_DOCUMENT_BACKUP_${stamp}`;
+      const zip = new JSZip();
+      const firestoreData = await collectFirestoreBackup();
+      const payload = {
+        exportedAt: now.toISOString(),
+        app: DATA.app || {},
+        company: getSettings(),
+        localData: { projects: getProjects(), customers: getCustomers(), employees: getEmployees(), history: getHistory(), templates: getTemplates() },
+        firestore: firestoreData
+      };
+
+      zip.file(`${root}/BACKUP_INFO.json`, backupSafeJSON({
+        backupType: "GROVA_DOCUMENT_FULL_SYSTEM",
+        backupVersion: SYSTEM_BACKUP_VERSION,
+        createdAt: now.toISOString(),
+        appVersion: DATA.app?.version || SYSTEM_BACKUP_VERSION,
+        note: "Firebase Authentication credentials/passwords are not exportable from the browser. users profiles are included; Authentication accounts remain in Firebase Auth."
+      }));
+      zip.file(`${root}/DATA/firestore-and-local-data.json`, backupSafeJSON(payload));
+
+      const sourcePaths = [...SYSTEM_BACKUP_FILES, ...SYSTEM_BACKUP_TEMPLATE_FILES.map((name) => `templates/${name}`)];
+      for (const path of sourcePaths) {
+        try {
+          zip.file(`${root}/SYSTEM/${path}`, await fetchBackupFile(path));
+        } catch (error) {
+          zip.file(`${root}/SYSTEM_MISSING/${path}.txt`, `Không thể đọc file ${path}.\n${String(error?.message || error)}`);
+        }
+      }
+      zip.file(`${root}/README_RESTORE.txt`,
+`GROVA DOCUMENT — HƯỚNG DẪN BACKUP / KHÔI PHỤC\n\n` +
+`1. Backup chứa mã nguồn, templates, assets và dữ liệu Firestore mà tài khoản hiện tại được phép đọc.\n` +
+`2. Mật khẩu và thông tin đăng nhập Firebase Authentication không thể xuất từ trình duyệt.\n` +
+`3. Khôi phục dữ liệu bằng chức năng Khôi phục trong GROVA có thể ghi đè dữ liệu hiện tại.\n` +
+`4. Mã nguồn trong SYSTEM là bản lưu để upload/khôi phục thủ công trên GitHub/hosting.\n` +
+`5. Giữ lại file backup gốc ở nơi an toàn.`);
+
+      const blob = await zip.generateAsync({ type: "blob", compression: "DEFLATE", compressionOptions: { level: 6 } });
+      downloadBackupBlob(blob, `GROVA-DOCUMENT-FULL-BACKUP-${stamp}.zip`);
+      showToast("Đã tạo backup toàn hệ thống.");
+    } catch (error) {
+      console.error("GROVA BACKUP: create failed.", error);
+      showToast(error?.message === "JSZIP_UNAVAILABLE" ? "Chưa tải được thư viện tạo file ZIP. Vui lòng tải lại trang." : "Không thể tạo backup toàn hệ thống.");
+    } finally {
+      if (button) { button.disabled = false; button.textContent = "Tạo backup toàn hệ thống"; }
+    }
+  }
+
+  async function restoreFullSystemBackup(file) {
+    if (!isAdminUser()) { showToast("Chỉ Administrator mới có thể khôi phục backup."); return; }
+    if (!file || !window.JSZip) { showToast("Không thể đọc file backup ZIP. Vui lòng tải lại trang."); return; }
+    if (!confirm("CẢNH BÁO KHÔI PHỤC\n\nDữ liệu trong backup sẽ được ghi vào Firestore. Dữ liệu hiện tại có thể bị ghi đè.\n\nBạn chắc chắn muốn tiếp tục?")) return;
+    try {
+      const zip = await JSZip.loadAsync(file);
+      const dataEntry = Object.values(zip.files).find((entry) => /\/DATA\/firestore-and-local-data\.json$/i.test(entry.name));
+      if (!dataEntry) throw new Error("BACKUP_DATA_NOT_FOUND");
+      const payload = JSON.parse(await dataEntry.async("text"));
+      const firestoreData = payload?.firestore || {};
+      await waitForFirestore();
+      for (const collectionName of SYSTEM_BACKUP_COLLECTIONS) {
+        const records = Array.isArray(firestoreData[collectionName]) ? firestoreData[collectionName] : [];
+        for (let start = 0; start < records.length; start += 400) {
+          const batch = firestoreDb.batch();
+          records.slice(start, start + 400).forEach((record) => {
+            if (!record?.id || !record?.data) return;
+            batch.set(firestoreDb.collection(collectionName).doc(String(record.id)), backupRestoreValue(record.data), { merge: false });
+          });
+          await batch.commit();
+        }
+      }
+      if (payload.company) writeStorage(STORAGE.settings, payload.company);
+      if (payload.localData?.projects) writeStorage(STORAGE.projects, payload.localData.projects);
+      if (payload.localData?.customers) writeStorage(STORAGE.customers, payload.localData.customers);
+      if (payload.localData?.employees) writeStorage(STORAGE.employees, payload.localData.employees);
+      if (payload.localData?.history) writeStorage(STORAGE.history, payload.localData.history);
+      showToast("Đã khôi phục dữ liệu từ backup. Vui lòng tải lại trang.");
+      setTimeout(() => window.location.reload(), 1200);
+    } catch (error) {
+      console.error("GROVA BACKUP: restore failed.", error);
+      showToast(error?.code === "permission-denied" ? "Firebase từ chối khôi phục theo Rules hiện tại." : "Không thể khôi phục backup.");
+    }
+  }
+
+  /* =======================================================
      EXPORT DATA
   ======================================================= */
 
@@ -7110,6 +7293,14 @@
         exportData();
         break;
 
+      case "backup-system":
+        void createFullSystemBackup();
+        break;
+
+      case "restore-system":
+        document.getElementById("systemBackupFileInput")?.click();
+        break;
+
       case "reset-data":
         resetData();
         break;
@@ -7310,6 +7501,13 @@
 
       }
     );
+
+    document.addEventListener("change", (event) => {
+      if (event.target?.id !== "systemBackupFileInput") return;
+      const file = event.target.files?.[0];
+      event.target.value = "";
+      if (file) void restoreFullSystemBackup(file);
+    });
 
     document.addEventListener(
       "click",
