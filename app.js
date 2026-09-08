@@ -1,6 +1,6 @@
 /* =========================================================
    GROVA DOCUMENT
-   APP.JS — VERSION 225
+   APP.JS — VERSION 226
    FIRESTORE PHASE 4 — HISTORY + PHASE 5A PERMISSION CORE + PHASE 5B.4 ACCOUNT MANAGEMENT UI + PHASE 5B.5 ACCOUNT PROFILE UI + PHASE 5B.6 ACCOUNT MANAGEMENT HARDENING + PHASE 5B.7 ACCOUNT PROFILE UI SYNC + SPARK ACCOUNT PROFILE MANAGEMENT + FULL VIEW/CREATE/EDIT/DELETE PERMISSION ENFORCEMENT
    PROJECTS + CUSTOMERS + EMPLOYEES + HISTORY
    CLEAN BASE FROM LOCKED VERSION 209
@@ -6208,7 +6208,7 @@
 
         ${accountUsers.length ? `
           <div class="table-wrap">
-            <table class="data-table">
+            <table class="data-table account-users-table">
               <thead>
                 <tr>
                   <th>Họ tên</th>
