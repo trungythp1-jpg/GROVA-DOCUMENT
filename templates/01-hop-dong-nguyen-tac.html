@@ -65,8 +65,7 @@ body{min-height:100vh}
 
   <button
     class="print-btn"
-    id="grovaPrintButton01"
-    onclick="if (window.GROVA_DOCUMENT_PERMISSION && !window.GROVA_DOCUMENT_PERMISSION.can("export")) { alert("Tài khoản của bạn không được cấp quyền Xuất/In mẫu văn bản này."); return false; } window.print(); return false;"
+    onclick="window.print()"
   >
     🖨 In văn bản
   </button>
@@ -1441,7 +1440,6 @@ body{min-height:100vh}
   <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore-compat.js"></script>
-  <script src="../document-permission.js?v=243"></script>
 <script>
 
 /* =========================================================
