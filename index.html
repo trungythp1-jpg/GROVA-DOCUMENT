@@ -102,6 +102,58 @@
   @media (max-width: 720px) {
     .print-list-btn { width: 100%; }
   }
+  .grova-ai-nav-item .nav-icon { font-size: 1.05em; }
+  .grova-ai-page-head { align-items: flex-start; }
+  .grova-ai-card {
+    background: var(--card, #fff);
+    border: 1px solid var(--border, #e5e7eb);
+    border-radius: 18px;
+    padding: 16px;
+    box-shadow: 0 8px 28px rgba(0,0,0,.05);
+  }
+  .grova-ai-messages {
+    min-height: 360px;
+    max-height: 58vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 4px;
+  }
+  .grova-ai-message {
+    max-width: min(860px, 92%);
+    border-radius: 14px;
+    padding: 11px 13px;
+    line-height: 1.55;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  .grova-ai-message.is-user {
+    align-self: flex-end;
+    background: #e9f7f1;
+  }
+  .grova-ai-message.is-assistant {
+    align-self: flex-start;
+    background: #f5f7f9;
+  }
+  .grova-ai-message small { display:block; font-weight:700; margin-bottom:4px; }
+  .grova-ai-message-body { white-space: pre-wrap; overflow-wrap:anywhere; }
+  .grova-ai-composer {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    margin-top: 14px;
+    align-items: end;
+  }
+  .grova-ai-composer textarea { width:100%; resize:vertical; min-height:84px; }
+  .grova-ai-send { min-width:110px; height:48px; }
+  .grova-ai-status { margin-top: 10px; }
+  @media (max-width: 720px) {
+    .grova-ai-composer { grid-template-columns: 1fr; }
+    .grova-ai-send { width:100%; }
+    .grova-ai-message { max-width: 96%; }
+    .grova-ai-messages { min-height: 300px; max-height: 55vh; }
+  }
 </style>
 </head>
 
@@ -204,6 +256,15 @@
         >
           <span class="nav-icon">▥</span>
           <span>Báo cáo</span>
+        </button>
+
+        <button
+          class="nav-item grova-ai-nav-item"
+          data-page="ai"
+          type="button"
+        >
+          <span class="nav-icon">🤖</span>
+          <span>GROVA AI</span>
         </button>
 
         <div class="divider"></div>
@@ -851,6 +912,61 @@
         </section>
 
         <!-- =================================================
+             GROVA AI
+        ================================================== -->
+        <section
+          id="page-ai"
+          class="page"
+        >
+          <div class="page-head grova-ai-page-head">
+            <div>
+              <small>TRỢ LÝ HỆ THỐNG</small>
+              <h2>🤖 GROVA AI</h2>
+              <p>Hỏi và phân tích dữ liệu GROVA theo đúng quyền của tài khoản đang đăng nhập.</p>
+            </div>
+            <button
+              class="secondary"
+              data-action="grova-ai-clear"
+              type="button"
+            >
+              Xóa cuộc trò chuyện
+            </button>
+          </div>
+
+          <div class="grova-ai-card">
+            <div
+              id="grovaAiMessages"
+              class="grova-ai-messages"
+              aria-live="polite"
+            ></div>
+
+            <div class="grova-ai-composer">
+              <textarea
+                id="grovaAiInput"
+                rows="3"
+                placeholder="Ví dụ: Có bao nhiêu công trình đang thi công? Khách hàng nào đang có nhiều công trình nhất?"
+                autocomplete="off"
+              ></textarea>
+              <button
+                id="grovaAiSend"
+                class="primary grova-ai-send"
+                data-action="grova-ai-send"
+                type="button"
+              >
+                Gửi
+              </button>
+            </div>
+
+            <div
+              id="grovaAiStatus"
+              class="setting-note grova-ai-status"
+            >
+              AI chỉ đọc dữ liệu theo quyền của tài khoản. AI v1 không tự sửa hoặc xóa dữ liệu.
+            </div>
+          </div>
+        </section>
+
+        <!-- =================================================
              REPORTS
         ================================================== -->
 
@@ -1147,6 +1263,10 @@
   src="https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore-compat.js"
 ></script>
 
+  <script
+    src="https://www.gstatic.com/firebasejs/12.18.0/firebase-functions-compat.js"
+  ></script>
+
   <!-- =====================================================
        GROVA AUTHENTICATION
        ===================================================== -->
@@ -1176,7 +1296,7 @@
        ===================================================== -->
 
   <script
-    src="./app.js?v=227"
+    src="./app.js?v=228"
   ></script>
   <!-- =====================================================
        SERVICE WORKER
