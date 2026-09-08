@@ -1,6 +1,6 @@
 /* =========================================================
    GROVA DOCUMENT
-   APP.JS — VERSION 227
+   APP.JS — VERSION 228
    FIRESTORE PHASE 4 — HISTORY + PHASE 5A PERMISSION CORE + PHASE 5B.4 ACCOUNT MANAGEMENT UI + PHASE 5B.5 ACCOUNT PROFILE UI + PHASE 5B.6 ACCOUNT MANAGEMENT HARDENING + PHASE 5B.7 ACCOUNT PROFILE UI SYNC + SPARK ACCOUNT PROFILE MANAGEMENT + FULL VIEW/CREATE/EDIT/DELETE PERMISSION ENFORCEMENT
    PROJECTS + CUSTOMERS + EMPLOYEES + HISTORY
    CLEAN BASE FROM LOCKED VERSION 209
@@ -66,6 +66,11 @@
       subtitle: "Tổng hợp dữ liệu GROVA"
     },
 
+    ai: {
+      title: "GROVA AI",
+      subtitle: "Trợ lý AI đọc dữ liệu theo quyền của tài khoản"
+    },
+
     settings: {
       title: "Cài đặt",
       subtitle: "Cấu hình hệ thống"
@@ -108,7 +113,8 @@
       documents: { view: true, create: true, edit: true, delete: true, export: true },
       history: { view: true },
       users: { view: true, create: true, edit: true, lock: true, managePermissions: true },
-      settings: { view: true, edit: true }
+      settings: { view: true, edit: true },
+      ai: { view: true }
     },
     manager: {
       projects: { view: true, create: true, edit: true, delete: true },
@@ -117,7 +123,8 @@
       documents: { view: true, create: true, edit: true, delete: true, export: true },
       history: { view: true },
       users: { view: false, create: false, edit: false, lock: false, managePermissions: false },
-      settings: { view: true, edit: true }
+      settings: { view: true, edit: true },
+      ai: { view: true }
     },
     employee: {
       projects: { view: true, create: true, edit: true, delete: false },
@@ -126,7 +133,8 @@
       documents: { view: true, create: true, edit: false, delete: false, export: true },
       history: { view: true },
       users: { view: false, create: false, edit: false, lock: false, managePermissions: false },
-      settings: { view: false, edit: false }
+      settings: { view: false, edit: false },
+      ai: { view: true }
     },
     viewer: {
       projects: { view: true, create: false, edit: false, delete: false },
@@ -135,7 +143,8 @@
       documents: { view: true, create: false, edit: false, delete: false, export: false },
       history: { view: true },
       users: { view: false, create: false, edit: false, lock: false, managePermissions: false },
-      settings: { view: false, edit: false }
+      settings: { view: false, edit: false },
+      ai: { view: true }
     },
     custom: {
       projects: { view: false, create: false, edit: false, delete: false },
@@ -144,7 +153,8 @@
       documents: { view: false, create: false, edit: false, delete: false, export: false },
       history: { view: false },
       users: { view: false, create: false, edit: false, lock: false, managePermissions: false },
-      settings: { view: false, edit: false }
+      settings: { view: false, edit: false },
+      ai: { view: false }
     }
   };
 
@@ -2412,6 +2422,7 @@
       employees: ["employees", "view"],
       history: ["history", "view"],
       reports: ["reports", "view"],
+      ai: ["ai", "view"],
       settings: ["settings", "view"]
     };
     return map[page] || null;
@@ -2431,6 +2442,7 @@
       employees: "Nhân sự",
       history: "Lịch sử",
       reports: "Báo cáo",
+      ai: "GROVA AI",
       settings: "Cài đặt"
     };
     return `Bạn không có quyền xem ${labels[page] || "nội dung này"}.`;
@@ -2525,6 +2537,10 @@
 
     if (page === "reports") {
       renderReports();
+    }
+
+    if (page === "ai") {
+      renderGrovaAI();
     }
 
     if (page === "settings") {
@@ -6608,6 +6624,125 @@
   }
 
   /* =======================================================
+     GROVA AI — VERSION 228 / READ-ONLY ASSISTANT
+  ======================================================= */
+
+  let grovaAiBusy = false;
+
+  function appendGrovaAIMessage(role, text) {
+    const container = $("#grovaAiMessages");
+    if (!container) return;
+
+    const item = document.createElement("div");
+    item.className = `grova-ai-message ${role === "user" ? "is-user" : "is-assistant"}`;
+
+    const label = document.createElement("small");
+    label.textContent = role === "user" ? "Bạn" : "GROVA AI";
+
+    const body = document.createElement("div");
+    body.className = "grova-ai-message-body";
+    body.textContent = String(text || "");
+
+    item.appendChild(label);
+    item.appendChild(body);
+    container.appendChild(item);
+    container.scrollTop = container.scrollHeight;
+  }
+
+  function renderGrovaAI() {
+    if (!hasPermission("ai", "view")) {
+      showPermissionDenied("ai");
+      return;
+    }
+
+    const container = $("#grovaAiMessages");
+    if (container && !container.dataset.initialized) {
+      container.dataset.initialized = "1";
+      appendGrovaAIMessage(
+        "assistant",
+        "Xin chào. Tôi là GROVA AI. Tôi có thể trả lời câu hỏi về dữ liệu GROVA mà tài khoản của bạn được phép xem. Giai đoạn này AI chỉ đọc và phân tích, không tự sửa hoặc xóa dữ liệu."
+      );
+    }
+  }
+
+  function getGrovaFunctions() {
+    if (window.firebase && typeof firebase.functions === "function") {
+      try {
+        return firebase.functions();
+      } catch (error) {
+        console.warn("GROVA AI: Firebase Functions unavailable.", error);
+      }
+    }
+    return null;
+  }
+
+  async function askGrovaAI() {
+    if (grovaAiBusy) return;
+    if (!hasPermission("ai", "view")) {
+      showPermissionDenied("ai");
+      return;
+    }
+
+    const input = $("#grovaAiInput");
+    const question = String(input?.value || "").trim();
+    if (!question) {
+      showToast("Hãy nhập câu hỏi cho GROVA AI.");
+      input?.focus();
+      return;
+    }
+
+    const functions = getGrovaFunctions();
+    if (!functions) {
+      showToast("Firebase Functions chưa sẵn sàng.");
+      return;
+    }
+
+    appendGrovaAIMessage("user", question);
+    input.value = "";
+
+    const button = $("#grovaAiSend");
+    const status = $("#grovaAiStatus");
+    grovaAiBusy = true;
+    if (button) {
+      button.disabled = true;
+      button.textContent = "Đang xử lý...";
+    }
+    if (status) status.textContent = "GROVA AI đang phân tích dữ liệu được phép truy cập...";
+
+    try {
+      const callable = functions.httpsCallable("grovaAiAsk");
+      const result = await callable({ question });
+      const answer = result?.data?.answer || "GROVA AI không trả về nội dung trả lời.";
+      appendGrovaAIMessage("assistant", answer);
+    } catch (error) {
+      console.error("GROVA AI: ask failed.", error);
+      const code = String(error?.code || "");
+      let message = "Không thể kết nối GROVA AI.";
+      if (code === "functions/unauthenticated") message = "Phiên đăng nhập không hợp lệ. Vui lòng đăng nhập lại.";
+      if (code === "functions/permission-denied") message = "Tài khoản hiện tại chưa được cấp quyền sử dụng GROVA AI.";
+      if (code === "functions/failed-precondition") message = "GROVA AI chưa được cấu hình API trên Firebase.";
+      if (code === "functions/resource-exhausted") message = "GROVA AI đang vượt giới hạn sử dụng. Vui lòng thử lại sau.";
+      appendGrovaAIMessage("assistant", message);
+    } finally {
+      grovaAiBusy = false;
+      if (button) {
+        button.disabled = false;
+        button.textContent = "Gửi";
+      }
+      if (status) status.textContent = "AI chỉ đọc dữ liệu theo quyền của tài khoản.";
+      input?.focus();
+    }
+  }
+
+  function clearGrovaAIChat() {
+    const container = $("#grovaAiMessages");
+    if (!container) return;
+    container.innerHTML = "";
+    delete container.dataset.initialized;
+    renderGrovaAI();
+  }
+
+  /* =======================================================
      SETTINGS
   ======================================================= */
 
@@ -6776,7 +6911,7 @@
      FULL SYSTEM BACKUP / RESTORE — VERSION 227
   ======================================================= */
 
-  const SYSTEM_BACKUP_VERSION = "227";
+  const SYSTEM_BACKUP_VERSION = "228";
 
   const SYSTEM_BACKUP_FILES = [
     "index.html", "app.js", "style.css", "auth.js", "auth.css", "sw.js",
@@ -7293,6 +7428,14 @@
         exportData();
         break;
 
+      case "grova-ai-send":
+        void askGrovaAI();
+        break;
+
+      case "grova-ai-clear":
+        clearGrovaAIChat();
+        break;
+
       case "backup-system":
         void createFullSystemBackup();
         break;
@@ -7593,7 +7736,8 @@
     hasPermission,
     isAdminUser,
     ROLE_LABELS,
-    DEFAULT_PERMISSIONS
+    DEFAULT_PERMISSIONS,
+    askGrovaAI
   };
 
   /* =======================================================
