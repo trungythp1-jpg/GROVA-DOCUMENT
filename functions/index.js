@@ -1,549 +1,284 @@
 /**
- * GROVA DOCUMENT — PHASE 5B.3
- * Account Profile Bridge + Secure Account API
+ * GROVA DOCUMENT — VERSION 228
+ * GROVA AI — READ-ONLY, PERMISSION-AWARE BACKEND
  *
- * Purpose:
- * - Keep Firebase Admin SDK on the trusted server side.
- * - Authenticate the caller on every account-management operation.
- * - Enforce GROVA users.* permissions before changing Firebase Auth or users/{uid}.
- * - Provide create/list/update/lock/unlock operations for the future account UI.
- *
- * This phase connects only the current-account profile bridge to app.js.
- * Account-management UI remains a later phase.
- * It also does NOT hard-delete Firebase Auth accounts.
+ * Security model:
+ * - Firebase Auth must authenticate the caller.
+ * - The server reads users/{uid} with Firebase Admin SDK.
+ * - Client-supplied roles/permissions are never trusted.
+ * - Only Firestore collections allowed by the user's view permissions are
+ *   included in the AI context.
+ * - GROVA AI v1 is read-only: it does not create/edit/delete Firestore data.
+ * - OpenAI API key stays server-side in Firebase Secret Manager.
  */
 
 const { initializeApp } = require("firebase-admin/app");
-const { getAuth } = require("firebase-admin/auth");
-const { getFirestore, FieldValue } = require("firebase-admin/firestore");
+const { getFirestore } = require("firebase-admin/firestore");
 const { onCall, HttpsError } = require("firebase-functions/v2/https");
+const { defineSecret } = require("firebase-functions/params");
 
 initializeApp();
 
-const auth = getAuth();
 const db = getFirestore();
-
+const OPENAI_API_KEY = defineSecret("OPENAI_API_KEY");
 const BOOTSTRAP_ADMIN_UID = "nJmKgjEILgVOEjWKYWTsuonxbO03";
-const USERS_COLLECTION = "users";
-const ROLE_LABELS = {
-  admin: "Administrator",
-  manager: "Quản lý",
-  employee: "Nhân viên",
-  viewer: "Chỉ xem",
-  custom: "Tùy chỉnh"
+const DEFAULT_MODEL = "gpt-5.6-luna";
+const MAX_DOCS_PER_COLLECTION = 120;
+const MAX_STRING_LENGTH = 1800;
+const MAX_CONTEXT_CHARS = 90000;
+
+const COLLECTION_PERMISSION_MAP = {
+  projects: "projects",
+  customers: "customers",
+  employees: "employees",
+  history: "history",
+  documents: "documents",
+  users: "users"
 };
 
-const PERMISSION_KEYS = [
-  "projects",
-  "customers",
-  "employees",
-  "documents",
-  "history",
-  "users",
-  "settings"
-];
-
-const DEFAULT_PERMISSIONS = {
-  admin: {
-    projects: { view: true, create: true, edit: true, delete: true },
-    customers: { view: true, create: true, edit: true, delete: true },
-    employees: { view: true, create: true, edit: true, delete: true },
-    documents: { view: true, create: true, edit: true, delete: true, export: true },
-    history: { view: true },
-    users: { view: true, create: true, edit: true, lock: true, managePermissions: true },
-    settings: { view: true, edit: true }
-  },
-  manager: {
-    projects: { view: true, create: true, edit: true, delete: true },
-    customers: { view: true, create: true, edit: true, delete: true },
-    employees: { view: true, create: true, edit: true, delete: true },
-    documents: { view: true, create: true, edit: true, delete: true, export: true },
-    history: { view: true },
-    users: { view: false, create: false, edit: false, lock: false, managePermissions: false },
-    settings: { view: true, edit: true }
-  },
-  employee: {
-    projects: { view: true, create: true, edit: true, delete: false },
-    customers: { view: true, create: true, edit: true, delete: false },
-    employees: { view: true, create: false, edit: false, delete: false },
-    documents: { view: true, create: true, edit: false, delete: false, export: true },
-    history: { view: true },
-    users: { view: false, create: false, edit: false, lock: false, managePermissions: false },
-    settings: { view: false, edit: false }
-  },
-  viewer: {
-    projects: { view: true, create: false, edit: false, delete: false },
-    customers: { view: true, create: false, edit: false, delete: false },
-    employees: { view: true, create: false, edit: false, delete: false },
-    documents: { view: true, create: false, edit: false, delete: false, export: false },
-    history: { view: true },
-    users: { view: false, create: false, edit: false, lock: false, managePermissions: false },
-    settings: { view: false, edit: false }
-  },
-  custom: {
-    projects: { view: false, create: false, edit: false, delete: false },
-    customers: { view: false, create: false, edit: false, delete: false },
-    employees: { view: false, create: false, edit: false, delete: false },
-    documents: { view: false, create: false, edit: false, delete: false, export: false },
-    history: { view: false },
-    users: { view: false, create: false, edit: false, lock: false, managePermissions: false },
-    settings: { view: false, edit: false }
-  }
-};
-
-function clone(value) {
-  return JSON.parse(JSON.stringify(value));
-}
-
-function normalizePermissions(input, role = "employee") {
-  const base = clone(DEFAULT_PERMISSIONS[role] || DEFAULT_PERMISSIONS.employee);
-  if (!input || typeof input !== "object") return base;
-
-  for (const group of PERMISSION_KEYS) {
-    if (!input[group] || typeof input[group] !== "object") continue;
-    for (const key of Object.keys(base[group])) {
-      if (typeof input[group][key] === "boolean") {
-        base[group][key] = input[group][key];
-      }
-    }
-  }
-
-  return base;
-}
-
-function makeAdminPermissions() {
-  return clone(DEFAULT_PERMISSIONS.admin);
-}
-
-function normalizeRole(role) {
-  return Object.prototype.hasOwnProperty.call(ROLE_LABELS, role) ? role : "employee";
-}
-
-function cleanString(value, maxLength = 200) {
-  if (value === undefined || value === null) return "";
-  return String(value).trim().slice(0, maxLength);
-}
-
-function isBootstrapAdmin(uid) {
+function isAdmin(uid) {
   return uid === BOOTSTRAP_ADMIN_UID;
 }
 
-function isAdminProfile(profile, uid) {
-  return isBootstrapAdmin(uid) || (profile && profile.status === "active" && profile.role === "admin");
-}
-
-async function getUserProfile(uid) {
-  const snap = await db.collection(USERS_COLLECTION).doc(uid).get();
-  return snap.exists ? snap.data() : null;
-}
-
-async function requireCaller(request, permission) {
-  if (!request.auth || !request.auth.uid) {
-    throw new HttpsError("unauthenticated", "Bạn phải đăng nhập để sử dụng GROVA backend.");
-  }
-
-  const uid = request.auth.uid;
-  const profile = await getUserProfile(uid);
-
-  if (isBootstrapAdmin(uid)) {
-    return {
-      uid,
-      profile: {
-        uid,
-        role: "admin",
-        status: "active",
-        permissions: makeAdminPermissions()
-      }
-    };
-  }
-
-  if (!profile || profile.status !== "active") {
-    throw new HttpsError("permission-denied", "Tài khoản không có quyền sử dụng chức năng này.");
-  }
-
-  if (profile.role === "admin") {
-    return { uid, profile };
-  }
-
-  if (!profile.permissions || !profile.permissions.users || profile.permissions.users[permission] !== true) {
-    throw new HttpsError("permission-denied", "Bạn không có quyền quản lý tài khoản.");
-  }
-
-  return { uid, profile };
-}
-
-function assertTargetUid(targetUid) {
-  const uid = cleanString(targetUid, 128);
-  if (!uid) {
-    throw new HttpsError("invalid-argument", "Thiếu UID tài khoản.");
-  }
-  return uid;
-}
-
-async function assertNotProtectedAdminTarget(caller, targetUid, action) {
-  if (targetUid !== BOOTSTRAP_ADMIN_UID) return;
-
-  if (caller.uid !== BOOTSTRAP_ADMIN_UID) {
-    throw new HttpsError("permission-denied", "Không được phép thay đổi tài khoản Admin gốc.");
-  }
-
-  if (action === "lock" || action === "unlock") {
-    throw new HttpsError("failed-precondition", "Không thể khóa hoặc mở khóa tài khoản Admin gốc.");
-  }
-}
-
-async function countActiveAdmins() {
-  const snap = await db.collection(USERS_COLLECTION)
-    .where("role", "==", "admin")
-    .where("status", "==", "active")
-    .get();
-  return snap.size;
-}
-
-function buildAuthUserResponse(userRecord, profile) {
-  return {
-    uid: userRecord.uid,
-    email: userRecord.email || "",
-    displayName: userRecord.displayName || "",
-    phoneNumber: userRecord.phoneNumber || "",
-    disabled: Boolean(userRecord.disabled),
-    emailVerified: Boolean(userRecord.emailVerified),
-    creationTime: userRecord.metadata && userRecord.metadata.creationTime
-      ? userRecord.metadata.creationTime
-      : null,
-    lastSignInTime: userRecord.metadata && userRecord.metadata.lastSignInTime
-      ? userRecord.metadata.lastSignInTime
-      : null,
-    profile: profile || null
+function defaultPermissions(role) {
+  const common = {
+    projects: { view: false },
+    customers: { view: false },
+    employees: { view: false },
+    documents: { view: false },
+    history: { view: false },
+    users: { view: false },
+    settings: { view: false },
+    ai: { view: false }
   };
+
+  if (role === "admin") {
+    Object.keys(common).forEach((key) => { common[key].view = true; });
+  } else if (role === "manager" || role === "employee") {
+    ["projects", "customers", "employees", "documents", "history", "ai"].forEach((key) => {
+      common[key].view = true;
+    });
+  } else if (role === "viewer") {
+    ["projects", "customers", "employees", "documents", "history", "ai"].forEach((key) => {
+      common[key].view = true;
+    });
+  }
+
+  return common;
+}
+
+function getPermissions(profile, uid) {
+  if (isAdmin(uid)) return defaultPermissions("admin");
+  const role = String(profile?.role || "employee");
+  const permissions = profile?.permissions && typeof profile.permissions === "object"
+    ? profile.permissions
+    : defaultPermissions(role);
+  return permissions;
+}
+
+function canView(permissions, group) {
+  return Boolean(permissions?.[group]?.view);
+}
+
+function sanitizeValue(value, depth = 0) {
+  if (depth > 4) return "[nested object omitted]";
+  if (value === null || value === undefined) return value;
+  if (typeof value === "string") return value.slice(0, MAX_STRING_LENGTH);
+  if (typeof value === "number" || typeof value === "boolean") return value;
+  if (value instanceof Date) return value.toISOString();
+  if (Array.isArray(value)) return value.slice(0, 50).map((item) => sanitizeValue(item, depth + 1));
+  if (typeof value === "object") {
+    const result = {};
+    for (const [key, item] of Object.entries(value).slice(0, 80)) {
+      if (/password|token|secret|api.?key/i.test(key)) continue;
+      result[key] = sanitizeValue(item, depth + 1);
+    }
+    return result;
+  }
+  return String(value).slice(0, MAX_STRING_LENGTH);
+}
+
+function extractOutputText(response) {
+  if (typeof response?.output_text === "string" && response.output_text.trim()) {
+    return response.output_text.trim();
+  }
+
+  const chunks = [];
+  for (const item of Array.isArray(response?.output) ? response.output : []) {
+    for (const content of Array.isArray(item?.content) ? item.content : []) {
+      if (content?.type === "output_text" && typeof content.text === "string") {
+        chunks.push(content.text);
+      }
+    }
+  }
+  return chunks.join("\n").trim();
+}
+
+async function loadAllowedContext(uid, profile, permissions) {
+  const context = {
+    user: {
+      uid,
+      name: profile?.name || "",
+      email: profile?.email || "",
+      role: profile?.role || (isAdmin(uid) ? "admin" : "employee")
+    },
+    collections: {}
+  };
+
+  let chars = JSON.stringify(context).length;
+
+  for (const [collection, group] of Object.entries(COLLECTION_PERMISSION_MAP)) {
+    if (!canView(permissions, group)) continue;
+
+    try {
+      const snapshot = await db.collection(collection).limit(MAX_DOCS_PER_COLLECTION).get();
+      const records = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...sanitizeValue(doc.data())
+      }));
+      const serialized = JSON.stringify(records);
+      if (chars + serialized.length > MAX_CONTEXT_CHARS) {
+        context.collections[collection] = {
+          truncated: true,
+          note: "Dữ liệu bị giới hạn để bảo vệ hiệu năng và chi phí AI.",
+          records: records.slice(0, 20)
+        };
+      } else {
+        context.collections[collection] = records;
+        chars += serialized.length;
+      }
+    } catch (error) {
+      console.warn(`GROVA AI: cannot read ${collection}.`, error);
+      context.collections[collection] = {
+        unavailable: true,
+        reason: "Không thể đọc collection này ở thời điểm hiện tại."
+      };
+    }
+  }
+
+  return context;
+}
+
+function buildSystemPrompt(context) {
+  return [
+    "Bạn là GROVA AI, trợ lý nội bộ của GROVA DOCUMENT.",
+    "Bạn chỉ được trả lời dựa trên dữ liệu GROVA được cung cấp trong context và câu hỏi của người dùng.",
+    "Không được suy đoán dữ liệu không có trong context. Nếu thiếu dữ liệu, hãy nói rõ là chưa có dữ liệu.",
+    "Không tiết lộ hoặc suy luận quyền truy cập của người dùng khác.",
+    "Không tự tạo số liệu. Khi tính toán, hãy tính từ dữ liệu được cung cấp và nói rõ nếu dữ liệu đã bị giới hạn.",
+    "Giai đoạn AI v1 là READ-ONLY: không được yêu cầu hoặc thực hiện thao tác sửa, xóa, tạo dữ liệu.",
+    "Trả lời bằng tiếng Việt, rõ ràng, ngắn gọn, ưu tiên gạch đầu dòng và số liệu.",
+    "Nếu người dùng yêu cầu hành động thay đổi dữ liệu, hãy giải thích rằng GROVA AI v1 chưa thực hiện thao tác đó.",
+    "\nDỮ LIỆU GROVA ĐƯỢC PHÉP SỬ DỤNG:\n" + JSON.stringify(context)
+  ].join("\n");
 }
 
 exports.grovaBackendStatus = onCall((request) => {
   if (!request.auth) {
-    throw new HttpsError(
-      "unauthenticated",
-      "Bạn phải đăng nhập để sử dụng GROVA backend."
-    );
+    throw new HttpsError("unauthenticated", "Bạn phải đăng nhập để sử dụng GROVA backend.");
   }
 
   return {
     ok: true,
     service: "GROVA DOCUMENT",
-    phase: "5B.3",
+    phase: "5B.1",
     backend: "cloud-functions-2nd-gen",
     callerUid: request.auth.uid,
     isBootstrapAdmin: request.auth.uid === BOOTSTRAP_ADMIN_UID
   };
 });
 
-exports.grovaGetMyProfile = onCall(async (request) => {
-  if (!request.auth || !request.auth.uid) {
-    throw new HttpsError(
-      "unauthenticated",
-      "Bạn phải đăng nhập để lấy hồ sơ tài khoản."
-    );
-  }
-
-  const uid = request.auth.uid;
-  let profile = await getUserProfile(uid);
-
-  /*
-    Only the immutable bootstrap Admin UID may be bootstrapped here.
-    Ordinary users are never promoted or assigned a default role by the
-    client or by this read bridge.
-  */
-  if (!profile && isBootstrapAdmin(uid)) {
-    const userRecord = await auth.getUser(uid);
-    const now = FieldValue.serverTimestamp();
-
-    const adminProfile = {
-      uid,
-      name: userRecord.displayName || "Quản trị viên",
-      email: userRecord.email || "",
-      role: "admin",
-      status: "active",
-      permissions: makeAdminPermissions(),
-      createdAt: now,
-      updatedAt: now,
-      createdBy: uid,
-      updatedBy: uid
-    };
-
-    await db.collection(USERS_COLLECTION).doc(uid).set(adminProfile, { merge: false });
-    profile = await getUserProfile(uid);
-  }
-
-  if (!profile) {
-    throw new HttpsError(
-      "permission-denied",
-      "Tài khoản chưa có hồ sơ GROVA. Vui lòng liên hệ Administrator."
-    );
-  }
-
-  if (profile.status !== "active") {
-    throw new HttpsError(
-      "permission-denied",
-      "Tài khoản đang bị khóa."
-    );
-  }
-
-  if (profile.uid && profile.uid !== uid) {
-    throw new HttpsError(
-      "failed-precondition",
-      "Hồ sơ tài khoản không khớp UID Firebase Authentication."
-    );
-  }
-
-  return {
-    ok: true,
-    profile: {
-      ...profile,
-      uid
+exports.grovaAiAsk = onCall(
+  {
+    secrets: [OPENAI_API_KEY],
+    timeoutSeconds: 120,
+    memory: "512MiB"
+  },
+  async (request) => {
+    if (!request.auth?.uid) {
+      throw new HttpsError("unauthenticated", "Bạn phải đăng nhập để sử dụng GROVA AI.");
     }
-  };
-});
 
-exports.grovaListUsers = onCall(async (request) => {
-  const caller = await requireCaller(request, "view");
-  const pageToken = cleanString(request.data && request.data.pageToken, 2048) || undefined;
-  const maxResultsRaw = Number(request.data && request.data.maxResults);
-  const maxResults = Number.isInteger(maxResultsRaw) && maxResultsRaw >= 1 && maxResultsRaw <= 1000
-    ? maxResultsRaw
-    : 100;
+    const uid = String(request.auth.uid);
+    const question = String(request.data?.question || "").trim();
 
-  const result = await auth.listUsers(maxResults, pageToken);
-  const users = [];
+    if (!question) {
+      throw new HttpsError("invalid-argument", "Câu hỏi không được để trống.");
+    }
+    if (question.length > 5000) {
+      throw new HttpsError("invalid-argument", "Câu hỏi quá dài.");
+    }
 
-  for (const userRecord of result.users) {
-    const profile = await getUserProfile(userRecord.uid);
-    users.push(buildAuthUserResponse(userRecord, profile));
-  }
-
-  return {
-    ok: true,
-    users,
-    nextPageToken: result.pageToken || null,
-    requestedBy: caller.uid
-  };
-});
-
-exports.grovaCreateUser = onCall(async (request) => {
-  const caller = await requireCaller(request, "create");
-  const data = request.data && typeof request.data === "object" ? request.data : {};
-
-  const email = cleanString(data.email, 320).toLowerCase();
-  const password = typeof data.password === "string" ? data.password : "";
-  const displayName = cleanString(data.name || data.displayName, 200);
-  const phoneNumber = cleanString(data.phoneNumber, 40);
-  const requestedRole = normalizeRole(cleanString(data.role, 30));
-
-  if (!email) throw new HttpsError("invalid-argument", "Email là bắt buộc.");
-  if (!password || password.length < 6) {
-    throw new HttpsError("invalid-argument", "Mật khẩu phải có ít nhất 6 ký tự.");
-  }
-
-  if (requestedRole === "admin" && !isAdminProfile(caller.profile, caller.uid)) {
-    throw new HttpsError("permission-denied", "Chỉ Administrator mới được tạo tài khoản Administrator.");
-  }
-
-  const canManagePermissions = isAdminProfile(caller.profile, caller.uid)
-    || caller.profile.permissions?.users?.managePermissions === true;
-
-  if ((data.permissions !== undefined || requestedRole !== "employee") && !canManagePermissions) {
-    throw new HttpsError("permission-denied", "Bạn không có quyền thiết lập role hoặc permissions.");
-  }
-
-  const role = requestedRole;
-  const permissions = role === "admin"
-    ? makeAdminPermissions()
-    : normalizePermissions(data.permissions, role);
-
-  const authData = {
-    email,
-    password,
-    displayName: displayName || undefined,
-    disabled: false
-  };
-
-  if (phoneNumber) authData.phoneNumber = phoneNumber;
-
-  let userRecord;
-  try {
-    userRecord = await auth.createUser(authData);
-  } catch (error) {
-    throw new HttpsError("already-exists", "Không thể tạo tài khoản. Email hoặc thông tin tài khoản có thể đã tồn tại.");
-  }
-
-  const profile = {
-    uid: userRecord.uid,
-    name: displayName || "",
-    email,
-    role,
-    status: "active",
-    permissions,
-    createdAt: FieldValue.serverTimestamp(),
-    updatedAt: FieldValue.serverTimestamp(),
-    createdBy: caller.uid,
-    updatedBy: caller.uid
-  };
-
-  try {
-    await db.collection(USERS_COLLECTION).doc(userRecord.uid).set(profile);
-  } catch (error) {
+    let profile = null;
     try {
-      await auth.deleteUser(userRecord.uid);
-    } catch (rollbackError) {
-      console.error("GROVA account creation rollback failed", rollbackError);
+      const profileSnapshot = await db.collection("users").doc(uid).get();
+      profile = profileSnapshot.exists ? profileSnapshot.data() : null;
+    } catch (error) {
+      console.error("GROVA AI: user profile read failed.", error);
+      throw new HttpsError("internal", "Không thể xác thực hồ sơ quyền của tài khoản.");
     }
-    throw new HttpsError("internal", "Không thể hoàn tất hồ sơ tài khoản. Tài khoản tạo mới đã được hủy nếu có thể.");
-  }
 
-  return {
-    ok: true,
-    user: buildAuthUserResponse(userRecord, {
-      ...profile,
-      createdAt: null,
-      updatedAt: null
-    })
-  };
-});
-
-exports.grovaUpdateUser = onCall(async (request) => {
-  const caller = await requireCaller(request, "edit");
-  const data = request.data && typeof request.data === "object" ? request.data : {};
-  const targetUid = assertTargetUid(data.uid);
-
-  await assertNotProtectedAdminTarget(caller, targetUid, "edit");
-
-  const existingProfile = await getUserProfile(targetUid);
-  if (!existingProfile) {
-    throw new HttpsError("not-found", "Không tìm thấy hồ sơ tài khoản.");
-  }
-
-  const targetIsAdmin = existingProfile.role === "admin";
-  if (targetIsAdmin && !isAdminProfile(caller.profile, caller.uid)) {
-    throw new HttpsError("permission-denied", "Chỉ Administrator mới được thay đổi tài khoản Administrator.");
-  }
-  const requestedRole = data.role === undefined ? existingProfile.role : normalizeRole(cleanString(data.role, 30));
-  const canManagePermissions = isAdminProfile(caller.profile, caller.uid)
-    || caller.profile.permissions?.users?.managePermissions === true;
-
-  if ((data.role !== undefined || data.permissions !== undefined) && !canManagePermissions) {
-    throw new HttpsError("permission-denied", "Bạn không có quyền thay đổi role hoặc permissions.");
-  }
-
-  if (targetUid === BOOTSTRAP_ADMIN_UID && requestedRole !== "admin") {
-    throw new HttpsError("failed-precondition", "Không thể hạ quyền Admin gốc.");
-  }
-
-  if (requestedRole === "admin" && !isAdminProfile(caller.profile, caller.uid)) {
-    throw new HttpsError("permission-denied", "Chỉ Administrator mới được cấp role Administrator.");
-  }
-
-  if (targetIsAdmin && requestedRole !== "admin") {
-    const activeAdmins = await countActiveAdmins();
-    if (activeAdmins <= 1) {
-      throw new HttpsError("failed-precondition", "Không thể hạ quyền Administrator cuối cùng.");
+    const status = profile?.status || (isAdmin(uid) ? "active" : "disabled");
+    if (status !== "active") {
+      throw new HttpsError("permission-denied", "Tài khoản chưa được phép sử dụng GROVA AI.");
     }
-  }
 
-  const authUpdate = {};
-  if (data.email !== undefined) {
-    const email = cleanString(data.email, 320).toLowerCase();
-    if (!email) throw new HttpsError("invalid-argument", "Email không được để trống.");
-    authUpdate.email = email;
-  }
-  if (data.displayName !== undefined || data.name !== undefined) {
-    authUpdate.displayName = cleanString(data.name ?? data.displayName, 200) || null;
-  }
-  if (data.phoneNumber !== undefined) {
-    const phone = cleanString(data.phoneNumber, 40);
-    authUpdate.phoneNumber = phone || null;
-  }
-  if (data.password !== undefined) {
-    if (typeof data.password !== "string" || data.password.length < 6) {
-      throw new HttpsError("invalid-argument", "Mật khẩu phải có ít nhất 6 ký tự.");
+    const permissions = getPermissions(profile, uid);
+    if (!isAdmin(uid) && !canView(permissions, "ai")) {
+      throw new HttpsError("permission-denied", "Tài khoản chưa được cấp quyền sử dụng GROVA AI.");
     }
-    authUpdate.password = data.password;
-  }
 
-  let userRecord;
-  try {
-    userRecord = Object.keys(authUpdate).length
-      ? await auth.updateUser(targetUid, authUpdate)
-      : await auth.getUser(targetUid);
-  } catch (error) {
-    throw new HttpsError("invalid-argument", "Không thể cập nhật thông tin Firebase Authentication.");
-  }
-
-  const profileUpdate = {
-    updatedAt: FieldValue.serverTimestamp(),
-    updatedBy: caller.uid
-  };
-
-  if (data.email !== undefined) profileUpdate.email = userRecord.email || "";
-  if (data.displayName !== undefined || data.name !== undefined) profileUpdate.name = userRecord.displayName || "";
-  if (data.role !== undefined) profileUpdate.role = requestedRole;
-  if (data.permissions !== undefined) {
-    profileUpdate.permissions = requestedRole === "admin"
-      ? makeAdminPermissions()
-      : normalizePermissions(data.permissions, requestedRole);
-  } else if (data.role !== undefined) {
-    profileUpdate.permissions = requestedRole === "admin"
-      ? makeAdminPermissions()
-      : normalizePermissions(existingProfile.permissions, requestedRole);
-  }
-  if (data.phoneNumber !== undefined) profileUpdate.phone = userRecord.phoneNumber || "";
-
-  await db.collection(USERS_COLLECTION).doc(targetUid).update(profileUpdate);
-  const freshProfile = await getUserProfile(targetUid);
-  return { ok: true, user: buildAuthUserResponse(userRecord, freshProfile) };
-});
-
-exports.grovaSetUserStatus = onCall(async (request) => {
-  const data = request.data && typeof request.data === "object" ? request.data : {};
-  const status = cleanString(data.status, 30);
-  const action = status === "disabled" ? "lock" : status === "active" ? "unlock" : "";
-  if (!action) {
-    throw new HttpsError("invalid-argument", "Trạng thái phải là active hoặc disabled.");
-  }
-
-  const caller = await requireCaller(request, "lock");
-  const targetUid = assertTargetUid(data.uid);
-  await assertNotProtectedAdminTarget(caller, targetUid, action);
-
-  if (targetUid === caller.uid) {
-    throw new HttpsError("failed-precondition", "Không thể tự khóa hoặc tự mở khóa tài khoản đang đăng nhập.");
-  }
-
-  const targetProfile = await getUserProfile(targetUid);
-  if (!targetProfile) {
-    throw new HttpsError("not-found", "Không tìm thấy hồ sơ tài khoản.");
-  }
-
-  if (targetProfile.role === "admin" && !isAdminProfile(caller.profile, caller.uid)) {
-    throw new HttpsError("permission-denied", "Chỉ Administrator mới được khóa hoặc mở khóa Administrator.");
-  }
-
-  if (targetProfile.role === "admin" && status === "disabled") {
-    const activeAdmins = await countActiveAdmins();
-    if (activeAdmins <= 1) {
-      throw new HttpsError("failed-precondition", "Không thể khóa Administrator cuối cùng.");
+    const apiKey = OPENAI_API_KEY.value();
+    if (!apiKey) {
+      throw new HttpsError("failed-precondition", "OPENAI_API_KEY chưa được cấu hình trên Firebase.");
     }
-  }
 
-  let userRecord;
-  try {
-    userRecord = await auth.updateUser(targetUid, { disabled: status === "disabled" });
-    await db.collection(USERS_COLLECTION).doc(targetUid).update({
-      status,
-      updatedAt: FieldValue.serverTimestamp(),
-      updatedBy: caller.uid
+    const context = await loadAllowedContext(uid, profile, permissions);
+    const model = process.env.GROVA_AI_MODEL || DEFAULT_MODEL;
+
+    const openaiResponse = await fetch("https://api.openai.com/v1/responses", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model,
+        input: [
+          {
+            role: "system",
+            content: [{ type: "input_text", text: buildSystemPrompt(context) }]
+          },
+          {
+            role: "user",
+            content: [{ type: "input_text", text: question }]
+          }
+        ],
+        max_output_tokens: 1200
+      })
     });
-  } catch (error) {
-    throw new HttpsError("internal", "Không thể cập nhật trạng thái tài khoản.");
-  }
 
-  const freshProfile = await getUserProfile(targetUid);
-  return { ok: true, user: buildAuthUserResponse(userRecord, freshProfile) };
-});
+    if (!openaiResponse.ok) {
+      const errorText = await openaiResponse.text();
+      console.error("GROVA AI: OpenAI request failed.", openaiResponse.status, errorText.slice(0, 2000));
+      if (openaiResponse.status === 429) {
+        throw new HttpsError("resource-exhausted", "OpenAI đang giới hạn yêu cầu hoặc tài khoản API chưa đủ hạn mức.");
+      }
+      throw new HttpsError("internal", "OpenAI không trả lời được yêu cầu GROVA AI.");
+    }
+
+    const response = await openaiResponse.json();
+    const answer = extractOutputText(response);
+    if (!answer) {
+      throw new HttpsError("internal", "GROVA AI không trả về nội dung.");
+    }
+
+    return {
+      ok: true,
+      model,
+      answer,
+      readOnly: true,
+      permissionsApplied: true
+    };
+  }
+);
