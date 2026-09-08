@@ -1769,3 +1769,24 @@ textarea {
     word-break: break-word;
   }
 }
+
+
+/* =====================================================
+   GROVA DOCUMENT — SYSTEM BACKUP UI
+===================================================== */
+.settings-backup-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 14px;
+}
+.settings-backup-actions button {
+  min-height: 46px;
+}
+.backup-warning {
+  margin-top: 14px;
+}
+@media (max-width: 560px) {
+  .settings-backup-actions { flex-direction: column; }
+  .settings-backup-actions button { width: 100%; }
+}
