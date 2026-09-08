@@ -1,6 +1,6 @@
 /* =========================================================
    GROVA DOCUMENT
-   APP.JS — VERSION 229
+   APP.JS — VERSION 230
    FIRESTORE PHASE 4 — HISTORY + PHASE 5A PERMISSION CORE + PHASE 5B.4 ACCOUNT MANAGEMENT UI + PHASE 5B.5 ACCOUNT PROFILE UI + PHASE 5B.6 ACCOUNT MANAGEMENT HARDENING + PHASE 5B.7 ACCOUNT PROFILE UI SYNC + SPARK ACCOUNT PROFILE MANAGEMENT + FULL VIEW/CREATE/EDIT/DELETE PERMISSION ENFORCEMENT
    PROJECTS + CUSTOMERS + EMPLOYEES + HISTORY
    CLEAN BASE FROM LOCKED VERSION 209
@@ -4373,6 +4373,9 @@
               <button type="button" class="secondary" data-action="open-project-location">
                 🗺 Mở Google Maps
               </button>
+              <button type="button" class="secondary" data-action="clear-project-location">
+                🗑 Xoá ghim
+              </button>
             ` : ""}
           </div>
           <div id="projectLocationStatus" style="font-size:12px;color:#66756d;margin-top:9px;">
@@ -4467,6 +4470,25 @@
       `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${latitude},${longitude}`)}`;
 
     window.open(url, "_blank", "noopener,noreferrer");
+  }
+
+  function clearProjectLocation() {
+
+    const latInput =
+      $("#modalProjectLatitude");
+    const lngInput =
+      $("#modalProjectLongitude");
+    const status =
+      $("#projectLocationStatus");
+
+    if (latInput) latInput.value = "";
+    if (lngInput) lngInput.value = "";
+
+    if (status) {
+      status.textContent = "Đã xoá ghim vị trí. Bấm “Lưu” để lưu thay đổi.";
+    }
+
+    showToast("Đã xoá ghim vị trí. Hãy bấm Lưu để xác nhận.");
   }
 
   function pinProjectLocation() {
@@ -7075,7 +7097,7 @@
      FULL SYSTEM BACKUP / RESTORE — VERSION 227
   ======================================================= */
 
-  const SYSTEM_BACKUP_VERSION = "229";
+  const SYSTEM_BACKUP_VERSION = "230";
 
   const SYSTEM_BACKUP_FILES = [
     "index.html", "app.js", "style.css", "auth.js", "auth.css", "sw.js",
@@ -7522,6 +7544,10 @@
 
       case "pin-project-location":
         pinProjectLocation();
+        break;
+
+      case "clear-project-location":
+        clearProjectLocation();
         break;
 
       case "delete-project":
