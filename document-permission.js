@@ -102,6 +102,10 @@
   }
 
   function showOverlay(title, message, denied) {
+    if (document.documentElement) {
+      document.documentElement.classList.remove("grova-permission-loading");
+    }
+
     var existing = document.getElementById("grovaDocumentPermissionOverlay");
     if (existing) existing.remove();
 
@@ -298,18 +302,45 @@
       return false;
     }
 
+    var user = null;
+
     try {
-      if (typeof auth.authStateReady === "function") {
-        await auth.authStateReady();
-      }
+      user = await new Promise(function (resolve) {
+        var settled = false;
+        var unsubscribe = null;
+
+        function finish(value) {
+          if (settled) return;
+          settled = true;
+          if (typeof unsubscribe === "function") unsubscribe();
+          resolve(value || null);
+        }
+
+        try {
+          unsubscribe = auth.onAuthStateChanged(function (currentUser) {
+            finish(currentUser);
+          }, function (error) {
+            console.error("GROVA DOCUMENT: Auth state error.", error);
+            finish(null);
+          });
+        } catch (error) {
+          console.error("GROVA DOCUMENT: Auth listener failed.", error);
+          finish(null);
+        }
+
+        if (auth.currentUser) finish(auth.currentUser);
+      });
     } catch (error) {
-      console.warn("GROVA DOCUMENT: Auth readiness warning.", error);
+      console.error("GROVA DOCUMENT: Auth readiness failed.", error);
+      user = null;
     }
 
-    var user = auth.currentUser;
     if (!user) {
       state.denied = true;
       state.ready = true;
+      if (document.documentElement) {
+        document.documentElement.classList.remove("grova-permission-loading");
+      }
       showOverlay("Chưa đăng nhập", "Bạn cần đăng nhập GROVA DOCUMENT trước khi mở mẫu văn bản.", true);
       readyResolve(false);
       return false;
