@@ -65,7 +65,8 @@ body{min-height:100vh}
 
   <button
     class="print-btn"
-    onclick="window.print()"
+    type="button"
+    onclick="grovaPrintDocument()"
   >
     🖨 In văn bản
   </button>
@@ -2231,6 +2232,29 @@ function goBack(){
 
   }
 
+}
+
+
+/* =========================================================
+   PRINT — GROVA DOCUMENT V239
+========================================================= */
+
+function grovaPrintDocument(){
+
+  if (window.GROVA_DOCUMENT_PERMISSION &&
+      !window.GROVA_DOCUMENT_PERMISSION.can("export")) {
+    alert("Tài khoản của bạn không được cấp quyền Xuất/In mẫu văn bản này.");
+    return false;
+  }
+
+  try {
+    updatePreview();
+  } catch(error) {
+    console.warn("GROVA DOCUMENT: Không thể cập nhật bản xem trước trước khi in.", error);
+  }
+
+  window.print();
+  return false;
 }
 
 
