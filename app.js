@@ -208,7 +208,7 @@
   }
 
   /* =======================================================
-     DOCUMENT PERMISSION MATRIX — PHASE 5C / V236
+     DOCUMENT PERMISSION MATRIX — PHASE 5C / V237
   ======================================================= */
 
   function getDocumentTemplateIds() {
@@ -7297,14 +7297,14 @@
      FULL SYSTEM BACKUP / RESTORE — VERSION 227
   ======================================================= */
 
-  const SYSTEM_BACKUP_VERSION = "233";
+  const SYSTEM_BACKUP_VERSION = "237";
 
   const SYSTEM_BACKUP_FILES = [
     "index.html", "app.js", "style.css", "auth.js", "auth.css", "sw.js",
     "firestore.js", "firestore.rules", "firebase.json", ".firebaserc",
     "manifest.json", "data/data.js", "data/grova_logo.png",
     "assets/icon-192.png", "assets/icon-512.png",
-    "functions/index.js", "functions/package.json"
+    "functions/index.js", "functions/package.json", "document-permission.js"
   ];
 
   const SYSTEM_BACKUP_TEMPLATE_FILES = [
