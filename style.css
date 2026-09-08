@@ -1582,3 +1582,190 @@ textarea {
     }
   }
 }
+
+
+/* =========================================================
+   GROVA DOCUMENT — ACCOUNT MANAGEMENT / iPHONE RESPONSIVE
+   VERSION 226
+   Purpose:
+   - Prevent the 6-column account table from forcing the page
+     wider than an iPhone viewport.
+   - Keep all account data and actions available on mobile.
+   - Desktop/tablet layout remains unchanged.
+   - No change to Firestore, Authentication, permissions or data.
+========================================================= */
+
+.account-users-table {
+  width: 100%;
+  max-width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.account-users-table th,
+.account-users-table td {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.account-users-table .action-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+@media (max-width: 560px) {
+  /* The account list becomes a stack of readable cards instead of
+     a squeezed 6-column table. */
+  .account-users-table,
+  .account-users-table tbody,
+  .account-users-table tr,
+  .account-users-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .account-users-table thead {
+    display: none;
+  }
+
+  .account-users-table {
+    border: 0;
+    table-layout: auto;
+  }
+
+  .account-users-table tbody {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .account-users-table tr {
+    margin: 0;
+    padding: 5px 14px 12px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: 0 2px 10px rgba(20, 55, 42, .035);
+  }
+
+  .account-users-table td {
+    display: grid;
+    grid-template-columns: minmax(88px, 34%) minmax(0, 1fr);
+    align-items: start;
+    gap: 10px;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  .account-users-table td:last-child {
+    border-bottom: 0;
+    padding-bottom: 6px;
+  }
+
+  .account-users-table td::before {
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.4;
+  }
+
+  .account-users-table td:nth-child(1)::before { content: "Họ tên"; }
+  .account-users-table td:nth-child(2)::before { content: "Email"; }
+  .account-users-table td:nth-child(3)::before { content: "Vai trò"; }
+  .account-users-table td:nth-child(4)::before { content: "Trạng thái"; }
+  .account-users-table td:nth-child(5)::before { content: "Đăng nhập gần nhất"; }
+  .account-users-table td:nth-child(6)::before { content: "Thao tác"; }
+
+  .account-users-table td:nth-child(1) > *,
+  .account-users-table td:nth-child(2) > *,
+  .account-users-table td:nth-child(3) > *,
+  .account-users-table td:nth-child(4) > *,
+  .account-users-table td:nth-child(5) > * {
+    min-width: 0;
+  }
+
+  .account-users-table td:nth-child(6) {
+    display: block;
+  }
+
+  .account-users-table td:nth-child(6)::before {
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .account-users-table td:nth-child(6) .action-group {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .account-users-table td:nth-child(6) .secondary {
+    width: 100%;
+    min-height: 44px;
+    padding: 9px 12px;
+  }
+
+  /* Long Firebase emails/UIDs must never create horizontal overflow. */
+  .account-users-table td,
+  .account-users-table strong,
+  .account-users-table .setting-note {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  /* Account-management card itself stays inside the iPhone viewport. */
+  #accountManagementSection,
+  #accountManagementSection .form-card {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  #accountManagementSection .form-card {
+    padding: 16px;
+    overflow: hidden;
+  }
+
+  #accountManagementSection .page-head {
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  #accountManagementSection .page-head > div {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  #accountManagementSection .page-head h3 {
+    font-size: 17px;
+    line-height: 1.3;
+  }
+
+  #accountManagementSection .page-head p {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  #accountManagementSection .page-head .action-group {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  #accountManagementSection .page-head .action-group .primary,
+  #accountManagementSection .page-head .action-group .secondary {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  #accountManagementSection .setting-note {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+}
