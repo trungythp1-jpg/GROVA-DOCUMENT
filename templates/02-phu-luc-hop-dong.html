@@ -166,7 +166,7 @@ li{margin:2px 0;}
 
   </div>
 
-  <button class="print-btn" onclick="window.print()">
+  <button class="print-btn" data-grova-no-print-permission="true" onclick="window.print()">
     🖨 In văn bản
   </button>
 
@@ -1380,6 +1380,11 @@ li{margin:2px 0;}
 </div>
 
 
+<script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore-compat.js"></script>
+<script src="../document-permission.js?v=244"></script>
+
 <script>
 
 /* =========================
@@ -2044,6 +2049,10 @@ function updatePreview(){
 
 function saveDraft(){
 
+  if (!window.GROVA_DOCUMENT_PERMISSION || window.GROVA_DOCUMENT_PERMISSION.isReadOnly()) {
+    return;
+  }
+
   const data = {};
 
 
@@ -2093,6 +2102,10 @@ function saveDraft(){
 ========================= */
 
 function loadDraft(){
+
+  if (!window.GROVA_DOCUMENT_PERMISSION || !window.GROVA_DOCUMENT_PERMISSION.can("edit")) {
+    return false;
+  }
 
   let raw =
     localStorage.getItem(
@@ -2295,13 +2308,17 @@ document.addEventListener(
   "DOMContentLoaded",
   function(){
 
-    initializeNumber();
+    GROVA_DOCUMENT_PERMISSION.run(function(){
 
-    loadDraft();
+      initializeNumber();
 
-    bindEvents();
+      loadDraft();
 
-    updatePreview();
+      bindEvents();
+
+      updatePreview();
+
+    });
 
   }
 );
