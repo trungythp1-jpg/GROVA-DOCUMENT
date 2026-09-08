@@ -1017,6 +1017,34 @@
 
           <div id="accountManagementSection"></div>
 
+          <div class="form-card backup-system-card">
+
+            <h3>
+              Sao lưu & Khôi phục hệ thống
+            </h3>
+
+            <p class="setting-note">
+              Tạo một file ZIP chứa mã nguồn, templates, tài nguyên và dữ liệu Firestore mà tài khoản Administrator được phép đọc.
+            </p>
+
+            <div class="settings-backup-actions">
+              <button class="primary" data-action="backup-system" type="button">
+                💾 Tạo backup toàn hệ thống
+              </button>
+
+              <button class="secondary" data-action="restore-system" type="button">
+                ♻ Khôi phục từ backup
+              </button>
+            </div>
+
+            <div class="setting-note backup-warning">
+              ⚠ Khôi phục có thể ghi đè dữ liệu hiện tại. Mật khẩu Firebase Authentication không nằm trong file backup. Mã nguồn trong backup được lưu để upload/khôi phục thủ công trên GitHub hoặc hosting.
+            </div>
+
+            <input id="systemBackupFileInput" type="file" accept=".zip,application/zip" hidden>
+
+          </div>
+
           <div class="form-card">
 
             <h3>
@@ -1136,11 +1164,19 @@
   ></script>
 
   <!-- =====================================================
+       ZIP BACKUP LIBRARY
+       ===================================================== -->
+
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"
+  ></script>
+
+  <!-- =====================================================
        APPLICATION
        ===================================================== -->
 
   <script
-    src="./app.js?v=226"
+    src="./app.js?v=227"
   ></script>
   <!-- =====================================================
        SERVICE WORKER
