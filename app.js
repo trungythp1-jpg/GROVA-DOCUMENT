@@ -1,6 +1,6 @@
 /* =========================================================
    GROVA DOCUMENT
-   APP.JS — VERSION 231
+   APP.JS — VERSION 233
    FIRESTORE PHASE 4 — HISTORY + PHASE 5A PERMISSION CORE + PHASE 5B.4 ACCOUNT MANAGEMENT UI + PHASE 5B.5 ACCOUNT PROFILE UI + PHASE 5B.6 ACCOUNT MANAGEMENT HARDENING + PHASE 5B.7 ACCOUNT PROFILE UI SYNC + SPARK ACCOUNT PROFILE MANAGEMENT + FULL VIEW/CREATE/EDIT/DELETE PERMISSION ENFORCEMENT
    PROJECTS + CUSTOMERS + EMPLOYEES + HISTORY
    CLEAN BASE FROM LOCKED VERSION 209
@@ -4351,23 +4351,18 @@
         <div class="full" style="border:1px solid #dbe5df;border-radius:14px;padding:14px;background:#f8fbf9;">
           <div style="font-weight:700;margin-bottom:8px;">📍 Vị trí công trình</div>
           <div style="font-size:13px;color:#66756d;margin-bottom:12px;line-height:1.5;">
-            Dùng GPS của thiết bị để ghim đúng vị trí công trình. Tọa độ sẽ được lưu cùng công trình.
+            Dùng GPS của thiết bị để ghim đúng vị trí công trình. Vị trí sẽ được lưu cùng công trình.
           </div>
 
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-            <label style="margin:0;">
-              Vĩ độ
-              <input id="modalProjectLatitude" type="text" readonly value="${escapeHTML(project?.latitude || "")}" placeholder="Chưa ghim">
-            </label>
-            <label style="margin:0;">
-              Kinh độ
-              <input id="modalProjectLongitude" type="text" readonly value="${escapeHTML(project?.longitude || "")}" placeholder="Chưa ghim">
-            </label>
-          </div>
+          <input id="modalProjectLatitude" type="hidden" value="${escapeHTML(project?.latitude || "")}">
+          <input id="modalProjectLongitude" type="hidden" value="${escapeHTML(project?.longitude || "")}">
 
           <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
             <button type="button" class="secondary" data-action="pin-project-location">
               📍 Ghim vị trí hiện tại
+            </button>
+            <button type="button" class="secondary" data-action="import-project-location-link">
+              🔗 Nhập từ liên kết
             </button>
             ${project?.latitude && project?.longitude ? `
               <button type="button" class="secondary" data-action="open-project-location">
@@ -4379,7 +4374,7 @@
             </button>
           </div>
           <div id="projectLocationStatus" style="font-size:12px;color:#66756d;margin-top:9px;">
-            ${project?.latitude && project?.longitude ? "Đã có tọa độ. Bấm Lưu nếu anh vừa thay đổi vị trí." : "Chưa ghim vị trí."}
+            ${project?.latitude && project?.longitude ? "Đã ghim vị trí. Bấm Lưu nếu anh vừa thay đổi vị trí." : "Chưa ghim vị trí."}
           </div>
         </div>
 
@@ -4470,6 +4465,98 @@
       `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${latitude},${longitude}`)}`;
 
     window.open(url, "_blank", "noopener,noreferrer");
+  }
+
+  function extractCoordinatesFromLocationLink(value) {
+
+    const raw = String(value || "").trim();
+
+    if (!raw) return null;
+
+    // 1) geo:20.123,106.456
+    let match = raw.match(/geo:\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/i);
+    if (match) return normalizeCoordinates(match[1], match[2]);
+
+    // 2) Google Maps URL with @latitude,longitude
+    match = raw.match(/@(-?\d+(?:\.\d+)?),\s*(-?\d+(?:\.\d+)?)/);
+    if (match) return normalizeCoordinates(match[1], match[2]);
+
+    // 3) URL parameters: q=lat,lng / query=lat,lng / ll=lat,lng / destination=lat,lng
+    try {
+      const url = new URL(raw);
+      const keys = ["q", "query", "ll", "destination", "daddr"];
+
+      for (const key of keys) {
+        const value = url.searchParams.get(key);
+        if (!value) continue;
+
+        match = value.match(/(-?\d+(?:\.\d+)?)\s*[, ]\s*(-?\d+(?:\.\d+)?)/);
+        if (match) return normalizeCoordinates(match[1], match[2]);
+      }
+    } catch (error) {
+      // Continue with raw coordinate detection below.
+    }
+
+    // 4) Pasted plain coordinates: 20.123456, 106.456789
+    match = raw.match(/(^|[^\d-])(-?\d{1,3}(?:\.\d+)?)\s*,\s*(-?\d{1,3}(?:\.\d+)?)(?!\d)/);
+    if (match) return normalizeCoordinates(match[2], match[3]);
+
+    return null;
+  }
+
+  function normalizeCoordinates(latitudeValue, longitudeValue) {
+
+    const latitude = Number(latitudeValue);
+    const longitude = Number(longitudeValue);
+
+    if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+      return null;
+    }
+
+    if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
+      return null;
+    }
+
+    return {
+      latitude: latitude.toFixed(6),
+      longitude: longitude.toFixed(6)
+    };
+  }
+
+  function importProjectLocationFromLink() {
+
+    const status = $("#projectLocationStatus");
+
+    const link = window.prompt(
+      "Dán liên kết vị trí từ Zalo hoặc Google Maps vào đây:\n\nVí dụ: https://www.google.com/maps/..."
+    );
+
+    if (link === null) return;
+
+    const coordinates =
+      extractCoordinatesFromLocationLink(link);
+
+    if (!coordinates) {
+      if (status) {
+        status.textContent =
+          "Không đọc được tọa độ từ liên kết. Hãy dùng liên kết Google Maps có chứa tọa độ hoặc nhập dạng vĩ độ, kinh độ.";
+      }
+      showToast("Không tìm thấy tọa độ trong liên kết.");
+      return;
+    }
+
+    const latInput = $("#modalProjectLatitude");
+    const lngInput = $("#modalProjectLongitude");
+
+    if (latInput) latInput.value = coordinates.latitude;
+    if (lngInput) lngInput.value = coordinates.longitude;
+
+    if (status) {
+      status.textContent =
+        "Đã nhập vị trí từ liên kết. Bấm “Lưu” để lưu vị trí.";
+    }
+
+    showToast("Đã nhập vị trí. Hãy bấm Lưu để xác nhận.");
   }
 
   function clearProjectLocation() {
@@ -7097,7 +7184,7 @@
      FULL SYSTEM BACKUP / RESTORE — VERSION 227
   ======================================================= */
 
-  const SYSTEM_BACKUP_VERSION = "231";
+  const SYSTEM_BACKUP_VERSION = "233";
 
   const SYSTEM_BACKUP_FILES = [
     "index.html", "app.js", "style.css", "auth.js", "auth.css", "sw.js",
@@ -7544,6 +7631,10 @@
 
       case "pin-project-location":
         pinProjectLocation();
+        break;
+
+      case "import-project-location-link":
+        importProjectLocationFromLink();
         break;
 
       case "clear-project-location":
