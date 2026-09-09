@@ -2014,7 +2014,7 @@
             <button
               type="button"
               class="btn btn-primary"
-              onclick="printDocument()"
+              onclick="window.print()"
             >
               In / Xuất PDF
             </button>
@@ -2910,14 +2910,6 @@
 
 
 
-
-  <!-- =====================================================
-       GROVA DOCUMENT PERMISSION — VERSION 238
-       ===================================================== -->
-  <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore-compat.js"></script>
-  <script src="../document-permission.js?v=238"></script>
   <script>
 
     /* =====================================
@@ -3790,10 +3782,6 @@
 
     function saveDraft() {
 
-    if (!window.GROVA_DOCUMENT_PERMISSION || window.GROVA_DOCUMENT_PERMISSION.isReadOnly()) {
-      return;
-    }
-
       const data = {
 
         fields: {},
@@ -3867,10 +3855,6 @@
 
 
     function loadDraft() {
-
-    if (!window.GROVA_DOCUMENT_PERMISSION || !window.GROVA_DOCUMENT_PERMISSION.can("edit")) {
-      return false;
-    }
 
       const raw =
         localStorage.getItem(
@@ -3962,10 +3946,6 @@
 
 
     function clearDraft() {
-
-    if (!window.GROVA_DOCUMENT_PERMISSION || !window.GROVA_DOCUMENT_PERMISSION.can("delete")) {
-      return;
-    }
 
       const confirmed =
         window.confirm(
@@ -4100,43 +4080,27 @@
     }
 
 
-    function printDocument() {
-
-    if (!window.GROVA_DOCUMENT_PERMISSION || !window.GROVA_DOCUMENT_PERMISSION.can("export")) {
-      return;
-    }
-
-      updatePreview();
-
-      window.print();
-
-    }
-
-
     function goBack() {
 
-      const target =
-        new URL(
-          "../index.html",
-          window.location.href
-        ).href;
-
-      // Ưu tiên quay lại đúng trang GROVA DOCUMENT đã mở mẫu.
       if (
-        window.history.length > 1 &&
+
         document.referrer &&
+
         document.referrer.indexOf(
           window.location.origin
         ) === 0
+
       ) {
+
         window.history.back();
-        return false;
+
+      } else {
+
+        window.location.href =
+          "../index.html";
+
       }
 
-      // Nếu mẫu được mở trực tiếp, quay thẳng về trang chính.
-      window.location.replace(target);
-
-      return false;
     }
 
 
@@ -4272,7 +4236,7 @@
     }
 
 
-    GROVA_DOCUMENT_PERMISSION.run(init);
+    init();
 
   </script>
 
