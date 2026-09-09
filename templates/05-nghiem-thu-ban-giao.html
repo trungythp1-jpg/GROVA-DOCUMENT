@@ -629,24 +629,6 @@
       font-weight: 700;
 
       line-height: 1.3;
-
-      min-width: 0;
-    }
-
-    .national-header .country {
-
-      font-size: 12pt;
-
-      white-space: nowrap;
-    }
-
-    .national-header .motto {
-
-      margin-top: 2px;
-
-      font-size: 12.5pt;
-
-      white-space: nowrap;
     }
 
 
@@ -1148,38 +1130,6 @@
       }
 
 
-      .doc-header {
-
-        grid-template-columns:
-          50mm 1fr;
-
-        gap: 8mm;
-
-        align-items: start;
-      }
-
-      .national-header {
-
-        min-width: 0;
-
-        white-space: nowrap;
-      }
-
-      .national-header .country {
-
-        font-size: 12pt;
-
-        white-space: nowrap;
-      }
-
-      .national-header .motto {
-
-        font-size: 12.5pt;
-
-        white-space: nowrap;
-      }
-
-
       .acceptance-table {
 
         break-inside: auto;
@@ -1218,7 +1168,7 @@
       <button
         type="button"
         class="back-button"
-        onclick="return window.grovaBackToDocument()"
+        onclick="goBack()"
         aria-label="Quay lại"
       >
         ←
@@ -2055,7 +2005,7 @@
             <button
               type="button"
               class="btn btn-secondary"
-              onclick="return window.grovaClearTemplate05()"
+              onclick="clearDraft()"
             >
               Xóa nhập
             </button>
@@ -2064,7 +2014,7 @@
             <button
               type="button"
               class="btn btn-primary"
-              onclick="window.print()"
+              onclick="printDocument()"
             >
               In / Xuất PDF
             </button>
@@ -2956,7 +2906,21 @@
 
     </div>
 
-  </main>/* =====================================
+  </main>
+
+
+
+
+  <!-- =====================================================
+       GROVA DOCUMENT PERMISSION — VERSION 238
+       ===================================================== -->
+  <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore-compat.js"></script>
+  <script src="../document-permission.js?v=238"></script>
+  <script>
+
+    /* =====================================
        GROVA DOCUMENT – TEMPLATE 05
        TÍCH HỢP GROVA SETTINGS
     ===================================== */
@@ -3658,48 +3622,24 @@
           .value
           .trim();
 
+
       const conclusionLines =
         conclusion
-          ? conclusion.split(/
-?
-/)
+          ? conclusion.split(/\r?\n/)
           : [];
 
+
       const conclusionBlankLines =
-        Array.from(
-          document.querySelectorAll(
-            "#documentPreview .blank-line"
-          )
-        ).slice(0, 4);
-
-      conclusionBlankLines.forEach(
-        (element, index) => {
-
-          const value =
-            conclusionLines[index] || "";
-
-          element.textContent =
-            value;
-
-          element.style.borderBottom =
-            value
-              ? "none"
-              : "";
-
-          element.style.minHeight =
-            value
-              ? "auto"
-              : "";
-
-          element.style.margin =
-            value
-              ? "1mm 0 2mm"
-              : "";
-        }
-      );
+        document.querySelectorAll(
+          "#documentPreview .blank-line"
+        );
 
 
-
+      /*
+        Không đưa nội dung này vào
+        dòng ghi chú cuối văn bản.
+        Phần kết luận giữ riêng.
+      */
 
 
       /* -------------------------
@@ -3810,45 +3750,37 @@
           .value
           .trim();
 
+
       const noteLines =
         notes
-          ? notes.split(/
-?
-/)
+          ? notes.split(/\r?\n/)
           : [];
 
+
       const noteElements = [
+
         $("previewNote1"),
+
         $("previewNote2")
+
       ];
 
+
       noteElements.forEach(
+
         (element, index) => {
 
           if (!element) {
             return;
           }
 
-          const value =
-            noteLines[index] || "";
 
           element.textContent =
-            value;
+            noteLines[index] || "";
 
-          element.style.borderBottom =
-            value
-              ? "none"
-              : "";
-
-          element.style.minHeight =
-            value
-              ? "auto"
-              : "";
         }
+
       );
-
-
-
 
 
       saveDraft();
@@ -3857,7 +3789,12 @@
 
 
     function saveDraft() {
-const data = {
+
+    if (!window.GROVA_DOCUMENT_PERMISSION || window.GROVA_DOCUMENT_PERMISSION.isReadOnly()) {
+      return;
+    }
+
+      const data = {
 
         fields: {},
 
@@ -3930,7 +3867,12 @@ const data = {
 
 
     function loadDraft() {
-const raw =
+
+    if (!window.GROVA_DOCUMENT_PERMISSION || !window.GROVA_DOCUMENT_PERMISSION.can("edit")) {
+      return false;
+    }
+
+      const raw =
         localStorage.getItem(
           STORAGE_KEY
         );
@@ -4019,112 +3961,186 @@ const raw =
     }
 
 
-    window.grovaClearTemplate05 = function() {
+    function clearDraft() {
 
-      if (
-        !window.confirm(
+    if (!window.GROVA_DOCUMENT_PERMISSION || !window.GROVA_DOCUMENT_PERMISSION.can("delete")) {
+      return;
+    }
+
+      const confirmed =
+        window.confirm(
           "Xóa toàn bộ dữ liệu đang nhập?"
-        )
-      ) {
-        return false;
+        );
+
+
+      if (!confirmed) {
+        return;
       }
+
 
       localStorage.removeItem(
         STORAGE_KEY
       );
 
-      const documentNo =
-        $("documentNo");
 
-      if (documentNo) {
-        documentNo.value =
-          createDocumentNumber();
-      }
+      $("documentNo").value =
+        createDocumentNumber();
 
-      const documentDate =
-        $("documentDate");
 
-      if (documentDate) {
-        documentDate.value =
-          new Date()
-            .toISOString()
-            .slice(0, 10);
-      }
+      $("documentDate").value =
+        new Date()
+          .toISOString()
+          .slice(0, 10);
 
-      const contractNo =
-        $("contractNo");
 
-      if (contractNo) {
-        contractNo.value =
-          "01/2026/HĐNT";
-      }
+      $("contractNo").value =
+        "01/2026/HĐNT";
+
 
       inputIds.forEach(
+
         id => {
 
           if (
+
             id === "documentNo" ||
+
             id === "documentDate" ||
+
             id === "contractNo"
+
           ) {
+
             return;
+
           }
+
 
           const element =
             $(id);
 
+
           if (element) {
+
             element.value = "";
+
           }
 
         }
+
       );
 
+
       checkboxIds.forEach(
+
         id => {
 
           const element =
             $(id);
+
 
           if (!element) {
             return;
           }
 
-          element.checked =
-            (
-              id === "handoverA1" ||
-              id === "handoverA2" ||
-              id === "handoverA3" ||
-              id === "handoverA4" ||
-              id === "commit1" ||
-              id === "commit2" ||
-              id === "commit3" ||
-              id === "commit4"
-            );
+
+          /*
+            Các lựa chọn mặc định
+            theo file gốc:
+            Bên A xác nhận = ☑
+            Cam kết = nội dung cố định.
+          */
+
+          if (
+
+            id === "handoverA1" ||
+
+            id === "handoverA2" ||
+
+            id === "handoverA3" ||
+
+            id === "handoverA4" ||
+
+            id === "commit1" ||
+
+            id === "commit2" ||
+
+            id === "commit3" ||
+
+            id === "commit4"
+
+          ) {
+
+            element.checked =
+              true;
+
+          } else {
+
+            element.checked =
+              false;
+
+          }
 
         }
+
       );
 
+
+      /*
+        Sau khi xóa bản nháp,
+        lấy lại thông tin công ty
+        từ GROVA_SETTINGS_V1.
+      */
+
       applyCompanySettingsToForm();
+
+
       updatePreview();
 
-      return false;
-    };
+    }
 
-window.grovaBackToDocument = function() {
 
-      window.location.replace(
+    function printDocument() {
+
+    if (!window.GROVA_DOCUMENT_PERMISSION || !window.GROVA_DOCUMENT_PERMISSION.can("export")) {
+      return;
+    }
+
+      updatePreview();
+
+      window.print();
+
+    }
+
+
+    function goBack() {
+
+      const target =
         new URL(
           "../index.html",
           window.location.href
-        ).href
-      );
+        ).href;
+
+      // Ưu tiên quay lại đúng trang GROVA DOCUMENT đã mở mẫu.
+      if (
+        window.history.length > 1 &&
+        document.referrer &&
+        document.referrer.indexOf(
+          window.location.origin
+        ) === 0
+      ) {
+        window.history.back();
+        return false;
+      }
+
+      // Nếu mẫu được mở trực tiếp, quay thẳng về trang chính.
+      window.location.replace(target);
 
       return false;
-    };
+    }
 
 
-function bindInputs() {
+    function bindInputs() {
 
 
       inputIds.forEach(
@@ -4256,7 +4272,7 @@ function bindInputs() {
     }
 
 
-    init();
+    GROVA_DOCUMENT_PERMISSION.run(init);
 
   </script>
 
