@@ -1517,6 +1517,10 @@
   </main>
 
 
+  <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore-compat.js"></script>
+
   <script>
 
     /* =====================================================
@@ -1867,6 +1871,8 @@
 
     function saveDraft() {
 
+      if (!window.GROVA_DOCUMENT_PERMISSION || !window.GROVA_DOCUMENT_PERMISSION.isReadOnly()) {
+
       const draft = {};
 
 
@@ -1912,9 +1918,14 @@
       }
 
     }
+      }
 
 
     function loadDraft() {
+
+      if (!window.GROVA_DOCUMENT_PERMISSION || !window.GROVA_DOCUMENT_PERMISSION.can("edit")) {
+        return false;
+      }
 
       const draft =
         getDraft();
@@ -2327,6 +2338,8 @@
 
       function() {
 
+        GROVA_DOCUMENT_PERMISSION.run(function(){
+
         loadDraft();
 
         updatePreview();
@@ -2358,6 +2371,8 @@
           }
 
         );
+
+        });
 
       }
 
