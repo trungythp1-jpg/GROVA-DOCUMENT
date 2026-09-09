@@ -2371,6 +2371,15 @@
   </main>
 
 
+  <!-- =====================================================
+       GROVA DOCUMENT PERMISSION — VERSION 247
+       Template 04: view / create / edit / delete
+       Nút In KHÔNG thuộc hệ thống phân quyền.
+       ===================================================== -->
+  <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore-compat.js"></script>
+  <script src="../document-permission.js?v=247"></script>
   <script>
     /* =========================================
        GROVA DOCUMENT – TEMPLATE 04
@@ -3316,6 +3325,10 @@
 
     function saveDraft() {
 
+    if (!window.GROVA_DOCUMENT_PERMISSION || window.GROVA_DOCUMENT_PERMISSION.isReadOnly()) {
+      return;
+    }
+
       const data = {
 
         fields: {},
@@ -3386,6 +3399,10 @@
     ========================================= */
 
     function loadDraft() {
+
+    if (!window.GROVA_DOCUMENT_PERMISSION || !window.GROVA_DOCUMENT_PERMISSION.can("edit")) {
+      return false;
+    }
 
       const raw =
         localStorage.getItem(
@@ -3473,6 +3490,10 @@
     ========================================= */
 
     function clearDraft() {
+
+    if (!window.GROVA_DOCUMENT_PERMISSION || !window.GROVA_DOCUMENT_PERMISSION.can("delete")) {
+      return;
+    }
 
       const confirmed =
         window.confirm(
@@ -3740,7 +3761,7 @@
     }
 
 
-    init();
+    GROVA_DOCUMENT_PERMISSION.run(init);
 
   </script>
 
