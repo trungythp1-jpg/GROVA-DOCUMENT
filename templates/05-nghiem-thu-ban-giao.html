@@ -1168,7 +1168,7 @@
       <button
         type="button"
         class="back-button"
-        onclick="goBack()"
+        onclick="return window.grovaBackToDocument()"
         aria-label="Quay lại"
       >
         ←
@@ -2005,7 +2005,7 @@
             <button
               type="button"
               class="btn btn-secondary"
-              onclick="clearDraft()"
+              onclick="return window.grovaClearTemplate05()"
             >
               Xóa nhập
             </button>
@@ -2906,7 +2906,13 @@
 
     </div>
 
-  </main>/* =====================================
+  </main>
+
+
+
+  <script>
+
+    /* =====================================
        GROVA DOCUMENT – TEMPLATE 05
        TÍCH HỢP GROVA SETTINGS
     ===================================== */
@@ -3775,7 +3781,8 @@
 
 
     function saveDraft() {
-const data = {
+
+      const data = {
 
         fields: {},
 
@@ -3848,7 +3855,8 @@ const data = {
 
 
     function loadDraft() {
-const raw =
+
+      const raw =
         localStorage.getItem(
           STORAGE_KEY
         );
@@ -3937,158 +3945,133 @@ const raw =
     }
 
 
-    function clearDraft() {
-const confirmed =
-        window.confirm(
-          "Xóa toàn bộ dữ liệu đang nhập?"
-        );
-
-
-      if (!confirmed) {
-        return;
-      }
-
-
-      localStorage.removeItem(
-        STORAGE_KEY
-      );
-
-
-      $("documentNo").value =
-        createDocumentNumber();
-
-
-      $("documentDate").value =
-        new Date()
-          .toISOString()
-          .slice(0, 10);
-
-
-      $("contractNo").value =
-        "01/2026/HĐNT";
-
-
-      inputIds.forEach(
-
-        id => {
-
-          if (
-
-            id === "documentNo" ||
-
-            id === "documentDate" ||
-
-            id === "contractNo"
-
-          ) {
-
-            return;
-
-          }
-
-
-          const element =
-            $(id);
-
-
-          if (element) {
-
-            element.value = "";
-
-          }
-
-        }
-
-      );
-
-
-      checkboxIds.forEach(
-
-        id => {
-
-          const element =
-            $(id);
-
-
-          if (!element) {
-            return;
-          }
-
-
-          /*
-            Các lựa chọn mặc định
-            theo file gốc:
-            Bên A xác nhận = ☑
-            Cam kết = nội dung cố định.
-          */
-
-          if (
-
-            id === "handoverA1" ||
-
-            id === "handoverA2" ||
-
-            id === "handoverA3" ||
-
-            id === "handoverA4" ||
-
-            id === "commit1" ||
-
-            id === "commit2" ||
-
-            id === "commit3" ||
-
-            id === "commit4"
-
-          ) {
-
-            element.checked =
-              true;
-
-          } else {
-
-            element.checked =
-              false;
-
-          }
-
-        }
-
-      );
-
-
-      /*
-        Sau khi xóa bản nháp,
-        lấy lại thông tin công ty
-        từ GROVA_SETTINGS_V1.
-      */
-
-      applyCompanySettingsToForm();
-
-
-      updatePreview();
-
-    }
-
-function goBack() {
-
-      const sameOriginReferrer =
-        document.referrer &&
-        document.referrer.indexOf(
-          window.location.origin
-        ) === 0;
+    window.grovaClearTemplate05 = function() {
 
       if (
-        sameOriginReferrer &&
-        window.history.length > 1
+        !window.confirm(
+          "Xóa toàn bộ dữ liệu đang nhập?"
+        )
       ) {
-        window.history.back();
-        return;
+        return false;
       }
 
-      window.location.href =
-        "../index.html";
-    }
+      try {
+
+        localStorage.removeItem(
+          STORAGE_KEY
+        );
+
+        const documentNo =
+          $("documentNo");
+
+        if (documentNo) {
+          documentNo.value =
+            createDocumentNumber();
+        }
+
+        const documentDate =
+          $("documentDate");
+
+        if (documentDate) {
+          documentDate.value =
+            new Date()
+              .toISOString()
+              .slice(0, 10);
+        }
+
+        const contractNo =
+          $("contractNo");
+
+        if (contractNo) {
+          contractNo.value =
+            "01/2026/HĐNT";
+        }
+
+        inputIds.forEach(
+          id => {
+
+            if (
+              id === "documentNo" ||
+              id === "documentDate" ||
+              id === "contractNo"
+            ) {
+              return;
+            }
+
+            const element =
+              $(id);
+
+            if (element) {
+              element.value = "";
+            }
+
+          }
+        );
+
+        checkboxIds.forEach(
+          id => {
+
+            const element =
+              $(id);
+
+            if (!element) {
+              return;
+            }
+
+            element.checked =
+              (
+                id === "handoverA1" ||
+                id === "handoverA2" ||
+                id === "handoverA3" ||
+                id === "handoverA4" ||
+                id === "commit1" ||
+                id === "commit2" ||
+                id === "commit3" ||
+                id === "commit4"
+              );
+
+          }
+        );
+
+        applyCompanySettingsToForm();
+        updatePreview();
+
+        const status =
+          $("saveStatus");
+
+        if (status) {
+          status.textContent =
+            "Đã xóa dữ liệu nhập";
+        }
+
+      } catch (error) {
+
+        console.error(
+          "Không thể xóa dữ liệu nhập:",
+          error
+        );
+
+        window.alert(
+          "Không thể xóa dữ liệu nhập. Vui lòng thử lại."
+        );
+
+      }
+
+      return false;
+    };
+
+
+    window.grovaBackToDocument = function() {
+
+      window.location.replace(
+        new URL(
+          "../index.html",
+          window.location.href
+        ).href
+      );
+
+      return false;
+    };
 
 
 function bindInputs() {
