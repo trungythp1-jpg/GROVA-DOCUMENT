@@ -102,8 +102,7 @@
     manager: "Quản lý",
     employee: "Nhân viên",
     viewer: "Chỉ xem",
-    custom: "Tùy chỉnh",
-    customer: "Khách hàng"
+    custom: "Tùy chỉnh"
   };
 
   const DEFAULT_PERMISSIONS = {
@@ -156,16 +155,6 @@
       users: { view: false, create: false, edit: false, lock: false, managePermissions: false },
       settings: { view: false, edit: false },
       ai: { view: false }
-    },
-    customer: {
-      projects: { view: true, create: false, edit: false, delete: false },
-      customers: { view: false, create: false, edit: false, delete: false },
-      employees: { view: false, create: false, edit: false, delete: false },
-      documents: { view: false, create: false, edit: false, delete: false, export: false },
-      history: { view: false },
-      users: { view: false, create: false, edit: false, lock: false, managePermissions: false },
-      settings: { view: false, edit: false },
-      ai: { view: false }
     }
   };
 
@@ -199,7 +188,6 @@
       name: String(profile?.name || user?.displayName || ""),
       email: String(profile?.email || user?.email || ""),
       role,
-      customerId: String(profile?.customerId || "").trim(),
       status: profile?.status === "disabled" ? "disabled" : "active",
       permissions: clonePermissions(permissions),
       createdAt: profile?.createdAt || nowISO(),
@@ -217,20 +205,6 @@
     if (isAdminUser()) return true;
     if (!currentUserProfile || currentUserProfile.status !== "active") return false;
     return Boolean(currentUserProfile.permissions?.[group]?.[action]);
-  }
-
-  function isCustomerUser() {
-    return !isAdminUser() && currentUserProfile?.role === "customer";
-  }
-
-  function getCurrentCustomerId() {
-    return String(currentUserProfile?.customerId || "").trim();
-  }
-
-  function projectBelongsToCurrentCustomer(project) {
-    if (!isCustomerUser()) return true;
-    const customerId = getCurrentCustomerId();
-    return Boolean(customerId && String(project?.customerId || "").trim() === customerId);
   }
 
   /* =======================================================
@@ -500,9 +474,6 @@
     if (scopedCache.length) {
       return scopedCache;
     }
-
-    // Customer accounts never fall back to the legacy global cache.
-    if (isCustomerUser()) return [];
 
     return normalizeProjects(
       readStorage(
@@ -1070,9 +1041,6 @@
       customer:
         project.customer || "",
 
-      customerId:
-        String(project.customerId || "").trim(),
-
       address:
         project.address || "",
 
@@ -1147,28 +1115,18 @@
       return null;
     }
 
-    let query = collection;
-
-    if (isCustomerUser()) {
-      const customerId = getCurrentCustomerId();
-      if (!customerId) return [];
-      query = collection.where("customerId", "==", customerId);
-    }
-
     const snapshot =
-      await query.get();
+      await collection.get();
 
     return normalizeProjects(
       snapshot.docs.map(
         mapFirestoreProject
       )
-    ).filter(projectBelongsToCurrentCustomer);
+    );
 
   }
 
   async function writeCloudProject(project, user, isCreate = false) {
-
-    if (isCustomerUser()) throw new Error("CUSTOMER_READ_ONLY");
 
     if (!hasPermission("projects", isCreate ? "create" : "edit")) {
       throw new Error("PERMISSION_DENIED");
@@ -1224,8 +1182,6 @@
   }
 
   async function deleteCloudProject(id, user) {
-
-    if (isCustomerUser()) throw new Error("CUSTOMER_READ_ONLY");
 
     if (!hasPermission("projects", "delete")) {
       throw new Error("PERMISSION_DENIED");
@@ -1597,6 +1553,8 @@
     currentUser =
       user || null;
 
+    void syncCurrentUserProfile(currentUser);
+
     if (!user) {
 
       setProjectsCache([]);
@@ -1620,16 +1578,12 @@
 
     }
 
-    // Wait for profile before loading scoped customer data.
-    void (async () => {
-      await syncCurrentUserProfile(user);
+    const cachedProjects =
+      getBestLocalProjects(user.uid);
+    setProjectsCache(cachedProjects);
 
-      const cachedProjects =
-        getBestLocalProjects(user.uid);
-      setProjectsCache(cachedProjects);
-
-      const cachedCustomers =
-        getBestLocalCustomers(user.uid);
+    const cachedCustomers =
+      getBestLocalCustomers(user.uid);
     setCustomersCache(cachedCustomers);
 
     const cachedEmployees =
@@ -1655,11 +1609,10 @@
       renderHistory();
     }
 
-      syncProjectsFromCloud(user);
-      syncCustomersFromCloud(user);
-      syncEmployeesFromCloud(user);
-      syncHistoryFromCloud(user);
-    })();
+    syncProjectsFromCloud(user);
+    syncCustomersFromCloud(user);
+    syncEmployeesFromCloud(user);
+    syncHistoryFromCloud(user);
 
   }
 
@@ -1724,9 +1677,6 @@
 
       name:
         customer.name || "",
-
-      customerId:
-        String(customer.customerId || customer.id || "").trim(),
 
       phone:
         customer.phone || "",
@@ -2523,7 +2473,6 @@
   }
 
   function canViewPage(page) {
-    if (isCustomerUser() && page !== "dashboard" && page !== "projects") return false;
     const required = getPagePermission(page);
     if (!required) return true;
     return hasPermission(required[0], required[1]);
@@ -4798,14 +4747,6 @@
     const now =
       nowISO();
 
-    const customerName =
-      $("#modalProjectCustomer")?.value?.trim() || "";
-
-    const matchedCustomer = getCustomers().find((customer) =>
-      String(customer?.name || "").trim().toLocaleLowerCase("vi") ===
-      customerName.toLocaleLowerCase("vi")
-    );
-
     const data = {
 
       name,
@@ -4815,10 +4756,10 @@
           ?.value
           .trim() || "",
 
-      customer: customerName,
-
-      customerId:
-        String(existingProject?.customerId || matchedCustomer?.customerId || matchedCustomer?.id || "").trim(),
+      customer:
+        $("#modalProjectCustomer")
+          ?.value
+          .trim() || "",
 
       address:
         $("#modalProjectAddress")
@@ -5255,18 +5196,6 @@
         </label>
 
         <label>
-          Customer ID
-
-          <input
-            id="modalCustomerId"
-            type="text"
-            placeholder="Ví dụ: KH-001"
-            value="${escapeHTML(customer?.customerId || "")}"
-          >
-
-        </label>
-
-        <label>
           Số điện thoại
 
           <input
@@ -5388,14 +5317,8 @@
     const now =
       nowISO();
 
-    const customerId =
-      $("#modalCustomerId")?.value?.trim() ||
-      existingCustomer?.customerId ||
-      "";
-
     const data = {
       name,
-      customerId,
 
       phone:
         $("#modalCustomerPhone")
@@ -6378,7 +6301,6 @@
       email: String(payload.email || base.email || "").trim(),
       phone: String(payload.phone || base.phone || "").trim(),
       role: String(payload.role || base.role || "employee"),
-      customerId: String(payload.customerId || base.customerId || "").trim(),
       status: payload.status === "disabled" ? "disabled" : (base.status === "disabled" ? "disabled" : "active"),
       permissions: clonePermissions(payload.permissions || base.permissions || getDefaultPermissions("employee")),
       createdAt: base.createdAt || now,
@@ -6420,7 +6342,6 @@
     };
 
     if (payload.role) next.role = payload.role;
-    if (Object.prototype.hasOwnProperty.call(payload, "customerId")) next.customerId = String(payload.customerId || "").trim();
     if (payload.permissions) next.permissions = clonePermissions(payload.permissions);
     if (payload.status) next.status = payload.status === "disabled" ? "disabled" : "active";
 
@@ -6774,7 +6695,6 @@
       ["viewer", "Chỉ xem"],
       ["manager", "Quản lý"],
       ["custom", "Tùy chỉnh"],
-      ["customer", "Khách hàng"],
       ["admin", "Administrator"]
     ];
 
@@ -6860,14 +6780,6 @@
         </label>
 
         <label>
-          Customer ID
-          <input id="modalUserCustomerId" type="text"
-            value="${escapeHTML(profile.customerId || "")}"
-            placeholder="Ví dụ: KH001"
-            ${role !== "customer" || protectedAdmin || selfAccount || !canManagePermissions ? "disabled" : ""}>
-        </label>
-
-        <label>
           Vai trò
           <select id="modalUserRole" ${(!canManagePermissions || restrictRoleAndPermissions) ? "disabled" : ""}>
             ${roleSelect}
@@ -6916,11 +6828,6 @@
     if (roleElement) {
       roleElement.addEventListener("change", () => {
         const selected = roleElement.value;
-        const customerIdElement = $("#modalUserCustomerId");
-        if (customerIdElement) {
-          customerIdElement.disabled = selected !== "customer" || restrictRoleAndPermissions || !canManagePermissions;
-          if (selected !== "customer") customerIdElement.value = "";
-        }
         const defaults = getDefaultPermissions(selected);
         $$("#modalBody input[data-user-permission]").forEach((input) => {
           const parts = String(input.dataset.userPermission || "").split(".");
@@ -6982,7 +6889,6 @@
     const phone = $("#modalUserPhone")?.value.trim() || "";
     const role = $("#modalUserRole")?.value || "employee";
     const status = $("#modalUserStatus")?.value || "active";
-    const customerId = $("#modalUserCustomerId")?.value.trim() || "";
 
     if (!uid) {
       showToast("Vui lòng nhập UID Firebase Authentication.");
@@ -7002,15 +6908,9 @@
       return;
     }
 
-    if (role === "customer" && !customerId) {
-      showToast("Vui lòng nhập Customer ID cho tài khoản khách hàng.");
-      return;
-    }
-
     const payload = { name, email, phone };
     if (canManagePermissions && !targetProtected && !targetSelf) {
       payload.role = role;
-      payload.customerId = role === "customer" ? customerId : "";
       payload.status = status;
       payload.permissions = readUserModalPermissions(role);
     }
@@ -7038,7 +6938,6 @@
         await saveAccountProfile(uid, {
           ...payload,
           role: canManagePermissions ? role : "employee",
-          customerId: canManagePermissions && role === "customer" ? customerId : "",
           status: canManagePermissions ? status : "active",
           permissions: canManagePermissions ? readUserModalPermissions(role) : getDefaultPermissions("employee")
         }, { createOnly: true });
