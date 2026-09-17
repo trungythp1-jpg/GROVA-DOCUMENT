@@ -1725,6 +1725,9 @@
       name:
         customer.name || "",
 
+      customerId:
+        String(customer.customerId || customer.id || "").trim(),
+
       phone:
         customer.phone || "",
 
@@ -4815,7 +4818,7 @@
       customer: customerName,
 
       customerId:
-        String(existingProject?.customerId || matchedCustomer?.id || "").trim(),
+        String(existingProject?.customerId || matchedCustomer?.customerId || matchedCustomer?.id || "").trim(),
 
       address:
         $("#modalProjectAddress")
@@ -5252,6 +5255,18 @@
         </label>
 
         <label>
+          Customer ID
+
+          <input
+            id="modalCustomerId"
+            type="text"
+            placeholder="Ví dụ: KH-001"
+            value="${escapeHTML(customer?.customerId || "")}"
+          >
+
+        </label>
+
+        <label>
           Số điện thoại
 
           <input
@@ -5373,8 +5388,14 @@
     const now =
       nowISO();
 
+    const customerId =
+      $("#modalCustomerId")?.value?.trim() ||
+      existingCustomer?.customerId ||
+      "";
+
     const data = {
       name,
+      customerId,
 
       phone:
         $("#modalCustomerPhone")
@@ -6978,6 +6999,11 @@
 
     if (targetProtected && !isAdminUser()) {
       showToast("Tài khoản Admin gốc được bảo vệ.");
+      return;
+    }
+
+    if (role === "customer" && !customerId) {
+      showToast("Vui lòng nhập Customer ID cho tài khoản khách hàng.");
       return;
     }
 
