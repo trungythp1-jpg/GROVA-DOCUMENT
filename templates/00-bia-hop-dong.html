@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Bìa hợp đồng - GROVA DOCUMENT</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:#eef1ee;color:#17352c;font-family:Arial,Helvetica,sans-serif}
+.topbar{position:sticky;top:0;z-index:20;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:#fff;border-bottom:1px solid #d9e1de;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+.topbar-left{display:flex;align-items:center;gap:12px}
+button{border:0;border-radius:10px;padding:10px 15px;cursor:pointer;font-weight:700;font-size:14px}
+.back-btn{background:#eef4f1;color:#075a43}.print-btn{background:#0b7a5a;color:#fff}
+.topbar-title{font-size:17px;font-weight:800}
+.workspace{width:min(1500px,calc(100% - 28px));margin:20px auto;display:grid;grid-template-columns:340px minmax(0,1fr);gap:22px;align-items:start}
+.control-panel{background:#fff;border:1px solid #d9e1de;border-radius:14px;padding:18px;height:max-content;box-shadow:0 4px 16px rgba(0,0,0,.05);position:sticky;top:78px}
+.panel-title{font-size:17px;font-weight:800;margin-bottom:16px;color:#075a43}
+.form-group{margin-bottom:15px}.form-label{display:block;margin-bottom:6px;font-size:13px;font-weight:700}
+.form-input,.form-textarea{width:100%;border:1px solid #cfd9d5;border-radius:8px;padding:10px;font:13px Arial,sans-serif;outline:none;background:#fff}
+.form-textarea{resize:vertical;min-height:88px}.form-input:focus,.form-textarea:focus{border-color:#0b7a5a;box-shadow:0 0 0 3px rgba(11,122,90,.08)}
+.hint{font-size:11px;line-height:1.5;color:#68736f;margin-top:14px}
+.preview-area{min-width:0}.document-wrap{overflow:auto;padding:8px 4px 24px}
+.document{position:relative;width:210mm;height:297mm;max-width:none;margin:0 auto;background:#fff;box-shadow:0 5px 22px rgba(0,0,0,.13);overflow:hidden}
+.cover-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.dynamic{position:absolute;color:#17352c;text-align:center;white-space:pre-wrap;overflow:hidden;font-family:"Times New Roman",Georgia,serif}
+.contract-no{left:20%;top:40.0%;width:60%;height:4.2%;font-size:clamp(11px,1.25vw,18px);font-weight:700;line-height:1.25}
+.subject{left:15%;top:43.4%;width:70%;height:7.2%;font-size:clamp(12px,1.35vw,20px);font-weight:700;line-height:1.25;display:flex;align-items:center;justify-content:center}
+.party-b{left:18%;top:79.0%;width:64%;height:4.8%;font-size:clamp(11px,1.25vw,18px);font-weight:700;line-height:1.25}
+@media(max-width:900px){.workspace{grid-template-columns:1fr;width:calc(100% - 20px)}.control-panel{position:static}.document{margin:0 auto}}
+@page{size:A4 portrait;margin:0}
+@media print{
+html,body{background:#fff!important;padding:0!important;margin:0!important}
+.topbar,.control-panel{display:none!important}
+.workspace{display:block!important;width:auto!important;margin:0!important}
+.preview-area,.document-wrap{padding:0!important;margin:0!important;overflow:visible!important}
+.document{width:210mm!important;height:297mm!important;margin:0!important;box-shadow:none!important}
+}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-left">
+    <button class="back-btn" onclick="history.back()">← Quay lại</button>
+    <div class="topbar-title">Bìa hợp đồng</div>
+  </div>
+  <button class="print-btn" onclick="window.print()">🖨 In / Xuất PDF</button>
+</div>
+
+<div class="workspace">
+  <aside class="control-panel">
+    <div class="panel-title">Thông tin bìa hợp đồng</div>
+
+    <div class="form-group">
+      <label class="form-label">Số HĐ</label>
+      <input id="contractNo" class="form-input" placeholder="Ví dụ: GROVA-2026-001">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Nội dung hợp đồng</label>
+      <textarea id="subject" class="form-textarea" placeholder="Ví dụ: THI CÔNG KHUNG THÉP&#10;hoặc THI CÔNG KÍNH&#10;hoặc THI CÔNG KHUNG THÉP VÀ KÍNH"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Bên B</label>
+      <input id="partyB" class="form-input" placeholder="Ví dụ: ÔNG HOÀNG VĂN QUYẾT">
+    </div>
+
+    <div class="hint">
+      Bìa giữ nguyên thiết kế GROVA. Chỉ các thông tin nhập bên trái thay đổi trên bản xem trước.
+      Có thể để trống nội dung hoặc Bên B nếu chưa có thông tin.
+    </div>
+  </aside>
+
+  <section class="preview-area">
+    <div class="document-wrap">
+      <div class="document">
+        <img class="cover-bg" src="../assets/grova-contract-cover-2026.png" alt="GROVA contract cover">
+        <div id="previewNo" class="dynamic contract-no"></div>
+        <div id="previewSubject" class="dynamic subject"></div>
+        <div id="previewPartyB" class="dynamic party-b"></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+const fields={
+  contractNo:document.getElementById("contractNo"),
+  subject:document.getElementById("subject"),
+  partyB:document.getElementById("partyB")
+};
+const previews={
+  contractNo:document.getElementById("previewNo"),
+  subject:document.getElementById("previewSubject"),
+  partyB:document.getElementById("previewPartyB")
+};
+
+function sync(){
+  previews.contractNo.textContent=fields.contractNo.value.trim();
+  previews.subject.textContent=fields.subject.value.trim();
+  previews.partyB.textContent=fields.partyB.value.trim();
+  try{
+    localStorage.setItem("GROVA_CONTRACT_COVER_V1",JSON.stringify({
+      contractNo:fields.contractNo.value,
+      subject:fields.subject.value,
+      partyB:fields.partyB.value
+    }));
+  }catch(e){}
+}
+Object.values(fields).forEach(el=>el.addEventListener("input",sync));
+try{
+  const saved=JSON.parse(localStorage.getItem("GROVA_CONTRACT_COVER_V1")||"null");
+  if(saved){
+    fields.contractNo.value=saved.contractNo||"";
+    fields.subject.value=saved.subject||"";
+    fields.partyB.value=saved.partyB||"";
+  }
+}catch(e){}
+sync();
+</script>
+</body>
+</html>
