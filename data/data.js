@@ -57,6 +57,18 @@ window.GROVA_DATA = {
   templates: [
 
     {
+      id: "00",
+      code: "BIA-HĐ",
+      name: "Bìa hợp đồng",
+      title: "BÌA HỢP ĐỒNG",
+      description: "Tạo bìa hợp đồng GROVA theo mẫu A4, nhập thông tin và in/xuất PDF.",
+      category: "Hợp đồng",
+      icon: "📘",
+      file: "./templates/00-bia-hop-dong.html",
+      enabled: true
+    },
+
+    {
       id: "01",
 
       code: "HĐNT",
