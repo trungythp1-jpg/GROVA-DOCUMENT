@@ -18,24 +18,15 @@ button{border:0;border-radius:10px;padding:10px 15px;cursor:pointer;font-weight:
 .form-group{margin-bottom:15px}.form-label{display:block;margin-bottom:6px;font-size:13px;font-weight:700}
 .form-input,.form-textarea{width:100%;border:1px solid #cfd9d5;border-radius:8px;padding:10px;font:13px Arial,sans-serif;outline:none;background:#fff}
 .form-textarea{resize:vertical;min-height:88px}.form-input:focus,.form-textarea:focus{border-color:#0b7a5a;box-shadow:0 0 0 3px rgba(11,122,90,.08)}
-.hint{font-size:11px;line-height:1.5;color:#68736f;margin-top:14px}
+.panel select{background:#fff;color:#17231e;cursor:pointer}.hint{font-size:11px;line-height:1.5;color:#68736f;margin-top:14px}
 .preview-area{min-width:0}.document-wrap{overflow:auto;padding:8px 4px 24px}
 .document{position:relative;width:210mm;height:297mm;max-width:none;margin:0 auto;background:#fff;box-shadow:0 5px 22px rgba(0,0,0,.13);overflow:hidden}
 .cover-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
-.dynamic{position:absolute;color:#17352c;text-align:center;white-space:pre-wrap;overflow:hidden;font-family:"Times New Roman",Georgia,serif}
+.dynamic{position:absolute;color:#17352c;text-align:center;white-space:pre-wrap;overflow:hidden;overflow-wrap:break-word;font-family:"Times New Roman",Georgia,serif}
 .contract-no{left:34%;top:39.85%;width:45%;height:4.4%;font-size:19px;font-weight:700;line-height:1.15;display:flex;align-items:center;justify-content:flex-start;text-align:left;padding:0}
-.subject{left:14%;top:44.2%;width:72%;height:8.8%;font-size:22px;font-weight:700;line-height:1.15;display:grid;place-items:center;text-align:center;padding:4px 18px}
+.subject{left:15%;top:43.7%;width:70%;height:9.4%;font-family:Georgia,serif;font-size:clamp(18px,2.05vw,30px);font-weight:700;line-height:1.15;display:flex;align-items:center;justify-content:center;text-align:center;white-space:normal;overflow:hidden;padding:0 3%;}
 .party-b{left:18%;top:79.0%;width:64%;height:4.8%;font-size:18px;font-weight:700;line-height:1.2;display:flex;align-items:center;justify-content:center;text-align:center}
 @media(max-width:900px){.workspace{grid-template-columns:1fr;width:calc(100% - 20px)}.control-panel{position:static}.document{margin:0 auto}}
-@page{size:A4 portrait;margin:0}
-@media print{
-  html,body{background:#fff!important;padding:0!important;margin:0!important;width:210mm!important;height:297mm!important;overflow:hidden!important}
-  .topbar,.control-panel{display:none!important}
-  .workspace{display:block!important;width:210mm!important;height:297mm!important;margin:0!important;padding:0!important}
-  .preview-area,.document-wrap{width:210mm!important;height:297mm!important;padding:0!important;margin:0!important;overflow:hidden!important}
-  .document{width:210mm!important;height:297mm!important;min-width:210mm!important;max-width:210mm!important;min-height:297mm!important;max-height:297mm!important;margin:0!important;box-shadow:none!important;overflow:hidden!important;break-inside:avoid!important;page-break-inside:avoid!important;page-break-after:avoid!important}
-  .cover-bg{width:210mm!important;height:297mm!important;object-fit:fill!important}
-}
 </style>
 </head>
 <body>
@@ -44,7 +35,7 @@ button{border:0;border-radius:10px;padding:10px 15px;cursor:pointer;font-weight:
     <button class="back-btn" onclick="history.back()">← Quay lại</button>
     <div class="topbar-title">Bìa hợp đồng</div>
   </div>
-  <div class="top-actions"><button class="print-btn" onclick="exportPDF()">⬇ Xuất PDF A4 1 trang</button><button class="print-btn secondary-btn" onclick="window.print()">🖨 In</button></div>
+  <div class="top-actions"><button class="print-btn" onclick="exportPDF()">⬇ Xuất PDF A4 1 trang</button></div>
 </div>
 
 <div class="workspace">
@@ -57,7 +48,17 @@ button{border:0;border-radius:10px;padding:10px 15px;cursor:pointer;font-weight:
     </div>
 
     <div class="form-group">
-      <label class="form-label">Nội dung hợp đồng</label>
+      <label>Nội dung hợp đồng
+  <select id="subject">
+    <option value="">-- Chọn nội dung hợp đồng --</option>
+    <option value="CUNG CẤP KHUNG THANG MÁY">1. CUNG CẤP KHUNG THANG MÁY</option>
+    <option value="CUNG CẤP KHUNG THANG MÁY VÀ KÍNH THANG MÁY">2. CUNG CẤP KHUNG THANG MÁY VÀ KÍNH THANG MÁY</option>
+    <option value="CUNG CẤP KÍNH THANG MÁY">3. CUNG CẤP KÍNH THANG MÁY</option>
+    <option value="CUNG CẤP NHÂN CÔNG THI CÔNG LẮP ĐẶT KHUNG THANG MÁY">4. CUNG CẤP NHÂN CÔNG THI CÔNG LẮP ĐẶT KHUNG THANG MÁY</option>
+    <option value="CUNG CẤP NHÂN CÔNG THI CÔNG LẮP ĐẶT KÍNH THANG MÁY">5. CUNG CẤP NHÂN CÔNG THI CÔNG LẮP ĐẶT KÍNH THANG MÁY</option>
+    <option value="CUNG CẤP KÍNH VÀ NHÂN CÔNG LẮP ĐẶT KÍNH THANG MÁY">6. CUNG CẤP KÍNH VÀ NHÂN CÔNG LẮP ĐẶT KÍNH THANG MÁY</option>
+  </select>
+</label>
       <textarea id="subject" class="form-textarea" placeholder="Ví dụ: THI CÔNG KHUNG THÉP&#10;hoặc THI CÔNG KÍNH&#10;hoặc THI CÔNG KHUNG THÉP VÀ KÍNH"></textarea>
     </div>
 
@@ -68,7 +69,7 @@ button{border:0;border-radius:10px;padding:10px 15px;cursor:pointer;font-weight:
 
     <div class="hint">
       Bìa giữ nguyên thiết kế GROVA. Chỉ các thông tin nhập bên trái thay đổi trên bản xem trước.
-      Có thể để trống nội dung hoặc Bên B nếu chưa có thông tin.
+      Chọn nội dung hợp đồng từ danh sách để bìa tự điền. Bìa được xuất trực tiếp thành PDF A4 1 trang.
     </div>
   </aside>
 
@@ -97,6 +98,22 @@ const previews={
   partyB:document.getElementById("previewPartyB")
 };
 
+
+function fitSubjectText(){
+  const el = preview.subject;
+  if (!el) return;
+  const text = el.textContent.trim();
+  if (!text) return;
+  let size = 30;
+  const minSize = 18;
+  el.style.fontSize = size + 'px';
+  el.style.lineHeight = '1.15';
+  while ((el.scrollHeight > el.clientHeight || el.scrollWidth > el.clientWidth) && size > minSize){
+    size -= 1;
+    el.style.fontSize = size + 'px';
+  }
+}
+
 function sync(){
   previews.contractNo.textContent=fields.contractNo.value.trim();
   previews.subject.textContent=fields.subject.value.trim();
@@ -122,9 +139,9 @@ try{
 sync();
 function fitSubject(){
   const el = previews.subject;
-  let size = 22;
+  let size = 21;
   el.style.fontSize = size + "px";
-  while ((el.scrollHeight > el.clientHeight || el.scrollWidth > el.clientWidth) && size > 13){
+  while ((el.scrollHeight > el.clientHeight || el.scrollWidth > el.clientWidth) && size > 11){
     size -= 0.5;
     el.style.fontSize = size + "px";
   }
@@ -185,7 +202,7 @@ async function exportPDF(){
   function totalHeight(lines,lh){return lines.length*lh;}
 
   drawText(fields.contractNo.value.trim(),34,39.85,45,4.4,58,"left");
-  drawText(fields.subject.value.trim(),14,44.2,72,8.8,66,"center");
+  drawText(fields.subject.value.trim(),14,44.9,72,9.2,62,"center");
   drawText(fields.partyB.value.trim(),18,79.0,64,4.8,58,"center");
 
   const {jsPDF}=window.jspdf;
