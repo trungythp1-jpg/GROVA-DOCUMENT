@@ -23,17 +23,17 @@ button{border:0;border-radius:10px;padding:10px 15px;cursor:pointer;font-weight:
 .document{position:relative;width:210mm;height:297mm;max-width:none;margin:0 auto;background:#fff;box-shadow:0 5px 22px rgba(0,0,0,.13);overflow:hidden}
 .cover-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 .dynamic{position:absolute;color:#17352c;text-align:center;white-space:pre-wrap;overflow:hidden;font-family:"Times New Roman",Georgia,serif}
-.contract-no{left:33%;top:40.8%;width:42%;height:3.4%;font-size:5.4mm;font-weight:700;line-height:1.05;display:flex;align-items:center;justify-content:flex-start;text-align:left}
-.subject{left:16%;top:43.8%;width:68%;height:8.0%;font-size:6.2mm;font-weight:700;line-height:1.15;display:flex;align-items:center;justify-content:center;padding:0 4mm}
-.party-b{left:18%;top:77.6%;width:64%;height:6.2%;font-size:6.0mm;font-weight:700;line-height:1.1;display:flex;align-items:center;justify-content:center;padding:0 3mm}
+.contract-no{left:34%;top:39.85%;width:45%;height:4.4%;font-size:18px;font-weight:700;line-height:1.15;display:flex;align-items:center;justify-content:flex-start;text-align:left}
+.subject{left:14%;top:43.35%;width:72%;height:7.5%;font-size:21px;font-weight:700;line-height:1.22;display:flex;align-items:center;justify-content:center;text-align:center;padding:0 10px}
+.party-b{left:18%;top:79.0%;width:64%;height:4.8%;font-size:18px;font-weight:700;line-height:1.2;display:flex;align-items:center;justify-content:center;text-align:center}
 @media(max-width:900px){.workspace{grid-template-columns:1fr;width:calc(100% - 20px)}.control-panel{position:static}.document{margin:0 auto}}
 @page{size:A4 portrait;margin:0}
 @media print{
-html,body{background:#fff!important;padding:0!important;margin:0!important}
+html,body{background:#fff!important;padding:0!important;margin:0!important;height:296.9mm!important;overflow:hidden!important}
 .topbar,.control-panel{display:none!important}
 .workspace{display:block!important;width:auto!important;margin:0!important}
 .preview-area,.document-wrap{padding:0!important;margin:0!important;overflow:visible!important}
-.document{width:210mm!important;height:297mm!important;margin:0!important;box-shadow:none!important}
+.document{width:210mm!important;height:296.9mm!important;min-height:296.9mm!important;margin:0!important;box-shadow:none!important;page-break-after:avoid!important;break-after:avoid-page!important}
 }
 </style>
 </head>
@@ -95,22 +95,10 @@ const previews={
   partyB:document.getElementById("previewPartyB")
 };
 
-function fitText(el, maxMm, minMm=4.2){
-  let size=maxMm;
-  el.style.fontSize=size+"mm";
-  while((el.scrollWidth>el.clientWidth || el.scrollHeight>el.clientHeight) && size>minMm){
-    size-=0.2;
-    el.style.fontSize=size+"mm";
-  }
-}
-
 function sync(){
   previews.contractNo.textContent=fields.contractNo.value.trim();
   previews.subject.textContent=fields.subject.value.trim();
   previews.partyB.textContent=fields.partyB.value.trim();
-  fitText(previews.contractNo,5.4,4.2);
-  fitText(previews.subject,6.2,4.2);
-  fitText(previews.partyB,6.0,4.2);
   try{
     localStorage.setItem("GROVA_CONTRACT_COVER_V1",JSON.stringify({
       contractNo:fields.contractNo.value,
