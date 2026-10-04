@@ -2992,17 +2992,11 @@
       return;
     }
 
-    const template =
-      findTemplate(id);
+    const template = findTemplate(id);
 
     if (!template) {
-
-      showToast(
-        "Không tìm thấy mẫu văn bản."
-      );
-
+      showToast("Không tìm thấy mẫu văn bản.");
       return;
-
     }
 
     if (!hasDocumentTemplatePermission(template.id, "create")) {
@@ -3011,40 +3005,24 @@
     }
 
     if (!template.file) {
-
-      showToast(
-        "Mẫu văn bản chưa được cấu hình đường dẫn."
-      );
-
-      return;
-
-    }
-
-    let documentNo;
-
-    try {
-      documentNo = await reserveCentralDocumentNumber(template);
-    } catch (error) {
-      console.error("GROVA DOCUMENT: central document numbering failed.", error);
-      showToast("Không thể cấp số văn bản trung tâm. Văn bản chưa được mở.");
+      showToast("Mẫu văn bản chưa được cấu hình đường dẫn.");
       return;
     }
 
     /*
-      TASK 4: cấp số trung tâm theo TỪNG LOẠI VĂN BẢN.
-      Ví dụ: 001-HĐNT, 002-HĐNT và 001-DNTT là các dãy độc lập.
-      Firestore Transaction đảm bảo không trùng số giữa các máy.
-      Template nhận số qua query parameter để tự hiển thị.
+      TASK 4 — DRAFT FIRST / OFFICIAL NUMBER ON PDF EXPORT
+      Mở mẫu chỉ tạo BẢN NHÁP. Không cấp số và không chạm
+      vào document_counters. Số chính thức chỉ được cấp khi
+      người dùng bấm “Xuất PDF” và xác nhận tạo văn bản chính thức.
     */
-    void addHistory(template);
+    const rawFile = String(template.file || "");
+    const hashIndex = rawFile.indexOf("#");
+    const hash = hashIndex >= 0 ? rawFile.slice(hashIndex) : "";
+    const base = hashIndex >= 0 ? rawFile.slice(0, hashIndex) : rawFile;
+    const separator = base.includes("?") ? "&" : "?";
+    const draftUrl = `${base}${separator}grovaDraft=1&grovaTemplateId=${encodeURIComponent(String(template.id || ""))}${hash}`;
 
-    window.location.href =
-      buildTemplateUrlWithDocumentNumber(
-        template.file,
-        documentNo,
-        template.id
-      );
-
+    window.location.href = draftUrl;
   }
 
   /* =======================================================
