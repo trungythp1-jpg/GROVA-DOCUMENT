@@ -2922,9 +2922,11 @@
     return firestoreDb.collection("document_counters");
   }
 
-  function formatCentralDocumentNumber(value) {
+  function formatCentralDocumentNumber(value, code) {
     const number = Math.max(0, Number(value) || 0);
-    return String(number).padStart(3, "0");
+    const sequence = String(number).padStart(3, "0");
+    const documentCode = String(code || "VB").trim().toUpperCase();
+    return documentCode ? `${sequence}-${documentCode}` : sequence;
   }
 
   async function reserveCentralDocumentNumber(template, user = currentUser) {
@@ -2947,7 +2949,9 @@
       throw new Error("DOCUMENT_COUNTER_UNAVAILABLE");
     }
 
-    const reference = collection.doc("global");
+    const templateId = String(template.id || "").trim();
+    const documentCode = String(template.code || templateId || "VB").trim().toUpperCase();
+    const reference = collection.doc(`template_${templateId || documentCode}`);
 
     const nextNumber = await firestoreDb.runTransaction(async (transaction) => {
       const snapshot = await transaction.get(reference);
@@ -2958,15 +2962,17 @@
 
       transaction.set(reference, {
         current: next,
+        templateId,
+        documentCode,
         updatedAt: nowISO(),
         updatedBy: user.uid,
-        counterType: "global_document_number"
+        counterType: "document_type_sequence"
       }, { merge: true });
 
       return next;
     });
 
-    return formatCentralDocumentNumber(nextNumber);
+    return formatCentralDocumentNumber(nextNumber, documentCode);
   }
 
   function buildTemplateUrlWithDocumentNumber(file, documentNo, templateId) {
@@ -3025,9 +3031,10 @@
     }
 
     /*
-      TASK 4: cấp số trung tâm trước khi mở mẫu.
-      Số được cấp bằng Firestore Transaction nên không trùng giữa các máy.
-      Template nhận số qua query parameter để tự hiển thị mà không thay đổi nội dung mẫu.
+      TASK 4: cấp số trung tâm theo TỪNG LOẠI VĂN BẢN.
+      Ví dụ: 001-HĐNT, 002-HĐNT và 001-DNTT là các dãy độc lập.
+      Firestore Transaction đảm bảo không trùng số giữa các máy.
+      Template nhận số qua query parameter để tự hiển thị.
     */
     void addHistory(template);
 
