@@ -4241,6 +4241,45 @@
   </script>
 
 
+
+<script>
+(function () {
+  "use strict";
+
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const documentNo = params.get("grovaDocumentNo");
+    if (!documentNo) return;
+
+    const targets = [
+      "contractNumberDisplay",
+      "previewContractNumber",
+      "appendixNumberDisplay",
+      "previewAppendixNumber",
+      "documentNumber",
+      "previewNumber",
+      "documentNo",
+      "previewContractNo",
+      "pvDocumentNumber"
+    ];
+
+    targets.forEach(function (id) {
+      const element = document.getElementById(id);
+      if (!element) return;
+
+      if ("value" in element) {
+        element.value = documentNo;
+      }
+
+      element.textContent = documentNo;
+      element.dispatchEvent(new Event("input", { bubbles: true }));
+      element.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+  } catch (error) {
+    console.warn("GROVA DOCUMENT: cannot apply central document number.", error);
+  }
+})();
+</script>
 </body>
 
 </html>
