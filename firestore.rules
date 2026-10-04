@@ -1,17 +1,35 @@
 rules_version = '2';
 
 service cloud.firestore {
-
   match /databases/{database}/documents {
 
-    // ------------------------------------------------------------
-    // GROVA DOCUMENT — TASK 1
-    // Firestore authorization source:
-    // Firebase Auth -> users/{uid} profile -> permission matrix
-    // ------------------------------------------------------------
+    /* =====================================================
+       GROVA DOCUMENT — TASK 1
+       FIRESTORE SECURITY HARDENING
+
+       Authorization:
+       Firebase Auth -> users/{uid} -> active profile -> permission matrix
+
+       Rules below preserve the current V234/V233 data model and UI behavior.
+       No Firebase SDK / Functions / Hosting upgrade is required here.
+       ===================================================== */
 
     function signedIn() {
       return request.auth != null;
+    }
+
+    function userPath(uid) {
+      return /databases/$(database)/documents/users/$(uid);
+    }
+
+    function hasUserProfile() {
+      return signedIn()
+        && exists(userPath(request.auth.uid));
+    }
+
+    function isActiveUser() {
+      return hasUserProfile()
+        && get(userPath(request.auth.uid)).data.status == "active";
     }
 
     function isBootstrapAdmin() {
@@ -19,23 +37,105 @@ service cloud.firestore {
         && request.auth.uid == "nJmKgjEILgVOEjWKYWTsuonxbO03";
     }
 
-    function hasActiveProfile() {
-      return signedIn()
-        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
-        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.status == "active";
-    }
-
-    function hasPermission(group, action) {
+    function isAdmin() {
       return isBootstrapAdmin()
         || (
-          hasActiveProfile()
-          && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.permissions[group][action] == true
+          isActiveUser()
+          && get(userPath(request.auth.uid)).data.role == "admin"
         );
     }
 
-    // ------------------------------------------------------------
-    // PROJECTS
-    // ------------------------------------------------------------
+    function hasPermission(group, action) {
+      return isAdmin()
+        || (
+          isActiveUser()
+          && get(userPath(request.auth.uid)).data.permissions[group][action] == true
+        );
+    }
+
+    function canManageUserPermissions() {
+      return isAdmin()
+        || (
+          isActiveUser()
+          && get(userPath(request.auth.uid)).data.permissions.users.managePermissions == true
+        );
+    }
+
+    function validUserRole() {
+      return request.resource.data.role
+        in ["employee", "viewer", "manager", "custom", "admin"];
+    }
+
+    function validUserStatus() {
+      return request.resource.data.status
+        in ["active", "disabled"];
+    }
+
+    /*
+      Safe default employee profile used when a user without
+      permission-management rights creates an employee profile.
+    */
+    function isDefaultEmployeePermissions() {
+      return request.resource.data.permissions.keys().hasOnly([
+        "projects", "customers", "employees", "documents",
+        "history", "users", "settings", "ai"
+      ])
+      && request.resource.data.permissions.projects.keys().hasOnly([
+        "view", "create", "edit", "delete"
+      ])
+      && request.resource.data.permissions.projects.view == true
+      && request.resource.data.permissions.projects.create == true
+      && request.resource.data.permissions.projects.edit == true
+      && request.resource.data.permissions.projects.delete == false
+      && request.resource.data.permissions.customers.keys().hasOnly([
+        "view", "create", "edit", "delete"
+      ])
+      && request.resource.data.permissions.customers.view == true
+      && request.resource.data.permissions.customers.create == true
+      && request.resource.data.permissions.customers.edit == true
+      && request.resource.data.permissions.customers.delete == false
+      && request.resource.data.permissions.employees.keys().hasOnly([
+        "view", "create", "edit", "delete"
+      ])
+      && request.resource.data.permissions.employees.view == true
+      && request.resource.data.permissions.employees.create == false
+      && request.resource.data.permissions.employees.edit == false
+      && request.resource.data.permissions.employees.delete == false
+      && request.resource.data.permissions.documents.keys().hasOnly([
+        "view", "create", "edit", "delete", "export"
+      ])
+      && request.resource.data.permissions.documents.view == true
+      && request.resource.data.permissions.documents.create == true
+      && request.resource.data.permissions.documents.edit == false
+      && request.resource.data.permissions.documents.delete == false
+      && request.resource.data.permissions.documents.export == true
+      && request.resource.data.permissions.history.keys().hasOnly([
+        "view"
+      ])
+      && request.resource.data.permissions.history.view == true
+      && request.resource.data.permissions.users.keys().hasOnly([
+        "view", "create", "edit", "lock", "managePermissions"
+      ])
+      && request.resource.data.permissions.users.view == false
+      && request.resource.data.permissions.users.create == false
+      && request.resource.data.permissions.users.edit == false
+      && request.resource.data.permissions.users.lock == false
+      && request.resource.data.permissions.users.managePermissions == false
+      && request.resource.data.permissions.settings.keys().hasOnly([
+        "view", "edit"
+      ])
+      && request.resource.data.permissions.settings.view == false
+      && request.resource.data.permissions.settings.edit == false
+      && request.resource.data.permissions.ai.keys().hasOnly([
+        "view"
+      ])
+      && request.resource.data.permissions.ai.view == true;
+    }
+
+    /* =====================================================
+       PROJECTS
+       ===================================================== */
+
     match /projects/{projectId} {
       allow read: if hasPermission("projects", "view");
       allow create: if hasPermission("projects", "create");
@@ -43,9 +143,10 @@ service cloud.firestore {
       allow delete: if hasPermission("projects", "delete");
     }
 
-    // ------------------------------------------------------------
-    // CUSTOMERS
-    // ------------------------------------------------------------
+    /* =====================================================
+       CUSTOMERS
+       ===================================================== */
+
     match /customers/{customerId} {
       allow read: if hasPermission("customers", "view");
       allow create: if hasPermission("customers", "create");
@@ -53,9 +154,10 @@ service cloud.firestore {
       allow delete: if hasPermission("customers", "delete");
     }
 
-    // ------------------------------------------------------------
-    // EMPLOYEES
-    // ------------------------------------------------------------
+    /* =====================================================
+       EMPLOYEES
+       ===================================================== */
+
     match /employees/{employeeId} {
       allow read: if hasPermission("employees", "view");
       allow create: if hasPermission("employees", "create");
@@ -63,11 +165,138 @@ service cloud.firestore {
       allow delete: if hasPermission("employees", "delete");
     }
 
-    // ------------------------------------------------------------
-    // DOCUMENTS
-    // TASK 1 enforces collection-level document permissions.
-    // Template-level permissions remain in document-permission.js.
-    // ------------------------------------------------------------
+    /* =====================================================
+       HISTORY
+
+       Current UI stores history under the authenticated user's UID.
+       Firestore also enforces history.view so a custom role cannot
+       bypass the client permission check.
+       ===================================================== */
+
+    match /history/{historyId} {
+      allow read: if hasPermission("history", "view")
+        && resource.data.createdBy == request.auth.uid;
+
+      allow create: if hasPermission("history", "view")
+        && request.resource.data.createdBy == request.auth.uid;
+
+      allow update: if hasPermission("history", "view")
+        && resource.data.createdBy == request.auth.uid
+        && request.resource.data.createdBy == request.auth.uid;
+
+      allow delete: if hasPermission("history", "view")
+        && resource.data.createdBy == request.auth.uid;
+    }
+
+    /* =====================================================
+       USERS / ACCOUNT PROFILES
+       ===================================================== */
+
+    match /users/{userId} {
+
+      /* A user may read only their own profile; Admin may read all. */
+      allow read: if signedIn()
+        && (
+          userId == request.auth.uid
+          || isAdmin()
+        );
+
+      /*
+        Create:
+        - Admin / approved permission manager can create profiles.
+        - Non-admin permission holders may only create safe employee profiles.
+        - A user may create their own safe employee profile.
+        - Bootstrap Admin can never be created from the client.
+      */
+      allow create: if
+        userId != "nJmKgjEILgVOEjWKYWTsuonxbO03"
+        && request.resource.data.uid == userId
+        && request.resource.data.createdBy == request.auth.uid
+        && request.resource.data.updatedBy == request.auth.uid
+        && validUserRole()
+        && validUserStatus()
+        && (
+          (
+            hasPermission("users", "create")
+            && canManageUserPermissions()
+            && (
+              request.resource.data.role != "admin"
+              || isAdmin()
+            )
+          )
+          ||
+          (
+            hasPermission("users", "create")
+            && !canManageUserPermissions()
+            && request.resource.data.role == "employee"
+            && request.resource.data.status == "active"
+            && isDefaultEmployeePermissions()
+          )
+          ||
+          (
+            signedIn()
+            && userId == request.auth.uid
+            && request.resource.data.role == "employee"
+            && request.resource.data.status == "active"
+            && isDefaultEmployeePermissions()
+          )
+        );
+
+      /*
+        Update:
+        - Basic profile fields require users.edit.
+        - Status changes require users.lock.
+        - Role / permissions changes require managePermissions.
+        - Bootstrap Admin profile cannot be modified from the client.
+      */
+      allow update: if
+        userId != "nJmKgjEILgVOEjWKYWTsuonxbO03"
+        && request.resource.data.uid == resource.data.uid
+        && request.resource.data.updatedBy == request.auth.uid
+        && (
+          (
+            hasPermission("users", "edit")
+            && request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(["name", "email", "phone", "updatedAt", "updatedBy"])
+          )
+          ||
+          (
+            hasPermission("users", "lock")
+            && request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(["status", "updatedAt", "updatedBy"])
+            && validUserStatus()
+          )
+          ||
+          (
+            canManageUserPermissions()
+            && request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly([
+                "name", "email", "phone",
+                "role", "status", "permissions",
+                "updatedAt", "updatedBy"
+              ])
+            && validUserRole()
+            && validUserStatus()
+            && (
+              request.resource.data.role != "admin"
+              || isAdmin()
+            )
+          )
+        );
+
+      /* Client-side deletion is Administrator-only. */
+      allow delete: if isAdmin()
+        && userId != "nJmKgjEILgVOEjWKYWTsuonxbO03";
+    }
+
+    /* =====================================================
+       DOCUMENTS
+
+       TASK 1 enforces the existing collection-level document
+       permission matrix. Template-level permissions remain in
+       document-permission.js and are not rewritten here.
+       ===================================================== */
+
     match /documents/{documentId} {
       allow read: if hasPermission("documents", "view");
       allow create: if hasPermission("documents", "create");
@@ -75,53 +304,21 @@ service cloud.firestore {
       allow delete: if hasPermission("documents", "delete");
     }
 
-    // ------------------------------------------------------------
-    // HISTORY
-    // Current app has only history.view in the permission matrix.
-    // Active users may create their own history entries.
-    // History entries cannot be edited through Firestore.
-    // Users may delete only their own history; admin may delete all.
-    // ------------------------------------------------------------
-    match /history/{historyId} {
-      allow read: if hasPermission("history", "view");
+    /* =====================================================
+       DOCUMENT COUNTERS
 
-      allow create: if hasActiveProfile()
-        && request.resource.data.createdBy == request.auth.uid;
+       Numbering is TASK 4. TASK 1 only protects the collection.
+       Ordinary users cannot read or mutate counters directly.
+       ===================================================== */
 
-      allow update: if false;
-
-      allow delete: if isBootstrapAdmin()
-        || (
-          hasActiveProfile()
-          && resource.data.createdBy == request.auth.uid
-        );
-    }
-
-    // ------------------------------------------------------------
-    // USERS
-    // Only the bootstrap Administrator can manage user profiles.
-    // This protects role/status/permissions from client-side tampering.
-    // ------------------------------------------------------------
-    match /users/{userId} {
-      allow read: if isBootstrapAdmin()
-        || (signedIn() && userId == request.auth.uid);
-      allow create: if isBootstrapAdmin();
-      allow update: if isBootstrapAdmin();
-      allow delete: if isBootstrapAdmin();
-    }
-
-    // ------------------------------------------------------------
-    // DOCUMENT COUNTERS
-    // TASK 1 only protects the collection.
-    // Central numbering / transaction logic belongs to TASK 4.
-    // ------------------------------------------------------------
     match /document_counters/{counterId} {
-      allow read, write: if isBootstrapAdmin();
+      allow read, create, update, delete: if isAdmin();
     }
 
-    // ------------------------------------------------------------
-    // DEFAULT DENY
-    // ------------------------------------------------------------
+    /* =====================================================
+       DEFAULT DENY
+       ===================================================== */
+
     match /{document=**} {
       allow read, write: if false;
     }
