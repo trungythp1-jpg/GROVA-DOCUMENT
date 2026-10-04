@@ -807,9 +807,9 @@
       <button
         class="btn btn-print"
         type="button"
-        onclick="window.print()"
+        onclick="exportDocumentPDF()"
       >
-        🖨 In hợp đồng
+        📄 Xuất PDF
       </button>
 
     </div>
@@ -1294,9 +1294,9 @@
         <button
           class="btn btn-primary"
           type="button"
-          onclick="window.print()"
+          onclick="exportDocumentPDF()"
         >
-          🖨 In
+          📄 Xuất PDF
         </button>
 
       </div>
@@ -1338,9 +1338,9 @@
       <button
         class="btn btn-primary"
         type="button"
-        onclick="window.print()"
+        onclick="exportDocumentPDF()"
       >
-        🖨 In hợp đồng
+        📄 Xuất PDF
       </button>
 
     </div>
@@ -3139,6 +3139,165 @@
   applyCentralDocumentNumber();
   document.addEventListener("DOMContentLoaded", applyCentralDocumentNumber);
 })();
+</script>
+
+<style id="grova-pdf-pagination-fix">
+/* GROVA PDF EXPORT — keep logical blocks together when possible */
+.pdf-exporting p,
+.pdf-exporting li,
+.pdf-exporting tr,
+.pdf-exporting .party,
+.pdf-exporting .section,
+.pdf-exporting .document-section,
+.pdf-exporting .article,
+.pdf-exporting .article-content,
+.pdf-exporting .sub-clause,
+.pdf-exporting .assignment-row,
+.pdf-exporting .check-item,
+.pdf-exporting .item,
+.pdf-exporting .total-row,
+.pdf-exporting .total-box-row,
+.pdf-exporting .money-result-row,
+.pdf-exporting .bank-row,
+.pdf-exporting .check-row,
+.pdf-exporting .signature-grid,
+.pdf-exporting .signature-table,
+.pdf-exporting .signature-box,
+.pdf-exporting .signature-block,
+.pdf-exporting .company-block,
+.pdf-exporting .content,
+.pdf-exporting .checkbox-item,
+.pdf-exporting .party-grid {
+  break-inside: avoid !important;
+  page-break-inside: avoid !important;
+}
+</style>
+<style>
+
+/* GROVA PDF PAGINATION V5
+   Important: only keep page-break avoidance on small semantic units.
+   Large wrappers must remain splittable; otherwise html2pdf can create
+   completely blank pages when an avoided element is taller than one A4 page.
+*/
+.pdf-exporting h1,
+.pdf-exporting h2,
+.pdf-exporting h3,
+.pdf-exporting h4 {
+  break-after: avoid !important;
+  page-break-after: avoid !important;
+}
+
+.pdf-exporting p,
+.pdf-exporting li,
+.pdf-exporting tr {
+  break-inside: avoid !important;
+  page-break-inside: avoid !important;
+}
+
+/* Large containers MUST be allowed to split across A4 pages. */
+.pdf-exporting .party,
+.pdf-exporting .section,
+.pdf-exporting .document-section,
+.pdf-exporting .article,
+.pdf-exporting .article-content,
+.pdf-exporting .sub-clause,
+.pdf-exporting .content,
+.pdf-exporting .company-block,
+.pdf-exporting .party-grid,
+.pdf-exporting .signature-grid,
+.pdf-exporting .signature-block,
+.pdf-exporting .assignment-row,
+.pdf-exporting .check-item,
+.pdf-exporting .item,
+.pdf-exporting .total-row,
+.pdf-exporting .total-box-row,
+.pdf-exporting .money-result-row,
+.pdf-exporting .bank-row,
+.pdf-exporting .check-row {
+  break-inside: auto !important;
+  page-break-inside: auto !important;
+}
+
+/* Small table/signature units can stay together when they fit. */
+.pdf-exporting td,
+.pdf-exporting th,
+.pdf-exporting .signature-box {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+  function exportDocumentPDF() {
+    if (typeof html2canvas === "undefined" || !window.jspdf || !window.jspdf.jsPDF) {
+      alert("Không tải được bộ xuất PDF. Vui lòng kiểm tra kết nối mạng rồi thử lại.");
+      return;
+    }
+    if (typeof window.updatePreview === "function") {
+      try { window.updatePreview(); } catch (e) {}
+    }
+    const target = document.querySelector(".document, #documentPreview, #paper, article.paper");
+    if (!target) {
+      alert("Không tìm thấy nội dung văn bản để xuất PDF.");
+      return;
+    }
+    const numberEl = document.querySelector("#documentNumber, #documentNo, .document-number, #contractNumberDisplay, #appendixNumberDisplay");
+    const rawNumber = numberEl ? (numberEl.textContent || numberEl.value || "").trim() : "";
+    const number = rawNumber.replace(/\s+/g, "-").replace(/[^0-9A-Za-zÀ-ỹĐđ_-]/g, "").replace(/-+/g, "-");
+    const title = (document.title || "GROVA DOCUMENT").replace(/\s*[–—-]\s*GROVA.*$/i, "").replace(/[^0-9A-Za-zÀ-ỹĐđ _-]/g, "").trim().replace(/\s+/g, "-");
+    const filename = `${number || "van-ban"}${title ? "-" + title : ""}.pdf`;
+    const oldOverflow = document.documentElement.style.overflow;
+    const oldBodyOverflow = document.body.style.overflow;
+    target.classList.add("pdf-exporting");
+    document.documentElement.style.overflow = "visible";
+    document.body.style.overflow = "visible";
+    const finish = () => {
+      target.classList.remove("pdf-exporting");
+      document.documentElement.style.overflow = oldOverflow;
+      document.body.style.overflow = oldBodyOverflow;
+    };
+    html2canvas(target, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: false,
+      backgroundColor: "#ffffff",
+      logging: false,
+      imageTimeout: 15000,
+      scrollX: 0,
+      scrollY: 0,
+      windowWidth: Math.max(document.documentElement.clientWidth, target.scrollWidth),
+      windowHeight: Math.max(window.innerHeight, target.scrollHeight)
+    }).then((fullCanvas) => {
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait", compress: true });
+      const pageWidthMm = 210;
+      const pageHeightMm = 297;
+      const pageHeightPx = Math.round(fullCanvas.width * (pageHeightMm / pageWidthMm));
+      const totalPages = Math.max(1, Math.ceil(fullCanvas.height / pageHeightPx));
+      for (let page = 0; page < totalPages; page++) {
+        const sourceY = page * pageHeightPx;
+        const sliceHeight = Math.min(pageHeightPx, fullCanvas.height - sourceY);
+        if (sliceHeight <= 0) continue;
+        const pageCanvas = document.createElement("canvas");
+        pageCanvas.width = fullCanvas.width;
+        pageCanvas.height = sliceHeight;
+        const ctx = pageCanvas.getContext("2d", { alpha: false });
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
+        ctx.drawImage(fullCanvas, 0, sourceY, fullCanvas.width, sliceHeight, 0, 0, pageCanvas.width, sliceHeight);
+        if (page > 0) pdf.addPage("a4", "portrait");
+        const imageData = pageCanvas.toDataURL("image/jpeg", 0.96);
+        const renderedHeightMm = pageHeightMm * (sliceHeight / pageHeightPx);
+        pdf.addImage(imageData, "JPEG", 0, 0, pageWidthMm, renderedHeightMm, undefined, "FAST");
+      }
+      pdf.save(filename);
+    }).catch((error) => {
+      console.error("GROVA PDF direct cut error:", error);
+      alert("Xuất PDF thất bại. Vui lòng thử lại.");
+    }).finally(finish);
+  }
 </script>
 </body>
 </html>
