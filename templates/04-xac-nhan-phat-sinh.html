@@ -1686,9 +1686,9 @@
             <button
               type="button"
               class="btn btn-primary"
-              onclick="window.print()"
+              onclick="exportDocumentPDF()"
             >
-              In / Xuất PDF
+              📄 Xuất PDF
             </button>
 
           </div>
@@ -3779,12 +3779,13 @@
 (function () {
   "use strict";
 
-  try {
-    const params = new URLSearchParams(window.location.search);
-    const documentNo = params.get("grovaDocumentNo");
-    if (!documentNo) return;
+  function applyCentralDocumentNumber() {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const documentNo = params.get("grovaDocumentNo");
+      if (!documentNo) return;
 
-    const targets = [
+      const targets = [
       "contractNumberDisplay",
       "previewContractNumber",
       "appendixNumberDisplay",
@@ -3796,22 +3797,95 @@
       "pvDocumentNumber"
     ];
 
-    targets.forEach(function (id) {
-      const element = document.getElementById(id);
-      if (!element) return;
+      targets.forEach(function (id) {
+        const element = document.getElementById(id);
+        if (!element) return;
 
-      if ("value" in element) {
-        element.value = documentNo;
-      }
+        if ("value" in element) {
+          element.value = documentNo;
+        }
 
-      element.textContent = documentNo;
-      element.dispatchEvent(new Event("input", { bubbles: true }));
-      element.dispatchEvent(new Event("change", { bubbles: true }));
-    });
-  } catch (error) {
-    console.warn("GROVA DOCUMENT: cannot apply central document number.", error);
+        element.textContent = documentNo;
+        element.dispatchEvent(new Event("input", { bubbles: true }));
+        element.dispatchEvent(new Event("change", { bubbles: true }));
+      });
+    } catch (error) {
+      console.warn("GROVA DOCUMENT: cannot apply central document number.", error);
+    }
   }
+
+  // Apply immediately and again after DOMContentLoaded so legacy localStorage
+  // initializers cannot overwrite the central GROVA number.
+  applyCentralDocumentNumber();
+  document.addEventListener("DOMContentLoaded", applyCentralDocumentNumber);
 })();
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script>
+  function exportDocumentPDF() {
+    if (typeof html2pdf === "undefined") {
+      alert("Không tải được bộ xuất PDF. Vui lòng kiểm tra kết nối mạng rồi thử lại.");
+      return;
+    }
+
+    if (typeof window.updatePreview === "function") {
+      try { window.updatePreview(); } catch (e) {}
+    }
+
+    const target = document.querySelector(
+      ".document, #documentPreview, #paper, article.paper"
+    );
+
+    if (!target) {
+      alert("Không tìm thấy nội dung văn bản để xuất PDF.");
+      return;
+    }
+
+    const numberEl = document.querySelector(
+      "#documentNumber, #documentNo, .document-number"
+    );
+    const rawNumber = numberEl ? numberEl.textContent.trim() : "";
+    const number = rawNumber
+      .replace(/\s+/g, "-")
+      .replace(/[^0-9A-Za-zÀ-ỹĐđ_-]/g, "")
+      .replace(/-+/g, "-");
+
+    const title = (document.title || "GROVA DOCUMENT")
+      .replace(/\s*[–—-]\s*GROVA.*$/i, "")
+      .replace(/[^0-9A-Za-zÀ-ỹĐđ _-]/g, "")
+      .trim()
+      .replace(/\s+/g, "-");
+
+    const filename = `${number || "van-ban"}${title ? "-" + title : ""}.pdf`;
+
+    const options = {
+      margin: 0,
+      filename,
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#ffffff",
+        logging: false
+      },
+      jsPDF: {
+        unit: "mm",
+        format: "a4",
+        orientation: "portrait",
+        compress: true
+      },
+      pagebreak: {
+        mode: ["css", "legacy"]
+      }
+    };
+
+    target.classList.add("pdf-exporting");
+    html2pdf()
+      .set(options)
+      .from(target)
+      .save()
+      .finally(() => target.classList.remove("pdf-exporting"));
+  }
 </script>
 </body>
 </html>
