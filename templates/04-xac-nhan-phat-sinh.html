@@ -3968,7 +3968,6 @@
 }
 
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 /* GROVA A4 document margins: left 30mm, right 20mm, top 20mm, bottom 20mm. */
@@ -4093,90 +4092,87 @@ async function exportDocumentPDF() {
       }
 
       // STEP 3: regenerate after the official number is attached, then save PDF.
-      const officialCanvas = await renderCanvas();
+      // STEP 3: regenerate the official document and let jsPDF paginate the DOM.
+      // This avoids creating one huge canvas and then slicing it into page canvases,
+      // which is memory-heavy and unreliable on iPad/iPhone Safari.
+      if (typeof window.updatePreview === "function") {
+        try { window.updatePreview(); } catch (e) {}
+      }
+      const target = document.querySelector(".document, #documentPreview, #paper, article.paper");
+      if (!target) throw new Error("DOCUMENT_TARGET_NOT_FOUND");
+
       const numberEl = document.querySelector("#documentNumber, #documentNo, .document-number, #contractNumberDisplay, #appendixNumberDisplay");
       const rawNumber = numberEl ? (numberEl.textContent || numberEl.value || "").trim() : "";
       const number = rawNumber.replace(/\s+/g, "-").replace(/[^0-9A-Za-zÀ-ỹĐđ_-]/g, "").replace(/-+/g, "-");
       const title = (document.title || "GROVA DOCUMENT").replace(/\s*[–—-]\s*GROVA.*$/i, "").replace(/[^0-9A-Za-zÀ-ỹĐđ _-]/g, "").trim().replace(/\s+/g, "-");
       const filename = `${number || "van-ban"}${title ? "-" + title : ""}.pdf`;
 
-      const target = document.querySelector(".document, #documentPreview, #paper, article.paper");
-      if (!target) throw new Error("DOCUMENT_TARGET_NOT_FOUND");
-
-      if (typeof html2pdf === "undefined") {
+      if (!window.jspdf || !window.jspdf.jsPDF) {
         throw new Error("PDF_LIB_NOT_READY");
       }
 
-      // Temporarily apply the export CSS to the real document so computed
-      // dimensions/fonts/images are exactly the ones the user reviewed.
       const oldOverflow = document.documentElement.style.overflow;
       const oldBodyOverflow = document.body.style.overflow;
       const oldScrollBehavior = document.documentElement.style.scrollBehavior;
-
       target.classList.add("pdf-exporting");
       document.documentElement.style.overflow = "visible";
       document.body.style.overflow = "visible";
       document.documentElement.style.scrollBehavior = "auto";
 
       try {
-        if (typeof window.updatePreview === "function") {
-          try { window.updatePreview(); } catch (e) {}
+        if (document.fonts && document.fonts.ready) {
+          try { await document.fonts.ready; } catch (e) {}
         }
 
-        // Let the browser finish layout before html2pdf reads the DOM.
-        await new Promise(resolve =>
-          requestAnimationFrame(() =>
-            requestAnimationFrame(resolve)
-          )
-        );
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({
+          unit: "mm",
+          format: "a4",
+          orientation: "portrait",
+          compress: true
+        });
 
-        const opt = {
-          margin: 0,
-          filename,
-          image: {
-            type: "jpeg",
-            quality: 0.98
-          },
-          html2canvas: {
-            scale: 2,
-            useCORS: true,
-            allowTaint: false,
-            backgroundColor: "#ffffff",
-            logging: false,
-            imageTimeout: 15000,
-            scrollX: 0,
-            scrollY: 0,
-            windowWidth: Math.max(
-              document.documentElement.clientWidth,
-              target.scrollWidth
-            ),
-            windowHeight: Math.max(
-              window.innerHeight,
-              target.scrollHeight
-            )
-          },
-          jsPDF: {
-            unit: "mm",
-            format: "a4",
-            orientation: "portrait",
-            compress: true
-          },
-          pagebreak: {
-            mode: ["css", "legacy"]
+        await new Promise((resolve, reject) => {
+          try {
+            pdf.html(target, {
+              x: 0,
+              y: 0,
+              width: 210,
+              windowWidth: Math.max(document.documentElement.clientWidth, target.scrollWidth),
+              autoPaging: "text",
+              margin: [0, 0, 0, 0],
+              html2canvas: {
+                scale: 1.35,
+                useCORS: true,
+                allowTaint: false,
+                backgroundColor: "#ffffff",
+                logging: false,
+                imageTimeout: 15000,
+                scrollX: 0,
+                scrollY: 0,
+                windowWidth: Math.max(document.documentElement.clientWidth, target.scrollWidth),
+                windowHeight: Math.max(window.innerHeight, target.scrollHeight)
+              },
+              callback: function(doc) {
+                try {
+                  doc.save(filename);
+                  resolve();
+                } catch (error) {
+                  reject(error);
+                }
+              }
+            });
+          } catch (error) {
+            reject(error);
           }
-        };
-
-        await html2pdf()
-          .set(opt)
-          .from(target)
-          .save();
-
+        });
       } finally {
         target.classList.remove("pdf-exporting");
         document.documentElement.style.overflow = oldOverflow;
         document.body.style.overflow = oldBodyOverflow;
         document.documentElement.style.scrollBehavior = oldScrollBehavior;
       }
+
     } catch (error) {
       console.error("GROVA PDF preview/export error:", error);
       if (error && error.message === "PDF_LIB_NOT_READY") alert("Không tải được bộ xuất PDF. Vui lòng kiểm tra kết nối mạng rồi thử lại.");
