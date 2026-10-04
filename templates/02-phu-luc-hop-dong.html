@@ -2371,6 +2371,38 @@ document.addEventListener(
   document.addEventListener("DOMContentLoaded", applyCentralDocumentNumber);
 })();
 </script>
+
+<style id="grova-pdf-pagination-fix">
+/* GROVA PDF EXPORT — keep logical blocks together when possible */
+.pdf-exporting p,
+.pdf-exporting li,
+.pdf-exporting tr,
+.pdf-exporting .party,
+.pdf-exporting .section,
+.pdf-exporting .document-section,
+.pdf-exporting .article,
+.pdf-exporting .article-content,
+.pdf-exporting .sub-clause,
+.pdf-exporting .assignment-row,
+.pdf-exporting .check-item,
+.pdf-exporting .item,
+.pdf-exporting .total-row,
+.pdf-exporting .total-box-row,
+.pdf-exporting .money-result-row,
+.pdf-exporting .bank-row,
+.pdf-exporting .check-row,
+.pdf-exporting .signature-grid,
+.pdf-exporting .signature-table,
+.pdf-exporting .signature-box,
+.pdf-exporting .signature-block,
+.pdf-exporting .company-block,
+.pdf-exporting .content,
+.pdf-exporting .checkbox-item,
+.pdf-exporting .party-grid {
+  break-inside: avoid !important;
+  page-break-inside: avoid !important;
+}
+</style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
   function exportDocumentPDF() {
@@ -2426,7 +2458,8 @@ document.addEventListener(
         compress: true
       },
       pagebreak: {
-        mode: ["css", "legacy"]
+        mode: ["css"],
+        avoid: ["p", "li", "tr", ".party", ".section", ".document-section", ".article", ".article-content", ".sub-clause", ".assignment-row", ".check-item", ".item", ".total-row", ".total-box-row", ".money-result-row", ".bank-row", ".check-row", ".signature-grid", ".signature-table", ".signature-box", ".signature-block", ".company-block", ".content", ".checkbox-item", ".party-grid"]
       }
     };
 
@@ -2435,7 +2468,9 @@ document.addEventListener(
       .set(options)
       .from(target)
       .save()
-      .finally(() => target.classList.remove("pdf-exporting"));
+      .finally(() => {
+        target.classList.remove("pdf-exporting");
+      });
   }
 </script>
 </body>
