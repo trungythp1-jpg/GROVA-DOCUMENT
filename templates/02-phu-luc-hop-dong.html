@@ -2330,45 +2330,109 @@ document.addEventListener(
 (function () {
   "use strict";
 
-  function applyCentralDocumentNumber() {
+  const GROVA_TEMPLATE_ID = "02";
+  const GROVA_DOCUMENT_CODE = "PLHĐ";
+  const GROVA_FIREBASE_CONFIG = {
+    apiKey: "AIzaSyBcqgrkL64utUMwyZz9wmb_cM0gA5Hy8II",
+    authDomain: "grova-document.firebaseapp.com",
+    projectId: "grova-document",
+    storageBucket: "grova-document.firebasestorage.app",
+    messagingSenderId: "220105094085",
+    appId: "1:220105094085:web:5a7263b0653333baed51ac",
+    measurementId: "G-TNVNP286G4"
+  };
+
+  window.GROVA_DOCUMENT_STATE = window.GROVA_DOCUMENT_STATE || {};
+  window.GROVA_DOCUMENT_STATE.templateId = GROVA_TEMPLATE_ID;
+  window.GROVA_DOCUMENT_STATE.documentCode = GROVA_DOCUMENT_CODE;
+  window.GROVA_DOCUMENT_STATE.documentNo = null;
+  window.GROVA_DOCUMENT_STATE.isOfficial = false;
+
+  function applyDocumentNumber(value) {
+    const display = value || "DỰ THẢO";
+    const targets = [
+      "contractNumberDisplay", "previewContractNumber",
+      "appendixNumberDisplay", "previewAppendixNumber",
+      "documentNumber", "previewNumber", "documentNo",
+      "previewContractNo", "pvDocumentNumber"
+    ];
+    targets.forEach(function (id) {
+      const element = document.getElementById(id);
+      if (!element) return;
+      if ("value" in element) element.value = display;
+      element.textContent = display;
+      element.dispatchEvent(new Event("input", { bubbles: true }));
+      element.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+  }
+
+  function readOfficialNumberFromUrl() {
     try {
       const params = new URLSearchParams(window.location.search);
-      const documentNo = params.get("grovaDocumentNo");
-      if (!documentNo) return;
-
-      const targets = [
-      "contractNumberDisplay",
-      "previewContractNumber",
-      "appendixNumberDisplay",
-      "previewAppendixNumber",
-      "documentNumber",
-      "previewNumber",
-      "documentNo",
-      "previewContractNo",
-      "pvDocumentNumber"
-    ];
-
-      targets.forEach(function (id) {
-        const element = document.getElementById(id);
-        if (!element) return;
-
-        if ("value" in element) {
-          element.value = documentNo;
-        }
-
-        element.textContent = documentNo;
-        element.dispatchEvent(new Event("input", { bubbles: true }));
-        element.dispatchEvent(new Event("change", { bubbles: true }));
-      });
+      const value = (params.get("grovaDocumentNo") || "").trim();
+      if (!value) return false;
+      window.GROVA_DOCUMENT_STATE.documentNo = value;
+      window.GROVA_DOCUMENT_STATE.isOfficial = true;
+      applyDocumentNumber(value);
+      return true;
     } catch (error) {
-      console.warn("GROVA DOCUMENT: cannot apply central document number.", error);
+      console.warn("GROVA DOCUMENT: cannot read official number.", error);
+      return false;
     }
   }
 
-  // Apply immediately and again after DOMContentLoaded so legacy localStorage
-  // initializers cannot overwrite the central GROVA number.
-  applyCentralDocumentNumber();
-  document.addEventListener("DOMContentLoaded", applyCentralDocumentNumber);
+  window.GROVA_DOCUMENT_STATE.applyDocumentNumber = applyDocumentNumber;
+  window.GROVA_DOCUMENT_STATE.readOfficialNumberFromUrl = readOfficialNumberFromUrl;
+
+  readOfficialNumberFromUrl();
+  if (!window.GROVA_DOCUMENT_STATE.isOfficial) applyDocumentNumber(null);
+  document.addEventListener("DOMContentLoaded", function () {
+    readOfficialNumberFromUrl();
+    if (!window.GROVA_DOCUMENT_STATE.isOfficial) applyDocumentNumber(null);
+  });
+
+  window.GROVA_DOCUMENT_STATE.reserveOfficialNumber = async function () {
+    if (window.GROVA_DOCUMENT_STATE.isOfficial && window.GROVA_DOCUMENT_STATE.documentNo) {
+      return window.GROVA_DOCUMENT_STATE.documentNo;
+    }
+
+    if (typeof firebase === "undefined") throw new Error("FIREBASE_SDK_UNAVAILABLE");
+    if (!firebase.apps.length) firebase.initializeApp(GROVA_FIREBASE_CONFIG);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const user = auth.currentUser;
+    if (!user) throw new Error("AUTH_REQUIRED");
+
+    const ref = db.collection("document_counters").doc("template_" + GROVA_TEMPLATE_ID);
+    const next = await db.runTransaction(async function (transaction) {
+      const snapshot = await transaction.get(ref);
+      const current = snapshot.exists ? Math.max(0, Number(snapshot.data().current) || 0) : 0;
+      const value = current + 1;
+      transaction.set(ref, {
+        current: value,
+        templateId: GROVA_TEMPLATE_ID,
+        documentCode: GROVA_DOCUMENT_CODE,
+        counterType: "document_type_sequence",
+        updatedAt: new Date().toISOString(),
+        updatedBy: user.uid
+      }, { merge: true });
+      return value;
+    });
+
+    const documentNo = String(next).padStart(3, "0") + "-" + GROVA_DOCUMENT_CODE;
+    window.GROVA_DOCUMENT_STATE.documentNo = documentNo;
+    window.GROVA_DOCUMENT_STATE.isOfficial = true;
+    applyDocumentNumber(documentNo);
+
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("grovaDraft");
+      url.searchParams.set("grovaDocumentNo", documentNo);
+      history.replaceState(null, "", url.toString());
+    } catch (error) {}
+
+    return documentNo;
+  };
 })();
 </script>
 
@@ -2482,84 +2546,141 @@ document.addEventListener(
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
-  function exportDocumentPDF() {
-    if (typeof html2canvas === "undefined" || !window.jspdf || !window.jspdf.jsPDF) {
-      alert("Không tải được bộ xuất PDF. Vui lòng kiểm tra kết nối mạng rồi thử lại."); return;
-    }
-    if (typeof window.updatePreview === "function") { try { window.updatePreview(); } catch (e) {} }
-    const target = document.querySelector(".document, #documentPreview, #paper, article.paper");
-    if (!target) { alert("Không tìm thấy nội dung văn bản để xuất PDF."); return; }
-    const numberEl = document.querySelector("#documentNumber, #documentNo, .document-number, #contractNumberDisplay, #appendixNumberDisplay");
-    const rawNumber = numberEl ? (numberEl.textContent || numberEl.value || "").trim() : "";
-    const number = rawNumber.replace(/\s+/g, "-").replace(/[^0-9A-Za-zÀ-ỹĐđ_-]/g, "").replace(/-+/g, "-");
-    const title = (document.title || "GROVA DOCUMENT").replace(/\s*[–—-]\s*GROVA.*$/i, "").replace(/[^0-9A-Za-zÀ-ỹĐđ _-]/g, "").trim().replace(/\s+/g, "-");
-    const filename = `${number || "van-ban"}${title ? "-" + title : ""}.pdf`;
-    const oldOverflow = document.documentElement.style.overflow;
-    const oldBodyOverflow = document.body.style.overflow;
-    target.classList.add("pdf-exporting");
-    document.documentElement.style.overflow = "visible"; document.body.style.overflow = "visible";
-    const finish = () => { target.classList.remove("pdf-exporting"); document.documentElement.style.overflow = oldOverflow; document.body.style.overflow = oldBodyOverflow; };
+async function exportDocumentPDF() {
+    const state = window.GROVA_DOCUMENT_STATE || {};
 
-    html2canvas(target, {
-      scale: 2, useCORS: true, allowTaint: false, backgroundColor: "#ffffff", logging: false, imageTimeout: 15000, scrollX: 0, scrollY: 0,
-      windowWidth: Math.max(document.documentElement.clientWidth, target.scrollWidth),
-      windowHeight: Math.max(window.innerHeight, target.scrollHeight)
-    }).then((fullCanvas) => {
+    const ensurePreviewStyles = () => {
+      if (document.getElementById("grova-pdf-preview-style")) return;
+      const style = document.createElement("style");
+      style.id = "grova-pdf-preview-style";
+      style.textContent = `
+        #grovaPdfPreviewOverlay{position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:18px;box-sizing:border-box}
+        #grovaPdfPreviewModal{width:min(920px,96vw);height:min(92vh,1100px);background:#fff;border-radius:16px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 70px rgba(0,0,0,.35)}
+        #grovaPdfPreviewHeader{padding:14px 18px;border-bottom:1px solid #ddd;display:flex;align-items:center;justify-content:space-between;font-family:Arial,sans-serif}
+        #grovaPdfPreviewHeader strong{font-size:18px;color:#153d32}
+        #grovaPdfPreviewBody{flex:1;overflow:auto;background:#e9ecef;padding:18px;display:flex;justify-content:center;align-items:flex-start}
+        #grovaPdfPreviewImage{display:block;width:min(100%,794px);height:auto;background:#fff;box-shadow:0 2px 12px rgba(0,0,0,.18)}
+        #grovaPdfPreviewFooter{padding:12px 18px;border-top:1px solid #ddd;display:flex;gap:10px;justify-content:flex-end;font-family:Arial,sans-serif}
+        #grovaPdfPreviewFooter button{border:0;border-radius:9px;padding:11px 18px;font-size:15px;cursor:pointer}
+        #grovaPdfPreviewCancel{background:#eef2f0;color:#173b31}
+        #grovaPdfPreviewContinue{background:#087f5b;color:#fff}
+        #grovaPdfPreviewBusy{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.9);font-family:Arial,sans-serif;font-size:16px;color:#173b31}
+      `;
+      document.head.appendChild(style);
+    };
+
+    const renderCanvas = async () => {
+      if (typeof html2canvas === "undefined" || !window.jspdf || !window.jspdf.jsPDF) {
+        throw new Error("PDF_LIB_NOT_READY");
+      }
+      if (typeof window.updatePreview === "function") { try { window.updatePreview(); } catch (e) {} }
+      const target = document.querySelector(".document, #documentPreview, #paper, article.paper");
+      if (!target) throw new Error("DOCUMENT_TARGET_NOT_FOUND");
+
+      const oldOverflow = document.documentElement.style.overflow;
+      const oldBodyOverflow = document.body.style.overflow;
+      target.classList.add("pdf-exporting");
+      document.documentElement.style.overflow = "visible";
+      document.body.style.overflow = "visible";
+      try {
+        return await html2canvas(target, {
+          scale: 2,
+          useCORS: true,
+          allowTaint: false,
+          backgroundColor: "#ffffff",
+          logging: false,
+          imageTimeout: 15000,
+          windowWidth: Math.max(document.documentElement.clientWidth, target.scrollWidth),
+          windowHeight: Math.max(window.innerHeight, target.scrollHeight),
+          scrollX: 0,
+          scrollY: 0
+        });
+      } finally {
+        target.classList.remove("pdf-exporting");
+        document.documentElement.style.overflow = oldOverflow;
+        document.body.style.overflow = oldBodyOverflow;
+      }
+    };
+
+    const showPreview = (canvas) => new Promise(resolve => {
+      ensurePreviewStyles();
+      const overlay = document.createElement("div");
+      overlay.id = "grovaPdfPreviewOverlay";
+      overlay.innerHTML = `
+        <div id="grovaPdfPreviewModal" role="dialog" aria-modal="true" aria-label="Xem trước văn bản">
+          <div id="grovaPdfPreviewHeader"><strong>👁 XEM TRƯỚC VĂN BẢN</strong><span style="font-size:13px;color:#666">Bản xem trước · chưa cấp số</span></div>
+          <div id="grovaPdfPreviewBody"><img id="grovaPdfPreviewImage" alt="Xem trước văn bản"></div>
+          <div id="grovaPdfPreviewFooter">
+            <button type="button" id="grovaPdfPreviewCancel">← Quay lại chỉnh sửa</button>
+            <button type="button" id="grovaPdfPreviewContinue">Tiếp tục xuất PDF →</button>
+          </div>
+        </div>`;
+      document.body.appendChild(overlay);
+      const img = overlay.querySelector("#grovaPdfPreviewImage");
+      img.src = canvas.toDataURL("image/jpeg", 0.94);
+      const close = value => { overlay.remove(); resolve(value); };
+      overlay.querySelector("#grovaPdfPreviewCancel").onclick = () => close(false);
+      overlay.querySelector("#grovaPdfPreviewContinue").onclick = () => close(true);
+      overlay.addEventListener("click", e => { if (e.target === overlay) close(false); });
+    });
+
+    try {
+      // STEP 1: render and show the complete draft for review. No number is issued here.
+      const draftCanvas = await renderCanvas();
+      const proceed = await showPreview(draftCanvas);
+      if (!proceed) return;
+
+      // STEP 2: only after the user has reviewed the draft, ask for official numbering.
+      if (!state.isOfficial) {
+        const confirmed = window.confirm(
+          "XÁC NHẬN XUẤT VĂN BẢN CHÍNH THỨC\n\n" +
+          "Văn bản đang là DỰ THẢO.\n" +
+          "Nếu chọn OK, hệ thống sẽ cấp số chính thức và xuất PDF.\n\n" +
+          "Bạn có muốn tiếp tục không?"
+        );
+        if (!confirmed) {
+          alert("Vẫn giữ bản nháp. Chưa cấp số chính thức.");
+          return;
+        }
+        await state.reserveOfficialNumber();
+      }
+
+      // STEP 3: regenerate after the official number is attached, then save PDF.
+      const officialCanvas = await renderCanvas();
+      const numberEl = document.querySelector("#documentNumber, #documentNo, .document-number, #contractNumberDisplay, #appendixNumberDisplay");
+      const rawNumber = numberEl ? (numberEl.textContent || numberEl.value || "").trim() : "";
+      const number = rawNumber.replace(/\s+/g, "-").replace(/[^0-9A-Za-zÀ-ỹĐđ_-]/g, "").replace(/-+/g, "-");
+      const title = (document.title || "GROVA DOCUMENT").replace(/\s*[–—-]\s*GROVA.*$/i, "").replace(/[^0-9A-Za-zÀ-ỹĐđ _-]/g, "").trim().replace(/\s+/g, "-");
+      const filename = `${number || "van-ban"}${title ? "-" + title : ""}.pdf`;
+
       const { jsPDF } = window.jspdf;
       const A4_W = 210, A4_H = 297, M_TOP = 20, M_BOTTOM = 20;
-      const pxPerMm = fullCanvas.width / A4_W;
+      const pxPerMm = officialCanvas.width / A4_W;
       const pagePx = Math.round(A4_H * pxPerMm);
       const topPx = Math.round(M_TOP * pxPerMm);
-      const bottomPx = Math.round(M_BOTTOM * pxPerMm);
       const usablePx = Math.round((A4_H - M_TOP - M_BOTTOM) * pxPerMm);
-
-      // Find horizontal whitespace bands so no text line/glyph is cut in half.
       const sample = document.createElement("canvas");
-      sample.width = Math.max(1, Math.round(fullCanvas.width / 2)); sample.height = fullCanvas.height;
-      const sctx = sample.getContext("2d", { willReadFrequently: true }); sctx.drawImage(fullCanvas, 0, 0, sample.width, sample.height);
-      const data = sctx.getImageData(0, 0, sample.width, sample.height).data;
+      sample.width = Math.max(1, Math.round(officialCanvas.width / 2)); sample.height = officialCanvas.height;
+      const sctx = sample.getContext("2d", {willReadFrequently:true}); sctx.drawImage(officialCanvas,0,0,sample.width,sample.height);
+      const data = sctx.getImageData(0,0,sample.width,sample.height).data;
       const rows = new Uint32Array(sample.height);
-      for (let y=0;y<sample.height;y++) {
-        let n=0, base=y*sample.width*4;
-        for (let x=0;x<sample.width;x+=2) { const i=base+x*4; if(data[i]<235 || data[i+1]<235 || data[i+2]<235) n++; }
-        rows[y]=n;
-      }
-      const blankThreshold=Math.max(2, sample.width*0.004);
-      const blankBand=(y)=>{ for(let k=-5;k<=5;k++){const yy=y+k;if(yy<0||yy>=rows.length||rows[yy]>blankThreshold)return false;} return true; };
-      function safeCut(targetY,minY,maxY){
-        const radius=Math.min(500, Math.round(usablePx*0.45));
-        for(let d=0;d<=radius;d++){
-          const ys=d===0?[targetY]:[targetY-d,targetY+d];
-          for(const y of ys){if(y>=minY&&y<=maxY&&blankBand(y))return y;}
-        }
-        return Math.max(minY,Math.min(maxY,targetY));
-      }
-
-      const cuts=[]; let start=0; let page=0;
-      while(start<fullCanvas.height-1){
-        const nominal = page===0 ? pagePx : start+usablePx;
-        if(nominal>=fullCanvas.height){cuts.push([start,fullCanvas.height]);break;}
-        // Do not search too close to the page start; preserve readable page size.
-        const minCut=start+Math.round(90*pxPerMm);
-        const maxCut=Math.min(fullCanvas.height-1,start+Math.round((usablePx+90)*pxPerMm));
-        const cut=safeCut(nominal,minCut,maxCut);
-        cuts.push([start,cut]); start=cut; page++;
-      }
-
+      for(let y=0;y<sample.height;y++){let n=0,base=y*sample.width*4;for(let x=0;x<sample.width;x+=2){const i=base+x*4;if(data[i]<235||data[i+1]<235||data[i+2]<235)n++;}rows[y]=n;}
+      const blankThreshold=Math.max(2,sample.width*0.004);
+      const blankBand=y=>{for(let k=-5;k<=5;k++){const yy=y+k;if(yy<0||yy>=rows.length||rows[yy]>blankThreshold)return false;}return true;};
+      function safeCut(targetY,minY,maxY){const radius=Math.min(500,Math.round(usablePx*.45));for(let d=0;d<=radius;d++){const ys=d===0?[targetY]:[targetY-d,targetY+d];for(const y of ys){if(y>=minY&&y<=maxY&&blankBand(y))return y;}}return Math.max(minY,Math.min(maxY,targetY));}
+      const cuts=[];let start=0,page=0;
+      while(start<officialCanvas.height-1){const nominal=page===0?pagePx:start+usablePx;if(nominal>=officialCanvas.height){cuts.push([start,officialCanvas.height]);break;}const minCut=start+Math.round(90*pxPerMm);const maxCut=Math.min(officialCanvas.height-1,start+Math.round((usablePx+90)*pxPerMm));const cut=safeCut(nominal,minCut,maxCut);cuts.push([start,cut]);start=cut;page++;}
       const pdf=new jsPDF({unit:"mm",format:"a4",orientation:"portrait",compress:true});
-      cuts.forEach(([start,end],idx)=>{
-        const slice=end-start; if(slice<=0)return;
-        const pageCanvas=document.createElement("canvas"); pageCanvas.width=fullCanvas.width; pageCanvas.height=pagePx;
-        const ctx=pageCanvas.getContext("2d",{alpha:false}); ctx.fillStyle="#fff"; ctx.fillRect(0,0,pageCanvas.width,pageCanvas.height);
-        const destY=idx===0?0:topPx;
-        const available=pagePx-destY; const drawH=Math.min(slice,available);
-        ctx.drawImage(fullCanvas,0,start,fullCanvas.width,drawH,0,destY,fullCanvas.width,drawH);
-        if(idx>0)pdf.addPage("a4","portrait");
-        pdf.addImage(pageCanvas.toDataURL("image/jpeg",0.97),"JPEG",0,0,A4_W,A4_H,undefined,"FAST");
-      });
+      cuts.forEach(([start,end],idx)=>{const slice=end-start;if(slice<=0)return;const pageCanvas=document.createElement("canvas");pageCanvas.width=officialCanvas.width;pageCanvas.height=pagePx;const ctx=pageCanvas.getContext("2d",{alpha:false});ctx.fillStyle="#fff";ctx.fillRect(0,0,pageCanvas.width,pageCanvas.height);const destY=idx===0?0:topPx;const available=pagePx-destY;const drawH=Math.min(slice,available);ctx.drawImage(officialCanvas,0,start,officialCanvas.width,drawH,0,destY,officialCanvas.width,drawH);if(idx>0)pdf.addPage("a4","portrait");pdf.addImage(pageCanvas.toDataURL("image/jpeg",0.97),"JPEG",0,0,A4_W,A4_H,undefined,"FAST");});
       pdf.save(filename);
-    }).catch((error)=>{ console.error("GROVA PDF safe-cut export error:",error); alert("Xuất PDF thất bại. Vui lòng thử lại."); }).finally(finish);
+    } catch (error) {
+      console.error("GROVA PDF preview/export error:", error);
+      if (error && error.message === "PDF_LIB_NOT_READY") alert("Không tải được bộ xuất PDF. Vui lòng kiểm tra kết nối mạng rồi thử lại.");
+      else if (error && error.message === "DOCUMENT_TARGET_NOT_FOUND") alert("Không tìm thấy nội dung văn bản để xuất PDF.");
+      else alert("Xuất PDF thất bại. Vui lòng thử lại.");
+    }
   }
+
 </script>
 </body>
 </html>
