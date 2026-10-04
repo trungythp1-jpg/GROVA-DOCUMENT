@@ -160,6 +160,7 @@
 
   let currentUserProfile = null;
   let userProfileSyncToken = 0;
+  let userProfileUnsubscribe = null;
 
   /* =======================================================
      PHASE 5B.4 — ACCOUNT MANAGEMENT UI STATE
@@ -268,10 +269,21 @@
 
   async function syncCurrentUserProfile(user) {
     const token = ++userProfileSyncToken;
+
+    if (typeof userProfileUnsubscribe === "function") {
+      try {
+        userProfileUnsubscribe();
+      } catch (error) {
+        console.warn("GROVA DOCUMENT: user profile listener cleanup warning.", error);
+      }
+      userProfileUnsubscribe = null;
+    }
+
     currentUserProfile = null;
 
     if (!user) {
       refreshAccountProfileUI();
+      refreshPermissionUI();
       return null;
     }
 
@@ -287,18 +299,43 @@
       const reference = getUsersCollection()?.doc(String(user.uid));
       if (!reference) throw new Error("FIRESTORE_UNAVAILABLE");
 
+      const applyProfileSnapshot = (snapshot) => {
+        if (token !== userProfileSyncToken || currentUser?.uid !== user.uid) return;
+
+        currentUserProfile = snapshot.exists
+          ? normalizeUserProfile(snapshot.data(), user)
+          : null;
+
+        refreshAccountProfileUI();
+        refreshPermissionUI();
+
+        if (currentPage !== "dashboard" && !canViewPage(currentPage)) {
+          showPage("dashboard");
+        }
+      };
+
+      // Read once immediately so the first permission decision does not depend
+      // on a later realtime callback.
       const snapshot = await reference.get();
       if (token !== userProfileSyncToken) return null;
+      applyProfileSnapshot(snapshot);
 
-      currentUserProfile = snapshot.exists
-        ? normalizeUserProfile(snapshot.data(), user)
-        : null;
+      // Keep the current user's permission profile synchronized in realtime.
+      // When an Administrator changes role/status/permissions, this session
+      // receives the new matrix without requiring logout/login or page reload.
+      userProfileUnsubscribe = reference.onSnapshot(
+        (nextSnapshot) => {
+          applyProfileSnapshot(nextSnapshot);
+        },
+        (error) => {
+          if (token !== userProfileSyncToken) return;
+          console.warn(
+            "GROVA DOCUMENT: user profile realtime sync unavailable.",
+            error
+          );
+        }
+      );
 
-      refreshAccountProfileUI();
-      refreshPermissionUI();
-      if (currentPage !== "dashboard" && !canViewPage(currentPage)) {
-        showPage("dashboard");
-      }
       return currentUserProfile;
     } catch (error) {
       console.warn(
@@ -309,6 +346,7 @@
       if (token !== userProfileSyncToken) return null;
       currentUserProfile = null;
       refreshAccountProfileUI();
+      refreshPermissionUI();
       return null;
     }
   }
