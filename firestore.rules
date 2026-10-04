@@ -4,30 +4,126 @@ service cloud.firestore {
 
   match /databases/{database}/documents {
 
+    // ------------------------------------------------------------
+    // GROVA DOCUMENT — TASK 1
+    // Firestore authorization source:
+    // Firebase Auth -> users/{uid} profile -> permission matrix
+    // ------------------------------------------------------------
+
     function signedIn() {
       return request.auth != null;
     }
 
+    function isBootstrapAdmin() {
+      return signedIn()
+        && request.auth.uid == "nJmKgjEILgVOEjWKYWTsuonxbO03";
+    }
+
+    function hasActiveProfile() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.status == "active";
+    }
+
+    function hasPermission(group, action) {
+      return isBootstrapAdmin()
+        || (
+          hasActiveProfile()
+          && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.permissions[group][action] == true
+        );
+    }
+
+    // ------------------------------------------------------------
+    // PROJECTS
+    // ------------------------------------------------------------
     match /projects/{projectId} {
-
-      allow read:
-        if signedIn();
-
-      allow create:
-        if signedIn();
-
-      allow update:
-        if signedIn();
-
-      allow delete:
-        if signedIn();
+      allow read: if hasPermission("projects", "view");
+      allow create: if hasPermission("projects", "create");
+      allow update: if hasPermission("projects", "edit");
+      allow delete: if hasPermission("projects", "delete");
     }
 
+    // ------------------------------------------------------------
+    // CUSTOMERS
+    // ------------------------------------------------------------
+    match /customers/{customerId} {
+      allow read: if hasPermission("customers", "view");
+      allow create: if hasPermission("customers", "create");
+      allow update: if hasPermission("customers", "edit");
+      allow delete: if hasPermission("customers", "delete");
+    }
+
+    // ------------------------------------------------------------
+    // EMPLOYEES
+    // ------------------------------------------------------------
+    match /employees/{employeeId} {
+      allow read: if hasPermission("employees", "view");
+      allow create: if hasPermission("employees", "create");
+      allow update: if hasPermission("employees", "edit");
+      allow delete: if hasPermission("employees", "delete");
+    }
+
+    // ------------------------------------------------------------
+    // DOCUMENTS
+    // TASK 1 enforces collection-level document permissions.
+    // Template-level permissions remain in document-permission.js.
+    // ------------------------------------------------------------
+    match /documents/{documentId} {
+      allow read: if hasPermission("documents", "view");
+      allow create: if hasPermission("documents", "create");
+      allow update: if hasPermission("documents", "edit");
+      allow delete: if hasPermission("documents", "delete");
+    }
+
+    // ------------------------------------------------------------
+    // HISTORY
+    // Current app has only history.view in the permission matrix.
+    // Active users may create their own history entries.
+    // History entries cannot be edited through Firestore.
+    // Users may delete only their own history; admin may delete all.
+    // ------------------------------------------------------------
+    match /history/{historyId} {
+      allow read: if hasPermission("history", "view");
+
+      allow create: if hasActiveProfile()
+        && request.resource.data.createdBy == request.auth.uid;
+
+      allow update: if false;
+
+      allow delete: if isBootstrapAdmin()
+        || (
+          hasActiveProfile()
+          && resource.data.createdBy == request.auth.uid
+        );
+    }
+
+    // ------------------------------------------------------------
+    // USERS
+    // Only the bootstrap Administrator can manage user profiles.
+    // This protects role/status/permissions from client-side tampering.
+    // ------------------------------------------------------------
+    match /users/{userId} {
+      allow read: if isBootstrapAdmin()
+        || (signedIn() && userId == request.auth.uid);
+      allow create: if isBootstrapAdmin();
+      allow update: if isBootstrapAdmin();
+      allow delete: if isBootstrapAdmin();
+    }
+
+    // ------------------------------------------------------------
+    // DOCUMENT COUNTERS
+    // TASK 1 only protects the collection.
+    // Central numbering / transaction logic belongs to TASK 4.
+    // ------------------------------------------------------------
+    match /document_counters/{counterId} {
+      allow read, write: if isBootstrapAdmin();
+    }
+
+    // ------------------------------------------------------------
+    // DEFAULT DENY
+    // ------------------------------------------------------------
     match /{document=**} {
-
-      allow read, write:
-        if false;
+      allow read, write: if false;
     }
-
   }
 }
