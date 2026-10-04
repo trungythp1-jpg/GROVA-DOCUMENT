@@ -1921,102 +1921,81 @@
 <script>
   function exportDocumentPDF() {
     if (typeof html2canvas === "undefined" || !window.jspdf || !window.jspdf.jsPDF) {
-      alert("Không tải được bộ xuất PDF. Vui lòng kiểm tra kết nối mạng rồi thử lại.");
-      return;
+      alert("Không tải được bộ xuất PDF. Vui lòng kiểm tra kết nối mạng rồi thử lại."); return;
     }
-    if (typeof window.updatePreview === "function") {
-      try { window.updatePreview(); } catch (e) {}
-    }
+    if (typeof window.updatePreview === "function") { try { window.updatePreview(); } catch (e) {} }
     const target = document.querySelector(".document, #documentPreview, #paper, article.paper");
-    if (!target) {
-      alert("Không tìm thấy nội dung văn bản để xuất PDF.");
-      return;
-    }
-
+    if (!target) { alert("Không tìm thấy nội dung văn bản để xuất PDF."); return; }
     const numberEl = document.querySelector("#documentNumber, #documentNo, .document-number, #contractNumberDisplay, #appendixNumberDisplay");
     const rawNumber = numberEl ? (numberEl.textContent || numberEl.value || "").trim() : "";
     const number = rawNumber.replace(/\s+/g, "-").replace(/[^0-9A-Za-zÀ-ỹĐđ_-]/g, "").replace(/-+/g, "-");
-    const title = (document.title || "GROVA DOCUMENT")
-      .replace(/\s*[–—-]\s*GROVA.*$/i, "")
-      .replace(/[^0-9A-Za-zÀ-ỹĐđ _-]/g, "")
-      .trim()
-      .replace(/\s+/g, "-");
+    const title = (document.title || "GROVA DOCUMENT").replace(/\s*[–—-]\s*GROVA.*$/i, "").replace(/[^0-9A-Za-zÀ-ỹĐđ _-]/g, "").trim().replace(/\s+/g, "-");
     const filename = `${number || "van-ban"}${title ? "-" + title : ""}.pdf`;
-
     const oldOverflow = document.documentElement.style.overflow;
     const oldBodyOverflow = document.body.style.overflow;
     target.classList.add("pdf-exporting");
-    document.documentElement.style.overflow = "visible";
-    document.body.style.overflow = "visible";
+    document.documentElement.style.overflow = "visible"; document.body.style.overflow = "visible";
+    const finish = () => { target.classList.remove("pdf-exporting"); document.documentElement.style.overflow = oldOverflow; document.body.style.overflow = oldBodyOverflow; };
 
-    const finish = () => {
-      target.classList.remove("pdf-exporting");
-      document.documentElement.style.overflow = oldOverflow;
-      document.body.style.overflow = oldBodyOverflow;
-    };
-
-    // Render the A4 sheet itself, including its fixed margins. Then place only
-    // the content-area slices on each PDF page, rebuilding the 20mm top/bottom
-    // and 30/20mm left/right margins on EVERY page.
     html2canvas(target, {
-      scale: 2,
-      useCORS: true,
-      allowTaint: false,
-      backgroundColor: "#ffffff",
-      logging: false,
-      imageTimeout: 15000,
-      scrollX: 0,
-      scrollY: 0,
+      scale: 2, useCORS: true, allowTaint: false, backgroundColor: "#ffffff", logging: false, imageTimeout: 15000, scrollX: 0, scrollY: 0,
       windowWidth: Math.max(document.documentElement.clientWidth, target.scrollWidth),
       windowHeight: Math.max(window.innerHeight, target.scrollHeight)
     }).then((fullCanvas) => {
       const { jsPDF } = window.jspdf;
-      const A4_W = 210;
-      const A4_H = 297;
-      const M_LEFT = 30;
-      const M_RIGHT = 20;
-      const M_TOP = 20;
-      const M_BOTTOM = 20;
+      const A4_W = 210, A4_H = 297, M_TOP = 20, M_BOTTOM = 20;
       const pxPerMm = fullCanvas.width / A4_W;
+      const pagePx = Math.round(A4_H * pxPerMm);
       const topPx = Math.round(M_TOP * pxPerMm);
       const bottomPx = Math.round(M_BOTTOM * pxPerMm);
       const usablePx = Math.round((A4_H - M_TOP - M_BOTTOM) * pxPerMm);
-      const contentHeightPx = Math.max(1, fullCanvas.height - topPx - bottomPx);
-      const totalPages = Math.max(1, Math.ceil(contentHeightPx / usablePx));
 
-      const pdf = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait", compress: true });
-
-      for (let page = 0; page < totalPages; page++) {
-        const contentOffset = page * usablePx;
-        const sliceHeight = Math.min(usablePx, contentHeightPx - contentOffset);
-        if (sliceHeight <= 0) continue;
-
-        const pageCanvas = document.createElement("canvas");
-        pageCanvas.width = fullCanvas.width;
-        pageCanvas.height = Math.round(A4_H * pxPerMm);
-        const ctx = pageCanvas.getContext("2d", { alpha: false });
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
-
-        const sourceY = page === 0 ? 0 : topPx + contentOffset;
-        const destY = page === 0 ? 0 : topPx;
-        const sourceHeight = page === 0 ? topPx + sliceHeight : sliceHeight;
-        ctx.drawImage(
-          fullCanvas,
-          0, sourceY, fullCanvas.width, sourceHeight,
-          0, destY, fullCanvas.width, sourceHeight
-        );
-
-        if (page > 0) pdf.addPage("a4", "portrait");
-        const imageData = pageCanvas.toDataURL("image/jpeg", 0.97);
-        pdf.addImage(imageData, "JPEG", 0, 0, A4_W, A4_H, undefined, "FAST");
+      // Find horizontal whitespace bands so no text line/glyph is cut in half.
+      const sample = document.createElement("canvas");
+      sample.width = Math.max(1, Math.round(fullCanvas.width / 2)); sample.height = fullCanvas.height;
+      const sctx = sample.getContext("2d", { willReadFrequently: true }); sctx.drawImage(fullCanvas, 0, 0, sample.width, sample.height);
+      const data = sctx.getImageData(0, 0, sample.width, sample.height).data;
+      const rows = new Uint32Array(sample.height);
+      for (let y=0;y<sample.height;y++) {
+        let n=0, base=y*sample.width*4;
+        for (let x=0;x<sample.width;x+=2) { const i=base+x*4; if(data[i]<235 || data[i+1]<235 || data[i+2]<235) n++; }
+        rows[y]=n;
+      }
+      const blankThreshold=Math.max(2, sample.width*0.004);
+      const blankBand=(y)=>{ for(let k=-5;k<=5;k++){const yy=y+k;if(yy<0||yy>=rows.length||rows[yy]>blankThreshold)return false;} return true; };
+      function safeCut(targetY,minY,maxY){
+        const radius=Math.min(500, Math.round(usablePx*0.45));
+        for(let d=0;d<=radius;d++){
+          const ys=d===0?[targetY]:[targetY-d,targetY+d];
+          for(const y of ys){if(y>=minY&&y<=maxY&&blankBand(y))return y;}
+        }
+        return Math.max(minY,Math.min(maxY,targetY));
       }
 
+      const cuts=[]; let start=0; let page=0;
+      while(start<fullCanvas.height-1){
+        const nominal = page===0 ? pagePx : start+usablePx;
+        if(nominal>=fullCanvas.height){cuts.push([start,fullCanvas.height]);break;}
+        // Do not search too close to the page start; preserve readable page size.
+        const minCut=start+Math.round(90*pxPerMm);
+        const maxCut=Math.min(fullCanvas.height-1,start+Math.round((usablePx+90)*pxPerMm));
+        const cut=safeCut(nominal,minCut,maxCut);
+        cuts.push([start,cut]); start=cut; page++;
+      }
+
+      const pdf=new jsPDF({unit:"mm",format:"a4",orientation:"portrait",compress:true});
+      cuts.forEach(([start,end],idx)=>{
+        const slice=end-start; if(slice<=0)return;
+        const pageCanvas=document.createElement("canvas"); pageCanvas.width=fullCanvas.width; pageCanvas.height=pagePx;
+        const ctx=pageCanvas.getContext("2d",{alpha:false}); ctx.fillStyle="#fff"; ctx.fillRect(0,0,pageCanvas.width,pageCanvas.height);
+        const destY=idx===0?0:topPx;
+        const available=pagePx-destY; const drawH=Math.min(slice,available);
+        ctx.drawImage(fullCanvas,0,start,fullCanvas.width,drawH,0,destY,fullCanvas.width,drawH);
+        if(idx>0)pdf.addPage("a4","portrait");
+        pdf.addImage(pageCanvas.toDataURL("image/jpeg",0.97),"JPEG",0,0,A4_W,A4_H,undefined,"FAST");
+      });
       pdf.save(filename);
-    }).catch((error) => {
-      console.error("GROVA PDF A4 margin export error:", error);
-      alert("Xuất PDF thất bại. Vui lòng thử lại.");
-    }).finally(finish);
+    }).catch((error)=>{ console.error("GROVA PDF safe-cut export error:",error); alert("Xuất PDF thất bại. Vui lòng thử lại."); }).finally(finish);
   }
 </script>
 </body>
