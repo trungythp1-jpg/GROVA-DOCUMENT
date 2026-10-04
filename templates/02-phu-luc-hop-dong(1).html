@@ -1,0 +1,2744 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Phụ lục hợp đồng - GROVA HOLDINGS</title>
+
+<style>
+:root{
+  --green:#0b7a5a;
+  --green-dark:#075a43;
+  --green-soft:#eef7f3;
+  --bg:#f3f6f5;
+  --border:#d9e1de;
+  --border-soft:#e4ebe8;
+  --text:#202523;
+  --muted:#68736f;
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;color:var(--text);background:var(--bg);}
+body{min-height:100vh;}
+
+/* TOP BAR */
+.topbar{
+  position:sticky;top:0;z-index:20;height:60px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 18px;background:#fff;border-bottom:1px solid var(--border);box-shadow:0 2px 10px rgba(0,0,0,.05);
+}
+.topbar-left{display:flex;align-items:center;gap:12px;min-width:0;}
+.back-btn,.print-btn{border:0;cursor:pointer;font-weight:700;transition:.15s ease;}
+.back-btn{background:#eef4f1;color:var(--green-dark);border-radius:10px;padding:9px 13px;}
+.back-btn:hover{background:#e2eee9;}
+.topbar-title{font-size:17px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.print-btn{background:var(--green);color:#fff;border-radius:10px;padding:10px 16px;}
+.print-btn:hover{background:var(--green-dark);}
+
+/* WORKSPACE */
+.workspace{width:min(1500px,calc(100% - 28px));margin:20px auto;display:grid;grid-template-columns:340px minmax(0,1fr);gap:20px;align-items:start;}
+.control-panel{background:#fff;border:1px solid var(--border);border-radius:14px;padding:18px;box-shadow:0 3px 12px rgba(0,0,0,.04);height:max-content;position:sticky;top:78px;}
+.panel-title{font-size:17px;font-weight:800;margin-bottom:16px;color:var(--green-dark);letter-spacing:.1px;}
+.form-group{margin-bottom:13px;}
+.form-label{display:block;margin-bottom:6px;font-size:13px;font-weight:700;}
+.form-input,.form-textarea{width:100%;border:1px solid #cfd9d5;border-radius:8px;padding:9px 10px;font:inherit;font-size:13px;outline:none;background:#fff;transition:.15s ease;}
+.form-input:focus,.form-textarea:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(11,122,90,.08);}
+.form-textarea{resize:vertical;min-height:60px;}
+.number-card{background:var(--green-soft);border:1px solid #cde6dc;border-radius:10px;padding:12px;margin-bottom:16px;}
+.number-label{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;}
+.number-value{margin-top:4px;font-size:19px;font-weight:900;color:var(--green-dark);}
+.number-note{margin-top:5px;font-size:11px;line-height:1.45;color:var(--muted);}
+.checkbox-grid{display:grid;gap:7px;}
+.checkbox-item{display:flex;align-items:flex-start;gap:8px;font-size:12px;line-height:1.4;padding:3px 0;}
+.checkbox-item input{margin-top:2px;accent-color:var(--green);}
+
+/* PREVIEW */
+.preview-area{min-width:0;}
+.preview-heading{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding:0 2px;}
+.preview-heading strong{font-size:15px;}
+.preview-note{font-size:12px;color:var(--muted);}
+.document-wrap{overflow:auto;padding:8px 8px 28px;}
+.document{width:210mm;max-width:100%;margin:0 auto;background:#fff;padding:15mm 17mm 18mm;box-shadow:0 4px 20px rgba(0,0,0,.10);font-family:"Times New Roman",Times,serif;font-size:12.5pt;line-height:1.42;}
+
+/* DOCUMENT HEADER */
+.document-header{display:grid;grid-template-columns:42% 58%;align-items:start;margin-bottom:13px;}
+.logo-box{display:flex;align-items:flex-start;justify-content:flex-start;padding-top:2px;}
+.logo-box img{width:110px;height:auto;object-fit:contain;}
+.national-header{text-align:center;font-weight:700;line-height:1.35;font-size:12.5pt;}
+.national-header .line-2{font-weight:700;margin-top:2px;}
+.document-title{text-align:center;margin-top:5px;font-weight:700;font-size:16pt;line-height:1.25;}
+.document-number{text-align:center;margin-top:4px;font-size:12pt;}
+
+/* DOCUMENT BODY */
+.intro{margin-top:13px;margin-bottom:10px;}
+.party{margin:10px 0;padding:10px 14px 11px;border:1px solid #d6dfdc;border-radius:11px;background:linear-gradient(180deg,#fbfdfc 0%,#f7faf9 100%);box-shadow:0 1px 3px rgba(0,0,0,.025);}
+.party-title{font-weight:700;color:var(--green-dark);font-size:13.5pt;margin-bottom:6px;}
+.party-line{margin:4px 0;line-height:1.4;}
+.party-line span[id]{font-weight:400;}
+.party-line strong{font-weight:700;}
+.center-line{text-align:center;font-weight:700;color:var(--green-dark);margin:8px 0;}
+.section{margin-top:12px;}
+.section-title{font-weight:700;text-transform:uppercase;margin-bottom:5px;line-height:1.35;}
+p{margin:3px 0;}
+ul{margin:4px 0 6px 20px;padding:0;}
+li{margin:2px 0;}
+.dotted-line{border-bottom:1px dotted #777;height:17px;margin:2px 0 3px;}
+.indent{margin-left:18px;}
+
+/* TABLE */
+.price-table{width:100%;border-collapse:collapse;margin:8px 0 9px;font-size:11.5pt;}
+.price-table th,.price-table td{border:1px solid #333;padding:5px 5px;vertical-align:middle;}
+.price-table th{text-align:center;font-weight:700;background:#fafafa;}
+.price-table td:nth-child(2),.price-table td:nth-child(3),.price-table td:nth-child(4),.price-table td:nth-child(5){text-align:center;}
+.total-line{font-weight:700;margin:6px 0;}
+
+/* SIGNATURE */
+.signature-grid{display:grid;grid-template-columns:1fr 1fr;gap:35px;margin-top:30px;text-align:center;}
+.signature-title{font-weight:700;}
+.signature-company{font-weight:700;margin-top:2px;}
+.signature-note{margin-top:3px;font-style:italic;font-size:11.5pt;}
+.signature-space{height:80px;}
+
+/* PRINT */
+@page { size: A4 portrait; margin: 20mm 20mm 20mm 30mm; }
+@media print{
+  html,body{width:auto!important;min-height:0!important;margin:0!important;padding:0!important;background:#fff!important;overflow:visible!important;}
+  .topbar,.control-panel,.preview-heading{display:none!important;}
+  .workspace{display:block!important;width:auto!important;max-width:none!important;margin:0!important;padding:0!important;}
+  .preview-area{width:auto!important;margin:0!important;padding:0!important;}
+  .document-wrap{display:block!important;width:auto!important;margin:0!important;padding:0!important;overflow:visible!important;}
+  .document{width:auto!important;max-width:none!important;margin:0!important;padding:0!important;box-shadow:none!important;background:#fff!important;font-size:12.5pt!important;}
+  .party{box-shadow:none!important;}
+  .section{break-inside:auto!important;page-break-inside:auto!important;}
+  .price-table{break-inside:auto!important;page-break-inside:auto!important;}
+  .price-table tr{break-inside:avoid;page-break-inside:avoid;}
+  .signature-grid{break-inside:auto!important;page-break-inside:auto!important;}
+  .signature{break-inside:avoid;page-break-inside:avoid;}
+}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .workspace{grid-template-columns:1fr;}
+  .control-panel{position:static;}
+  .document-wrap{padding:0 0 24px;}
+  .document{max-width:none;}
+}
+@media(max-width:640px){
+  .topbar{height:56px;padding:0 10px;}
+  .topbar-title{font-size:15px;}
+  .back-btn{padding:8px 10px;}
+  .print-btn{padding:9px 11px;}
+  .workspace{width:100%;margin:12px 0;gap:12px;}
+  .control-panel{border-radius:12px;padding:14px;}
+  .document{padding:10mm 10mm 13mm;font-size:11.5pt;}
+  .document-header{grid-template-columns:38% 62%;}
+  .logo-box img{width:88px;}
+  .national-header{font-size:10.5pt;}
+  .document-title{font-size:14pt;}
+  .document-number{font-size:10.5pt;}
+  .party{padding:9px 11px 10px;}
+  .party-title{font-size:12pt;}
+  .party-line{margin:3px 0;}
+  .price-table{font-size:10pt;}
+  .price-table th,.price-table td{padding:4px 3px;}
+  .signature-grid{gap:16px;}
+}
+</style>
+</head>
+
+<body>
+
+<!-- =========================
+     TOP BAR
+========================= -->
+
+<div class="topbar">
+
+  <div class="topbar-left">
+
+    <button class="back-btn" onclick="goBack()">
+      ← Quay lại
+    </button>
+
+    <div class="topbar-title">
+      Phụ lục hợp đồng
+    </div>
+
+  </div>
+
+  <button class="print-btn" onclick="exportDocumentPDF()">
+    📄 Xuất PDF
+  </button>
+
+</div>
+
+
+<!-- =========================
+     WORKSPACE
+========================= -->
+
+<div class="workspace">
+
+  <!-- =========================
+       CONTROL PANEL
+  ========================== -->
+
+  <aside class="control-panel">
+
+    <div class="panel-title">
+      Thông tin phụ lục
+    </div>
+
+    <div class="number-card">
+
+      <div class="number-label">
+        Số phụ lục
+      </div>
+
+      <div
+        class="number-value"
+        id="appendixNumberDisplay"
+      >
+        01/PLHĐ/2026
+      </div>
+
+      <div class="number-note">
+        Số được hệ thống tự quản lý trên thiết bị.
+        Sau này có thể chuyển sang hệ thống cấp số tập trung.
+      </div>
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label class="form-label">
+        Số Hợp đồng nguyên tắc tham chiếu
+      </label>
+
+      <input
+        id="contractReference"
+        class="form-input"
+        type="text"
+        placeholder="Ví dụ: 01/2026/HĐTC"
+      >
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label class="form-label">
+        Ngày ký
+      </label>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+
+        <input
+          id="signDay"
+          class="form-input"
+          type="number"
+          min="1"
+          max="31"
+          placeholder="Ngày"
+        >
+
+        <input
+          id="signMonth"
+          class="form-input"
+          type="number"
+          min="1"
+          max="12"
+          placeholder="Tháng"
+        >
+
+      </div>
+
+    </div>
+
+
+    <div class="panel-title" style="margin-top:20px;">
+      Bên B
+    </div>
+
+
+    <div class="form-group">
+
+      <label class="form-label">
+        Tên công ty
+      </label>
+
+      <input
+        id="partyBName"
+        class="form-input"
+        type="text"
+        placeholder="Tên công ty"
+      >
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label class="form-label">
+        Mã số thuế
+      </label>
+
+      <input
+        id="partyBTax"
+        class="form-input"
+        type="text"
+        placeholder="Mã số thuế"
+      >
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label class="form-label">
+        Địa chỉ
+      </label>
+
+      <textarea
+        id="partyBAddress"
+        class="form-textarea"
+        placeholder="Địa chỉ"
+      ></textarea>
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label class="form-label">
+        Đại diện
+      </label>
+
+      <input
+        id="partyBRepresentative"
+        class="form-input"
+        type="text"
+        placeholder="Họ và tên"
+      >
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label class="form-label">
+        Chức vụ
+      </label>
+
+      <input
+        id="partyBPosition"
+        class="form-input"
+        type="text"
+        placeholder="Chức vụ"
+      >
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label class="form-label">
+        Điện thoại
+      </label>
+
+      <input
+        id="partyBPhone"
+        class="form-input"
+        type="text"
+        placeholder="Số điện thoại"
+      >
+
+    </div>
+
+
+    <div class="panel-title" style="margin-top:20px;">
+      Thông tin công trình
+    </div>
+
+
+    <div class="form-group">
+
+      <label class="form-label">
+        Địa chỉ công trình
+      </label>
+
+      <textarea
+        id="projectAddress"
+        class="form-textarea"
+        placeholder="Địa chỉ công trình"
+      ></textarea>
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label class="form-label">
+        Chủ đầu tư
+      </label>
+
+      <input
+        id="investor"
+        class="form-input"
+        type="text"
+        placeholder="Chủ đầu tư"
+      >
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label class="form-label">
+        Số tầng lắp đặt
+      </label>
+
+      <input
+        id="floorCount"
+        class="form-input"
+        type="text"
+        placeholder="Ví dụ: 6"
+      >
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label class="form-label">
+        Loại khung
+      </label>
+
+      <div class="checkbox-grid">
+
+        <label class="checkbox-item">
+          <input
+            type="checkbox"
+            name="frameType"
+            value="Khung thép"
+          >
+          <span>Khung thép</span>
+        </label>
+
+        <label class="checkbox-item">
+          <input
+            type="checkbox"
+            name="frameType"
+            value="Khung thép bọc inox"
+          >
+          <span>Khung thép bọc inox</span>
+        </label>
+
+        <label class="checkbox-item">
+          <input
+            type="checkbox"
+            name="frameType"
+            value="Khung nhôm"
+          >
+          <span>Khung nhôm</span>
+        </label>
+
+      </div>
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label class="form-label">
+        Vị trí lắp đặt
+      </label>
+
+      <div class="checkbox-grid">
+
+        <label class="checkbox-item">
+          <input
+            type="checkbox"
+            name="locationType"
+            value="Trong nhà"
+          >
+          <span>Trong nhà</span>
+        </label>
+
+        <label class="checkbox-item">
+          <input
+            type="checkbox"
+            name="locationType"
+            value="Ngoài trời"
+          >
+          <span>Ngoài trời</span>
+        </label>
+
+      </div>
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label class="form-label">
+        Ghi chú kỹ thuật khác
+      </label>
+
+      <textarea
+        id="technicalNote"
+        class="form-textarea"
+        placeholder="Nếu có"
+      ></textarea>
+
+    </div>
+
+
+    <div class="panel-title" style="margin-top:20px;">
+      Giá trị công trình
+    </div>
+
+
+    <div class="form-group">
+
+      <label class="form-label">
+        Khối lượng
+      </label>
+
+      <input
+        id="quantity"
+        class="form-input"
+        type="text"
+        placeholder="Ví dụ: 1"
+      >
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label class="form-label">
+        Đơn giá (VNĐ)
+      </label>
+
+      <input
+        id="unitPrice"
+        class="form-input"
+        type="text"
+        placeholder="Ví dụ: 2.540.000"
+      >
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label class="form-label">
+        Thành tiền (VNĐ)
+      </label>
+
+      <input
+        id="totalPrice"
+        class="form-input"
+        type="text"
+        placeholder="Ví dụ: 2.540.000"
+      >
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label class="form-label">
+        Tổng giá trị phụ lục
+      </label>
+
+      <input
+        id="appendixTotal"
+        class="form-input"
+        type="text"
+        placeholder="VNĐ"
+      >
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label class="form-label">
+        Bằng chữ
+      </label>
+
+      <textarea
+        id="amountWords"
+        class="form-textarea"
+        placeholder="Số tiền bằng chữ"
+      ></textarea>
+
+    </div>
+
+
+    <div class="panel-title" style="margin-top:20px;">
+      Tiến độ
+    </div>
+
+
+    <div class="form-group">
+
+      <label class="form-label">
+        Ngày bàn giao mặt bằng
+      </label>
+
+      <input
+        id="handoverDate"
+        class="form-input"
+        type="text"
+        placeholder="..... / ..... / 20....."
+      >
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label class="form-label">
+        Ngày khởi công
+      </label>
+
+      <input
+        id="startDate"
+        class="form-input"
+        type="text"
+        placeholder="..... / ..... / 20....."
+      >
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label class="form-label">
+        Thời gian thực hiện
+      </label>
+
+      <input
+        id="duration"
+        class="form-input"
+        type="text"
+        placeholder="Số ngày"
+      >
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label class="form-label">
+        Ngày hoàn thành dự kiến
+      </label>
+
+      <input
+        id="expectedEndDate"
+        class="form-input"
+        type="text"
+        placeholder="..... / ..... / 20....."
+      >
+
+    </div>
+
+
+    <div class="panel-title" style="margin-top:20px;">
+      Thanh toán
+    </div>
+
+
+    <div class="form-group">
+
+      <label class="form-label">
+        Tạm ứng (%)
+      </label>
+
+      <input
+        id="advancePercent"
+        class="form-input"
+        type="text"
+        placeholder="Ví dụ: 30"
+      >
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label class="form-label">
+        Số tiền tạm ứng
+      </label>
+
+      <input
+        id="advanceAmount"
+        class="form-input"
+        type="text"
+        placeholder="VNĐ"
+      >
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label class="form-label">
+        Thanh toán còn lại (%)
+      </label>
+
+      <input
+        id="remainingPercent"
+        class="form-input"
+        type="text"
+        placeholder="Ví dụ: 70"
+      >
+
+    </div>
+
+
+    <div class="panel-title" style="margin-top:20px;">
+      Điều kiện thi công đặc biệt
+    </div>
+
+
+    <div class="checkbox-grid">
+
+      <label class="checkbox-item">
+        <input
+          id="nightWork"
+          type="checkbox"
+        >
+        <span>Công trình thi công ban đêm</span>
+      </label>
+
+      <label class="checkbox-item">
+        <input
+          id="specialWork"
+          type="checkbox"
+        >
+        <span>Công trình có yêu cầu đặc biệt</span>
+      </label>
+
+    </div>
+
+
+    <div class="form-group" style="margin-top:10px;">
+
+      <textarea
+        id="specialCondition"
+        class="form-textarea"
+        placeholder="Nội dung yêu cầu đặc biệt nếu có"
+      ></textarea>
+
+    </div>
+
+  </aside>
+
+
+  <!-- =========================
+       PREVIEW
+  ========================== -->
+
+  <main class="preview-area">
+
+    <div class="preview-heading">
+
+      <strong>
+        Xem trước văn bản
+      </strong>
+
+      <span class="preview-note">
+        Nội dung tự cập nhật khi nhập dữ liệu
+      </span>
+
+    </div>
+
+
+    <div class="document-wrap">
+
+      <article class="document">
+
+        <!-- HEADER -->
+
+        <div class="document-header">
+
+          <div class="logo-box">
+
+            <img
+              src="../data/grova_logo.png"
+              alt="GROVA HOLDINGS"
+            >
+
+          </div>
+
+
+          <div class="national-header">
+
+            <div>
+              CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM
+            </div>
+
+            <div class="line-2">
+              Độc lập – Tự do – Hạnh phúc
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="document-title">
+          PHỤ LỤC HỢP ĐỒNG THI CÔNG
+        </div>
+
+
+        <div class="document-number">
+
+          Số:
+          <span id="previewAppendixNumber">
+            01/PLHĐ/2026
+          </span>
+
+        </div>
+
+
+        <div class="intro">
+
+          Hôm nay, ngày
+          <span id="previewDay">......</span>
+          tháng
+          <span id="previewMonth">......</span>
+          năm 2026, chúng tôi gồm:
+
+        </div>
+
+
+        <!-- BÊN A -->
+
+        <div class="party">
+
+          <div class="party-title">
+            BÊN A (BÊN THI CÔNG):
+          </div>
+
+          <div class="party-line">
+            <span id="previewCompanyName">
+              CÔNG TY CỔ PHẦN GROVA HOLDINGS
+            </span>
+          </div>
+
+          <div class="party-line">
+            Mã số thuế:
+            <span id="previewCompanyTaxCode">
+              0202328361
+            </span>
+          </div>
+
+          <div class="party-line">
+            Địa chỉ:
+            <span id="previewCompanyAddress">
+              49A/348 Trần Nguyên Hãn, Phường An Biên, Thành phố Hải Phòng
+            </span>
+          </div>
+
+          <div class="party-line">
+            Đại diện:
+            <span id="previewCompanyRepresentative">
+              PHẠM VĂN HỌC
+            </span>
+          </div>
+
+          <div class="party-line">
+            Chức vụ:
+            <span id="previewCompanyPosition">
+              Giám Đốc
+            </span>
+          </div>
+
+          <div class="party-line">
+            Điện thoại: ..........................................
+          </div>
+
+        </div>
+
+
+        <div class="center-line">
+          VÀ
+        </div>
+
+
+        <!-- BÊN B -->
+
+        <div class="party">
+
+          <div class="party-title">
+            BÊN B (BÊN THUÊ THI CÔNG):
+          </div>
+
+          <div class="party-line">
+            Tên công ty:
+            <span id="previewPartyBName">............................................</span>
+          </div>
+
+          <div class="party-line">
+            Mã số thuế:
+            <span id="previewPartyBTax">............................................</span>
+          </div>
+
+          <div class="party-line">
+            Địa chỉ:
+            <span id="previewPartyBAddress">..................................................</span>
+          </div>
+
+          <div class="party-line">
+            Đại diện:
+            <span id="previewPartyBRepresentative">................................................</span>
+          </div>
+
+          <div class="party-line">
+            Chức vụ:
+            <span id="previewPartyBPosition">................................................</span>
+          </div>
+
+          <div class="party-line">
+            Điện thoại:
+            <span id="previewPartyBPhone">..............................................</span>
+          </div>
+
+        </div>
+
+
+        <div class="center-line">
+          Hai bên thống nhất ký Phụ lục công trình với các nội dung như sau:
+        </div>
+
+
+        <!-- ĐIỀU 1 -->
+
+        <div class="section">
+
+          <div class="section-title">
+            ĐIỀU 1. THÔNG TIN CÔNG TRÌNH
+          </div>
+
+          <p>
+            Địa chỉ công trình:
+            <span id="previewProjectAddress">
+              ......................................................
+            </span>
+          </p>
+
+          <p>
+            Chủ đầu tư:
+            <span id="previewInvestor">
+              ..........................................................
+            </span>
+          </p>
+
+          <p>
+            Thông số phục vụ thi công khung thang máy:
+          </p>
+
+          <ul>
+
+            <li>
+              Số tầng lắp đặt:
+              <span id="previewFloorCount">............</span>
+            </li>
+
+            <li>
+              Loại khung:
+              <span id="previewFrameType">
+                ☐ Khung thép
+                ☐ Khung thép bọc inox
+                ☐ Khung nhôm
+              </span>
+            </li>
+
+            <li>
+              Vị trí lắp đặt:
+              <span id="previewLocationType">
+                ☐ Trong nhà
+                ☐ Ngoài trời
+              </span>
+            </li>
+
+          </ul>
+
+          <p>
+            Ghi chú kỹ thuật khác (nếu có):
+          </p>
+
+          <div class="dotted-line"></div>
+
+        </div>
+
+
+        <!-- ĐIỀU 2 -->
+
+        <div class="section">
+
+          <div class="section-title">
+            ĐIỀU 2. PHẠM VI CÔNG VIỆC
+          </div>
+
+          <p>
+            Bên A thực hiện:
+          </p>
+
+          <ul>
+
+            <li>☐ Lắp đặt khung thép thang máy</li>
+
+            <li>☐ Căn chỉnh kết cấu khung</li>
+
+            <li>☐ Liên kết bulong, bản mã</li>
+
+            <li>☐ Bọc bảo vệ chống xước sau lắp đặt</li>
+
+            <li>☐ Vệ sinh khu vực thi công</li>
+
+            <li>☐ Hỗ trợ nghiệm thu kỹ thuật</li>
+
+            <li>
+              ☐ Công việc khác:
+              ....................................................................
+            </li>
+
+          </ul>
+
+        </div>
+
+
+        <!-- ĐIỀU 3 -->
+
+        <div class="section">
+
+          <div class="section-title">
+            ĐIỀU 3. GIÁ TRỊ CÔNG TRÌNH
+          </div>
+
+
+          <table class="price-table">
+
+            <thead>
+
+              <tr>
+
+                <th>Nội dung</th>
+
+                <th>Đơn vị</th>
+
+                <th>Khối lượng</th>
+
+                <th>Đơn giá (VNĐ)</th>
+
+                <th>Thành tiền (VNĐ)</th>
+
+              </tr>
+
+            </thead>
+
+
+            <tbody>
+
+              <tr>
+
+                <td>
+                  Thi công lắp đặt khung thép thang máy
+                </td>
+
+                <td>
+                  Stop
+                </td>
+
+                <td id="previewQuantity">
+                  ......
+                </td>
+
+                <td id="previewUnitPrice">
+                  2.5400.000
+                </td>
+
+                <td id="previewTotalPrice">
+                  ..............
+                </td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+
+
+          <p class="total-line">
+
+            TỔNG GIÁ TRỊ PHỤ LỤC:
+            <span id="previewAppendixTotal">
+              ..................................................
+            </span>
+            VNĐ
+
+          </p>
+
+
+          <p>
+            (Bằng chữ:
+            <span id="previewAmountWords">
+              .................................................................................
+            </span>)
+          </p>
+
+
+          <p>
+            Giá trên:
+          </p>
+
+          <ul>
+
+            <li>Đã bao gồm VAT</li>
+
+            <li> Bao gồm nhân công lắp đặt</li>
+
+            <li>
+              Bao gồm bọc bảo vệ chống xước sau thi công
+            </li>
+
+            <li>
+              Chưa bao gồm các hạng mục phát sinh ngoài phạm vi hợp đồng (nếu có)
+            </li>
+
+          </ul>
+
+        </div>
+
+
+        <!-- ĐIỀU 4 -->
+
+        <div class="section">
+
+          <div class="section-title">
+            ĐIỀU 4. TIẾN ĐỘ VÀ THANH TOÁN
+          </div>
+
+          <p>
+            <strong>1. Tiến độ thi công</strong>
+          </p>
+
+          <ul>
+
+            <li>
+              Ngày bàn giao mặt bằng:
+              <span id="previewHandoverDate">
+                ..... / ..... / 20.....
+              </span>
+            </li>
+
+            <li>
+              Ngày khởi công:
+              <span id="previewStartDate">
+                ..... / ..... / 20.....
+              </span>
+            </li>
+
+            <li>
+              Thời gian thực hiện:
+              <span id="previewDuration">
+                ..........
+              </span>
+              ngày
+            </li>
+
+            <li>
+              Ngày hoàn thành dự kiến:
+              <span id="previewExpectedEndDate">
+                ..... / ..... / 20.....
+              </span>
+            </li>
+
+          </ul>
+
+
+          <p>
+            <strong>2. Thanh toán</strong>
+          </p>
+
+          <ul>
+
+            <li>
+              ☐ Tạm ứng:
+              <span id="previewAdvancePercent">
+                ..........
+              </span>
+              % tương đương:
+              <span id="previewAdvanceAmount">
+                ........................
+              </span>
+              VNĐ
+            </li>
+
+            <li>
+              ☐ Thanh toán còn lại:
+              <span id="previewRemainingPercent">
+                ..........
+              </span>
+              % sau khi nghiệm thu kỹ thuật khung thép.
+            </li>
+
+          </ul>
+
+
+          <p>
+            Hình thức thanh toán:
+          </p>
+
+          <p class="indent">
+            ☑ Chuyển khoản
+          </p>
+
+
+          <p>
+            Thông tin tài khoản:
+          </p>
+
+          <p class="indent">
+            Tên tài khoản:
+            <span id="previewAccountName">
+              CÔNG TY CỔ PHẦN GROVA HOLDINGS
+            </span>
+          </p>
+
+          <p class="indent">
+            Số tài khoản: ....................................
+          </p>
+
+          <p class="indent">
+            Ngân hàng: ........................................
+          </p>
+
+
+          <p>
+            <strong>Lưu ý:</strong>
+          </p>
+
+          <p>
+            Các khoảng thời gian chờ điện, chờ mặt bằng, chờ vật tư,
+            chờ thiết bị nâng hạ hoặc chờ xử lý sai sót công trình
+            không tính vào tiến độ thi công của Bên A.
+          </p>
+
+        </div>
+
+
+        <!-- ĐIỀU 5 -->
+
+        <div class="section">
+
+          <div class="section-title">
+            ĐIỀU 5. ĐIỀU KIỆN THI CÔNG ĐẶC BIỆT
+          </div>
+
+          <p>
+            <span id="previewNightWork">
+              ☐
+            </span>
+            Công trình thi công ban đêm
+          </p>
+
+          <p>
+            <span id="previewSpecialWork">
+              ☐
+            </span>
+            Công trình có yêu cầu đặc biệt:
+          </p>
+
+          <div
+            class="dotted-line"
+            id="previewSpecialLine1"
+          ></div>
+
+          <div
+            class="dotted-line"
+            id="previewSpecialLine2"
+          ></div>
+
+        </div>
+
+
+        <!-- ĐIỀU 6 -->
+
+        <div class="section">
+
+          <div class="section-title">
+            ĐIỀU 6. PHÁT SINH
+          </div>
+
+          <p>
+            Các phát sinh ngoài phạm vi hợp đồng nguyên tắc
+            hoặc ngoài nội dung phụ lục này sẽ được xác nhận riêng bằng:
+          </p>
+
+          <ul>
+
+            <li>
+              Biên bản phát sinh; Email, Zalo, Viber , Wechat …
+            </li>
+
+            <li>
+              Tin nhắn của người phụ trách công trình.
+            </li>
+
+          </ul>
+
+        </div>
+
+
+        <!-- ĐIỀU 7 -->
+
+        <div class="section">
+
+          <div class="section-title">
+            ĐIỀU 7. HIỆU LỰC
+          </div>
+
+          <p>
+            Phụ lục này là một phần không tách rời của
+            Hợp đồng nguyên tắc số
+            <strong id="previewContractReference1">
+              [REFERENCE]
+            </strong>.
+          </p>
+
+          <p>
+            Các nội dung không quy định trong phụ lục này được áp dụng theo
+            Hợp đồng nguyên tắc số
+            <strong id="previewContractReference2">
+              [REFERENCE]
+            </strong>.
+          </p>
+
+          <p>
+            Phụ lục có hiệu lực kể từ ngày ký.
+          </p>
+
+        </div>
+
+
+        <!-- SIGNATURE -->
+
+        <div class="signature-grid">
+
+          <div class="signature">
+
+            <div class="signature-title">
+              ĐẠI DIỆN BÊN A
+            </div>
+
+            <div
+              class="signature-company"
+              id="previewSignatureCompany"
+            >
+              CÔNG TY CỔ PHẦN GROVA HOLDINGS
+            </div>
+
+            <div class="signature-note">
+              (Ký, ghi rõ họ tên, đóng dấu)
+            </div>
+
+            <div class="signature-space"></div>
+
+          </div>
+
+
+          <div class="signature">
+
+            <div class="signature-title">
+              ĐẠI DIỆN BÊN B
+            </div>
+
+            <div class="signature-note">
+              (Ký, ghi rõ họ tên, đóng dấu)
+            </div>
+
+            <div class="signature-space"></div>
+
+          </div>
+
+        </div>
+
+      </article>
+
+    </div>
+
+  </main>
+
+</div>
+
+
+  <!-- =====================================================
+       GROVA DOCUMENT PERMISSION — VERSION 238
+       ===================================================== -->
+  <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore-compat.js"></script>
+<script>
+
+/* =========================
+   CONFIG
+========================= */
+
+const YEAR = 2026;
+
+const COUNTER_KEY =
+  "grova_plhd_counter_" + YEAR;
+
+const DRAFT_KEY =
+  "grova_document_template_02";
+
+const SETTINGS_KEY =
+  "GROVA_SETTINGS_V1";
+
+
+/* =========================
+   DEFAULT COMPANY SETTINGS
+========================= */
+
+function getGrovaSettings(){
+
+  const defaults = {
+
+    companyName:
+      "CÔNG TY CỔ PHẦN GROVA HOLDINGS",
+
+    taxCode:
+      "0202328361",
+
+    address:
+      "49A/348 Trần Nguyên Hãn, Phường An Biên, Thành phố Hải Phòng",
+
+    representative:
+      "PHẠM VĂN HỌC",
+
+    position:
+      "Giám Đốc"
+
+  };
+
+
+  try{
+
+    const raw =
+      localStorage.getItem(
+        SETTINGS_KEY
+      );
+
+    if(!raw){
+      return defaults;
+    }
+
+
+    const saved =
+      JSON.parse(raw);
+
+
+    return {
+      ...defaults,
+      ...(saved || {})
+    };
+
+  }catch(error){
+
+    console.warn(
+      "Không thể đọc cài đặt GROVA:",
+      error
+    );
+
+    return defaults;
+
+  }
+
+}
+
+
+/* =========================
+   UPDATE COMPANY INFORMATION
+========================= */
+
+function updateCompanyInformation(){
+
+  const settings =
+    getGrovaSettings();
+
+
+  const companyName =
+    settings.companyName ||
+    "CÔNG TY CỔ PHẦN GROVA HOLDINGS";
+
+  const taxCode =
+    settings.taxCode ||
+    "0202328361";
+
+  const address =
+    settings.address ||
+    "49A/348 Trần Nguyên Hãn, Phường An Biên, Thành phố Hải Phòng";
+
+  const representative =
+    settings.representative ||
+    "PHẠM VĂN HỌC";
+
+  const position =
+    settings.position ||
+    "Giám Đốc";
+
+
+  const companyNameEl =
+    $("previewCompanyName");
+
+  if(companyNameEl){
+
+    companyNameEl.textContent =
+      companyName;
+
+  }
+
+
+  const taxCodeEl =
+    $("previewCompanyTaxCode");
+
+  if(taxCodeEl){
+
+    taxCodeEl.textContent =
+      taxCode;
+
+  }
+
+
+  const addressEl =
+    $("previewCompanyAddress");
+
+  if(addressEl){
+
+    addressEl.textContent =
+      address;
+
+  }
+
+
+  const representativeEl =
+    $("previewCompanyRepresentative");
+
+  if(representativeEl){
+
+    representativeEl.textContent =
+      representative;
+
+  }
+
+
+  const positionEl =
+    $("previewCompanyPosition");
+
+  if(positionEl){
+
+    positionEl.textContent =
+      position;
+
+  }
+
+
+  const signatureEl =
+    $("previewSignatureCompany");
+
+  if(signatureEl){
+
+    signatureEl.textContent =
+      companyName;
+
+  }
+
+
+  const accountNameEl =
+    $("previewAccountName");
+
+  if(accountNameEl){
+
+    accountNameEl.textContent =
+      companyName;
+
+  }
+
+}
+
+
+/* =========================
+   ELEMENT HELPER
+========================= */
+
+function $(id){
+
+  return document.getElementById(id);
+
+}
+
+
+/* =========================
+   NUMBER
+========================= */
+
+function getNextNumber(){
+
+  let current =
+    parseInt(
+      localStorage.getItem(COUNTER_KEY) || "0",
+      10
+    );
+
+
+  if(current < 1){
+
+    current = 1;
+
+    localStorage.setItem(
+      COUNTER_KEY,
+      String(current)
+    );
+
+  }
+
+
+  return String(current)
+    .padStart(2,"0")
+    + "/PLHĐ/"
+    + YEAR;
+
+}
+
+
+function getCurrentNumber(){
+
+  let current =
+    parseInt(
+      localStorage.getItem(COUNTER_KEY) || "1",
+      10
+    );
+
+
+  if(current < 1){
+
+    current = 1;
+
+    localStorage.setItem(
+      COUNTER_KEY,
+      String(current)
+    );
+
+  }
+
+
+  return String(current)
+    .padStart(2,"0")
+    + "/PLHĐ/"
+    + YEAR;
+
+}
+
+
+function increaseNumber(){
+
+  let current =
+    parseInt(
+      localStorage.getItem(COUNTER_KEY) || "1",
+      10
+    );
+
+
+  current++;
+
+
+  localStorage.setItem(
+    COUNTER_KEY,
+    String(current)
+  );
+
+
+  return String(current)
+    .padStart(2,"0")
+    + "/PLHĐ/"
+    + YEAR;
+
+}
+
+
+/* =========================
+   INITIAL NUMBER
+========================= */
+
+function initializeNumber(){
+
+  let current =
+    localStorage.getItem(
+      COUNTER_KEY
+    );
+
+
+  if(!current){
+
+    localStorage.setItem(
+      COUNTER_KEY,
+      "1"
+    );
+
+  }
+
+
+  const number =
+    getCurrentNumber();
+
+
+  $("appendixNumberDisplay").textContent =
+    number;
+
+  $("previewAppendixNumber").textContent =
+    number;
+
+}
+
+
+/* =========================
+   VALUE HELPER
+========================= */
+
+function value(id, fallback=""){
+
+  const el =
+    $(id);
+
+
+  if(!el){
+
+    return fallback;
+
+  }
+
+
+  return el.value.trim() ||
+    fallback;
+
+}
+
+
+/* =========================
+   CHECKBOX HELPERS
+========================= */
+
+function selectedValues(name){
+
+  return Array.from(
+
+    document.querySelectorAll(
+      'input[name="' + name + '"]:checked'
+    )
+
+  ).map(
+
+    el => el.value
+
+  );
+
+}
+
+
+/* =========================
+   CHECKBOX DISPLAY
+========================= */
+
+function frameDisplay(){
+
+  const selected =
+    selectedValues("frameType");
+
+
+  return `
+    ${selected.includes("Khung thép") ? "☑" : "☐"} Khung thép
+    ${selected.includes("Khung thép bọc inox") ? "☑" : "☐"} Khung thép bọc inox
+    ${selected.includes("Khung nhôm") ? "☑" : "☐"} Khung nhôm
+  `;
+
+}
+
+
+function locationDisplay(){
+
+  const selected =
+    selectedValues("locationType");
+
+
+  return `
+    ${selected.includes("Trong nhà") ? "☑" : "☐"} Trong nhà
+    ${selected.includes("Ngoài trời") ? "☑" : "☐"} Ngoài trời
+  `;
+
+}
+
+
+/* =========================
+   UPDATE PREVIEW
+========================= */
+
+function updatePreview(){
+
+  /* COMPANY */
+
+  updateCompanyInformation();
+
+
+  /* DATE */
+
+  $("previewDay").textContent =
+    value(
+      "signDay",
+      "......"
+    );
+
+
+  $("previewMonth").textContent =
+    value(
+      "signMonth",
+      "......"
+    );
+
+
+  /* PARTY B */
+
+  $("previewPartyBName").textContent =
+    value(
+      "partyBName",
+      "............................................"
+    );
+
+
+  $("previewPartyBTax").textContent =
+    value(
+      "partyBTax",
+      "............................................"
+    );
+
+
+  $("previewPartyBAddress").textContent =
+    value(
+      "partyBAddress",
+      ".................................................."
+    );
+
+
+  $("previewPartyBRepresentative").textContent =
+    value(
+      "partyBRepresentative",
+      "................................................"
+    );
+
+
+  $("previewPartyBPosition").textContent =
+    value(
+      "partyBPosition",
+      "................................................"
+    );
+
+
+  $("previewPartyBPhone").textContent =
+    value(
+      "partyBPhone",
+      ".............................................."
+    );
+
+
+  /* PROJECT */
+
+  $("previewProjectAddress").textContent =
+    value(
+      "projectAddress",
+      "......................................................"
+    );
+
+
+  $("previewInvestor").textContent =
+    value(
+      "investor",
+      ".........................................................."
+    );
+
+
+  $("previewFloorCount").textContent =
+    value(
+      "floorCount",
+      "............"
+    );
+
+
+  $("previewFrameType").innerHTML =
+    frameDisplay();
+
+
+  $("previewLocationType").innerHTML =
+    locationDisplay();
+
+
+  /* PRICE */
+
+  $("previewQuantity").textContent =
+    value(
+      "quantity",
+      "......"
+    );
+
+
+  $("previewUnitPrice").textContent =
+    value(
+      "unitPrice",
+      "2.5400.000"
+    );
+
+
+  $("previewTotalPrice").textContent =
+    value(
+      "totalPrice",
+      ".............."
+    );
+
+
+  $("previewAppendixTotal").textContent =
+    value(
+      "appendixTotal",
+      ".................................................."
+    );
+
+
+  $("previewAmountWords").textContent =
+    value(
+      "amountWords",
+      "................................................................................."
+    );
+
+
+  /* PROGRESS */
+
+  $("previewHandoverDate").textContent =
+    value(
+      "handoverDate",
+      "..... / ..... / 20....."
+    );
+
+
+  $("previewStartDate").textContent =
+    value(
+      "startDate",
+      "..... / ..... / 20....."
+    );
+
+
+  $("previewDuration").textContent =
+    value(
+      "duration",
+      ".........."
+    );
+
+
+  $("previewExpectedEndDate").textContent =
+    value(
+      "expectedEndDate",
+      "..... / ..... / 20....."
+    );
+
+
+  /* PAYMENT */
+
+  $("previewAdvancePercent").textContent =
+    value(
+      "advancePercent",
+      ".........."
+    );
+
+
+  $("previewAdvanceAmount").textContent =
+    value(
+      "advanceAmount",
+      "........................"
+    );
+
+
+  $("previewRemainingPercent").textContent =
+    value(
+      "remainingPercent",
+      ".........."
+    );
+
+
+  /* SPECIAL CONDITIONS */
+
+  $("previewNightWork").textContent =
+    $("nightWork").checked
+      ? "☑"
+      : "☐";
+
+
+  $("previewSpecialWork").textContent =
+    $("specialWork").checked
+      ? "☑"
+      : "☐";
+
+
+  const special =
+    value(
+      "specialCondition",
+      ""
+    );
+
+
+  if(special){
+
+    $("previewSpecialLine1").textContent =
+      special;
+
+
+    $("previewSpecialLine2").style.display =
+      "none";
+
+  }else{
+
+    $("previewSpecialLine1").textContent =
+      "";
+
+
+    $("previewSpecialLine2").style.display =
+      "block";
+
+  }
+
+
+  /* CONTRACT REFERENCE */
+
+  const reference =
+    value(
+      "contractReference",
+      "[REFERENCE]"
+    );
+
+
+  $("previewContractReference1").textContent =
+    reference;
+
+
+  $("previewContractReference2").textContent =
+    reference;
+
+
+  /* SAVE */
+
+  saveDraft();
+
+}
+
+
+/* =========================
+   SAVE DRAFT
+========================= */
+
+function saveDraft(){
+
+  if (!window.GROVA_DOCUMENT_PERMISSION || !window.GROVA_DOCUMENT_PERMISSION.isReadOnly()) {
+    const data = {};
+
+
+  document
+    .querySelectorAll(
+      ".control-panel input, .control-panel textarea"
+    )
+    .forEach(el => {
+
+      if(el.type === "checkbox"){
+
+        data[el.id] =
+          el.checked;
+
+      }else{
+
+        data[el.id] =
+          el.value;
+
+      }
+
+    });
+
+
+  data.frameType =
+    selectedValues(
+      "frameType"
+    );
+
+
+  data.locationType =
+    selectedValues(
+      "locationType"
+    );
+
+
+  localStorage.setItem(
+    DRAFT_KEY,
+    JSON.stringify(data)
+  );
+
+  }
+
+}
+
+
+/* =========================
+   LOAD DRAFT
+========================= */
+
+function loadDraft(){
+
+  if (!window.GROVA_DOCUMENT_PERMISSION || !window.GROVA_DOCUMENT_PERMISSION.can("edit")) {
+    return false;
+  }
+
+  let raw =
+    localStorage.getItem(
+      DRAFT_KEY
+    );
+
+
+  if(!raw){
+
+    return;
+
+  }
+
+
+  try{
+
+    const data =
+      JSON.parse(raw);
+
+
+    Object.keys(data).forEach(
+      key => {
+
+        if(
+          key === "frameType" ||
+          key === "locationType"
+        ){
+
+          return;
+
+        }
+
+
+        const el =
+          $(key);
+
+
+        if(!el){
+
+          return;
+
+        }
+
+
+        if(el.type === "checkbox"){
+
+          el.checked =
+            Boolean(data[key]);
+
+        }else{
+
+          el.value =
+            data[key] || "";
+
+        }
+
+      }
+    );
+
+
+    if(
+      Array.isArray(
+        data.frameType
+      )
+    ){
+
+      document
+        .querySelectorAll(
+          'input[name="frameType"]'
+        )
+        .forEach(
+          el => {
+
+            el.checked =
+              data.frameType.includes(
+                el.value
+              );
+
+          }
+        );
+
+    }
+
+
+    if(
+      Array.isArray(
+        data.locationType
+      )
+    ){
+
+      document
+        .querySelectorAll(
+          'input[name="locationType"]'
+        )
+        .forEach(
+          el => {
+
+            el.checked =
+              data.locationType.includes(
+                el.value
+              );
+
+          }
+        );
+
+    }
+
+  }catch(error){
+
+    console.warn(
+      "Không thể đọc dữ liệu đã lưu:",
+      error
+    );
+
+  }
+
+}
+
+
+/* =========================
+   EVENT LISTENERS
+========================= */
+
+function bindEvents(){
+
+  document
+    .querySelectorAll(
+      ".control-panel input, .control-panel textarea"
+    )
+    .forEach(
+      el => {
+
+        el.addEventListener(
+          "input",
+          updatePreview
+        );
+
+
+        el.addEventListener(
+          "change",
+          updatePreview
+        );
+
+      }
+    );
+
+}
+
+
+/* =========================
+   STORAGE EVENT
+========================= */
+
+window.addEventListener(
+  "storage",
+  function(event){
+
+    if(
+      event.key === SETTINGS_KEY
+    ){
+
+      updateCompanyInformation();
+
+    }
+
+  }
+);
+
+
+/* =========================
+   BACK
+========================= */
+
+function goBack(){
+
+  if(
+    document.referrer &&
+    document.referrer.includes(
+      "GROVA-DOCUMENT"
+    )
+  ){
+
+    history.back();
+
+  }else{
+
+    window.location.href =
+      "../index.html";
+
+  }
+
+}
+
+
+/* =========================
+   INIT
+========================= */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  function(){
+
+    GROVA_DOCUMENT_PERMISSION.run(function(){
+
+      initializeNumber();
+
+      loadDraft();
+
+      bindEvents();
+
+      updatePreview();
+
+    });
+
+  }
+);
+
+</script>
+
+
+<script>
+(function () {
+  "use strict";
+
+  const GROVA_TEMPLATE_ID = "02";
+  const GROVA_DOCUMENT_CODE = "PLHĐ";
+  const GROVA_FIREBASE_CONFIG = {
+    apiKey: "AIzaSyBcqgrkL64utUMwyZz9wmb_cM0gA5Hy8II",
+    authDomain: "grova-document.firebaseapp.com",
+    projectId: "grova-document",
+    storageBucket: "grova-document.firebasestorage.app",
+    messagingSenderId: "220105094085",
+    appId: "1:220105094085:web:5a7263b0653333baed51ac",
+    measurementId: "G-TNVNP286G4"
+  };
+
+  window.GROVA_DOCUMENT_STATE = window.GROVA_DOCUMENT_STATE || {};
+  window.GROVA_DOCUMENT_STATE.templateId = GROVA_TEMPLATE_ID;
+  window.GROVA_DOCUMENT_STATE.documentCode = GROVA_DOCUMENT_CODE;
+  window.GROVA_DOCUMENT_STATE.documentNo = null;
+  window.GROVA_DOCUMENT_STATE.isOfficial = false;
+
+  function applyDocumentNumber(value) {
+    const display = value || "DỰ THẢO";
+    const targets = [
+      "contractNumberDisplay", "previewContractNumber",
+      "appendixNumberDisplay", "previewAppendixNumber",
+      "documentNumber", "previewNumber", "documentNo",
+      "previewContractNo", "pvDocumentNumber"
+    ];
+    targets.forEach(function (id) {
+      const element = document.getElementById(id);
+      if (!element) return;
+      if ("value" in element) element.value = display;
+      element.textContent = display;
+      element.dispatchEvent(new Event("input", { bubbles: true }));
+      element.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+  }
+
+  function readOfficialNumberFromUrl() {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const value = (params.get("grovaDocumentNo") || "").trim();
+      if (!value) return false;
+      window.GROVA_DOCUMENT_STATE.documentNo = value;
+      window.GROVA_DOCUMENT_STATE.isOfficial = true;
+      applyDocumentNumber(value);
+      return true;
+    } catch (error) {
+      console.warn("GROVA DOCUMENT: cannot read official number.", error);
+      return false;
+    }
+  }
+
+  window.GROVA_DOCUMENT_STATE.applyDocumentNumber = applyDocumentNumber;
+  window.GROVA_DOCUMENT_STATE.readOfficialNumberFromUrl = readOfficialNumberFromUrl;
+
+  readOfficialNumberFromUrl();
+  if (!window.GROVA_DOCUMENT_STATE.isOfficial) applyDocumentNumber(null);
+  document.addEventListener("DOMContentLoaded", function () {
+    readOfficialNumberFromUrl();
+    if (!window.GROVA_DOCUMENT_STATE.isOfficial) applyDocumentNumber(null);
+  });
+
+  window.GROVA_DOCUMENT_STATE.reserveOfficialNumber = async function () {
+    if (window.GROVA_DOCUMENT_STATE.isOfficial && window.GROVA_DOCUMENT_STATE.documentNo) {
+      return window.GROVA_DOCUMENT_STATE.documentNo;
+    }
+
+    if (typeof firebase === "undefined") throw new Error("FIREBASE_SDK_UNAVAILABLE");
+    if (!firebase.apps.length) firebase.initializeApp(GROVA_FIREBASE_CONFIG);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const user = auth.currentUser;
+    if (!user) throw new Error("AUTH_REQUIRED");
+
+    const ref = db.collection("document_counters").doc("template_" + GROVA_TEMPLATE_ID);
+    const next = await db.runTransaction(async function (transaction) {
+      const snapshot = await transaction.get(ref);
+      const current = snapshot.exists ? Math.max(0, Number(snapshot.data().current) || 0) : 0;
+      const value = current + 1;
+      transaction.set(ref, {
+        current: value,
+        templateId: GROVA_TEMPLATE_ID,
+        documentCode: GROVA_DOCUMENT_CODE,
+        counterType: "document_type_sequence",
+        updatedAt: new Date().toISOString(),
+        updatedBy: user.uid
+      }, { merge: true });
+      return value;
+    });
+
+    const documentNo = String(next).padStart(3, "0") + "-" + GROVA_DOCUMENT_CODE;
+    window.GROVA_DOCUMENT_STATE.documentNo = documentNo;
+    window.GROVA_DOCUMENT_STATE.isOfficial = true;
+    applyDocumentNumber(documentNo);
+
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("grovaDraft");
+      url.searchParams.set("grovaDocumentNo", documentNo);
+      history.replaceState(null, "", url.toString());
+    } catch (error) {}
+
+    return documentNo;
+  };
+})();
+</script>
+
+<style id="grova-pdf-pagination-fix">
+/* GROVA PDF EXPORT — keep logical blocks together when possible */
+.pdf-exporting p,
+.pdf-exporting li,
+.pdf-exporting tr,
+.pdf-exporting .party,
+.pdf-exporting .section,
+.pdf-exporting .document-section,
+.pdf-exporting .article,
+.pdf-exporting .article-content,
+.pdf-exporting .sub-clause,
+.pdf-exporting .assignment-row,
+.pdf-exporting .check-item,
+.pdf-exporting .item,
+.pdf-exporting .total-row,
+.pdf-exporting .total-box-row,
+.pdf-exporting .money-result-row,
+.pdf-exporting .bank-row,
+.pdf-exporting .check-row,
+.pdf-exporting .signature-grid,
+.pdf-exporting .signature-table,
+.pdf-exporting .signature-box,
+.pdf-exporting .signature-block,
+.pdf-exporting .company-block,
+.pdf-exporting .content,
+.pdf-exporting .checkbox-item,
+.pdf-exporting .party-grid {
+  break-inside: avoid !important;
+  page-break-inside: avoid !important;
+}
+</style>
+<style>
+
+/* GROVA PDF PAGINATION V5
+   Important: only keep page-break avoidance on small semantic units.
+   Large wrappers must remain splittable; otherwise html2pdf can create
+   completely blank pages when an avoided element is taller than one A4 page.
+*/
+.pdf-exporting h1,
+.pdf-exporting h2,
+.pdf-exporting h3,
+.pdf-exporting h4 {
+  break-after: avoid !important;
+  page-break-after: avoid !important;
+}
+
+.pdf-exporting p,
+.pdf-exporting li,
+.pdf-exporting tr {
+  break-inside: avoid !important;
+  page-break-inside: avoid !important;
+}
+
+/* Large containers MUST be allowed to split across A4 pages. */
+.pdf-exporting .party,
+.pdf-exporting .section,
+.pdf-exporting .document-section,
+.pdf-exporting .article,
+.pdf-exporting .article-content,
+.pdf-exporting .sub-clause,
+.pdf-exporting .content,
+.pdf-exporting .company-block,
+.pdf-exporting .party-grid,
+.pdf-exporting .signature-grid,
+.pdf-exporting .signature-block,
+.pdf-exporting .assignment-row,
+.pdf-exporting .check-item,
+.pdf-exporting .item,
+.pdf-exporting .total-row,
+.pdf-exporting .total-box-row,
+.pdf-exporting .money-result-row,
+.pdf-exporting .bank-row,
+.pdf-exporting .check-row {
+  break-inside: auto !important;
+  page-break-inside: auto !important;
+}
+
+/* Small table/signature units can stay together when they fit. */
+.pdf-exporting td,
+.pdf-exporting th,
+.pdf-exporting .signature-box {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+/* GROVA A4 document margins: left 30mm, right 20mm, top 20mm, bottom 20mm. */
+.document, .paper {
+  box-sizing: border-box !important;
+  width: 210mm !important;
+  max-width: none !important;
+  min-width: 210mm !important;
+  padding: 20mm 20mm 20mm 30mm !important;
+}
+.pdf-exporting.document, .pdf-exporting.paper {
+  box-sizing: border-box !important;
+  width: 210mm !important;
+  max-width: none !important;
+  min-width: 210mm !important;
+  padding: 20mm 20mm 20mm 30mm !important;
+  margin: 0 !important;
+  background: #fff !important;
+  box-shadow: none !important;
+}
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+async function exportDocumentPDF() {
+    const state = window.GROVA_DOCUMENT_STATE || {};
+
+    const ensurePreviewStyles = () => {
+      if (document.getElementById("grova-pdf-preview-style")) return;
+      const style = document.createElement("style");
+      style.id = "grova-pdf-preview-style";
+      style.textContent = `
+        #grovaPdfPreviewOverlay{position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:18px;box-sizing:border-box}
+        #grovaPdfPreviewModal{width:min(920px,96vw);height:min(92vh,1100px);background:#fff;border-radius:16px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 70px rgba(0,0,0,.35)}
+        #grovaPdfPreviewHeader{padding:14px 18px;border-bottom:1px solid #ddd;display:flex;align-items:center;justify-content:space-between;font-family:Arial,sans-serif}
+        #grovaPdfPreviewHeader strong{font-size:18px;color:#153d32}
+        #grovaPdfPreviewBody{flex:1;overflow:auto;background:#e9ecef;padding:18px;display:flex;justify-content:center;align-items:flex-start}
+        #grovaPdfPreviewImage{display:block;width:min(100%,794px);height:auto;background:#fff;box-shadow:0 2px 12px rgba(0,0,0,.18)}
+        #grovaPdfPreviewFooter{padding:12px 18px;border-top:1px solid #ddd;display:flex;gap:10px;justify-content:flex-end;font-family:Arial,sans-serif}
+        #grovaPdfPreviewFooter button{border:0;border-radius:9px;padding:11px 18px;font-size:15px;cursor:pointer}
+        #grovaPdfPreviewCancel{background:#eef2f0;color:#173b31}
+        #grovaPdfPreviewContinue{background:#087f5b;color:#fff}
+        #grovaPdfPreviewBusy{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.9);font-family:Arial,sans-serif;font-size:16px;color:#173b31}
+      `;
+      document.head.appendChild(style);
+    };
+
+    const renderCanvas = async () => {
+      if (typeof html2canvas === "undefined" || !window.jspdf || !window.jspdf.jsPDF) {
+        throw new Error("PDF_LIB_NOT_READY");
+      }
+      if (typeof window.updatePreview === "function") { try { window.updatePreview(); } catch (e) {} }
+      const target = document.querySelector(".document, #documentPreview, #paper, article.paper");
+      if (!target) throw new Error("DOCUMENT_TARGET_NOT_FOUND");
+
+      const oldOverflow = document.documentElement.style.overflow;
+      const oldBodyOverflow = document.body.style.overflow;
+      target.classList.add("pdf-exporting");
+      document.documentElement.style.overflow = "visible";
+      document.body.style.overflow = "visible";
+      try {
+        return await html2canvas(target, {
+          scale: 2,
+          useCORS: true,
+          allowTaint: false,
+          backgroundColor: "#ffffff",
+          logging: false,
+          imageTimeout: 15000,
+          windowWidth: Math.max(document.documentElement.clientWidth, target.scrollWidth),
+          windowHeight: Math.max(window.innerHeight, target.scrollHeight),
+          scrollX: 0,
+          scrollY: 0
+        });
+      } finally {
+        target.classList.remove("pdf-exporting");
+        document.documentElement.style.overflow = oldOverflow;
+        document.body.style.overflow = oldBodyOverflow;
+      }
+    };
+
+    const showPreview = (canvas) => new Promise(resolve => {
+      ensurePreviewStyles();
+      const overlay = document.createElement("div");
+      overlay.id = "grovaPdfPreviewOverlay";
+      overlay.innerHTML = `
+        <div id="grovaPdfPreviewModal" role="dialog" aria-modal="true" aria-label="Xem trước văn bản">
+          <div id="grovaPdfPreviewHeader"><strong>👁 XEM TRƯỚC VĂN BẢN</strong><span style="font-size:13px;color:#666">Bản xem trước · chưa cấp số</span></div>
+          <div id="grovaPdfPreviewBody"><img id="grovaPdfPreviewImage" alt="Xem trước văn bản"></div>
+          <div id="grovaPdfPreviewFooter">
+            <button type="button" id="grovaPdfPreviewCancel">← Quay lại chỉnh sửa</button>
+            <button type="button" id="grovaPdfPreviewContinue">Tiếp tục xuất PDF →</button>
+          </div>
+        </div>`;
+      document.body.appendChild(overlay);
+      const img = overlay.querySelector("#grovaPdfPreviewImage");
+      img.src = canvas.toDataURL("image/jpeg", 0.94);
+      const close = value => { overlay.remove(); resolve(value); };
+      overlay.querySelector("#grovaPdfPreviewCancel").onclick = () => close(false);
+      overlay.querySelector("#grovaPdfPreviewContinue").onclick = () => close(true);
+      overlay.addEventListener("click", e => { if (e.target === overlay) close(false); });
+    });
+
+    try {
+      // STEP 1: render and show the complete draft for review. No number is issued here.
+      const draftCanvas = await renderCanvas();
+      const proceed = await showPreview(draftCanvas);
+      if (!proceed) return;
+
+      // STEP 2: only after the user has reviewed the draft, ask for official numbering.
+      if (!state.isOfficial) {
+        const confirmed = window.confirm(
+          "XÁC NHẬN XUẤT VĂN BẢN CHÍNH THỨC\n\n" +
+          "Văn bản đang là DỰ THẢO.\n" +
+          "Nếu chọn OK, hệ thống sẽ cấp số chính thức và xuất PDF.\n\n" +
+          "Bạn có muốn tiếp tục không?"
+        );
+        if (!confirmed) {
+          alert("Vẫn giữ bản nháp. Chưa cấp số chính thức.");
+          return;
+        }
+        await state.reserveOfficialNumber();
+      }
+
+      // STEP 3: regenerate after the official number is attached, then save PDF.
+      const officialCanvas = await renderCanvas();
+      const numberEl = document.querySelector("#documentNumber, #documentNo, .document-number, #contractNumberDisplay, #appendixNumberDisplay");
+      const rawNumber = numberEl ? (numberEl.textContent || numberEl.value || "").trim() : "";
+      const number = rawNumber.replace(/\s+/g, "-").replace(/[^0-9A-Za-zÀ-ỹĐđ_-]/g, "").replace(/-+/g, "-");
+      const title = (document.title || "GROVA DOCUMENT").replace(/\s*[–—-]\s*GROVA.*$/i, "").replace(/[^0-9A-Za-zÀ-ỹĐđ _-]/g, "").trim().replace(/\s+/g, "-");
+      const filename = `${number || "van-ban"}${title ? "-" + title : ""}.pdf`;
+
+      const target = document.querySelector(".document, #documentPreview, #paper, article.paper");
+      if (!target) throw new Error("DOCUMENT_TARGET_NOT_FOUND");
+
+      if (typeof html2pdf === "undefined") {
+        throw new Error("PDF_LIB_NOT_READY");
+      }
+
+      // Temporarily apply the export CSS to the real document so computed
+      // dimensions/fonts/images are exactly the ones the user reviewed.
+      const oldOverflow = document.documentElement.style.overflow;
+      const oldBodyOverflow = document.body.style.overflow;
+      const oldScrollBehavior = document.documentElement.style.scrollBehavior;
+
+      target.classList.add("pdf-exporting");
+      document.documentElement.style.overflow = "visible";
+      document.body.style.overflow = "visible";
+      document.documentElement.style.scrollBehavior = "auto";
+
+      try {
+        if (typeof window.updatePreview === "function") {
+          try { window.updatePreview(); } catch (e) {}
+        }
+
+        // Let the browser finish layout before html2pdf reads the DOM.
+        await new Promise(resolve =>
+          requestAnimationFrame(() =>
+            requestAnimationFrame(resolve)
+          )
+        );
+
+        const opt = {
+          margin: 0,
+          filename,
+          image: {
+            type: "jpeg",
+            quality: 0.98
+          },
+          html2canvas: {
+            scale: 2,
+            useCORS: true,
+            allowTaint: false,
+            backgroundColor: "#ffffff",
+            logging: false,
+            imageTimeout: 15000,
+            scrollX: 0,
+            scrollY: 0,
+            windowWidth: Math.max(
+              document.documentElement.clientWidth,
+              target.scrollWidth
+            ),
+            windowHeight: Math.max(
+              window.innerHeight,
+              target.scrollHeight
+            )
+          },
+          jsPDF: {
+            unit: "mm",
+            format: "a4",
+            orientation: "portrait",
+            compress: true
+          },
+          pagebreak: {
+            mode: ["css", "legacy"]
+          }
+        };
+
+        await html2pdf()
+          .set(opt)
+          .from(target)
+          .save();
+
+      } finally {
+        target.classList.remove("pdf-exporting");
+        document.documentElement.style.overflow = oldOverflow;
+        document.body.style.overflow = oldBodyOverflow;
+        document.documentElement.style.scrollBehavior = oldScrollBehavior;
+      }
+    } catch (error) {
+      console.error("GROVA PDF preview/export error:", error);
+      if (error && error.message === "PDF_LIB_NOT_READY") alert("Không tải được bộ xuất PDF. Vui lòng kiểm tra kết nối mạng rồi thử lại.");
+      else if (error && error.message === "DOCUMENT_TARGET_NOT_FOUND") alert("Không tìm thấy nội dung văn bản để xuất PDF.");
+      else alert("Xuất PDF thất bại. Vui lòng thử lại.");
+    }
+  }
+
+</script>
+</body>
+</html>

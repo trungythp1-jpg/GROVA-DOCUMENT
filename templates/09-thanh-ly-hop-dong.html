@@ -3680,6 +3680,7 @@
 }
 
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 /* GROVA A4 document margins: left 30mm, right 20mm, top 20mm, bottom 20mm. */
@@ -3811,26 +3812,83 @@ async function exportDocumentPDF() {
       const title = (document.title || "GROVA DOCUMENT").replace(/\s*[–—-]\s*GROVA.*$/i, "").replace(/[^0-9A-Za-zÀ-ỹĐđ _-]/g, "").trim().replace(/\s+/g, "-");
       const filename = `${number || "van-ban"}${title ? "-" + title : ""}.pdf`;
 
-      const { jsPDF } = window.jspdf;
-      const A4_W = 210, A4_H = 297, M_TOP = 20, M_BOTTOM = 20;
-      const pxPerMm = officialCanvas.width / A4_W;
-      const pagePx = Math.round(A4_H * pxPerMm);
-      const topPx = Math.round(M_TOP * pxPerMm);
-      const usablePx = Math.round((A4_H - M_TOP - M_BOTTOM) * pxPerMm);
-      const sample = document.createElement("canvas");
-      sample.width = Math.max(1, Math.round(officialCanvas.width / 2)); sample.height = officialCanvas.height;
-      const sctx = sample.getContext("2d", {willReadFrequently:true}); sctx.drawImage(officialCanvas,0,0,sample.width,sample.height);
-      const data = sctx.getImageData(0,0,sample.width,sample.height).data;
-      const rows = new Uint32Array(sample.height);
-      for(let y=0;y<sample.height;y++){let n=0,base=y*sample.width*4;for(let x=0;x<sample.width;x+=2){const i=base+x*4;if(data[i]<235||data[i+1]<235||data[i+2]<235)n++;}rows[y]=n;}
-      const blankThreshold=Math.max(2,sample.width*0.004);
-      const blankBand=y=>{for(let k=-5;k<=5;k++){const yy=y+k;if(yy<0||yy>=rows.length||rows[yy]>blankThreshold)return false;}return true;};
-      function safeCut(targetY,minY,maxY){const radius=Math.min(500,Math.round(usablePx*.45));for(let d=0;d<=radius;d++){const ys=d===0?[targetY]:[targetY-d,targetY+d];for(const y of ys){if(y>=minY&&y<=maxY&&blankBand(y))return y;}}return Math.max(minY,Math.min(maxY,targetY));}
-      const cuts=[];let start=0,page=0;
-      while(start<officialCanvas.height-1){const nominal=page===0?pagePx:start+usablePx;if(nominal>=officialCanvas.height){cuts.push([start,officialCanvas.height]);break;}const minCut=start+Math.round(90*pxPerMm);const maxCut=Math.min(officialCanvas.height-1,start+Math.round((usablePx+90)*pxPerMm));const cut=safeCut(nominal,minCut,maxCut);cuts.push([start,cut]);start=cut;page++;}
-      const pdf=new jsPDF({unit:"mm",format:"a4",orientation:"portrait",compress:true});
-      cuts.forEach(([start,end],idx)=>{const slice=end-start;if(slice<=0)return;const pageCanvas=document.createElement("canvas");pageCanvas.width=officialCanvas.width;pageCanvas.height=pagePx;const ctx=pageCanvas.getContext("2d",{alpha:false});ctx.fillStyle="#fff";ctx.fillRect(0,0,pageCanvas.width,pageCanvas.height);const destY=idx===0?0:topPx;const available=pagePx-destY;const drawH=Math.min(slice,available);ctx.drawImage(officialCanvas,0,start,officialCanvas.width,drawH,0,destY,officialCanvas.width,drawH);if(idx>0)pdf.addPage("a4","portrait");pdf.addImage(pageCanvas.toDataURL("image/jpeg",0.97),"JPEG",0,0,A4_W,A4_H,undefined,"FAST");});
-      pdf.save(filename);
+      const target = document.querySelector(".document, #documentPreview, #paper, article.paper");
+      if (!target) throw new Error("DOCUMENT_TARGET_NOT_FOUND");
+
+      if (typeof html2pdf === "undefined") {
+        throw new Error("PDF_LIB_NOT_READY");
+      }
+
+      // Temporarily apply the export CSS to the real document so computed
+      // dimensions/fonts/images are exactly the ones the user reviewed.
+      const oldOverflow = document.documentElement.style.overflow;
+      const oldBodyOverflow = document.body.style.overflow;
+      const oldScrollBehavior = document.documentElement.style.scrollBehavior;
+
+      target.classList.add("pdf-exporting");
+      document.documentElement.style.overflow = "visible";
+      document.body.style.overflow = "visible";
+      document.documentElement.style.scrollBehavior = "auto";
+
+      try {
+        if (typeof window.updatePreview === "function") {
+          try { window.updatePreview(); } catch (e) {}
+        }
+
+        // Let the browser finish layout before html2pdf reads the DOM.
+        await new Promise(resolve =>
+          requestAnimationFrame(() =>
+            requestAnimationFrame(resolve)
+          )
+        );
+
+        const opt = {
+          margin: 0,
+          filename,
+          image: {
+            type: "jpeg",
+            quality: 0.98
+          },
+          html2canvas: {
+            scale: 2,
+            useCORS: true,
+            allowTaint: false,
+            backgroundColor: "#ffffff",
+            logging: false,
+            imageTimeout: 15000,
+            scrollX: 0,
+            scrollY: 0,
+            windowWidth: Math.max(
+              document.documentElement.clientWidth,
+              target.scrollWidth
+            ),
+            windowHeight: Math.max(
+              window.innerHeight,
+              target.scrollHeight
+            )
+          },
+          jsPDF: {
+            unit: "mm",
+            format: "a4",
+            orientation: "portrait",
+            compress: true
+          },
+          pagebreak: {
+            mode: ["css", "legacy"]
+          }
+        };
+
+        await html2pdf()
+          .set(opt)
+          .from(target)
+          .save();
+
+      } finally {
+        target.classList.remove("pdf-exporting");
+        document.documentElement.style.overflow = oldOverflow;
+        document.body.style.overflow = oldBodyOverflow;
+        document.documentElement.style.scrollBehavior = oldScrollBehavior;
+      }
     } catch (error) {
       console.error("GROVA PDF preview/export error:", error);
       if (error && error.message === "PDF_LIB_NOT_READY") alert("Không tải được bộ xuất PDF. Vui lòng kiểm tra kết nối mạng rồi thử lại.");
