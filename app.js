@@ -2917,7 +2917,69 @@
 
   }
 
-  function openTemplate(id) {
+  function getDocumentCountersCollection() {
+    if (!firestoreDb) return null;
+    return firestoreDb.collection("document_counters");
+  }
+
+  function formatCentralDocumentNumber(value) {
+    const number = Math.max(0, Number(value) || 0);
+    return String(number).padStart(3, "0");
+  }
+
+  async function reserveCentralDocumentNumber(template, user = currentUser) {
+    if (!template || !user) {
+      throw new Error("AUTH_REQUIRED");
+    }
+
+    if (!hasDocumentTemplatePermission(template.id, "create")) {
+      throw new Error("PERMISSION_DENIED");
+    }
+
+    if (!initializeFirestore()) {
+      throw new Error("FIRESTORE_UNAVAILABLE");
+    }
+
+    await waitForFirestore();
+
+    const collection = getDocumentCountersCollection();
+    if (!collection) {
+      throw new Error("DOCUMENT_COUNTER_UNAVAILABLE");
+    }
+
+    const reference = collection.doc("global");
+
+    const nextNumber = await firestoreDb.runTransaction(async (transaction) => {
+      const snapshot = await transaction.get(reference);
+      const current = snapshot.exists
+        ? Math.max(0, Number(snapshot.data()?.current) || 0)
+        : 0;
+      const next = current + 1;
+
+      transaction.set(reference, {
+        current: next,
+        updatedAt: nowISO(),
+        updatedBy: user.uid,
+        counterType: "global_document_number"
+      }, { merge: true });
+
+      return next;
+    });
+
+    return formatCentralDocumentNumber(nextNumber);
+  }
+
+  function buildTemplateUrlWithDocumentNumber(file, documentNo, templateId) {
+    const rawFile = String(file || "");
+    const hashIndex = rawFile.indexOf("#");
+    const hash = hashIndex >= 0 ? rawFile.slice(hashIndex) : "";
+    const base = hashIndex >= 0 ? rawFile.slice(0, hashIndex) : rawFile;
+    const separator = base.includes("?") ? "&" : "?";
+
+    return `${base}${separator}grovaDocumentNo=${encodeURIComponent(documentNo)}&grovaTemplateId=${encodeURIComponent(String(templateId || ""))}${hash}`;
+  }
+
+  async function openTemplate(id) {
 
     if (!hasPermission("documents", "create")) {
       showPermissionDenied("documents");
@@ -2952,15 +3014,29 @@
 
     }
 
+    let documentNo;
+
+    try {
+      documentNo = await reserveCentralDocumentNumber(template);
+    } catch (error) {
+      console.error("GROVA DOCUMENT: central document numbering failed.", error);
+      showToast("Không thể cấp số văn bản trung tâm. Văn bản chưa được mở.");
+      return;
+    }
+
     /*
-      Không chờ Firestore trước khi mở văn bản.
-      History được cập nhật local trước, còn đồng bộ cloud
-      chạy nền để không làm kẹt luồng mở văn bản sau khi Back.
+      TASK 4: cấp số trung tâm trước khi mở mẫu.
+      Số được cấp bằng Firestore Transaction nên không trùng giữa các máy.
+      Template nhận số qua query parameter để tự hiển thị mà không thay đổi nội dung mẫu.
     */
     void addHistory(template);
 
     window.location.href =
-      template.file;
+      buildTemplateUrlWithDocumentNumber(
+        template.file,
+        documentNo,
+        template.id
+      );
 
   }
 
@@ -7804,7 +7880,7 @@
 
     if (templateButton) {
 
-      openTemplate(
+      void openTemplate(
         templateButton.dataset.templateId
       );
 
@@ -7821,7 +7897,7 @@
 
       closeModal();
 
-      openTemplate(
+      void openTemplate(
         pickerButton.dataset.pickerTemplateId
       );
 
