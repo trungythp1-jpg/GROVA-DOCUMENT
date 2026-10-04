@@ -4290,6 +4290,15 @@
                 </button>
                 ` : ""}
 
+                <button
+                  type="button"
+                  class="small-btn"
+                  data-action="view-project"
+                  data-id="${escapeHTML(project.id)}"
+                >
+                  👁 Xem
+                </button>
+
                 ${hasPermission("projects", "edit") ? `
                 <button
                   type="button"
@@ -4321,6 +4330,80 @@
         .join("");
 
   }
+
+  function openProjectView(id) {
+
+    if (!hasPermission("projects", "view")) {
+      showToast("Bạn không có quyền xem công trình.");
+      return;
+    }
+
+    const project =
+      getProjects().find(
+        (item) =>
+          item.id === id
+      );
+
+    if (!project) {
+      showToast("Không tìm thấy công trình.");
+      return;
+    }
+
+    modalMode = "project-view";
+    modalEditId = id;
+
+    const hasLocation =
+      project.latitude &&
+      project.longitude;
+
+    const detailRow = (label, value, full = false) => `
+      <div style="${full ? "grid-column:1 / -1;" : ""}border:1px solid #e3ebe7;border-radius:12px;padding:12px 14px;background:#fbfdfc;">
+        <div style="font-size:12px;color:#718078;margin-bottom:5px;">${escapeHTML(label)}</div>
+        <div style="font-weight:650;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere;">${escapeHTML(value || "—")}</div>
+      </div>
+    `;
+
+    $("#modalEyebrow").textContent =
+      "CÔNG TRÌNH";
+
+    $("#modalTitle").textContent =
+      project.name ||
+      "Chi tiết công trình";
+
+    $("#modalBody").innerHTML = `
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;">
+        ${detailRow("Tên công trình", project.name, true)}
+        ${detailRow("Mã công trình", project.code)}
+        ${detailRow("Trạng thái", project.status || "Chuẩn bị")}
+        ${detailRow("Khách hàng", project.customer, true)}
+        ${detailRow("Địa chỉ công trình", project.address, true)}
+        ${detailRow("Ngày bắt đầu", project.startDate ? formatDate(project.startDate) : "")}
+        ${detailRow("Vị trí GPS", hasLocation ? `${project.latitude}, ${project.longitude}` : "Chưa ghim vị trí")}
+        ${detailRow("Ghi chú", project.note, true)}
+        ${detailRow("Ngày tạo", project.createdAt ? formatDateTime(project.createdAt) : "")}
+        ${detailRow("Cập nhật gần nhất", project.updatedAt ? formatDateTime(project.updatedAt) : "")}
+      </div>
+
+      ${hasLocation ? `
+        <div style="margin-top:14px;">
+          <button
+            type="button"
+            class="secondary"
+            data-action="open-project-location"
+            data-id="${escapeHTML(project.id)}"
+          >
+            🗺 Mở Google Maps
+          </button>
+        </div>
+      ` : ""}
+    `;
+
+    $("#modalSave").style.display =
+      "none";
+
+    openModal();
+  }
+
 
   function openProjectModal(id = null) {
 
@@ -7728,6 +7811,12 @@
 
       case "new-project":
         openProjectModal();
+        break;
+
+      case "view-project":
+        openProjectView(
+          actionButton.dataset.id
+        );
         break;
 
       case "edit-project":
