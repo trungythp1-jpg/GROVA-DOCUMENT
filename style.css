@@ -1790,3 +1790,45 @@ textarea {
   .settings-backup-actions { flex-direction: column; }
   .settings-backup-actions button { width: 100%; }
 }
+
+
+/* =====================================================
+   GROVA DOCUMENT — SHARED LIST PAGINATION
+===================================================== */
+.grova-pagination {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 8px;
+  padding: 12px 4px 4px;
+  border-top: 1px solid var(--border, #dce7e2);
+}
+.grova-pagination .small-btn {
+  min-height: 40px;
+  white-space: nowrap;
+}
+.grova-pagination .small-btn:disabled {
+  opacity: .42;
+  cursor: not-allowed;
+}
+.grova-pagination-info {
+  color: var(--muted, #73847d);
+  font-size: 13px;
+  line-height: 1.45;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.grova-pagination-single {
+  justify-content: flex-end;
+  padding-top: 8px;
+  border-top: 0;
+}
+@media (max-width: 560px) {
+  .grova-pagination { gap: 8px; }
+  .grova-pagination .small-btn { padding: 8px 10px; min-height: 42px; }
+  .grova-pagination-info { font-size: 12px; }
+}

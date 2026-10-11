@@ -2833,6 +2833,44 @@
 
   }
 
+  // Shared pagination for long lists. Keep page state independent per module.
+  const grovaPaginationState = Object.create(null);
+  const GROVA_PAGE_SIZE = 5;
+
+  function renderPaginatedList(container, items, renderItem, key, rerender) {
+    if (!container) return;
+    const signature = items.map((item) => String(item?.id ?? item?.code ?? item?.name ?? item?.title ?? "")).join("|");
+    if (grovaPaginationState[key + "Signature"] !== signature) {
+      grovaPaginationState[key + "Signature"] = signature;
+      grovaPaginationState[key] = 1;
+    }
+    const total = items.length;
+    const pages = Math.max(1, Math.ceil(total / GROVA_PAGE_SIZE));
+    let page = Number(grovaPaginationState[key] || 1);
+    page = Math.min(Math.max(1, page), pages);
+    grovaPaginationState[key] = page;
+    const start = (page - 1) * GROVA_PAGE_SIZE;
+    const visible = items.slice(start, start + GROVA_PAGE_SIZE);
+    const content = visible.map(renderItem).join("");
+    const pagination = total > GROVA_PAGE_SIZE ? `
+      <div class="grova-pagination" data-pagination="${key}">
+        <button type="button" class="small-btn" data-page-action="prev" ${page <= 1 ? "disabled" : ""}>‹ Trước</button>
+        <span class="grova-pagination-info">${start + 1}–${Math.min(start + GROVA_PAGE_SIZE, total)} / ${total} · Trang ${page}/${pages}</span>
+        <button type="button" class="small-btn" data-page-action="next" ${page >= pages ? "disabled" : ""}>Sau ›</button>
+      </div>` : (total ? `<div class="grova-pagination grova-pagination-single"><span class="grova-pagination-info">${total} bản ghi</span></div>` : "");
+    container.innerHTML = content + pagination;
+    const pager = container.querySelector(`[data-pagination="${key}"]`);
+    if (pager) {
+      pager.querySelectorAll("[data-page-action]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const delta = button.dataset.pageAction === "next" ? 1 : -1;
+          grovaPaginationState[key] = Math.min(pages, Math.max(1, page + delta));
+          rerender();
+        });
+      });
+    }
+  }
+
   function renderDocuments() {
 
     if (!hasPermission("documents", "view")) {
@@ -2903,8 +2941,12 @@
     }
 
     if ($("#documentsPageGrid")) {
-      $("#documentsPageGrid").innerHTML =
-        html;
+      const grid = $("#documentsPageGrid");
+      if (!filtered.length) {
+        grid.innerHTML = html;
+      } else {
+        renderPaginatedList(grid, filtered, renderDocumentCard, "documents", renderDocuments);
+      }
     }
 
   }
@@ -3735,31 +3777,12 @@
       return;
     }
 
-    container.innerHTML =
-      history
-        .map(
-          (item) => `
-            <div class="history-item">
-              <div class="history-icon">
-                ${escapeHTML(item.icon || "📄")}
-              </div>
-              <div class="history-content">
-                <b>
-                  ${escapeHTML(item.name || "")}
-                </b>
-                <span>
-                  ${escapeHTML(item.code || "")}
-                </span>
-              </div>
-              <div class="history-time">
-                ${escapeHTML(
-                  formatDateTime(item.openedAt)
-                )}
-              </div>
-            </div>
-          `
-        )
-        .join("");
+    renderPaginatedList(container, history, (item) => `
+      <div class="history-item">
+        <div class="history-icon">${escapeHTML(item.icon || "📄")}</div>
+        <div class="history-content"><b>${escapeHTML(item.name || "")}</b><span>${escapeHTML(item.code || "")}</span></div>
+        <div class="history-time">${escapeHTML(formatDateTime(item.openedAt))}</div>
+      </div>`, "history", renderHistory);
   }
 
   function renderRecentDocuments() {
@@ -4427,9 +4450,7 @@
 
     }
 
-    container.innerHTML =
-      filtered
-        .map(
+    renderPaginatedList(container, filtered,
           (project) => `
 
             <div class="data-row">
@@ -4533,9 +4554,7 @@
 
             </div>
 
-          `
-        )
-        .join("");
+          `, "projects", renderProjects);
 
   }
 
@@ -5400,9 +5419,7 @@
 
     }
 
-    container.innerHTML =
-      filtered
-        .map(
+    renderPaginatedList(container, filtered,
           (customer) => `
 
             <div class="data-row">
@@ -5466,9 +5483,7 @@
 
             </div>
 
-          `
-        )
-        .join("");
+          `, "customers", renderCustomers);
 
   }
 
@@ -5923,9 +5938,7 @@
 
     }
 
-    container.innerHTML =
-      filtered
-        .map(
+    renderPaginatedList(container, filtered,
           (employee) => `
 
             <div class="data-row">
@@ -5992,9 +6005,7 @@
 
             </div>
 
-          `
-        )
-        .join("");
+          `, "employees", renderEmployees);
 
   }
 
