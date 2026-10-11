@@ -199,7 +199,10 @@
   }
 
   function isAdminUser(user = currentUser) {
-    return Boolean(user?.uid && user.uid === ADMIN_UID);
+    return Boolean(user?.uid && (
+      user.uid === ADMIN_UID ||
+      (currentUserProfile?.uid === user.uid && currentUserProfile?.role === "admin" && currentUserProfile?.status === "active")
+    ));
   }
 
   function hasPermission(group, action) {
@@ -1079,6 +1082,12 @@
       customer:
         project.customer || "",
 
+      customerId:
+        String(project.customerId || ""),
+
+      employeeId:
+        String(project.employeeId || ""),
+
       address:
         project.address || "",
 
@@ -1791,9 +1800,7 @@
   }
 
   async function writeCloudCustomer(customer, user, isCreate = false) {
-    if (!hasPermission("customers", isCreate ? "create" : "edit")) {
-      throw new Error("PERMISSION_DENIED");
-    }
+    if (!isAdminUser(user)) throw new Error("ADMIN_ONLY");
     if (!user) {
       throw new Error(
         "AUTH_REQUIRED"
@@ -1841,9 +1848,7 @@
   }
 
   async function deleteCloudCustomer(id, user) {
-    if (!hasPermission("customers", "delete")) {
-      throw new Error("PERMISSION_DENIED");
-    }
+    if (!isAdminUser(user)) throw new Error("ADMIN_ONLY");
     if (!user) {
       throw new Error(
         "AUTH_REQUIRED"
@@ -2226,10 +2231,7 @@
   }
 
   async function writeCloudEmployee(employee, user) {
-    const isCreate = !employee?.createdAt;
-    if (!hasPermission("employees", isCreate ? "create" : "edit")) {
-      throw new Error("PERMISSION_DENIED");
-    }
+    if (!isAdminUser(user)) throw new Error("ADMIN_ONLY");
     if (!user) throw new Error("AUTH_REQUIRED");
     if (!initializeFirestore()) throw new Error("FIRESTORE_UNAVAILABLE");
     await waitForFirestore();
@@ -2241,9 +2243,7 @@
   }
 
   async function deleteCloudEmployee(id, user) {
-    if (!hasPermission("employees", "delete")) {
-      throw new Error("PERMISSION_DENIED");
-    }
+    if (!isAdminUser(user)) throw new Error("ADMIN_ONLY");
     if (!user) throw new Error("AUTH_REQUIRED");
     if (!initializeFirestore()) throw new Error("FIRESTORE_UNAVAILABLE");
     await waitForFirestore();
@@ -2540,6 +2540,14 @@
         "aria-hidden",
         canCreateDocuments ? "false" : "true"
       );
+    });
+
+    ['[data-action="new-customer"]', '[data-action="new-employee"]'].forEach((selector) => {
+      $$(selector).forEach((button) => {
+        const visible = isAdminUser();
+        button.style.display = visible ? "" : "none";
+        button.setAttribute("aria-hidden", visible ? "false" : "true");
+      });
     });
 
     $$(".nav-item[data-page]").forEach((button) => {
@@ -2992,17 +3000,11 @@
       return;
     }
 
-    const template =
-      findTemplate(id);
+    const template = findTemplate(id);
 
     if (!template) {
-
-      showToast(
-        "Không tìm thấy mẫu văn bản."
-      );
-
+      showToast("Không tìm thấy mẫu văn bản.");
       return;
-
     }
 
     if (!hasDocumentTemplatePermission(template.id, "create")) {
@@ -3011,40 +3013,24 @@
     }
 
     if (!template.file) {
-
-      showToast(
-        "Mẫu văn bản chưa được cấu hình đường dẫn."
-      );
-
-      return;
-
-    }
-
-    let documentNo;
-
-    try {
-      documentNo = await reserveCentralDocumentNumber(template);
-    } catch (error) {
-      console.error("GROVA DOCUMENT: central document numbering failed.", error);
-      showToast("Không thể cấp số văn bản trung tâm. Văn bản chưa được mở.");
+      showToast("Mẫu văn bản chưa được cấu hình đường dẫn.");
       return;
     }
 
     /*
-      TASK 4: cấp số trung tâm theo TỪNG LOẠI VĂN BẢN.
-      Ví dụ: 001-HĐNT, 002-HĐNT và 001-DNTT là các dãy độc lập.
-      Firestore Transaction đảm bảo không trùng số giữa các máy.
-      Template nhận số qua query parameter để tự hiển thị.
+      TASK 4 — DRAFT FIRST / OFFICIAL NUMBER ON PDF EXPORT
+      Mở mẫu chỉ tạo BẢN NHÁP. Không cấp số và không chạm
+      vào document_counters. Số chính thức chỉ được cấp khi
+      người dùng bấm “Xuất PDF” và xác nhận tạo văn bản chính thức.
     */
-    void addHistory(template);
+    const rawFile = String(template.file || "");
+    const hashIndex = rawFile.indexOf("#");
+    const hash = hashIndex >= 0 ? rawFile.slice(hashIndex) : "";
+    const base = hashIndex >= 0 ? rawFile.slice(0, hashIndex) : rawFile;
+    const separator = base.includes("?") ? "&" : "?";
+    const draftUrl = `${base}${separator}grovaDraft=1&grovaTemplateId=${encodeURIComponent(String(template.id || ""))}${hash}`;
 
-    window.location.href =
-      buildTemplateUrlWithDocumentNumber(
-        template.file,
-        documentNo,
-        template.id
-      );
-
+    window.location.href = draftUrl;
   }
 
   /* =======================================================
@@ -4264,6 +4250,44 @@
   }
 
   /* =======================================================
+     PROJECT ASSIGNMENT HISTORY — APPEND ONLY
+  ======================================================= */
+
+  function getProjectAssignmentHistoryCollection() {
+    if (!firestoreDb) return null;
+    return firestoreDb.collection("project_assignment_history");
+  }
+
+  async function writeProjectAssignmentHistory(project, oldEmployeeId, newEmployeeId, reason, user) {
+    if (!user) throw new Error("AUTH_REQUIRED");
+    if (!hasPermission("projects", "edit")) throw new Error("PERMISSION_DENIED");
+    if (!initializeFirestore()) throw new Error("FIRESTORE_UNAVAILABLE");
+    await waitForFirestore();
+    const collection = getProjectAssignmentHistoryCollection();
+    if (!collection) throw new Error("FIRESTORE_UNAVAILABLE");
+    const oldEmployee = getEmployees().find((item) => String(item.id) === String(oldEmployeeId || ""));
+    const newEmployee = getEmployees().find((item) => String(item.id) === String(newEmployeeId || ""));
+    const record = {
+      projectId: String(project.id),
+      projectName: String(project.name || ""),
+      oldEmployeeId: String(oldEmployeeId || ""),
+      oldEmployeeName: String(oldEmployee?.name || ""),
+      newEmployeeId: String(newEmployeeId || ""),
+      newEmployeeName: String(newEmployee?.name || ""),
+      reason: String(reason || "").trim(),
+      changedAt: nowISO(),
+      changedBy: String(user.uid || ""),
+      changedByName: String(currentUserProfile?.name || user.displayName || user.email || "")
+    };
+    if (!record.reason) throw new Error("ASSIGNMENT_REASON_REQUIRED");
+    const reference = collection.doc();
+    await reference.set(record);
+    const verification = await reference.get();
+    if (!verification.exists) throw new Error("WRITE_VERIFICATION_FAILED");
+    return { id: reference.id, ...record };
+  }
+
+  /* =======================================================
      PROJECTS
   ======================================================= */
 
@@ -4374,6 +4398,10 @@
                     project.address ||
                     "Chưa có địa chỉ"
                   )}
+                </p>
+
+                <p class="sub">
+                  ${escapeHTML("Phụ trách: " + (getEmployees().find((employee) => String(employee.id) === String(project.employeeId || ""))?.name || "Chưa phân công"))}
                 </p>
 
                 ${project.latitude && project.longitude ? `
@@ -4496,7 +4524,8 @@
         ${detailRow("Tên công trình", project.name, true)}
         ${detailRow("Mã công trình", project.code)}
         ${detailRow("Trạng thái", project.status || "Chuẩn bị")}
-        ${detailRow("Khách hàng", project.customer, true)}
+        ${detailRow("Khách hàng", getCustomers().find((item) => String(item.id) === String(project.customerId || ""))?.name || project.customer, true)}
+        ${detailRow("Nhân sự phụ trách", getEmployees().find((item) => String(item.id) === String(project.employeeId || ""))?.name || "Chưa phân công", true)}
         ${detailRow("Địa chỉ công trình", project.address, true)}
         ${detailRow("Ngày bắt đầu", project.startDate ? formatDate(project.startDate) : "")}
         ${detailRow("Vị trí GPS", hasLocation ? `${project.latitude}, ${project.longitude}` : "Chưa ghim vị trí")}
@@ -4597,14 +4626,26 @@
 
         <label>
           Khách hàng
+          <select id="modalProjectCustomerId">
+            <option value="">-- Chọn khách hàng --</option>
+            ${getCustomers().map((customer) => `<option value="${escapeHTML(customer.id)}" ${String(project?.customerId || "") === String(customer.id) ? "selected" : ""}>${escapeHTML(customer.name || "Khách hàng chưa đặt tên")}</option>`).join("")}
+            ${project?.customer && !project?.customerId ? `<option value="" disabled>Dữ liệu cũ chưa liên kết: ${escapeHTML(project.customer)}</option>` : ""}
+          </select>
+          ${project?.customer && !project?.customerId ? `<small style="display:block;color:#7a6a4f;margin-top:5px;">Tên cũ được giữ nguyên; không tự ghép theo tên. Chỉ chọn khách hàng khi đã xác minh.</small>` : ""}
+        </label>
 
-          <input
-            id="modalProjectCustomer"
-            type="text"
-            placeholder="Tên khách hàng"
-            value="${escapeHTML(project?.customer || "")}"
-          >
+        <label>
+          Nhân sự phụ trách
+          <select id="modalProjectEmployeeId">
+            <option value="">-- Chưa phân công --</option>
+            ${getEmployees().map((employee) => `<option value="${escapeHTML(employee.id)}" ${String(project?.employeeId || "") === String(employee.id) ? "selected" : ""}>${escapeHTML(employee.name || "Nhân sự chưa đặt tên")}${employee.position ? " — " + escapeHTML(employee.position) : ""}</option>`).join("")}
+          </select>
+        </label>
 
+        <label class="full">
+          Lý do đổi người phụ trách
+          <textarea id="modalProjectAssignmentReason" placeholder="Bắt buộc nhập nếu thay đổi nhân sự phụ trách"></textarea>
+          <small style="display:block;color:#66756d;margin-top:5px;">Chỉ bắt buộc khi thay đổi người phụ trách; lịch sử mỗi lần đổi được lưu thành bản ghi mới.</small>
         </label>
 
         <label class="full">
@@ -4960,10 +5001,18 @@
           ?.value
           .trim() || "",
 
+      customerId:
+        $("#modalProjectCustomerId")?.value || "",
+
       customer:
-        $("#modalProjectCustomer")
-          ?.value
-          .trim() || "",
+        (() => {
+          const selectedId = $("#modalProjectCustomerId")?.value || "";
+          const selectedCustomer = getCustomers().find((item) => String(item.id) === String(selectedId));
+          return selectedCustomer?.name || (existingProject?.customer || "");
+        })(),
+
+      employeeId:
+        $("#modalProjectEmployeeId")?.value || "",
 
       address:
         $("#modalProjectAddress")
@@ -4995,6 +5044,16 @@
           .trim() || ""
 
     };
+
+    const oldEmployeeId = String(existingProject?.employeeId || "");
+    const newEmployeeId = String(data.employeeId || "");
+    const assignmentChanged = Boolean(existingProject && oldEmployeeId !== newEmployeeId);
+    const assignmentReason = $("#modalProjectAssignmentReason")?.value.trim() || "";
+    if (assignmentChanged && !assignmentReason) {
+      showToast("Vui lòng nhập lý do đổi người phụ trách.");
+      $("#modalProjectAssignmentReason")?.focus();
+      return;
+    }
 
     const localProject =
       modalEditId && existingProject
@@ -5037,6 +5096,20 @@
           authUser,
           !modalEditId
         );
+
+      if (assignmentChanged) {
+        try {
+          await writeProjectAssignmentHistory(savedProject, oldEmployeeId, newEmployeeId, assignmentReason, authUser);
+        } catch (historyError) {
+          console.error("GROVA DOCUMENT: assignment history write failed after project save.", historyError);
+          setProjectsCache([...projects.filter((item) => item.id !== savedProject.id), savedProject]);
+          writeProjectCache(authUser.uid, projectsCache);
+          closeModal();
+          renderProjectViews();
+          showToast("Đã lưu công trình nhưng chưa ghi được lịch sử đổi người phụ trách. Vui lòng báo Admin kiểm tra quyền Firestore.");
+          return;
+        }
+      }
 
       setProjectsCache([
         ...projects.filter(
@@ -5299,18 +5372,19 @@
                 <p class="sub">
                   ${escapeHTML(
                     customer.taxCode
-                      ? "MST: " +
-                        customer.taxCode
-                      : customer.address ||
-                        "Chưa có thông tin"
+                      ? "MST: " + customer.taxCode
+                      : customer.address || "Chưa có thông tin"
                   )}
+                </p>
+                <p class="sub">
+                  ${getProjects().filter((project) => String(project.customerId || "") === String(customer.id)).length} công trình đã liên kết
                 </p>
 
               </div>
 
               <div class="data-actions">
 
-                ${hasPermission("customers", "edit") ? `
+                ${isAdminUser() ? `
                 <button
                   type="button"
                   class="small-btn"
@@ -5321,7 +5395,7 @@
                 </button>
                 ` : ""}
 
-                ${hasPermission("customers", "delete") ? `
+                ${isAdminUser() ? `
                 <button
                   type="button"
                   class="small-btn delete"
@@ -5344,24 +5418,11 @@
 
   function openCustomerModal(id = null) {
 
-    const requiredAction = id ? "edit" : "create";
-    if (!hasPermission("customers", requiredAction)) {
-      showToast(
-        id
-          ? "Bạn không có quyền sửa khách hàng."
-          : "Bạn không có quyền thêm khách hàng."
-      );
+    if (!isAdminUser()) {
+      showToast("Chỉ Admin được quản lý dữ liệu này.");
       return;
     }
 
-    if (id && !hasPermission("customers", "edit")) {
-      showToast("Bạn không có quyền sửa khách hàng.");
-      return;
-    }
-    if (!id && !hasPermission("customers", "create")) {
-      showToast("Bạn không có quyền thêm khách hàng.");
-      return;
-    }
 
     modalMode = "customer";
 
@@ -5477,18 +5538,9 @@
 
   async function saveCustomer() {
 
-    if (!hasPermission("customers", modalEditId ? "edit" : "create")) {
-      showToast(
-        modalEditId
-          ? "Bạn không có quyền sửa khách hàng."
-          : "Bạn không có quyền thêm khách hàng."
-      );
+    if (!isAdminUser()) {
+      showToast("Chỉ Admin được quản lý khách hàng.");
       closeModal();
-      return;
-    }
-
-    if (!hasPermission("customers", modalEditId ? "edit" : "create")) {
-      showToast(modalEditId ? "Bạn không có quyền sửa khách hàng." : "Bạn không có quyền thêm khách hàng.");
       return;
     }
 
@@ -5628,16 +5680,10 @@
         error
       );
 
-      if (
-        error &&
-        error.message ===
-          "AUTH_REQUIRED"
-      ) {
-
-        showToast(
-          "Chưa đăng nhập. Không thể lưu khách hàng."
-        );
-
+      if (error && error.message === "AUTH_REQUIRED") {
+        showToast("Chưa đăng nhập. Không thể lưu khách hàng.");
+      } else if (error && error.message === "ADMIN_ONLY") {
+        showToast("Chỉ Admin được quản lý khách hàng.");
       } else {
 
         showToast(
@@ -5656,8 +5702,8 @@
 
   async function deleteCustomer(id) {
 
-    if (!hasPermission("customers", "delete")) {
-      showToast("Bạn không có quyền xóa khách hàng.");
+    if (!isAdminUser()) {
+      showToast("Chỉ Admin được quản lý khách hàng.");
       return;
     }
 
@@ -5739,6 +5785,8 @@
           "Chưa đăng nhập. Không thể xóa khách hàng."
         );
 
+      } else if (error && error.message === "ADMIN_ONLY") {
+        showToast("Chỉ Admin được quản lý khách hàng.");
       } else {
 
         showToast(
@@ -5862,7 +5910,7 @@
 
               <div class="data-actions">
 
-                ${hasPermission("employees", "edit") ? `
+                ${isAdminUser() ? `
                 <button
                   type="button"
                   class="small-btn"
@@ -5873,7 +5921,7 @@
                 </button>
                 ` : ""}
 
-                ${hasPermission("employees", "delete") ? `
+                ${isAdminUser() ? `
                 <button
                   type="button"
                   class="small-btn delete"
@@ -5896,24 +5944,11 @@
 
   function openEmployeeModal(id = null) {
 
-    const requiredAction = id ? "edit" : "create";
-    if (!hasPermission("employees", requiredAction)) {
-      showToast(
-        id
-          ? "Bạn không có quyền sửa nhân sự."
-          : "Bạn không có quyền thêm nhân sự."
-      );
+    if (!isAdminUser()) {
+      showToast("Chỉ Admin được quản lý dữ liệu này.");
       return;
     }
 
-    if (id && !hasPermission("employees", "edit")) {
-      showToast("Bạn không có quyền sửa nhân sự.");
-      return;
-    }
-    if (!id && !hasPermission("employees", "create")) {
-      showToast("Bạn không có quyền thêm nhân sự.");
-      return;
-    }
 
     modalMode = "employee";
 
@@ -6030,18 +6065,9 @@
 
   async function saveEmployee() {
 
-    if (!hasPermission("employees", modalEditId ? "edit" : "create")) {
-      showToast(
-        modalEditId
-          ? "Bạn không có quyền sửa nhân sự."
-          : "Bạn không có quyền thêm nhân sự."
-      );
+    if (!isAdminUser()) {
+      showToast("Chỉ Admin được quản lý nhân sự.");
       closeModal();
-      return;
-    }
-
-    if (!hasPermission("employees", modalEditId ? "edit" : "create")) {
-      showToast(modalEditId ? "Bạn không có quyền sửa nhân sự." : "Bạn không có quyền thêm nhân sự.");
       return;
     }
 
@@ -6113,6 +6139,8 @@
 
       if (error && error.message === "AUTH_REQUIRED") {
         showToast("Chưa đăng nhập. Không thể lưu nhân sự.");
+      } else if (error && error.message === "ADMIN_ONLY") {
+        showToast("Chỉ Admin được quản lý nhân sự.");
       } else {
         showToast("Không thể lưu nhân sự lên hệ thống. Dữ liệu cục bộ chưa bị thay đổi.");
       }
@@ -6130,8 +6158,8 @@
 
   async function deleteEmployee(id) {
 
-    if (!hasPermission("employees", "delete")) {
-      showToast("Bạn không có quyền xóa nhân sự.");
+    if (!isAdminUser()) {
+      showToast("Chỉ Admin được quản lý nhân sự.");
       return;
     }
 
@@ -6165,6 +6193,8 @@
 
       if (error && error.message === "AUTH_REQUIRED") {
         showToast("Chưa đăng nhập. Không thể xóa nhân sự.");
+      } else if (error && error.message === "ADMIN_ONLY") {
+        showToast("Chỉ Admin được quản lý nhân sự.");
       } else {
         showToast("Không thể xóa nhân sự trên hệ thống. Dữ liệu cục bộ chưa bị thay đổi.");
       }

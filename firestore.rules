@@ -149,9 +149,7 @@ service cloud.firestore {
 
     match /customers/{customerId} {
       allow read: if hasPermission("customers", "view");
-      allow create: if hasPermission("customers", "create");
-      allow update: if hasPermission("customers", "edit");
-      allow delete: if hasPermission("customers", "delete");
+      allow create, update, delete: if isAdmin();
     }
 
     /* =====================================================
@@ -160,9 +158,27 @@ service cloud.firestore {
 
     match /employees/{employeeId} {
       allow read: if hasPermission("employees", "view");
-      allow create: if hasPermission("employees", "create");
-      allow update: if hasPermission("employees", "edit");
-      allow delete: if hasPermission("employees", "delete");
+      allow create, update, delete: if isAdmin();
+    }
+
+    /* =====================================================
+       PROJECT ASSIGNMENT HISTORY — APPEND ONLY
+       ===================================================== */
+
+    match /project_assignment_history/{recordId} {
+      allow read: if isAdmin()
+        || (hasPermission("projects", "view") && resource.data.changedBy == request.auth.uid);
+      allow create: if signedIn()
+        && isActiveUser()
+        && hasPermission("projects", "edit")
+        && request.resource.data.changedBy == request.auth.uid
+        && request.resource.data.projectId is string
+        && request.resource.data.newEmployeeId is string
+        && request.resource.data.oldEmployeeId is string
+        && request.resource.data.reason is string
+        && request.resource.data.reason.size() > 0
+        && request.resource.data.changedAt is string;
+      allow update, delete: if false;
     }
 
     /* =====================================================
