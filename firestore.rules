@@ -133,6 +133,36 @@ service cloud.firestore {
     }
 
     /* =====================================================
+       PROJECT DAILY COUNTERS — monotonic sequence per Vietnam date
+       Counter documents are never deleted or reset by application code.
+       ===================================================== */
+
+    match /project_daily_counters/{dateKey} {
+      allow read: if hasPermission("projects", "create");
+      allow create: if hasPermission("projects", "create")
+        && request.resource.data.keys().hasOnly([
+          "dateKey", "current", "updatedAt", "updatedBy", "counterType"
+        ])
+        && request.resource.data.dateKey == dateKey
+        && dateKey.matches('^[0-9]{8}$')
+        && request.resource.data.current is int
+        && request.resource.data.current == 1
+        && request.resource.data.updatedBy == request.auth.uid
+        && request.resource.data.counterType == "project_daily_sequence";
+      allow update: if hasPermission("projects", "create")
+        && request.resource.data.keys().hasOnly([
+          "dateKey", "current", "updatedAt", "updatedBy", "counterType"
+        ])
+        && request.resource.data.dateKey == dateKey
+        && dateKey.matches('^[0-9]{8}$')
+        && request.resource.data.current is int
+        && request.resource.data.current == resource.data.current + 1
+        && request.resource.data.updatedBy == request.auth.uid
+        && request.resource.data.counterType == "project_daily_sequence";
+      allow delete: if false;
+    }
+
+    /* =====================================================
        PROJECTS
        ===================================================== */
 

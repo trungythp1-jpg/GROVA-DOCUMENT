@@ -1228,6 +1228,65 @@
 
   }
 
+  function getVietnamDateKey(date = new Date()) {
+    const parts = new Intl.DateTimeFormat("en-GB", {
+      timeZone: "Asia/Ho_Chi_Minh",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit"
+    }).formatToParts(date);
+    const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+    return `${values.year}${values.month}${values.day}`;
+  }
+
+  function formatProjectCode(dateKey, sequence) {
+    return `CT-${dateKey}-${String(sequence).padStart(3, "0")}`;
+  }
+
+  async function createCloudProjectWithDailyCode(project, user) {
+    if (!hasPermission("projects", "create")) {
+      throw new Error("PERMISSION_DENIED");
+    }
+    if (!user) throw new Error("AUTH_REQUIRED");
+    if (!initializeFirestore()) throw new Error("FIRESTORE_UNAVAILABLE");
+
+    await waitForFirestore();
+    const projectsCollection = getProjectsCollection();
+    if (!projectsCollection) throw new Error("FIRESTORE_UNAVAILABLE");
+
+    // Freeze the date key for this save attempt so a midnight boundary cannot
+    // make the counter path and displayed code disagree.
+    const dateKey = getVietnamDateKey(new Date());
+    const counterRef = firestoreDb.collection("project_daily_counters").doc(dateKey);
+    const projectRef = projectsCollection.doc(String(project.id));
+
+    const created = await firestoreDb.runTransaction(async (transaction) => {
+      const counterSnapshot = await transaction.get(counterRef);
+      const current = counterSnapshot.exists
+        ? Math.max(0, Number(counterSnapshot.data()?.current) || 0)
+        : 0;
+      const next = current + 1;
+      const code = formatProjectCode(dateKey, next);
+      const projectWithCode = { ...project, code };
+      const data = buildProjectData(projectWithCode, user, true);
+
+      transaction.set(counterRef, {
+        dateKey,
+        current: next,
+        updatedAt: nowISO(),
+        updatedBy: String(user.uid || ""),
+        counterType: "project_daily_sequence"
+      }, { merge: true });
+      transaction.set(projectRef, data);
+
+      return { ...projectWithCode, ...data };
+    });
+
+    const verification = await projectRef.get();
+    if (!verification.exists) throw new Error("WRITE_VERIFICATION_FAILED");
+    return mapFirestoreProject(verification);
+  }
+
   async function deleteCloudProject(id, user) {
 
     if (!hasPermission("projects", "delete")) {
@@ -4618,8 +4677,10 @@
           <input
             id="modalProjectCode"
             type="text"
-            placeholder="CT-001"
-            value="${escapeHTML(project?.code || "")}"
+            placeholder="${project ? "Mã đã cấp" : "Tự động cấp khi lưu"}"
+            value="${escapeHTML(project?.code || "")}" 
+            readonly
+            aria-readonly="true"
           >
 
         </label>
@@ -4997,9 +5058,7 @@
       name,
 
       code:
-        $("#modalProjectCode")
-          ?.value
-          .trim() || "",
+        existingProject?.code || "",
 
       customerId:
         $("#modalProjectCustomerId")?.value || "",
@@ -5090,12 +5149,9 @@
 
       }
 
-      const savedProject =
-        await writeCloudProject(
-          localProject,
-          authUser,
-          !modalEditId
-        );
+      const savedProject = modalEditId
+        ? await writeCloudProject(localProject, authUser, false)
+        : await createCloudProjectWithDailyCode(localProject, authUser);
 
       if (assignmentChanged) {
         try {
