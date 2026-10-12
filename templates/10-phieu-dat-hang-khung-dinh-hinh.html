@@ -23,7 +23,7 @@ select{flex:1;min-height:30px}
 th{background:#eaf0f4}
 td.tech input{background:#fbfcfd}
 #totalHeight{font-weight:700;background:#edf2f5!important}
-.note-field textarea{min-height:58px}
+.note-field textarea{min-height:58px;overflow:hidden;white-space:pre-wrap;overflow-wrap:anywhere}
 .signature-title{font-size:10.5pt}
 @media screen and (max-width:800px){.line-field{flex-wrap:wrap}.line-field label{white-space:normal}.inline-contract{margin-left:0}.docno-input{max-width:65vw}.section-heading input{width:100%;display:block;margin-top:5px}.contact-grid .wide{overflow-wrap:anywhere}}
 .toolbar .primary{background:#fff;color:#111}
@@ -43,7 +43,7 @@ input:focus,textarea:focus,select:focus{outline:1px solid #aaa;background:#fff}
 .docno-input{width:210px;text-align:left}
 .tech input{text-align:center}
 .note-field{margin-top:10px}
-.note-field textarea{width:100%;min-height:48px;border:1px solid #555;padding:5px;resize:vertical}
+.note-field textarea{display:block;width:100%;min-height:58px;height:58px;box-sizing:border-box;border:1px solid #555;padding:5px;resize:vertical;overflow:hidden;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.25}
 .company-static{padding:4px 6px;border-bottom:1px solid var(--line)}
 .field-lines{display:grid;grid-template-columns:1fr;gap:5px;margin:8px 0 14px}
 .line-field{display:flex;align-items:baseline;gap:4px;min-width:0}
@@ -87,7 +87,7 @@ td.label-cell{overflow-wrap:anywhere}
  th,td{padding:2px 4px!important}
  td.tech input{min-height:19px!important;height:19px!important;padding:1px 2px!important}
  .note-field{margin-top:4px!important}
- .note-field textarea{min-height:24px!important;height:24px!important;padding:2px!important}
+ .note-field textarea{min-height:0!important;height:auto!important;max-height:none!important;padding:3px!important;overflow:visible!important;white-space:pre-wrap!important;overflow-wrap:anywhere!important;resize:none!important}
  .sign-date{margin:5px 0 3px!important}
  .signatures{gap:10px!important;margin-top:2px!important}
  .signature-space{height:24px!important}
@@ -161,6 +161,23 @@ td.label-cell{overflow-wrap:anywhere}
 </main>
 <script>
 (function(){
+  const notes = document.getElementById("notes");
+  function resizeNotes(){
+    if(!notes) return;
+    notes.style.height = "auto";
+    const computed = window.getComputedStyle(notes);
+    const lineHeight = parseFloat(computed.lineHeight) || 16;
+    const minHeight = Math.max(58, lineHeight * 3 + 10);
+    notes.style.height = Math.max(minHeight, notes.scrollHeight + 2) + "px";
+  }
+  if(notes){
+    notes.addEventListener("input", resizeNotes);
+    notes.addEventListener("change", resizeNotes);
+    window.addEventListener("beforeprint", resizeNotes);
+    window.addEventListener("afterprint", resizeNotes);
+    resizeNotes();
+  }
+
   const floorInput = document.getElementById("floorCount");
   const tbody = document.getElementById("specRows");
   const ohRow = document.getElementById("ohRow");
@@ -242,6 +259,7 @@ function resetForm(){
     else input.value="";
   });
   document.getElementById("department").value="";
+  const notes=document.getElementById("notes"); if(notes){notes.value=""; notes.style.height="auto";}
   document.getElementById("floorCount").dispatchEvent(new Event("change"));
   document.getElementById("pitHeight").value="";
   document.getElementById("totalHeight").value="";
