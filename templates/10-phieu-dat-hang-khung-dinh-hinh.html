@@ -158,8 +158,21 @@ td.label-cell{overflow-wrap:anywhere}
     });
     ohRow.cells[0].textContent=`3.${floorNum+1}`;
   }
-  floorInput.addEventListener("change",floorRows);
-  floorInput.addEventListener("input",floorRows);
+  // Mobile Safari fires input while the user is clearing/replacing the value.
+  // Do not restore "1" while the field is temporarily empty; allow full replacement.
+  floorInput.addEventListener("input",function(){
+    if(floorInput.value.trim()==="") return;
+    const n=Number(floorInput.value);
+    if(Number.isInteger(n) && n>=1 && n<=40) floorRows();
+  });
+  floorInput.addEventListener("change",function(){
+    if(floorInput.value.trim()==="") floorInput.value="1";
+    floorRows();
+  });
+  floorInput.addEventListener("blur",function(){
+    if(floorInput.value.trim()==="") floorInput.value="1";
+    floorRows();
+  });
   floorRows();
 })();
 function resetForm(){
