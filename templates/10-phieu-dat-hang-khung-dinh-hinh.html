@@ -68,11 +68,29 @@ td.label-cell{overflow-wrap:anywhere}
 .signature-space{height:55px}
 .small-note{font-size:9pt;color:#555}
 @media print{
- @page{size:A4 portrait;margin:0}
- html,body{width:210mm;margin:0!important;padding:0!important;background:#fff!important}
+ @page{size:A4 portrait;margin:6mm}
+ html,body{width:auto!important;min-height:0!important;margin:0!important;padding:0!important;background:#fff!important;font-size:9pt!important}
  .toolbar{display:none!important}
- .sheet{width:210mm;min-height:297mm;margin:0;padding:12mm 14mm 13mm;box-shadow:none;font-size:11pt}
- input,textarea{outline:none!important;background:transparent!important}
+ .sheet{width:100%!important;min-height:0!important;margin:0!important;padding:0!important;border-top:2px solid var(--accent)!important;box-shadow:none!important;font-size:9pt!important;line-height:1.08!important}
+ .header{gap:1px!important}
+ .company{font-size:10pt!important}
+ .contact-grid{margin-top:2px!important}
+ .contact-grid div{padding:2px 4px!important;min-height:0!important}
+ h1{font-size:13pt!important;margin:5px 0 2px!important}
+ .document-no{margin:0 0 4px!important}
+ .field-lines{gap:2px!important;margin:3px 0 5px!important}
+ .line-field{gap:3px!important}
+ input,textarea,select{font-size:9pt!important;padding:0 2px!important;outline:none!important;background:transparent!important}
+ .docno-input{width:125px!important}
+ .section-heading{margin:4px 0 3px!important;padding:3px 5px!important}
+ table{font-size:8.5pt!important;line-height:1.05!important}
+ th,td{padding:2px 4px!important}
+ td.tech input{min-height:19px!important;height:19px!important;padding:1px 2px!important}
+ .note-field{margin-top:4px!important}
+ .note-field textarea{min-height:24px!important;height:24px!important;padding:2px!important}
+ .sign-date{margin:5px 0 3px!important}
+ .signatures{gap:10px!important;margin-top:2px!important}
+ .signature-space{height:24px!important}
  tr,th,td,.signatures{break-inside:avoid;page-break-inside:avoid}
 }
 @media screen and (max-width:800px){
@@ -83,7 +101,7 @@ td.label-cell{overflow-wrap:anywhere}
 </head>
 <body>
 <div class="toolbar">
-  <button class="primary" type="button" onclick="updateFormDateAndPrint()">Xuất PDF / In</button>
+  <button class="primary" type="button" onclick="document.getElementById('signDay').value=new Date().getDate();document.getElementById('signMonth').value=new Date().getMonth()+1;document.getElementById('signYear').value=new Date().getFullYear();window.print()">Xuất PDF / In</button>
   <button class="secondary" type="button" onclick="resetForm()">Xóa nội dung nhập</button>
 </div>
 <main class="sheet" id="printSheet">
@@ -152,7 +170,7 @@ td.label-cell{overflow-wrap:anywhere}
     const pitText=pitInput.value.trim();
     const floorInputs=Array.from(tbody.querySelectorAll("[data-floor-row] .tech input"));
     if(!pitText || floorInputs.length===0 || floorInputs.some(input=>input.value.trim()==="")){totalHeight.value="";return;}
-    const texts=[pitText,...floorInputs.map(input=>input.value.trim())];
+    const texts=[pitText,floorInputs.map(input=>input.value.trim())];
     if(texts.some(value=>!/^\d+(?:[.,]\d+)?$/.test(value))){totalHeight.value="";return;}
     const sum=texts.reduce((total,value)=>total+Number(value.replace(",",".")),0);
     totalHeight.value=Number.isFinite(sum)?String(sum):"";
@@ -215,15 +233,7 @@ td.label-cell{overflow-wrap:anywhere}
   updateDate();
   updateTotalHeight();
   window.addEventListener("beforeprint",updateDate);
-  document.addEventListener("visibilitychange",function(){if(!document.hidden) updateDate();});
 })();
-function updateFormDateAndPrint(){
-  const now=new Date();
-  document.getElementById("signDay").value=String(now.getDate());
-  document.getElementById("signMonth").value=String(now.getMonth()+1);
-  document.getElementById("signYear").value=String(now.getFullYear());
-  window.print();
-}
 function resetForm(){
   if(!confirm("Xóa toàn bộ nội dung đã nhập trong phiếu này?")) return;
   document.querySelectorAll("#printSheet input").forEach(input=>{
