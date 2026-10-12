@@ -5,11 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Phiếu đặt hàng khung định hình</title>
 <style>
-:root{--ink:#171717;--line:#222}
+:root{--ink:#17212b;--line:#394653;--muted:#64748b;--accent:#1f3a4d;--soft:#f3f6f8}
 *{box-sizing:border-box}
 body{margin:0;background:#ececec;color:var(--ink);font-family:"Times New Roman",serif}
 .toolbar{position:sticky;top:0;z-index:10;background:#202020;color:#fff;padding:10px 14px;display:flex;gap:10px;align-items:center;justify-content:center}
-.toolbar button{border:0;border-radius:6px;padding:10px 16px;font-weight:700;cursor:pointer}
+.toolbar button{border:0;border-radius:6px;padding:10px 16px;font-weight:700;cursor:pointer;min-height:42px}
+.toolbar .primary{background:#e8eef2;color:#142633}
+.toolbar .secondary{background:#46545f;color:#fff}
+.sheet{border-top:5px solid var(--accent)}
+.contact-grid{border-color:#aab5be}
+.contact-grid div{border-color:#aab5be}
+h1{letter-spacing:.35px;color:#17212b}
+.document-no{margin-bottom:12px}
+input,textarea,select{border-bottom:1px solid #8a969f}
+select{flex:1;min-height:30px}
+.section-heading{padding:6px 8px;background:var(--soft);border-left:3px solid var(--accent)}
+th{background:#eaf0f4}
+td.tech input{background:#fbfcfd}
+#totalHeight{font-weight:700;background:#edf2f5!important}
+.note-field textarea{min-height:58px}
+.signature-title{font-size:10.5pt}
+@media screen and (max-width:800px){.line-field{flex-wrap:wrap}.line-field label{white-space:normal}.inline-contract{margin-left:0}.docno-input{max-width:65vw}.section-heading input{width:100%;display:block;margin-top:5px}.contact-grid .wide{overflow-wrap:anywhere}}
 .toolbar .primary{background:#fff;color:#111}
 .toolbar .secondary{background:#4a4a4a;color:#fff}
 .sheet{width:210mm;min-height:297mm;margin:18px auto;padding:12mm 14mm 13mm;background:#fff;box-shadow:0 2px 12px #0002;font-size:11pt;line-height:1.25}
@@ -43,7 +59,7 @@ th:first-child,td:first-child{width:9%;text-align:center}
 th:nth-child(2),td:nth-child(2){width:57%}
 th:nth-child(3),td:nth-child(3){width:34%}
 td.tech{padding:0}
-td.tech input{width:100%;height:100%;min-height:25px;border:0;padding:4px;text-align:center}
+td.tech input{width:100%;height:100%;min-height:30px;border:0;padding:5px;text-align:center;font-variant-numeric:tabular-nums}
 td.label-cell{overflow-wrap:anywhere}
 .subrow td:nth-child(2){padding-left:12px}
 .sign-date{text-align:right;font-style:italic;margin:17px 0 12px}
@@ -105,12 +121,12 @@ td.label-cell{overflow-wrap:anywhere}
       <tr><td>2.</td><td class="label-cell">Kích thước lọt lòng khung thép (Rộng × sâu, MM)</td><td class="tech"><input aria-label="Kích thước lọt lòng"></td></tr>
       <tr><td>3.</td><td class="label-cell">Tổng chiều cao (MM)</td><td class="tech"><input id="totalHeight" aria-label="Tổng chiều cao (MM)" readonly></td></tr>
       <tr><td>3.1</td><td class="label-cell subrow">Chiều cao Pit (MM)</td><td class="tech"><input id="pitHeight" inputmode="numeric" aria-label="Chiều cao Pit (MM)"></td></tr>
-      <tr data-floor-row="1"><td>3.2</td><td class="label-cell">Chiều cao tầng 1</td><td class="tech"><input aria-label="Chiều cao tầng 1"></td></tr>
-      <tr data-floor-row="2"><td>3.3</td><td class="label-cell">Chiều cao tầng 2</td><td class="tech"><input aria-label="Chiều cao tầng 2"></td></tr>
-      <tr data-floor-row="3"><td>3.4</td><td class="label-cell">Chiều cao tầng 3</td><td class="tech"><input aria-label="Chiều cao tầng 3"></td></tr>
-      <tr data-floor-row="4"><td>3.5</td><td class="label-cell">Chiều cao tầng 4</td><td class="tech"><input aria-label="Chiều cao tầng 4"></td></tr>
-      <tr data-floor-row="5"><td>3.6</td><td class="label-cell">Chiều cao tầng 5</td><td class="tech"><input aria-label="Chiều cao tầng 5"></td></tr>
-      <tr data-floor-row="6"><td>3.7</td><td class="label-cell">Chiều cao tầng 6</td><td class="tech"><input aria-label="Chiều cao tầng 6"></td></tr>
+      <tr data-floor-row="1"><td>3.2</td><td class="label-cell">Chiều cao tầng 1 (MM)</td><td class="tech"><input aria-label="Chiều cao tầng 1 (MM)"></td></tr>
+      <tr data-floor-row="2"><td>3.3</td><td class="label-cell">Chiều cao tầng 2 (MM)</td><td class="tech"><input aria-label="Chiều cao tầng 2 (MM)"></td></tr>
+      <tr data-floor-row="3"><td>3.4</td><td class="label-cell">Chiều cao tầng 3 (MM)</td><td class="tech"><input aria-label="Chiều cao tầng 3 (MM)"></td></tr>
+      <tr data-floor-row="4"><td>3.5</td><td class="label-cell">Chiều cao tầng 4 (MM)</td><td class="tech"><input aria-label="Chiều cao tầng 4 (MM)"></td></tr>
+      <tr data-floor-row="5"><td>3.6</td><td class="label-cell">Chiều cao tầng 5 (MM)</td><td class="tech"><input aria-label="Chiều cao tầng 5 (MM)"></td></tr>
+      <tr data-floor-row="6"><td>3.7</td><td class="label-cell">Chiều cao tầng 6 (MM)</td><td class="tech"><input aria-label="Chiều cao tầng 6 (MM)"></td></tr>
       <tr id="ohRow"><td>3.8</td><td class="label-cell">Chiều cao OH (MM)</td><td class="tech"><input inputmode="numeric" aria-label="Chiều cao OH (MM)"></td></tr>
       <tr><td>4.</td><td class="label-cell">Sản xuất thanh kê bệ máy (động cơ đặt trên khung) — Có/không</td><td class="tech"><input aria-label="Thanh kê bệ máy"></td></tr>
       <tr><td>5.</td><td class="label-cell">Sản xuất thanh thi công (móc treo)</td><td class="tech"><input aria-label="Thanh thi công móc treo"></td></tr>
@@ -133,13 +149,13 @@ td.label-cell{overflow-wrap:anywhere}
   const pitInput = document.getElementById("pitHeight");
   const totalHeight = document.getElementById("totalHeight");
   function updateTotalHeight(){
-    const count = Number.parseInt(floorInput.value,10);
-    const pitText = pitInput.value.trim();
-    const floorInputs = [tbody.querySelectorAll("[data-floor-row] .tech input")];
-    if(!pitText || floorInputs.length !== count || floorInputs.some(input=>input.value.trim()==="")){ totalHeight.value=""; return; }
-    const values=[pitText,floorInputs.map(input=>input.value.trim())];
-    if(values.some(value=>!/^\d+(?:[.,]\d+)?$/.test(value))){ totalHeight.value=""; return; }
-    totalHeight.value=String(values.reduce((sum,value)=>sum+Number(value.replace(",",".")),0));
+    const pitText=pitInput.value.trim();
+    const floorInputs=Array.from(tbody.querySelectorAll("[data-floor-row] .tech input"));
+    if(!pitText || floorInputs.length===0 || floorInputs.some(input=>input.value.trim()==="")){totalHeight.value="";return;}
+    const texts=[pitText,...floorInputs.map(input=>input.value.trim())];
+    if(texts.some(value=>!/^\d+(?:[.,]\d+)?$/.test(value))){totalHeight.value="";return;}
+    const sum=texts.reduce((total,value)=>total+Number(value.replace(",",".")),0);
+    totalHeight.value=Number.isFinite(sum)?String(sum):"";
   }
   function updateDate(){
     const now=new Date();
@@ -158,7 +174,7 @@ td.label-cell{overflow-wrap:anywhere}
       const tr=document.createElement("tr");
       tr.dataset.floorRow=String(floor);
       const num=document.createElement("td"); num.textContent=`3.${floor+1}`;
-      const label=document.createElement("td"); label.className="label-cell"; label.textContent=`Chiều cao tầng ${floor}`;
+      const label=document.createElement("td"); label.className="label-cell"; label.textContent=`Chiều cao tầng ${floor} (MM)`;
       const tech=document.createElement("td"); tech.className="tech";
       const input=document.createElement("input"); input.type="text"; input.inputMode="numeric"; input.setAttribute("aria-label",`Chiều cao tầng ${floor} (MM)`); input.addEventListener("input",updateTotalHeight);
       tech.appendChild(input); tr.append(num,label,tech); frag.appendChild(tr);
@@ -188,16 +204,17 @@ td.label-cell{overflow-wrap:anywhere}
     if(Number.isInteger(n) && n>=1 && n<=40) floorRows();
   });
   floorInput.addEventListener("change",function(){
-    if(floorInput.value.trim()==="") floorInput.value="1";
+    if(floorInput.value.trim()==="") floorInput.value="6";
     floorRows();
   });
   floorInput.addEventListener("blur",function(){
-    if(floorInput.value.trim()==="") floorInput.value="1";
+    if(floorInput.value.trim()==="") floorInput.value="6";
     floorRows();
   });
   floorRows();
   updateDate();
   updateTotalHeight();
+  window.addEventListener("beforeprint",updateDate);
 })();
 function resetForm(){
   if(!confirm("Xóa toàn bộ nội dung đã nhập trong phiếu này?")) return;
@@ -206,6 +223,7 @@ function resetForm(){
     else if(input.id==="signYear") input.value=String(new Date().getFullYear());
     else input.value="";
   });
+  document.getElementById("department").value="";
   document.getElementById("floorCount").dispatchEvent(new Event("change"));
   document.getElementById("pitHeight").value="";
   document.getElementById("totalHeight").value="";
