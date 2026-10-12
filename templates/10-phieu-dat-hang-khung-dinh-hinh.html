@@ -170,7 +170,7 @@ td.label-cell{overflow-wrap:anywhere}
     const pitText=pitInput.value.trim();
     const floorInputs=Array.from(tbody.querySelectorAll("[data-floor-row] .tech input"));
     if(!pitText || floorInputs.length===0 || floorInputs.some(input=>input.value.trim()==="")){totalHeight.value="";return;}
-    const texts=[pitText,floorInputs.map(input=>input.value.trim())];
+    const texts=[pitText,...floorInputs.map(input=>input.value.trim())];
     if(texts.some(value=>!/^\d+(?:[.,]\d+)?$/.test(value))){totalHeight.value="";return;}
     const sum=texts.reduce((total,value)=>total+Number(value.replace(",",".")),0);
     totalHeight.value=Number.isFinite(sum)?String(sum):"";
