@@ -83,7 +83,7 @@ td.label-cell{overflow-wrap:anywhere}
 </head>
 <body>
 <div class="toolbar">
-  <button class="primary" type="button" onclick="window.print()">Xuất PDF / In</button>
+  <button class="primary" type="button" onclick="updateFormDateAndPrint()">Xuất PDF / In</button>
   <button class="secondary" type="button" onclick="resetForm()">Xóa nội dung nhập</button>
 </div>
 <main class="sheet" id="printSheet">
@@ -215,7 +215,15 @@ td.label-cell{overflow-wrap:anywhere}
   updateDate();
   updateTotalHeight();
   window.addEventListener("beforeprint",updateDate);
+  document.addEventListener("visibilitychange",function(){if(!document.hidden) updateDate();});
 })();
+function updateFormDateAndPrint(){
+  const now=new Date();
+  document.getElementById("signDay").value=String(now.getDate());
+  document.getElementById("signMonth").value=String(now.getMonth()+1);
+  document.getElementById("signYear").value=String(now.getFullYear());
+  window.print();
+}
 function resetForm(){
   if(!confirm("Xóa toàn bộ nội dung đã nhập trong phiếu này?")) return;
   document.querySelectorAll("#printSheet input").forEach(input=>{
