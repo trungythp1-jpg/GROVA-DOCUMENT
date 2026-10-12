@@ -319,6 +319,20 @@ window.GROVA_DATA = {
         true
     }
 
+    ,
+
+    {
+      id: "10",
+      code: "PĐHKĐH",
+      name: "Phiếu đặt hàng khung định hình",
+      title: "PHIẾU ĐẶT HÀNG KHUNG ĐỊNH HÌNH",
+      description: "Phiếu đặt hàng khung thép thang máy, tự tạo dòng chiều cao tầng theo số tầng nhập tay.",
+      category: "Thi công",
+      icon: "📐",
+      file: "./templates/10-phieu-dat-hang-khung-dinh-hinh.html",
+      enabled: true
+    }
+
   ],
 
 
