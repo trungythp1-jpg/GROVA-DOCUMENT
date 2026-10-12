@@ -135,9 +135,9 @@ td.label-cell{overflow-wrap:anywhere}
   function updateTotalHeight(){
     const count = Number.parseInt(floorInput.value,10);
     const pitText = pitInput.value.trim();
-    const floorInputs = [...tbody.querySelectorAll("[data-floor-row] .tech input")];
+    const floorInputs = [tbody.querySelectorAll("[data-floor-row] .tech input")];
     if(!pitText || floorInputs.length !== count || floorInputs.some(input=>input.value.trim()==="")){ totalHeight.value=""; return; }
-    const values=[pitText,...floorInputs.map(input=>input.value.trim())];
+    const values=[pitText,floorInputs.map(input=>input.value.trim())];
     if(values.some(value=>!/^\d+(?:[.,]\d+)?$/.test(value))){ totalHeight.value=""; return; }
     totalHeight.value=String(values.reduce((sum,value)=>sum+Number(value.replace(",",".")),0));
   }
@@ -169,7 +169,7 @@ td.label-cell{overflow-wrap:anywhere}
     updateTotalHeight();
   }
   function renumberRows(){
-    const rows=[...tbody.querySelectorAll("tr")];
+    const rows=[tbody.querySelectorAll("tr")];
     let floorNum=1;
     rows.forEach(row=>{
       if(row.hasAttribute("data-floor-row")){
