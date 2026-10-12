@@ -3988,6 +3988,26 @@
   background: #fff !important;
   box-shadow: none !important;
 }
+
+
+/* GROVA PDF/A4 NORMALIZATION — additive overrides; preserve template content */
+@media print {
+  @page { size: A4 portrait; margin: 18mm 18mm 18mm 25mm; }
+  html, body { width: auto !important; min-width: 0 !important; height: auto !important; margin: 0 !important; padding: 0 !important; background: #fff !important; color: #000 !important; overflow: visible !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  *, *::before, *::after { box-shadow: none !important; text-shadow: none !important; }
+  .no-print, .no-print *, .topbar, .toolbar, .action-bar, .editor-toolbar, .print-actions, button[data-no-print] { display: none !important; }
+  .document-wrap, .document, .content, .page, main, article { max-width: none !important; width: auto !important; min-width: 0 !important; margin-left: 0 !important; margin-right: 0 !important; overflow: visible !important; }
+  p, li { orphans: 3; widows: 3; }
+  h1, h2, h3, h4, .section-title, .doc-section-title, .article-title { break-after: avoid-page; page-break-after: avoid; }
+  table { width: 100% !important; max-width: 100% !important; border-collapse: collapse !important; break-inside: auto; page-break-inside: auto; }
+  thead { display: table-header-group; }
+  tfoot { display: table-footer-group; }
+  tr { break-inside: avoid; page-break-inside: avoid; }
+  img, svg { max-width: 100% !important; }
+  .section, .document-section, .article, .article-content { break-inside: auto; page-break-inside: auto; }
+  .signature, .signature-grid, .signature-block, .signature-box, .signature-table, .signature-company { break-inside: avoid-page; page-break-inside: avoid; }
+  input, textarea, select { color: #000 !important; background: transparent !important; }
+}
 </style>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
