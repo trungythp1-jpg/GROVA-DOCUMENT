@@ -22,8 +22,8 @@ body{margin:0;background:#ececec;color:var(--ink);font-family:"Times New Roman",
 .contact-grid .wide{grid-column:span 3;border-right:0}
 h1{text-align:center;font-size:17pt;margin:12px 0 5px;text-transform:uppercase}
 .document-no{text-align:center;font-weight:bold;font-style:italic;margin:0 0 15px}
-input,textarea{font:inherit;color:inherit;border:0;border-bottom:1px dotted #555;background:transparent;border-radius:0;min-width:0;padding:1px 3px}
-input:focus,textarea:focus{outline:1px solid #aaa;background:#fff}
+input,textarea,select{font:inherit;color:inherit;border:0;border-bottom:1px dotted #555;background:transparent;border-radius:0;min-width:0;padding:1px 3px}
+input:focus,textarea:focus,select:focus{outline:1px solid #aaa;background:#fff}
 .docno-input{width:210px;text-align:left}
 .tech input{text-align:center}
 .note-field{margin-top:10px}
@@ -85,7 +85,7 @@ td.label-cell{overflow-wrap:anywhere}
   <section class="field-lines">
     <div class="line-field"><label for="orderBy">Họ và tên người đặt hàng:</label><input id="orderBy" type="text"></div>
     <div class="line-field">
-      <label for="department">Phòng ban:</label><input id="department" type="text">
+      <label for="department">Phòng ban:</label><select id="department" aria-label="Phòng ban"><option value="">-- Chọn phòng ban --</option><option>Phòng Kinh Doanh</option><option>Phòng Kỹ Thuật</option></select>
       <label for="contractNo" class="inline-contract">Số HĐ:</label><input id="contractNo" type="text" placeholder="/HĐ" style="max-width:190px">
     </div>
     <div class="line-field"><label for="projectName">Tên công trình:</label><input id="projectName" type="text"></div>
@@ -101,17 +101,17 @@ td.label-cell{overflow-wrap:anywhere}
   <table aria-label="Bảng thông số kỹ thuật">
     <thead><tr><th>TT</th><th>NỘI DUNG</th><th>THÔNG SỐ KỸ THUẬT</th></tr></thead>
     <tbody id="specRows">
-      <tr><td>1.</td><td class="label-cell">Kích thước phủ bì khung thép (Rộng × sâu)</td><td class="tech"><input aria-label="Kích thước phủ bì"></td></tr>
-      <tr><td>2.</td><td class="label-cell">Kích thước lọt lòng khung thép (Rộng × sâu)</td><td class="tech"><input aria-label="Kích thước lọt lòng"></td></tr>
-      <tr><td>3.</td><td class="label-cell">Tổng chiều cao</td><td class="tech"><input aria-label="Tổng chiều cao"></td></tr>
-      <tr><td>3.1</td><td class="label-cell subrow">Chiều cao Pit</td><td class="tech"><input aria-label="Chiều cao Pit"></td></tr>
+      <tr><td>1.</td><td class="label-cell">Kích thước phủ bì khung thép (Rộng × sâu, MM)</td><td class="tech"><input aria-label="Kích thước phủ bì"></td></tr>
+      <tr><td>2.</td><td class="label-cell">Kích thước lọt lòng khung thép (Rộng × sâu, MM)</td><td class="tech"><input aria-label="Kích thước lọt lòng"></td></tr>
+      <tr><td>3.</td><td class="label-cell">Tổng chiều cao (MM)</td><td class="tech"><input id="totalHeight" aria-label="Tổng chiều cao (MM)" readonly></td></tr>
+      <tr><td>3.1</td><td class="label-cell subrow">Chiều cao Pit (MM)</td><td class="tech"><input id="pitHeight" inputmode="numeric" aria-label="Chiều cao Pit (MM)"></td></tr>
       <tr data-floor-row="1"><td>3.2</td><td class="label-cell">Chiều cao tầng 1</td><td class="tech"><input aria-label="Chiều cao tầng 1"></td></tr>
       <tr data-floor-row="2"><td>3.3</td><td class="label-cell">Chiều cao tầng 2</td><td class="tech"><input aria-label="Chiều cao tầng 2"></td></tr>
       <tr data-floor-row="3"><td>3.4</td><td class="label-cell">Chiều cao tầng 3</td><td class="tech"><input aria-label="Chiều cao tầng 3"></td></tr>
       <tr data-floor-row="4"><td>3.5</td><td class="label-cell">Chiều cao tầng 4</td><td class="tech"><input aria-label="Chiều cao tầng 4"></td></tr>
       <tr data-floor-row="5"><td>3.6</td><td class="label-cell">Chiều cao tầng 5</td><td class="tech"><input aria-label="Chiều cao tầng 5"></td></tr>
       <tr data-floor-row="6"><td>3.7</td><td class="label-cell">Chiều cao tầng 6</td><td class="tech"><input aria-label="Chiều cao tầng 6"></td></tr>
-      <tr id="ohRow"><td>3.8</td><td class="label-cell">Chiều cao OH</td><td class="tech"><input aria-label="Chiều cao OH"></td></tr>
+      <tr id="ohRow"><td>3.8</td><td class="label-cell">Chiều cao OH (MM)</td><td class="tech"><input inputmode="numeric" aria-label="Chiều cao OH (MM)"></td></tr>
       <tr><td>4.</td><td class="label-cell">Sản xuất thanh kê bệ máy (động cơ đặt trên khung) — Có/không</td><td class="tech"><input aria-label="Thanh kê bệ máy"></td></tr>
       <tr><td>5.</td><td class="label-cell">Sản xuất thanh thi công (móc treo)</td><td class="tech"><input aria-label="Thanh thi công móc treo"></td></tr>
       <tr><td>6.</td><td class="label-cell">Màu sơn tĩnh điện</td><td class="tech"><input aria-label="Màu sơn tĩnh điện"></td></tr>
@@ -119,7 +119,7 @@ td.label-cell{overflow-wrap:anywhere}
     </tbody>
   </table>
   <div class="note-field"><b>Ghi chú:</b><textarea id="notes" aria-label="Ghi chú"></textarea></div>
-  <div class="sign-date">Hải Phòng, ngày <input id="signDay" type="text" style="width:32px"> tháng <input id="signMonth" type="text" style="width:32px"> năm <input id="signYear" type="text" style="width:55px" value="2026"></div>
+  <div class="sign-date">Hải Phòng, ngày <input id="signDay" type="text" style="width:32px" readonly> tháng <input id="signMonth" type="text" style="width:32px" readonly> năm <input id="signYear" type="text" style="width:55px" readonly></div>
   <div class="signatures">
     <div><div class="signature-title">Trưởng phòng kinh doanh</div><div class="signature-space"></div><input aria-label="Tên trưởng phòng kinh doanh" style="width:90%;text-align:center;border-bottom:0"></div>
     <div><div class="signature-title">Nhân viên kinh doanh</div><div class="signature-space"></div><input aria-label="Tên nhân viên kinh doanh" style="width:90%;text-align:center;border-bottom:0"></div>
@@ -130,6 +130,23 @@ td.label-cell{overflow-wrap:anywhere}
   const floorInput = document.getElementById("floorCount");
   const tbody = document.getElementById("specRows");
   const ohRow = document.getElementById("ohRow");
+  const pitInput = document.getElementById("pitHeight");
+  const totalHeight = document.getElementById("totalHeight");
+  function updateTotalHeight(){
+    const count = Number.parseInt(floorInput.value,10);
+    const pitText = pitInput.value.trim();
+    const floorInputs = [...tbody.querySelectorAll("[data-floor-row] .tech input")];
+    if(!pitText || floorInputs.length !== count || floorInputs.some(input=>input.value.trim()==="")){ totalHeight.value=""; return; }
+    const values=[pitText,...floorInputs.map(input=>input.value.trim())];
+    if(values.some(value=>!/^\d+(?:[.,]\d+)?$/.test(value))){ totalHeight.value=""; return; }
+    totalHeight.value=String(values.reduce((sum,value)=>sum+Number(value.replace(",",".")),0));
+  }
+  function updateDate(){
+    const now=new Date();
+    document.getElementById("signDay").value=String(now.getDate());
+    document.getElementById("signMonth").value=String(now.getMonth()+1);
+    document.getElementById("signYear").value=String(now.getFullYear());
+  }
   function floorRows(){
     let count = Number.parseInt(floorInput.value,10);
     if(!Number.isFinite(count)) count=1;
@@ -143,12 +160,13 @@ td.label-cell{overflow-wrap:anywhere}
       const num=document.createElement("td"); num.textContent=`3.${floor+1}`;
       const label=document.createElement("td"); label.className="label-cell"; label.textContent=`Chiều cao tầng ${floor}`;
       const tech=document.createElement("td"); tech.className="tech";
-      const input=document.createElement("input"); input.type="text"; input.setAttribute("aria-label",`Chiều cao tầng ${floor}`);
+      const input=document.createElement("input"); input.type="text"; input.inputMode="numeric"; input.setAttribute("aria-label",`Chiều cao tầng ${floor} (MM)`); input.addEventListener("input",updateTotalHeight);
       tech.appendChild(input); tr.append(num,label,tech); frag.appendChild(tr);
     }
     tbody.insertBefore(frag,ohRow);
     // Keep numbering of OH and subsequent items sequentially independent of floor count.
     renumberRows();
+    updateTotalHeight();
   }
   function renumberRows(){
     const rows=[...tbody.querySelectorAll("tr")];
@@ -163,6 +181,7 @@ td.label-cell{overflow-wrap:anywhere}
   }
   // Mobile Safari fires input while the user is clearing/replacing the value.
   // Do not restore "1" while the field is temporarily empty; allow full replacement.
+  pitInput.addEventListener("input",updateTotalHeight);
   floorInput.addEventListener("input",function(){
     if(floorInput.value.trim()==="") return;
     const n=Number(floorInput.value);
@@ -177,15 +196,22 @@ td.label-cell{overflow-wrap:anywhere}
     floorRows();
   });
   floorRows();
+  updateDate();
+  updateTotalHeight();
 })();
 function resetForm(){
   if(!confirm("Xóa toàn bộ nội dung đã nhập trong phiếu này?")) return;
   document.querySelectorAll("#printSheet input").forEach(input=>{
     if(input.id==="floorCount") input.value="6";
-    else if(input.id==="signYear") input.value="2026";
+    else if(input.id==="signYear") input.value=String(new Date().getFullYear());
     else input.value="";
   });
   document.getElementById("floorCount").dispatchEvent(new Event("change"));
+  document.getElementById("pitHeight").value="";
+  document.getElementById("totalHeight").value="";
+  document.getElementById("signDay").value=String(new Date().getDate());
+  document.getElementById("signMonth").value=String(new Date().getMonth()+1);
+  document.getElementById("signYear").value=String(new Date().getFullYear());
 }
 </script>
 </body>
