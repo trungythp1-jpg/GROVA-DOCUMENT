@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phiếu đặt hàng khung định hình</title>
+<style>
+:root{--ink:#171717;--line:#222}
+*{box-sizing:border-box}
+body{margin:0;background:#ececec;color:var(--ink);font-family:"Times New Roman",serif}
+.toolbar{position:sticky;top:0;z-index:10;background:#202020;color:#fff;padding:10px 14px;display:flex;gap:10px;align-items:center;justify-content:center}
+.toolbar button{border:0;border-radius:6px;padding:10px 16px;font-weight:700;cursor:pointer}
+.toolbar .primary{background:#fff;color:#111}
+.toolbar .secondary{background:#4a4a4a;color:#fff}
+.sheet{width:210mm;min-height:297mm;margin:18px auto;padding:12mm 14mm 13mm;background:#fff;box-shadow:0 2px 12px #0002;font-size:11pt;line-height:1.25}
+.header{display:grid;grid-template-columns:1fr;gap:4px;text-align:center}
+.company{font-size:13pt;font-weight:bold;text-transform:uppercase}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr 1fr;border:1px solid var(--line);margin-top:7px}
+.contact-grid div{padding:4px 6px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);min-height:25px}
+.contact-grid div:nth-child(3n){border-right:0}
+.contact-grid div:nth-last-child(-n+3){border-bottom:0}
+.contact-grid .wide{grid-column:span 3;border-right:0}
+h1{text-align:center;font-size:17pt;margin:12px 0 5px;text-transform:uppercase}
+.document-no{text-align:center;font-weight:bold;font-style:italic;margin:0 0 15px}
+input,textarea{font:inherit;color:inherit;border:0;border-bottom:1px dotted #555;background:transparent;border-radius:0;min-width:0;padding:1px 3px}
+input:focus,textarea:focus{outline:1px solid #aaa;background:#fff}
+.docno-input{width:210px;text-align:left}
+.field-lines{display:grid;grid-template-columns:1fr;gap:5px;margin:8px 0 14px}
+.line-field{display:flex;align-items:baseline;gap:4px;min-width:0}
+.line-field label{white-space:nowrap}
+.line-field input{flex:1;width:100%}
+.inline-contract{max-width:205px;margin-left:8px}
+.section-heading{font-weight:bold;text-transform:uppercase;margin:12px 0 7px}
+.section-heading input{width:62%}
+table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:10.5pt}
+th,td{border:1px solid var(--line);padding:4px 6px;vertical-align:middle}
+th{text-align:center;font-weight:bold}
+th:first-child,td:first-child{width:9%;text-align:center}
+th:nth-child(2),td:nth-child(2){width:57%}
+th:nth-child(3),td:nth-child(3){width:34%}
+td.tech{padding:0}
+td.tech input{width:100%;height:100%;min-height:25px;border:0;padding:4px}
+td.label-cell{overflow-wrap:anywhere}
+.subrow td:nth-child(2){padding-left:12px}
+.sign-date{text-align:right;font-style:italic;margin:17px 0 12px}
+.signatures{display:grid;grid-template-columns:1fr 1fr;text-align:center;gap:20px;margin-top:8px}
+.signature-title{font-weight:bold}
+.signature-space{height:55px}
+.small-note{font-size:9pt;color:#555}
+@media print{
+ @page{size:A4 portrait;margin:0}
+ html,body{width:210mm;margin:0!important;padding:0!important;background:#fff!important}
+ .toolbar{display:none!important}
+ .sheet{width:210mm;min-height:297mm;margin:0;padding:12mm 14mm 13mm;box-shadow:none;font-size:11pt}
+ input,textarea{outline:none!important;background:transparent!important}
+ tr,th,td,.signatures{break-inside:avoid;page-break-inside:avoid}
+}
+@media screen and (max-width:800px){
+ .sheet{width:100%;min-height:0;margin:0;padding:18px 14px;box-shadow:none}
+ .contact-grid{font-size:10pt}
+}
+</style>
+</head>
+<body>
+<div class="toolbar">
+  <button class="primary" type="button" onclick="window.print()">Xuất PDF / In</button>
+  <button class="secondary" type="button" onclick="resetForm()">Xóa nội dung nhập</button>
+</div>
+<main class="sheet" id="printSheet">
+  <header class="header">
+    <div class="company">CÔNG TY TNHH THANG MÁY ĐỨC ANH VIỆT NAM</div>
+    <div class="contact-grid">
+      <div class="wide">Địa chỉ: <input aria-label="Địa chỉ công ty" style="width:80%"></div>
+      <div>Email: <input aria-label="Email" style="width:65%"></div>
+      <div>Tel: 0225.3518163</div>
+      <div>Fax: 0225.3814859</div>
+      <div class="wide">Website: <input aria-label="Website" style="width:75%"></div>
+    </div>
+  </header>
+  <h1>Phiếu đặt hàng khung định hình</h1>
+  <p class="document-no">Số PĐH: <input id="documentNo" class="docno-input" type="text" placeholder="….. /PĐHKĐH" aria-label="Số phiếu đặt hàng nhập thủ công"></p>
+
+  <section class="field-lines">
+    <div class="line-field"><label for="orderBy">Họ và tên người đặt hàng:</label><input id="orderBy" type="text"></div>
+    <div class="line-field">
+      <label for="department">Phòng ban:</label><input id="department" type="text">
+      <label for="contractNo" class="inline-contract">Số HĐ:</label><input id="contractNo" type="text" placeholder="….. /HĐ" style="max-width:190px">
+    </div>
+    <div class="line-field"><label for="projectName">Tên công trình:</label><input id="projectName" type="text"></div>
+  </section>
+
+  <div class="section-heading">Nội dung đặt hàng khung: <input id="orderContent" type="text" aria-label="Nội dung đặt hàng khung"></div>
+
+  <div class="field-lines" style="grid-template-columns:1fr 1fr;align-items:center">
+    <div class="line-field"><label for="floorCount"><b>Số tầng nổi:</b></label><input id="floorCount" type="number" min="1" max="40" step="1" value="6" style="max-width:80px;border:1px solid #777;padding:4px"></div>
+    <div class="small-note">Nhập số tầng để tự tạo dòng chiều cao tầng.</div>
+  </div>
+
+  <table aria-label="Bảng thông số kỹ thuật">
+    <thead><tr><th>TT</th><th>NỘI DUNG</th><th>THÔNG SỐ KỸ THUẬT</th></tr></thead>
+    <tbody id="specRows">
+      <tr><td>1.</td><td class="label-cell">Kích thước phủ bì khung thép (Rộng × sâu)</td><td class="tech"><input aria-label="Kích thước phủ bì"></td></tr>
+      <tr><td>2.</td><td class="label-cell">Kích thước lọt lòng khung thép (Rộng × sâu)</td><td class="tech"><input aria-label="Kích thước lọt lòng"></td></tr>
+      <tr><td>3.</td><td class="label-cell">Tổng chiều cao</td><td class="tech"><input aria-label="Tổng chiều cao"></td></tr>
+      <tr><td>3.1</td><td class="label-cell subrow">Chiều cao Pit</td><td class="tech"><input aria-label="Chiều cao Pit"></td></tr>
+      <tr data-floor-row="1"><td>3.2</td><td class="label-cell">Chiều cao tầng 1</td><td class="tech"><input aria-label="Chiều cao tầng 1"></td></tr>
+      <tr data-floor-row="2"><td>3.3</td><td class="label-cell">Chiều cao tầng 2</td><td class="tech"><input aria-label="Chiều cao tầng 2"></td></tr>
+      <tr data-floor-row="3"><td>3.4</td><td class="label-cell">Chiều cao tầng 3</td><td class="tech"><input aria-label="Chiều cao tầng 3"></td></tr>
+      <tr data-floor-row="4"><td>3.5</td><td class="label-cell">Chiều cao tầng 4</td><td class="tech"><input aria-label="Chiều cao tầng 4"></td></tr>
+      <tr data-floor-row="5"><td>3.6</td><td class="label-cell">Chiều cao tầng 5</td><td class="tech"><input aria-label="Chiều cao tầng 5"></td></tr>
+      <tr data-floor-row="6"><td>3.7</td><td class="label-cell">Chiều cao tầng 6</td><td class="tech"><input aria-label="Chiều cao tầng 6"></td></tr>
+      <tr id="ohRow"><td>3.8</td><td class="label-cell">Chiều cao OH</td><td class="tech"><input aria-label="Chiều cao OH"></td></tr>
+      <tr><td>4.</td><td class="label-cell">Sản xuất thanh kê bệ máy (động cơ đặt trên khung) — Có/không</td><td class="tech"><input aria-label="Thanh kê bệ máy"></td></tr>
+      <tr><td>5.</td><td class="label-cell">Sản xuất thanh thi công (móc treo)</td><td class="tech"><input aria-label="Thanh thi công móc treo"></td></tr>
+      <tr><td>6.</td><td class="label-cell">Màu sơn tĩnh điện</td><td class="tech"><input aria-label="Màu sơn tĩnh điện"></td></tr>
+      <tr><td>7.</td><td class="label-cell">Yêu cầu khác (nếu có)</td><td class="tech"><input aria-label="Yêu cầu khác"></td></tr>
+    </tbody>
+  </table>
+  <div class="sign-date">Hải Phòng, ngày <input id="signDay" type="text" style="width:32px"> tháng <input id="signMonth" type="text" style="width:32px"> năm <input id="signYear" type="text" style="width:55px" value="2026"></div>
+  <div class="signatures">
+    <div><div class="signature-title">Trưởng phòng kinh doanh</div><div class="signature-space"></div><input aria-label="Tên trưởng phòng kinh doanh" style="width:90%;text-align:center;border-bottom:0"></div>
+    <div><div class="signature-title">Nhân viên kinh doanh</div><div class="signature-space"></div><input aria-label="Tên nhân viên kinh doanh" style="width:90%;text-align:center;border-bottom:0"></div>
+  </div>
+</main>
+<script>
+(function(){
+  const floorInput = document.getElementById("floorCount");
+  const tbody = document.getElementById("specRows");
+  const ohRow = document.getElementById("ohRow");
+  function floorRows(){
+    let count = Number.parseInt(floorInput.value,10);
+    if(!Number.isFinite(count)) count=1;
+    count=Math.max(1,Math.min(40,count));
+    floorInput.value=String(count);
+    tbody.querySelectorAll("[data-floor-row]").forEach(row=>row.remove());
+    const frag=document.createDocumentFragment();
+    for(let floor=1;floor<=count;floor++){
+      const tr=document.createElement("tr");
+      tr.dataset.floorRow=String(floor);
+      const num=document.createElement("td"); num.textContent=`3.${floor+1}`;
+      const label=document.createElement("td"); label.className="label-cell"; label.textContent=`Chiều cao tầng ${floor}`;
+      const tech=document.createElement("td"); tech.className="tech";
+      const input=document.createElement("input"); input.type="text"; input.setAttribute("aria-label",`Chiều cao tầng ${floor}`);
+      tech.appendChild(input); tr.append(num,label,tech); frag.appendChild(tr);
+    }
+    tbody.insertBefore(frag,ohRow);
+    // Keep numbering of OH and subsequent items sequentially independent of floor count.
+    renumberRows();
+  }
+  function renumberRows(){
+    const rows=[...tbody.querySelectorAll("tr")];
+    let floorNum=1;
+    rows.forEach(row=>{
+      if(row.hasAttribute("data-floor-row")){
+        row.cells[0].textContent=`3.${floorNum+1}`;
+        floorNum++;
+      }
+    });
+    ohRow.cells[0].textContent=`3.${floorNum+1}`;
+  }
+  floorInput.addEventListener("change",floorRows);
+  floorInput.addEventListener("input",floorRows);
+  floorRows();
+})();
+function resetForm(){
+  if(!confirm("Xóa toàn bộ nội dung đã nhập trong phiếu này?")) return;
+  document.querySelectorAll("#printSheet input").forEach(input=>{
+    if(input.id==="floorCount") input.value="6";
+    else if(input.id==="signYear") input.value="2026";
+    else input.value="";
+  });
+  document.getElementById("floorCount").dispatchEvent(new Event("change"));
+}
+</script>
+</body>
+</html>
