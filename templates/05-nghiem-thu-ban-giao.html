@@ -1146,6 +1146,43 @@
 
   </style>
 
+
+<style id="grova-native-a4-print-fix">
+@page { size: A4 portrait; margin: 0; }
+@media print {
+  html, body {
+    width: 210mm !important; min-width: 0 !important; max-width: 210mm !important;
+    height: auto !important; min-height: 0 !important;
+    margin: 0 !important; padding: 0 !important; overflow: visible !important;
+    background: #fff !important;
+  }
+  *, *::before, *::after { box-sizing: border-box !important; }
+  .topbar, .control-panel, .preview-heading, .print-btn, .back-btn,
+  #grovaPdfPreviewOverlay, .no-print, .toolbar, .actions { display: none !important; }
+  .workspace, .preview-area, .document-wrap {
+    display: block !important; width: 210mm !important; min-width: 0 !important;
+    max-width: 210mm !important; height: auto !important; min-height: 0 !important;
+    margin: 0 !important; padding: 0 !important; overflow: visible !important;
+    transform: none !important; box-shadow: none !important;
+  }
+  .document, .paper, #documentPreview, #paper, article.paper {
+    display: block !important; position: static !important;
+    width: 210mm !important; min-width: 0 !important; max-width: 210mm !important;
+    height: auto !important; min-height: 0 !important; max-height: none !important;
+    margin: 0 !important; padding: 20mm 20mm 20mm 30mm !important;
+    overflow: visible !important; transform: none !important; zoom: 1 !important;
+    box-shadow: none !important; background: #fff !important;
+  }
+  p, li, h1, h2, h3, h4 { orphans: 3; widows: 3; }
+  table { width: 100% !important; max-width: 100% !important; border-collapse: collapse; }
+  tr, img, .signature-box, .signature, .signatures {
+    break-inside: avoid; page-break-inside: avoid;
+  }
+  thead { display: table-header-group; }
+  tfoot { display: table-footer-group; }
+}
+</style>
+
 </head>
 
 
@@ -4278,8 +4315,18 @@
   }
 
   function readOfficialNumberFromUrl() {
-    // Automatic numbering is disabled. Numbers are entered manually in the form.
-    return false;
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const value = (params.get("grovaDocumentNo") || "").trim();
+      if (!value) return false;
+      window.GROVA_DOCUMENT_STATE.documentNo = value;
+      window.GROVA_DOCUMENT_STATE.isOfficial = true;
+      applyDocumentNumber(value);
+      return true;
+    } catch (error) {
+      console.warn("GROVA DOCUMENT: cannot read official number.", error);
+      return false;
+    }
   }
 
   window.GROVA_DOCUMENT_STATE.applyDocumentNumber = applyDocumentNumber;
@@ -4293,9 +4340,46 @@
   });
 
   window.GROVA_DOCUMENT_STATE.reserveOfficialNumber = async function () {
-    // Manual numbering only: never allocate or increment a document counter.
-    const current = String(window.GROVA_DOCUMENT_STATE.documentNo || "").trim();
-    return current;
+    if (window.GROVA_DOCUMENT_STATE.isOfficial && window.GROVA_DOCUMENT_STATE.documentNo) {
+      return window.GROVA_DOCUMENT_STATE.documentNo;
+    }
+
+    if (typeof firebase === "undefined") throw new Error("FIREBASE_SDK_UNAVAILABLE");
+    if (!firebase.apps.length) firebase.initializeApp(GROVA_FIREBASE_CONFIG);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const user = auth.currentUser;
+    if (!user) throw new Error("AUTH_REQUIRED");
+
+    const ref = db.collection("document_counters").doc("template_" + GROVA_TEMPLATE_ID);
+    const next = await db.runTransaction(async function (transaction) {
+      const snapshot = await transaction.get(ref);
+      const current = snapshot.exists ? Math.max(0, Number(snapshot.data().current) || 0) : 0;
+      const value = current + 1;
+      transaction.set(ref, {
+        current: value,
+        templateId: GROVA_TEMPLATE_ID,
+        documentCode: GROVA_DOCUMENT_CODE,
+        counterType: "document_type_sequence",
+        updatedAt: new Date().toISOString(),
+        updatedBy: user.uid
+      }, { merge: true });
+      return value;
+    });
+
+    const documentNo = String(next).padStart(3, "0") + "-" + GROVA_DOCUMENT_CODE;
+    window.GROVA_DOCUMENT_STATE.documentNo = documentNo;
+    window.GROVA_DOCUMENT_STATE.isOfficial = true;
+    applyDocumentNumber(documentNo);
+
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("grovaDraft");
+      url.searchParams.set("grovaDocumentNo", documentNo);
+      history.replaceState(null, "", url.toString());
+    } catch (error) {}
+
+    return documentNo;
   };
 })();
 </script>
@@ -4410,179 +4494,14 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
-async function exportDocumentPDF() {
-    const state = window.GROVA_DOCUMENT_STATE || {};
-
-    const ensurePreviewStyles = () => {
-      if (document.getElementById("grova-pdf-preview-style")) return;
-      const style = document.createElement("style");
-      style.id = "grova-pdf-preview-style";
-      style.textContent = `
-        #grovaPdfPreviewOverlay{position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:18px;box-sizing:border-box}
-        #grovaPdfPreviewModal{width:min(920px,96vw);height:min(92vh,1100px);background:#fff;border-radius:16px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 70px rgba(0,0,0,.35)}
-        #grovaPdfPreviewHeader{padding:14px 18px;border-bottom:1px solid #ddd;display:flex;align-items:center;justify-content:space-between;font-family:Arial,sans-serif}
-        #grovaPdfPreviewHeader strong{font-size:18px;color:#153d32}
-        #grovaPdfPreviewBody{flex:1;overflow:auto;background:#e9ecef;padding:18px;display:flex;justify-content:center;align-items:flex-start}
-        #grovaPdfPreviewImage{display:block;width:min(100%,794px);height:auto;background:#fff;box-shadow:0 2px 12px rgba(0,0,0,.18)}
-        #grovaPdfPreviewFooter{padding:12px 18px;border-top:1px solid #ddd;display:flex;gap:10px;justify-content:flex-end;font-family:Arial,sans-serif}
-        #grovaPdfPreviewFooter button{border:0;border-radius:9px;padding:11px 18px;font-size:15px;cursor:pointer}
-        #grovaPdfPreviewCancel{background:#eef2f0;color:#173b31}
-        #grovaPdfPreviewContinue{background:#087f5b;color:#fff}
-        #grovaPdfPreviewBusy{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.9);font-family:Arial,sans-serif;font-size:16px;color:#173b31}
-      `;
-      document.head.appendChild(style);
-    };
-
-    const renderCanvas = async () => {
-      if (typeof html2canvas === "undefined" || !window.jspdf || !window.jspdf.jsPDF) {
-        throw new Error("PDF_LIB_NOT_READY");
-      }
-      if (typeof window.updatePreview === "function") { try { window.updatePreview(); } catch (e) {} }
-      const target = document.querySelector(".document, #documentPreview, #paper, article.paper");
-      if (!target) throw new Error("DOCUMENT_TARGET_NOT_FOUND");
-
-      const oldOverflow = document.documentElement.style.overflow;
-      const oldBodyOverflow = document.body.style.overflow;
-      target.classList.add("pdf-exporting");
-      document.documentElement.style.overflow = "visible";
-      document.body.style.overflow = "visible";
-      try {
-        return await html2canvas(target, {
-          scale: 2,
-          useCORS: true,
-          allowTaint: false,
-          backgroundColor: "#ffffff",
-          logging: false,
-          imageTimeout: 15000,
-          windowWidth: Math.max(document.documentElement.clientWidth, target.scrollWidth),
-          windowHeight: Math.max(window.innerHeight, target.scrollHeight),
-          scrollX: 0,
-          scrollY: 0
-        });
-      } finally {
-        target.classList.remove("pdf-exporting");
-        document.documentElement.style.overflow = oldOverflow;
-        document.body.style.overflow = oldBodyOverflow;
-      }
-    };
-
-    const showPreview = (canvas) => new Promise(resolve => {
-      ensurePreviewStyles();
-      const overlay = document.createElement("div");
-      overlay.id = "grovaPdfPreviewOverlay";
-      overlay.innerHTML = `
-        <div id="grovaPdfPreviewModal" role="dialog" aria-modal="true" aria-label="Xem trước văn bản">
-          <div id="grovaPdfPreviewHeader"><strong>👁 XEM TRƯỚC VĂN BẢN</strong><span style="font-size:13px;color:#666">Bản xem trước · chưa cấp số</span></div>
-          <div id="grovaPdfPreviewBody"><img id="grovaPdfPreviewImage" alt="Xem trước văn bản"></div>
-          <div id="grovaPdfPreviewFooter">
-            <button type="button" id="grovaPdfPreviewCancel">← Quay lại chỉnh sửa</button>
-            <button type="button" id="grovaPdfPreviewContinue">Tiếp tục xuất PDF →</button>
-          </div>
-        </div>`;
-      document.body.appendChild(overlay);
-      const img = overlay.querySelector("#grovaPdfPreviewImage");
-      img.src = canvas.toDataURL("image/jpeg", 0.94);
-      const close = value => { overlay.remove(); resolve(value); };
-      overlay.querySelector("#grovaPdfPreviewCancel").onclick = () => close(false);
-      overlay.querySelector("#grovaPdfPreviewContinue").onclick = () => close(true);
-      overlay.addEventListener("click", e => { if (e.target === overlay) close(false); });
-    });
-
-    try {
-      // GROVA: export directly. No preview confirmation and no automatic document numbering.
-      // The user-entered document number (if any) is preserved as typed.
-      if (typeof window.updatePreview === "function") {
-        try { window.updatePreview(); } catch (e) {}
-      }
-      // Export the current document directly to a downloadable A4 PDF.
-      //
-      // This avoids creating one huge canvas and then slicing it into page canvases,
-      // which is memory-heavy and unreliable on iPad/iPhone Safari.
-      if (typeof window.updatePreview === "function") {
-        try { window.updatePreview(); } catch (e) {}
-      }
-      const target = document.querySelector(".document, #documentPreview, #paper, article.paper");
-      if (!target) throw new Error("DOCUMENT_TARGET_NOT_FOUND");
-
-      const numberEl = document.querySelector("#documentNumber, #documentNo, .document-number, #contractNumberDisplay, #appendixNumberDisplay");
-      const rawNumber = numberEl ? (numberEl.textContent || numberEl.value || "").trim() : "";
-      const number = rawNumber.replace(/\s+/g, "-").replace(/[^0-9A-Za-zÀ-ỹĐđ_-]/g, "").replace(/-+/g, "-");
-      const title = (document.title || "GROVA DOCUMENT").replace(/\s*[–—-]\s*GROVA.*$/i, "").replace(/[^0-9A-Za-zÀ-ỹĐđ _-]/g, "").trim().replace(/\s+/g, "-");
-      const filename = `${number || "van-ban"}${title ? "-" + title : ""}.pdf`;
-
-      if (!window.jspdf || !window.jspdf.jsPDF) {
-        throw new Error("PDF_LIB_NOT_READY");
-      }
-
-      const oldOverflow = document.documentElement.style.overflow;
-      const oldBodyOverflow = document.body.style.overflow;
-      const oldScrollBehavior = document.documentElement.style.scrollBehavior;
-      target.classList.add("pdf-exporting");
-      document.documentElement.style.overflow = "visible";
-      document.body.style.overflow = "visible";
-      document.documentElement.style.scrollBehavior = "auto";
-
-      try {
-        if (document.fonts && document.fonts.ready) {
-          try { await document.fonts.ready; } catch (e) {}
-        }
-
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF({
-          unit: "mm",
-          format: "a4",
-          orientation: "portrait",
-          compress: true
-        });
-
-        await new Promise((resolve, reject) => {
-          try {
-            pdf.html(target, {
-              x: 0,
-              y: 0,
-              width: 210,
-              windowWidth: Math.max(document.documentElement.clientWidth, target.scrollWidth),
-              autoPaging: "text",
-              margin: [0, 0, 0, 0],
-              html2canvas: {
-                scale: 1.35,
-                useCORS: true,
-                allowTaint: false,
-                backgroundColor: "#ffffff",
-                logging: false,
-                imageTimeout: 15000,
-                scrollX: 0,
-                scrollY: 0,
-                windowWidth: Math.max(document.documentElement.clientWidth, target.scrollWidth),
-                windowHeight: Math.max(window.innerHeight, target.scrollHeight)
-              },
-              callback: function(doc) {
-                try {
-                  doc.save(filename);
-                  resolve();
-                } catch (error) {
-                  reject(error);
-                }
-              }
-            });
-          } catch (error) {
-            reject(error);
-          }
-        });
-      } finally {
-        target.classList.remove("pdf-exporting");
-        document.documentElement.style.overflow = oldOverflow;
-        document.body.style.overflow = oldBodyOverflow;
-        document.documentElement.style.scrollBehavior = oldScrollBehavior;
-      }
-
-    } catch (error) {
-      console.error("GROVA PDF preview/export error:", error);
-      if (error && error.message === "PDF_LIB_NOT_READY") alert("Không tải được bộ xuất PDF. Vui lòng kiểm tra kết nối mạng rồi thử lại.");
-      else if (error && error.message === "DOCUMENT_TARGET_NOT_FOUND") alert("Không tìm thấy nội dung văn bản để xuất PDF.");
-      else alert("Xuất PDF thất bại. Vui lòng thử lại.");
-    }
+function exportDocumentPDF() {
+  // Xuất PDF trực tiếp bằng hộp thoại in của trình duyệt.
+  // Không cấp số, không tăng bộ đếm, không hỏi xác nhận.
+  if (typeof window.updatePreview === "function") {
+    try { window.updatePreview(); } catch (e) {}
   }
+  window.print();
+}
 
 </script>
 </body>
