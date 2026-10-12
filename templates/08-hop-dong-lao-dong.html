@@ -884,7 +884,7 @@
       </div>
 
 
-      <div class="field">
+      <div class="field"><label for="manualDocumentNumber">Số hợp đồng lao động</label><input id="manualDocumentNumber" type="text" placeholder="….. /HĐLĐ"></div><div class="field">
 
         <label for="contractDate">
           Ngày ký hợp đồng
@@ -1432,7 +1432,7 @@
           <div class="contract-no">
             Số:
             <span id="previewContractNo">
-              01.HĐLĐ
+              ….. /HĐLĐ
             </span>
           </div>
 
@@ -3362,5 +3362,25 @@ function exportDocumentPDF() {
 }
 
 </script>
+
+<script id="grova-manual-number-sync">
+(function() {
+ const input = document.getElementById("manualDocumentNumber") || document.getElementById("documentNumber");
+ const preview = document.getElementById("previewContractNo");
+ const display = document.getElementById("contractNumberDisplay");
+ if (!input) return;
+ const hint = "….. /HĐLĐ";
+ function sync() {
+   const value = input.value.trim() || hint;
+   if (preview) preview.textContent = value;
+   if (display && display !== input) display.textContent = value;
+ }
+ input.removeAttribute("readonly");
+ input.addEventListener("input", sync);
+ input.addEventListener("change", sync);
+ sync();
+})();
+</script>
+
 </body>
 </html>

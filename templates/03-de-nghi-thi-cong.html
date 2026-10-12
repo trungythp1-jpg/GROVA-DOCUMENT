@@ -960,7 +960,6 @@
           <input
             id="documentNumber"
             type="text"
-            readonly
           >
 
         </div>
@@ -2666,6 +2665,26 @@ function exportDocumentPDF() {
 }
 
 </script>
+
+<script id="grova-manual-number-sync">
+(function() {
+ const input = document.getElementById("manualDocumentNumber") || document.getElementById("documentNumber");
+ const preview = document.getElementById("previewNumber");
+ const display = document.getElementById("documentNumber");
+ if (!input) return;
+ const hint = "….. /ĐNTC";
+ function sync() {
+   const value = input.value.trim() || hint;
+   if (preview) preview.textContent = value;
+   if (display && display !== input) display.textContent = value;
+ }
+ input.removeAttribute("readonly");
+ input.addEventListener("input", sync);
+ input.addEventListener("change", sync);
+ sync();
+})();
+</script>
+
 </body>
 
 </html>

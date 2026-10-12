@@ -138,12 +138,7 @@ body{min-height:100vh}
       Số hợp đồng
     </div>
 
-    <div
-      class="number-value"
-      id="contractNumberDisplay"
-    >
-      01/2026/HĐTC
-    </div>
+    <input class="form-input number-value" id="manualDocumentNumber" type="text" placeholder="….. /HĐNT" aria-label="Số hợp đồng">
 
     <div class="number-note">
       Số được cấp tập trung theo dãy HĐNT của GROVA.
@@ -398,7 +393,7 @@ body{min-height:100vh}
 
         Số:
         <span id="previewContractNumber">
-          01/2026/HĐTC
+          ….. /HĐNT
         </span>
 
       </div>
@@ -1759,90 +1754,20 @@ function updateCompanyInformation(){
    NUMBER
 ========================================================= */
 
-function getCurrentNumber(){
-
-  let current =
-    parseInt(
-      localStorage.getItem(
-        COUNTER_KEY
-      ) || "1",
-      10
-    );
-
-
-  if(
-    !Number.isFinite(current) ||
-    current < 1
-  ){
-
-    current = 1;
-
-    localStorage.setItem(
-      COUNTER_KEY,
-      "1"
-    );
-
-  }
-
-
-  return (
-    String(current)
-      .padStart(2,"0")
-    + "/"
-    + YEAR
-    + "/HĐTC"
-  );
-
-}
+function getCurrentNumber() { return ""; }
 
 
 /* =========================================================
    INITIAL NUMBER
 ========================================================= */
 
-function initializeNumber(){
-
-  if(
-    !localStorage.getItem(
-      COUNTER_KEY
-    )
-  ){
-
-    localStorage.setItem(
-      COUNTER_KEY,
-      "1"
-    );
-
-  }
-
-
-  const number =
-    getCurrentNumber();
-
-
-  const numberDisplay =
-    $("contractNumberDisplay");
-
-
-  if(numberDisplay){
-
-    numberDisplay.textContent =
-      number;
-
-  }
-
-
-  const previewNumber =
-    $("previewContractNumber");
-
-
-  if(previewNumber){
-
-    previewNumber.textContent =
-      number;
-
-  }
-
+function initializeNumber() {
+  const input = document.getElementById("manualDocumentNumber");
+  const display = document.getElementById("contractNumberDisplay");
+  const preview = document.getElementById("previewContractNumber");
+  const value = input ? input.value.trim() : "";
+  if (display && display !== input) display.textContent = value || "….. /HĐNT";
+  if (preview) preview.textContent = value || "….. /HĐNT";
 }
 
 
@@ -2526,6 +2451,26 @@ function exportDocumentPDF() {
 }
 
 </script>
+
+<script id="grova-manual-number-sync">
+(function() {
+ const input = document.getElementById("manualDocumentNumber") || document.getElementById("documentNumber");
+ const preview = document.getElementById("previewContractNumber");
+ const display = document.getElementById("contractNumberDisplay");
+ if (!input) return;
+ const hint = "….. /HĐNT";
+ function sync() {
+   const value = input.value.trim() || hint;
+   if (preview) preview.textContent = value;
+   if (display && display !== input) display.textContent = value;
+ }
+ input.removeAttribute("readonly");
+ input.addEventListener("input", sync);
+ input.addEventListener("change", sync);
+ sync();
+})();
+</script>
+
 </body>
 
 </html>

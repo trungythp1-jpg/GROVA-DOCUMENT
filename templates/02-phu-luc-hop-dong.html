@@ -232,12 +232,7 @@ li{margin:2px 0;}
         Số phụ lục
       </div>
 
-      <div
-        class="number-value"
-        id="appendixNumberDisplay"
-      >
-        01/PLHĐ/2026
-      </div>
+      <input class="form-input number-value" id="manualDocumentNumber" type="text" placeholder="….. /PLHĐ" aria-label="Số phụ lục">
 
       <div class="number-note">
         Số được hệ thống tự quản lý trên thiết bị.
@@ -257,7 +252,7 @@ li{margin:2px 0;}
         id="contractReference"
         class="form-input"
         type="text"
-        placeholder="Ví dụ: 01/2026/HĐTC"
+        placeholder="Ví dụ: ….. /PLHĐ"
       >
 
     </div>
@@ -838,7 +833,7 @@ li{margin:2px 0;}
 
           Số:
           <span id="previewAppendixNumber">
-            01/PLHĐ/2026
+            ….. /PLHĐ
           </span>
 
         </div>
@@ -1627,122 +1622,26 @@ function $(id){
    NUMBER
 ========================= */
 
-function getNextNumber(){
-
-  let current =
-    parseInt(
-      localStorage.getItem(COUNTER_KEY) || "0",
-      10
-    );
+function getNextNumber() { return ""; }
 
 
-  if(current < 1){
-
-    current = 1;
-
-    localStorage.setItem(
-      COUNTER_KEY,
-      String(current)
-    );
-
-  }
+function getCurrentNumber() { return ""; }
 
 
-  return String(current)
-    .padStart(2,"0")
-    + "/PLHĐ/"
-    + YEAR;
-
-}
-
-
-function getCurrentNumber(){
-
-  let current =
-    parseInt(
-      localStorage.getItem(COUNTER_KEY) || "1",
-      10
-    );
-
-
-  if(current < 1){
-
-    current = 1;
-
-    localStorage.setItem(
-      COUNTER_KEY,
-      String(current)
-    );
-
-  }
-
-
-  return String(current)
-    .padStart(2,"0")
-    + "/PLHĐ/"
-    + YEAR;
-
-}
-
-
-function increaseNumber(){
-
-  let current =
-    parseInt(
-      localStorage.getItem(COUNTER_KEY) || "1",
-      10
-    );
-
-
-  current++;
-
-
-  localStorage.setItem(
-    COUNTER_KEY,
-    String(current)
-  );
-
-
-  return String(current)
-    .padStart(2,"0")
-    + "/PLHĐ/"
-    + YEAR;
-
-}
+function increaseNumber() { return ""; }
 
 
 /* =========================
    INITIAL NUMBER
 ========================= */
 
-function initializeNumber(){
-
-  let current =
-    localStorage.getItem(
-      COUNTER_KEY
-    );
-
-
-  if(!current){
-
-    localStorage.setItem(
-      COUNTER_KEY,
-      "1"
-    );
-
-  }
-
-
-  const number =
-    getCurrentNumber();
-
-
-  $("appendixNumberDisplay").textContent =
-    number;
-
-  $("previewAppendixNumber").textContent =
-    number;
-
+function initializeNumber() {
+  const input = document.getElementById("manualDocumentNumber");
+  const display = document.getElementById("appendixNumberDisplay");
+  const preview = document.getElementById("previewAppendixNumber");
+  const value = input ? input.value.trim() : "";
+  if (display && display !== input) display.textContent = value || "….. /PLHĐ";
+  if (preview) preview.textContent = value || "….. /PLHĐ";
 }
 
 
@@ -2593,5 +2492,25 @@ function exportDocumentPDF() {
 }
 
 </script>
+
+<script id="grova-manual-number-sync">
+(function() {
+ const input = document.getElementById("manualDocumentNumber") || document.getElementById("documentNumber");
+ const preview = document.getElementById("previewAppendixNumber");
+ const display = document.getElementById("appendixNumberDisplay");
+ if (!input) return;
+ const hint = "….. /PLHĐ";
+ function sync() {
+   const value = input.value.trim() || hint;
+   if (preview) preview.textContent = value;
+   if (display && display !== input) display.textContent = value;
+ }
+ input.removeAttribute("readonly");
+ input.addEventListener("input", sync);
+ input.addEventListener("change", sync);
+ sync();
+})();
+</script>
+
 </body>
 </html>
