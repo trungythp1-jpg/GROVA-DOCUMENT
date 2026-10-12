@@ -25,6 +25,10 @@ h1{text-align:center;font-size:17pt;margin:12px 0 5px;text-transform:uppercase}
 input,textarea{font:inherit;color:inherit;border:0;border-bottom:1px dotted #555;background:transparent;border-radius:0;min-width:0;padding:1px 3px}
 input:focus,textarea:focus{outline:1px solid #aaa;background:#fff}
 .docno-input{width:210px;text-align:left}
+.tech input{text-align:center}
+.note-field{margin-top:10px}
+.note-field textarea{width:100%;min-height:48px;border:1px solid #555;padding:5px;resize:vertical}
+.company-static{padding:4px 6px;border-bottom:1px solid var(--line)}
 .field-lines{display:grid;grid-template-columns:1fr;gap:5px;margin:8px 0 14px}
 .line-field{display:flex;align-items:baseline;gap:4px;min-width:0}
 .line-field label{white-space:nowrap}
@@ -39,7 +43,7 @@ th:first-child,td:first-child{width:9%;text-align:center}
 th:nth-child(2),td:nth-child(2){width:57%}
 th:nth-child(3),td:nth-child(3){width:34%}
 td.tech{padding:0}
-td.tech input{width:100%;height:100%;min-height:25px;border:0;padding:4px}
+td.tech input{width:100%;height:100%;min-height:25px;border:0;padding:4px;text-align:center}
 td.label-cell{overflow-wrap:anywhere}
 .subrow td:nth-child(2){padding-left:12px}
 .sign-date{text-align:right;font-style:italic;margin:17px 0 12px}
@@ -70,21 +74,19 @@ td.label-cell{overflow-wrap:anywhere}
   <header class="header">
     <div class="company">CÔNG TY TNHH THANG MÁY ĐỨC ANH VIỆT NAM</div>
     <div class="contact-grid">
-      <div class="wide">Địa chỉ: <input aria-label="Địa chỉ công ty" style="width:80%"></div>
-      <div>Email: <input aria-label="Email" style="width:65%"></div>
-      <div>Tel: 0225.3518163</div>
-      <div>Fax: 0225.3814859</div>
-      <div class="wide">Website: <input aria-label="Website" style="width:75%"></div>
+      <div class="wide company-static">Địa chỉ: HP 81 - Vinhomes Royal - Vũ Yên - Thủy Nguyên - Hải Phòng</div>
+      <div class="wide company-static">Email: thangmayducanhhp@gmail.com</div>
+      <div class="wide company-static">Website: thangmayducanh.com</div>
     </div>
   </header>
   <h1>Phiếu đặt hàng khung định hình</h1>
-  <p class="document-no">Số PĐH: <input id="documentNo" class="docno-input" type="text" placeholder="….. /PĐHKĐH" aria-label="Số phiếu đặt hàng nhập thủ công"></p>
+  <p class="document-no">Số PĐH: <input id="documentNo" class="docno-input" type="text" placeholder="/PĐHKĐH" aria-label="Số phiếu đặt hàng nhập thủ công"></p>
 
   <section class="field-lines">
     <div class="line-field"><label for="orderBy">Họ và tên người đặt hàng:</label><input id="orderBy" type="text"></div>
     <div class="line-field">
       <label for="department">Phòng ban:</label><input id="department" type="text">
-      <label for="contractNo" class="inline-contract">Số HĐ:</label><input id="contractNo" type="text" placeholder="….. /HĐ" style="max-width:190px">
+      <label for="contractNo" class="inline-contract">Số HĐ:</label><input id="contractNo" type="text" placeholder="/HĐ" style="max-width:190px">
     </div>
     <div class="line-field"><label for="projectName">Tên công trình:</label><input id="projectName" type="text"></div>
   </section>
@@ -116,6 +118,7 @@ td.label-cell{overflow-wrap:anywhere}
       <tr><td>7.</td><td class="label-cell">Yêu cầu khác (nếu có)</td><td class="tech"><input aria-label="Yêu cầu khác"></td></tr>
     </tbody>
   </table>
+  <div class="note-field"><b>Ghi chú:</b><textarea id="notes" aria-label="Ghi chú"></textarea></div>
   <div class="sign-date">Hải Phòng, ngày <input id="signDay" type="text" style="width:32px"> tháng <input id="signMonth" type="text" style="width:32px"> năm <input id="signYear" type="text" style="width:55px" value="2026"></div>
   <div class="signatures">
     <div><div class="signature-title">Trưởng phòng kinh doanh</div><div class="signature-space"></div><input aria-label="Tên trưởng phòng kinh doanh" style="width:90%;text-align:center;border-bottom:0"></div>
