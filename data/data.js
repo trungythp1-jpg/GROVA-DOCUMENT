@@ -332,6 +332,18 @@ window.GROVA_DATA = {
       file: "./templates/10-phieu-dat-hang-khung-dinh-hinh.html",
       enabled: true
     }
+,
+    {
+      id: "11",
+      code: "PĐHTM",
+      name: "Phiếu đặt hàng thang máy",
+      title: "PHIẾU ĐẶT HÀNG THANG MÁY",
+      description: "Phiếu đặt hàng thang máy, nhập thông tin công trình, thông số kỹ thuật, ghi chú và ngày giao hàng.",
+      category: "Thi công",
+      icon: "🛗",
+      file: "./templates/11-phieu-dat-hang-thang-may.html",
+      enabled: true
+    }
 
   ],
 
