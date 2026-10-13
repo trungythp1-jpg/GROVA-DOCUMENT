@@ -21,9 +21,9 @@ input,textarea,select{width:100%;font:inherit;border:1px solid var(--line);borde
 textarea{min-height:64px;resize:vertical}.full{grid-column:1/-1}
 table{width:100%;border-collapse:collapse;margin-top:8px}th,td{border:1px solid var(--line);padding:9px;text-align:left;vertical-align:top}th{background:#edf3ef;color:var(--green);font-size:12px}td.num,th.num{text-align:right;white-space:nowrap}
 .total{margin:16px 0 0 auto;max-width:360px}.total div{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line)}.total .grand{font-size:19px;font-weight:800;color:var(--green);border-bottom:2px solid var(--green)}
-.note{font-size:12px;color:var(--muted)}.signatures{display:grid;grid-template-columns:1fr 1fr;text-align:center;gap:30px;margin-top:36px;min-height:95px}.signatures strong{display:block}.foot{border-top:1px solid var(--line);margin-top:25px;padding-top:10px;font-size:11px;color:var(--muted);text-align:center}
+.note{font-size:12px;color:var(--muted)}.floor-row{display:grid;grid-template-columns:1fr 180px 150px;gap:8px;align-items:center;margin:6px 0}.floor-row input{min-width:0}.internal{border:1px dashed #b99a55;background:#fffaf0;padding:14px;border-radius:8px}.internal h3{margin:0 0 8px;color:#765c20}.internal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.warning{background:#fff4dc;border-left:4px solid #c38b23;padding:10px 12px;font-size:12px}.tech-table input{padding:5px}.tech-table td{font-size:12px}.no-print .internal{display:block}@media(max-width:650px){.floor-row{grid-template-columns:1fr 100px}.floor-row .elevation{grid-column:1/-1}.internal-grid{grid-template-columns:1fr}}.signatures{display:grid;grid-template-columns:1fr 1fr;text-align:center;gap:30px;margin-top:36px;min-height:95px}.signatures strong{display:block}.foot{border-top:1px solid var(--line);margin-top:25px;padding-top:10px;font-size:11px;color:var(--muted);text-align:center}
 @media(max-width:650px){.sheet{padding:22px 16px;margin:0}.brand{display:block}.fields{grid-template-columns:1fr}.full{grid-column:auto}.toolbar{padding:0 12px}.total{max-width:none}}
-@media print{@page{size:A4;margin:12mm}body{background:#fff;font-size:11px}.toolbar,.no-print{display:none!important}.sheet{max-width:none;margin:0;padding:0;box-shadow:none}input,textarea,select{border:0;border-bottom:1px dotted #aaa;border-radius:0;padding:2px 0;background:transparent;appearance:none}textarea{min-height:30px}th,td{padding:6px}.section{break-inside:avoid}.signatures{break-inside:avoid}}
+@media print{@page{size:A4;margin:12mm}body{background:#fff;font-size:11px}.toolbar,.no-print{display:none!important}#printFloorSummary{display:block!important}.sheet{max-width:none;margin:0;padding:0;box-shadow:none}input,textarea,select{border:0;border-bottom:1px dotted #aaa;border-radius:0;padding:2px 0;background:transparent;appearance:none}textarea{min-height:30px}th,td{padding:6px}.section{break-inside:avoid}.signatures{break-inside:avoid}}
 </style>
 </head>
 <body>
@@ -46,10 +46,38 @@ table{width:100%;border-collapse:collapse;margin-top:8px}th,td{border:1px solid 
 <div class="field"><label>Điện thoại</label><input data-field="phone" placeholder="Nhập số điện thoại"></div>
 <div class="field full"><label>Địa chỉ công trình</label><input data-field="site" value="Hải Phòng"></div>
 <div class="field"><label>Số tầng / Stop</label><input data-field="stops" value="4 tầng"></div>
-<div class="field"><label>Kích thước phủ bì khung</label><input data-field="size" value="1540 × 1540 mm"></div>
+<div class="field"><label>Chiều rộng phủ bì (mm)</label><input data-field="width" id="width" type="number" min="1" value="1540"></div><div class="field"><label>Chiều sâu phủ bì (mm)</label><input data-field="depth" id="depth" type="number" min="1" value="1540"></div>
 <div class="field"><label>Vị trí máy</label><input data-field="machine" value="Máy đặt trên khung thép"></div>
 <div class="field"><label>Màu sơn</label><input data-field="paint" placeholder="Theo màu được phê duyệt"></div>
 </div>
+<section class="section no-print">
+<div class="section-title">THÔNG SỐ HÌNH HỌC — NHẬP RIÊNG TỪNG KHOẢNG TẦNG</div>
+<div class="fields">
+<div class="field"><label>Số khoảng tầng</label><select id="floorCount" data-field="floorCount"><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select></div>
+<div class="field"><label>Độ sâu pit (mm)</label><input data-field="pit" id="pit" type="number" value="400"></div>
+<div class="field"><label>Chiều cao OH (mm)</label><input data-field="oh" id="oh" type="number" value="4500"></div>
+<div class="field"><label>Đơn giá thép tham chiếu (VNĐ/kg)</label><input data-field="steelRate" id="steelRate" type="number" value="26500"></div>
+</div>
+<div id="floorRows"></div>
+<div class="fields"><div class="field"><label>Tổng chênh cao các khoảng tầng</label><input id="totalRise" readonly value="13.500 mm"></div><div class="field"><label>Kích thước phủ bì hiện tại</label><input id="sizeSummary" readonly value="1540 × 1540 mm"></div></div>
+<div class="warning">Lưu ý: cao độ sàn được cộng dồn từ chiều cao từng khoảng tầng. Cao độ đà ngang, chiều dài cột thực tế, số lượng bản mã và cấu kiện phải theo bản vẽ/định mức đã duyệt; hệ thống không tự suy đoán các thông số kết cấu này.</div>
+</section>
+<p id="printFloorSummary" class="note"></p>
+<section class="section">
+<div class="section-title">01A · BẢNG THÔNG SỐ VÀ KHỐI LƯỢNG KỸ THUẬT</div>
+<p class="note">Giữ bảng chi tiết trong hồ sơ báo giá. Nhập khối lượng/định mức theo bản vẽ hoặc bảng định mức được duyệt; để trống nếu chưa xác nhận.</p>
+<table class="tech-table"><thead><tr><th>STT</th><th>Cấu kiện / quy cách tham chiếu</th><th>ĐVT</th><th class="num">Khối lượng / SL</th><th>Ghi chú</th></tr></thead><tbody id="techRows">
+<tr><td>1</td><td>Cột đứng thép chấn định hình 120×120×45×20×4 mm</td><td>m / kg</td><td><input data-tech="columns" placeholder="Theo bản vẽ"></td><td>Chiều dài từng đoạn và nối cột cần xác nhận</td></tr>
+<tr><td>2</td><td>Đà ngang C120×45×20×4 mm</td><td>m / kg</td><td><input data-tech="beams" placeholder="Theo bản vẽ"></td><td>Nhập theo từng cao độ/vị trí đã duyệt</td></tr>
+<tr><td>3</td><td>Đà đỡ bệ máy 50×160×80×25×5 mm</td><td>m / kg</td><td><input data-tech="machineBeams" placeholder="Theo bản vẽ"></td><td>Phụ thuộc phương án đặt máy</td></tr>
+<tr><td>4</td><td>Đà treo móc thi công C120×45×20×4 mm</td><td>m / kg</td><td><input data-tech="liftingBeams" placeholder="Theo bản vẽ"></td><td>Số lượng và chiều dài cần xác nhận</td></tr>
+<tr><td>5</td><td>Bản mã chân cột dày 8 mm</td><td>cái / kg</td><td><input data-tech="basePlates" placeholder="Theo bản vẽ"></td><td>Kích thước và số lượng cần xác nhận</td></tr>
+<tr><td>6</td><td>Bản mã đầu/nối cột, đà ngang dày 4–6 mm</td><td>cái / kg</td><td><input data-tech="jointPlates" placeholder="Theo bản vẽ"></td><td>Tách theo loại khi có định mức</td></tr>
+<tr><td>7</td><td>Bản mã tăng cứng cột và đà máy</td><td>cái / kg</td><td><input data-tech="stiffeners" placeholder="Theo bản vẽ"></td><td>Khoảng cách/điểm tăng cứng theo thiết kế</td></tr>
+<tr><td>8</td><td>Bản mã bắt rail dày 8 mm</td><td>cái / kg</td><td><input data-tech="railPlates" placeholder="Theo bản vẽ"></td><td>Phải đối chiếu bố trí rail</td></tr>
+<tr><td>9</td><td>Bulong, ecu, nở thép và vật tư phụ</td><td>bộ</td><td><input data-tech="fasteners" placeholder="Theo định mức"></td><td>Quy cách và số lượng theo hồ sơ</td></tr>
+</tbody></table>
+</section>
 <section class="section">
 <div class="section-title">01 · CHI TIẾT BÁO GIÁ</div>
 <table><thead><tr><th style="width:7%">STT</th><th>Hạng mục / phạm vi công việc</th><th style="width:12%">ĐVT</th><th class="num" style="width:10%">SL</th><th class="num" style="width:20%">Thành tiền (VNĐ)</th></tr></thead>
@@ -67,9 +95,27 @@ table{width:100%;border-collapse:collapse;margin-top:8px}th,td{border:1px solid 
 </div>
 <p><strong>Bằng chữ:</strong> <span id="words">Sáu mươi hai triệu đồng chẵn.</span></p>
 </section>
+<section class="section internal no-print">
+<h3>GIÁ VỐN NỘI BỘ — KHÔNG IN TRÊN BẢN GỬI KHÁCH</h3>
+<p class="note">Các khoản giá vốn là dữ liệu quản trị nhập vào, không tự suy ra từ thông số hình học khi chưa có định mức kết cấu được duyệt.</p>
+<div class="internal-grid">
+<div class="field"><label>Giá vốn cấu kiện / gia công (VNĐ)</label><input data-cost="frameCost" type="number" value="39805450"></div>
+<div class="field"><label>Giá vốn PVC (VNĐ)</label><input data-cost="pvcCost" type="number" value="1000000"></div>
+<div class="field"><label>Giá vốn vận chuyển (VNĐ)</label><input data-cost="transportCost" type="number" value="2800000"></div>
+<div class="field"><label>Giá vốn nhân công (VNĐ)</label><input data-cost="laborCost" type="number" value="10000000"></div>
+<div class="field"><label>Chi phí bổ sung/dự phòng (VNĐ)</label><input data-cost="otherCost" type="number" value="0"></div>
+<div class="field"><label>Biên lợi nhuận mục tiêu trên doanh thu (%)</label><input data-field="margin" id="margin" type="number" min="0" max="90" value="13.5"></div>
+</div>
+<div class="total">
+<div><span>Tổng giá vốn nội bộ</span><strong id="costTotal">53.605.450 đ</strong></div>
+<div><span>Giá bán đề xuất trước VAT</span><strong id="suggestedPrice">61.971.618 đ</strong></div>
+<div><span>Giá bán đang nhập</span><strong id="actualSell">62.000.000 đ</strong></div>
+<div><span>Lợi nhuận gộp dự kiến</span><strong id="grossProfit">8.394.550 đ</strong></div>
+</div>
+</section>
 <section class="section">
 <div class="section-title">02 · THÔNG SỐ KỸ THUẬT VÀ PHẠM VI</div>
-<div class="field"><label>Thông số / ghi chú kỹ thuật</label><textarea data-field="specs">Kích thước phủ bì khung 1540 × 1540 mm. Máy đặt trên khung thép. Cột, đà, bản mã theo cấu hình được duyệt; sơn tĩnh điện theo màu phê duyệt. Kèm vật tư liên kết và bản mã bắt rail theo hồ sơ kỹ thuật đã thống nhất.</textarea></div>
+<div class="field"><label>Thông số / ghi chú kỹ thuật</label><textarea data-field="specs">Kích thước phủ bì theo thông số nhập tại báo giá. Chiều cao từng khoảng tầng được liệt kê trong bảng thông số hình học. Máy đặt trên khung thép. Cột, đà, bản mã theo bản vẽ kết cấu được duyệt; sơn tĩnh điện theo màu phê duyệt. Kèm vật tư liên kết và bản mã bắt rail theo hồ sơ kỹ thuật đã thống nhất.</textarea></div>
 <div class="field" style="margin-top:10px"><label>Điều kiện / phần việc loại trừ</label><textarea data-field="exclusions">Chủ đầu tư xác nhận kích thước và điều kiện hiện trường trước khi sản xuất. Các thay đổi ngoài cấu hình được duyệt, công tác xây dựng và hạng mục không liệt kê trong báo giá sẽ được xác nhận, báo giá riêng trước khi thực hiện.</textarea></div>
 </section>
 <section class="section">
@@ -88,28 +134,16 @@ table{width:100%;border-collapse:collapse;margin-top:8px}th,td{border:1px solid 
 </main>
 <script>
 const fmt=n=>Math.round(n).toLocaleString('vi-VN')+' đ';
-function num(el){return Number(String(el.value||'0').replace(/[^\d-]/g,''))||0}
-function recalc(){
- const subtotal=[...document.querySelectorAll('[data-money]')].reduce((s,e)=>s+num(e),0);
- const rate=Number(document.getElementById('vat').value||0), tax=Math.round(subtotal*rate/100);
- document.getElementById('subtotal').textContent=fmt(subtotal);
- document.getElementById('vatamount').textContent=fmt(tax);
- document.getElementById('vatrow').style.display=rate?'flex':'none';
- document.getElementById('grand').textContent=fmt(subtotal+tax);
- document.getElementById('words').textContent=numberWords(subtotal+(tax||0));
-}
-function numberWords(n){
- if(n===0)return 'Không đồng.';
- const units=['',' nghìn',' triệu',' tỷ',' nghìn tỷ',' triệu tỷ'];
- const ones=['không','một','hai','ba','bốn','năm','sáu','bảy','tám','chín'];
- function triad(x,full){let h=Math.floor(x/100),t=Math.floor(x%100/10),u=x%10,s='';if(h||full)s+=ones[h]+' trăm ';if(t>1){s+=ones[t]+' mươi ';if(u===1)s+='mốt';else if(u===5)s+='lăm';else if(u)s+=ones[u]}else if(t===1){s+='mười ';if(u===5)s+='lăm';else if(u)s+=ones[u]}else if(u){if(h||full)s+='lẻ ';s+=ones[u]}return s.trim()}
- let parts=[],i=0;while(n>0&&i<units.length){let x=n%1000;if(x)parts.unshift(triad(x,parts.length>0)+units[i]);n=Math.floor(n/1000);i++}
- return parts.join(' ').replace(/\s+/g,' ').trim().replace(/^./,c=>c.toUpperCase())+' đồng.';
-}
-function values(){const o={};document.querySelectorAll('[data-field],[data-money]').forEach(e=>o[e.dataset.field||e.dataset.money]=e.value);return o}
-function apply(o){document.querySelectorAll('[data-field],[data-money]').forEach(e=>{const k=e.dataset.field||e.dataset.money;if(o[k]!==undefined)e.value=o[k]});recalc()}
-function saveDraft(){localStorage.setItem('grova_steel_quote_draft',JSON.stringify(values()));alert('Đã lưu nháp trên thiết bị này.')}
-function loadDraft(){const x=localStorage.getItem('grova_steel_quote_draft');if(!x){alert('Chưa có nháp đã lưu trên thiết bị này.');return}apply(JSON.parse(x))}
-document.querySelectorAll('[data-money],#vat').forEach(e=>e.addEventListener('input',recalc));recalc();
+function num(el){return Number(String(el?.value||'0').replace(/[^\d.-]/g,''))||0}
+function buildFloors(existing){const count=Math.max(1,Math.min(12,Number(document.getElementById('floorCount').value)||4));const root=document.getElementById('floorRows');const vals=existing||[3600,3300,3300,3300];root.innerHTML='';for(let i=0;i<count;i++){const row=document.createElement('div');row.className='floor-row';row.innerHTML=`<label>Khoảng tầng ${i+1} → ${i+2} (mm)</label><input type="number" min="1" data-floor="${i}" value="${vals[i]??''}" placeholder="Nhập chiều cao"><input class="elevation" readonly data-elevation="${i}" value="Cao độ sàn trên: —">`;root.appendChild(row)}root.querySelectorAll('[data-floor]').forEach(e=>e.addEventListener('input',recalcGeometry));recalcGeometry()}
+function recalcGeometry(){let z=0;document.querySelectorAll('[data-floor]').forEach((e,i)=>{const h=num(e);z+=h;const out=document.querySelector(`[data-elevation="${i}"]`);out.value='Cao độ sàn trên: '+(h>0?z.toLocaleString('vi-VN')+' mm':'Chưa đủ dữ liệu')});document.getElementById('totalRise').value=z.toLocaleString('vi-VN')+' mm';document.getElementById('printFloorSummary').textContent='Chiều cao các khoảng tầng: '+[...document.querySelectorAll('[data-floor]')].map((e,i)=>`Tầng ${i+1}→${i+2}: ${num(e).toLocaleString('vi-VN')} mm`).join('; ')+'. Tổng chênh cao: '+z.toLocaleString('vi-VN')+' mm; Pit: '+num(document.getElementById('pit')).toLocaleString('vi-VN')+' mm; OH: '+num(document.getElementById('oh')).toLocaleString('vi-VN')+' mm.';document.getElementById('sizeSummary').value=(num(document.getElementById('width'))||'—')+' × '+(num(document.getElementById('depth'))||'—')+' mm';const w=num(document.getElementById('width')),d=num(document.getElementById('depth'));document.querySelector('[data-field="size"]')?.setAttribute('value',`${w} × ${d} mm`);const sizeInput=document.querySelector('[data-field="specs"]');if(sizeInput&&!sizeInput.dataset.userEdited){sizeInput.value=`Kích thước phủ bì khung ${w} × ${d} mm. Chiều cao từng khoảng tầng: `+[...document.querySelectorAll('[data-floor]')].map((e,i)=>`Tầng ${i+1}→${i+2}: ${num(e).toLocaleString('vi-VN')} mm`).join('; ')+`. Pit ${num(document.getElementById('pit')).toLocaleString('vi-VN')} mm; OH ${num(document.getElementById('oh')).toLocaleString('vi-VN')} mm. Máy đặt trên khung thép. Cột, đà, bản mã theo bản vẽ kết cấu được duyệt; sơn tĩnh điện theo màu phê duyệt. Kèm vật tư liên kết và bản mã bắt rail theo hồ sơ kỹ thuật đã thống nhất.`}}
+function recalc(){const subtotal=[...document.querySelectorAll('[data-money]')].reduce((s,e)=>s+num(e),0);const rate=Number(document.getElementById('vat').value||0),tax=Math.round(subtotal*rate/100);document.getElementById('subtotal').textContent=fmt(subtotal);document.getElementById('vatamount').textContent=fmt(tax);document.getElementById('vatrow').style.display=rate?'flex':'none';document.getElementById('grand').textContent=fmt(subtotal+tax);document.getElementById('words').textContent=numberWords(subtotal+tax);recalcCost()}
+function recalcCost(){const cost=[...document.querySelectorAll('[data-cost]')].reduce((s,e)=>s+num(e),0);const margin=Math.max(0,Math.min(90,num(document.getElementById('margin'))));const suggested=margin<100?Math.round(cost/(1-margin/100)):0;const sell=[...document.querySelectorAll('[data-money]')].reduce((s,e)=>s+num(e),0);document.getElementById('costTotal').textContent=fmt(cost);document.getElementById('suggestedPrice').textContent=fmt(suggested);document.getElementById('actualSell').textContent=fmt(sell);document.getElementById('grossProfit').textContent=fmt(sell-cost)}
+function numberWords(n){if(n===0)return 'Không đồng.';const units=['',' nghìn',' triệu',' tỷ',' nghìn tỷ',' triệu tỷ'];const ones=['không','một','hai','ba','bốn','năm','sáu','bảy','tám','chín'];function triad(x,full){let h=Math.floor(x/100),t=Math.floor(x%100/10),u=x%10,s='';if(h||full)s+=ones[h]+' trăm ';if(t>1){s+=ones[t]+' mươi ';if(u===1)s+='mốt';else if(u===5)s+='lăm';else if(u)s+=ones[u]}else if(t===1){s+='mười ';if(u===5)s+='lăm';else if(u)s+=ones[u]}else if(u){if(h||full)s+='lẻ ';s+=ones[u]}return s.trim()}let parts=[],i=0;while(n>0&&i<units.length){let x=n%1000;if(x)parts.unshift(triad(x,parts.length>0)+units[i]);n=Math.floor(n/1000);i++}return parts.join(' ').replace(/\s+/g,' ').trim().replace(/^./,c=>c.toUpperCase())+' đồng.'}
+function values(){const o={floors:[...document.querySelectorAll('[data-floor]')].map(e=>e.value),tech:{}};document.querySelectorAll('[data-field],[data-money],[data-cost],[data-tech]').forEach(e=>{const k=e.dataset.field||e.dataset.money||e.dataset.cost||e.dataset.tech;o[k]=e.value});return o}
+function apply(o){document.querySelectorAll('[data-field],[data-money],[data-cost],[data-tech]').forEach(e=>{const k=e.dataset.field||e.dataset.money||e.dataset.cost||e.dataset.tech;if(o[k]!==undefined)e.value=o[k]});if(o.floors){buildFloors(o.floors);document.querySelectorAll('[data-floor]').forEach((e,i)=>e.value=o.floors[i]??'')}recalcGeometry();recalc()}
+function saveDraft(){localStorage.setItem('grova_steel_quote_draft_v2',JSON.stringify(values()));alert('Đã lưu nháp trên thiết bị này.')}
+function loadDraft(){const x=localStorage.getItem('grova_steel_quote_draft_v2');if(!x){alert('Chưa có nháp đã lưu trên thiết bị này.');return}apply(JSON.parse(x))}
+document.getElementById('floorCount').addEventListener('change',()=>buildFloors([...document.querySelectorAll('[data-floor]')].map(e=>num(e))));document.querySelectorAll('[data-money],#vat,[data-cost],#margin,#width,#depth,#pit,#oh').forEach(e=>e.addEventListener('input',()=>{recalcGeometry();recalc()}));document.querySelector('[data-field="specs"]').addEventListener('input',e=>e.target.dataset.userEdited='1');buildFloors();recalc();
 </script>
 </body></html>
