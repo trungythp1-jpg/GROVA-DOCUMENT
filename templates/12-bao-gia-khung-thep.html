@@ -23,7 +23,7 @@ table{width:100%;border-collapse:collapse;margin-top:8px}th,td{border:1px solid 
 .total{margin:16px 0 0 auto;max-width:360px}.total div{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line)}.total .grand{font-size:19px;font-weight:800;color:var(--green);border-bottom:2px solid var(--green)}
 .note{font-size:12px;color:var(--muted)}.floor-row{display:grid;grid-template-columns:1fr 180px 150px;gap:8px;align-items:center;margin:6px 0}.floor-row input{min-width:0}.internal{border:1px dashed #b99a55;background:#fffaf0;padding:14px;border-radius:8px}.internal h3{margin:0 0 8px;color:#765c20}.internal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.warning{background:#fff4dc;border-left:4px solid #c38b23;padding:10px 12px;font-size:12px}.tech-table input{padding:5px}.tech-table td{font-size:11px;line-height:1.3}.tech-table th{font-size:11px}.tech-table td:nth-child(2){min-width:220px}.no-print .internal{display:block}@media(max-width:650px){.floor-row{grid-template-columns:1fr 100px}.floor-row .elevation{grid-column:1/-1}.internal-grid{grid-template-columns:1fr}}.signatures{display:grid;grid-template-columns:1fr 1fr;text-align:center;gap:30px;margin-top:36px;min-height:95px}.signatures strong{display:block}.foot{border-top:1px solid var(--line);margin-top:25px;padding-top:10px;font-size:11px;color:var(--muted);text-align:center}
 @media(max-width:650px){.sheet{padding:22px 16px;margin:0}.brand{display:block}.fields{grid-template-columns:1fr}.full{grid-column:auto}.toolbar{padding:0 12px}.total{max-width:none}}
-@media print{@page{size:A4;margin:12mm}body{background:#fff;font-size:11px}.toolbar,.no-print{display:none!important}#printFloorSummary{display:block!important}.sheet{max-width:none;margin:0;padding:0;box-shadow:none}input,textarea,select{border:0;border-bottom:1px dotted #aaa;border-radius:0;padding:2px 0;background:transparent;appearance:none}textarea{min-height:30px}th,td{padding:4px 5px}.section{break-inside:auto;page-break-inside:auto}.section-title{break-after:avoid;page-break-after:avoid}.tech-table tr,table tr{break-inside:avoid;page-break-inside:avoid}.total,.warning{break-inside:avoid}.signatures{break-inside:avoid;page-break-inside:avoid}}
+@media print{@page{size:A4;margin:12mm}body{background:#fff;font-size:11px}.toolbar,.no-print{display:none!important}#printFloorSummary{display:block!important}.sheet{max-width:none;margin:0;padding:0;box-shadow:none}input,textarea,select{border:0;border-bottom:1px dotted #aaa;border-radius:0;padding:2px 0;background:transparent;appearance:none}textarea{min-height:30px}th,td{padding:4px 5px}.section{break-inside:auto;page-break-inside:auto}.section-title{break-after:avoid;page-break-after:avoid}.tech-table tr,table tr{break-inside:avoid;page-break-inside:avoid}.total,.warning{break-inside:avoid}.signatures{break-inside:avoid;page-break-inside:avoid}.tech-table th:last-child,.tech-table td:last-child{display:none!important}}
 </style>
 </head>
 <body>
@@ -56,7 +56,7 @@ table{width:100%;border-collapse:collapse;margin-top:8px}th,td{border:1px solid 
 <div class="field"><label>Số khoảng tầng</label><select id="floorCount" data-field="floorCount"><option value="0" selected>00</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select></div>
 <div class="field"><label>Độ sâu pit (mm)</label><input data-field="pit" id="pit" type="number" value="0"></div>
 <div class="field"><label>Chiều cao OH (mm)</label><input data-field="oh" id="oh" type="number" value="0"></div>
-<div class="field"><label>Đơn giá thép tham chiếu (VNĐ/kg)</label><input data-field="steelRate" id="steelRate" type="number" value="0"></div>
+
 </div>
 <div id="floorRows"></div>
 <div class="fields"><div class="field"><label>Tổng chênh cao các khoảng tầng</label><input id="totalRise" readonly value="0 mm"></div><div class="field"><label>Kích thước phủ bì hiện tại</label><input id="sizeSummary" readonly value="0 × 0 mm"></div></div>
@@ -89,7 +89,7 @@ table{width:100%;border-collapse:collapse;margin-top:8px}th,td{border:1px solid 
 <h3>GIÁ VỐN NỘI BỘ — KHÔNG IN TRÊN BẢN GỬI KHÁCH</h3>
 <p class="note">Giá vốn nội bộ gồm thép, phụ liệu/gia công, PVC, nhân công và vận chuyển. Có thể sửa trực tiếp đơn giá nhân công/tầng và chi phí vận chuyển cho từng công trình; hai khoản này được tính vào giá vốn nhưng không tách thành dòng trên báo giá khách hàng.</p>
 <div class="internal-grid">
-<div class="field"><label>Đơn giá thép đầu vào (VNĐ/kg)</label><input data-field="steelRate" id="steelRateCost" type="number" value="0"></div>
+<div class="field"><label>Đơn giá thép đầu vào (VNĐ/kg)</label><input data-cost="steelRateCost" id="steelRateCost" type="number" min="0" value="0"></div>
 <div class="field"><label>Chi phí phụ liệu / gia công theo kg (%)</label><input data-field="fabricationPct" id="fabricationPct" type="number" value="0" min="0" max="200"></div>
 <div class="field"><label>Giá vốn PVC (VNĐ)</label><input data-field="pvcCost" id="pvcCost" type="number" value="0"></div>
 <div class="field"><label>Nhân công lắp đặt (VNĐ/tầng)</label><input data-field="laborPerFloor" id="laborPerFloor" type="number" min="0" step="100000" value="0"></div>
@@ -134,7 +134,7 @@ function calcAuto(){
  const w=num(document.getElementById('width'))/1000,d=num(document.getElementById('depth'))/1000;
  const pit=num(document.getElementById('pit'))/1000,oh=num(document.getElementById('oh'))/1000;
  const hs=[...document.querySelectorAll('[data-floor]')].map(e=>num(e)/1000),rise=hs.reduce((a,b)=>a+b,0),levels=hs.length;
- const rate=num(document.getElementById('steelRate'))||num(document.getElementById('steelRateCost'));
+ const rate=num(document.getElementById('steelRateCost'));
  const fab=Math.max(0,num(document.getElementById('fabricationPct')))/100,pvc=Math.max(0,num(document.getElementById('pvcCost')));
  const laborPerFloor=Math.max(0,num(document.getElementById('laborPerFloor'))),labor=laborPerFloor*levels;
  const transport=Math.max(0,num(document.getElementById('transportCost')));
@@ -176,6 +176,6 @@ function values(){const o={floors:[...document.querySelectorAll('[data-floor]')]
 function apply(o){document.querySelectorAll('[data-field],[data-money],[data-cost],[data-tech]').forEach(e=>{const k=e.dataset.field||e.dataset.money||e.dataset.cost||e.dataset.tech;if(o[k]!==undefined)e.value=o[k]});if(o.floors){buildFloors(o.floors);document.querySelectorAll('[data-floor]').forEach((e,i)=>e.value=o.floors[i]??'')}recalcGeometry();recalc()}
 function saveDraft(){localStorage.setItem('grova_steel_quote_draft_v2',JSON.stringify(values()));alert('Đã lưu nháp trên thiết bị này.')}
 function loadDraft(){const x=localStorage.getItem('grova_steel_quote_draft_v2');if(!x){alert('Chưa có nháp đã lưu trên thiết bị này.');return}apply(JSON.parse(x))}
-document.getElementById('floorCount').addEventListener('change',()=>buildFloors([...document.querySelectorAll('[data-floor]')].map(e=>num(e))));document.querySelectorAll('#vat,#margin,#width,#depth,#pit,#oh,#steelRate,#steelRateCost,#fabricationPct,#pvcCost,#laborPerFloor,#transportCost').forEach(e=>e.addEventListener('input',()=>{if(e.id==='steelRateCost')document.getElementById('steelRate').value=e.value;if(e.id==='steelRate')document.getElementById('steelRateCost').value=e.value;if(e.id==='pvcCost'){}recalcGeometry();recalc()}));document.querySelector('[data-field="specs"]').addEventListener('input',e=>e.target.dataset.userEdited='1');document.getElementById("steelRateCost").value=document.getElementById("steelRate").value;buildFloors();recalc();
+document.getElementById('floorCount').addEventListener('change',()=>buildFloors([...document.querySelectorAll('[data-floor]')].map(e=>num(e))));document.querySelectorAll('#vat,#margin,#width,#depth,#pit,#oh,#steelRateCost,#fabricationPct,#pvcCost,#laborPerFloor,#transportCost').forEach(e=>e.addEventListener('input',()=>{recalcGeometry();recalc()}));document.querySelector('[data-field="specs"]').addEventListener('input',e=>e.target.dataset.userEdited='1');buildFloors();recalc();
 </script>
 </body></html>
