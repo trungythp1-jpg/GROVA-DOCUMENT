@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Báo giá khung thép thang máy | GROVA DOCUMENT</title>
+<style>
+:root{--green:#174d3a;--gold:#b99a55;--ink:#202923;--muted:#65716b;--line:#d8dfda;--paper:#fff}
+*{box-sizing:border-box}body{margin:0;background:#eef1ee;color:var(--ink);font:14px/1.5 Arial,sans-serif}
+.toolbar{max-width:980px;margin:18px auto;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+button{border:0;border-radius:6px;padding:10px 16px;background:var(--green);color:#fff;font-weight:700;cursor:pointer}
+button.secondary{background:#fff;color:var(--green);border:1px solid var(--green)}
+.sheet{max-width:980px;margin:0 auto 24px;background:var(--paper);padding:42px 48px;box-shadow:0 4px 24px #17291c12}
+.brand{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid var(--green);padding-bottom:18px;gap:18px}
+.brand h1{font-size:24px;letter-spacing:2px;color:var(--green);margin:0}.brand p{margin:3px 0;color:var(--muted);font-size:12px}
+h2{text-align:center;font-size:23px;letter-spacing:1px;margin:25px 0 4px;color:var(--green)}
+.subtitle{text-align:center;color:var(--muted);margin:0 0 22px}
+.section{margin-top:22px}.section-title{font-weight:700;color:var(--green);border-bottom:1px solid var(--gold);padding-bottom:7px;margin-bottom:10px}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:10px 18px}.field label{display:block;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:4px}
+input,textarea,select{width:100%;font:inherit;border:1px solid var(--line);border-radius:4px;padding:8px;background:#fff;color:var(--ink)}
+textarea{min-height:64px;resize:vertical}.full{grid-column:1/-1}
+table{width:100%;border-collapse:collapse;margin-top:8px}th,td{border:1px solid var(--line);padding:9px;text-align:left;vertical-align:top}th{background:#edf3ef;color:var(--green);font-size:12px}td.num,th.num{text-align:right;white-space:nowrap}
+.total{margin:16px 0 0 auto;max-width:360px}.total div{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line)}.total .grand{font-size:19px;font-weight:800;color:var(--green);border-bottom:2px solid var(--green)}
+.note{font-size:12px;color:var(--muted)}.signatures{display:grid;grid-template-columns:1fr 1fr;text-align:center;gap:30px;margin-top:36px;min-height:95px}.signatures strong{display:block}.foot{border-top:1px solid var(--line);margin-top:25px;padding-top:10px;font-size:11px;color:var(--muted);text-align:center}
+@media(max-width:650px){.sheet{padding:22px 16px;margin:0}.brand{display:block}.fields{grid-template-columns:1fr}.full{grid-column:auto}.toolbar{padding:0 12px}.total{max-width:none}}
+@media print{@page{size:A4;margin:12mm}body{background:#fff;font-size:11px}.toolbar,.no-print{display:none!important}.sheet{max-width:none;margin:0;padding:0;box-shadow:none}input,textarea,select{border:0;border-bottom:1px dotted #aaa;border-radius:0;padding:2px 0;background:transparent;appearance:none}textarea{min-height:30px}th,td{padding:6px}.section{break-inside:avoid}.signatures{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="toolbar">
+<button class="secondary" onclick="saveDraft()">Lưu nháp trên thiết bị</button>
+<button class="secondary" onclick="loadDraft()">Tải nháp</button>
+<button onclick="window.print()">In / Xuất PDF</button>
+</div>
+<main class="sheet">
+<header class="brand">
+<div><h1>GROVA HOLDINGS</h1><p>GIẢI PHÁP THANG MÁY CHO CÔNG TRÌNH HIỆN ĐẠI</p></div>
+<div style="text-align:right"><strong>CÔNG TY CỔ PHẦN GROVA HOLDINGS</strong><p>MST: 0202328361</p><p>49A/348 Trần Nguyên Hãn, Phường An Biên, Hải Phòng</p></div>
+</header>
+<h2>BÁO GIÁ KHUNG THÉP THANG MÁY</h2>
+<p class="subtitle">Báo giá cung cấp, vận chuyển và lắp đặt khung thép</p>
+<div class="fields">
+<div class="field"><label>Số báo giá</label><input data-field="quoteNo" value="BG-KT-20261013-001"></div>
+<div class="field"><label>Ngày báo giá</label><input data-field="quoteDate" type="date" value="2026-10-13"></div>
+<div class="field"><label>Khách hàng</label><input data-field="customer" placeholder="Nhập tên khách hàng"></div>
+<div class="field"><label>Điện thoại</label><input data-field="phone" placeholder="Nhập số điện thoại"></div>
+<div class="field full"><label>Địa chỉ công trình</label><input data-field="site" value="Hải Phòng"></div>
+<div class="field"><label>Số tầng / Stop</label><input data-field="stops" value="4 tầng"></div>
+<div class="field"><label>Kích thước phủ bì khung</label><input data-field="size" value="1540 × 1540 mm"></div>
+<div class="field"><label>Vị trí máy</label><input data-field="machine" value="Máy đặt trên khung thép"></div>
+<div class="field"><label>Màu sơn</label><input data-field="paint" placeholder="Theo màu được phê duyệt"></div>
+</div>
+<section class="section">
+<div class="section-title">01 · CHI TIẾT BÁO GIÁ</div>
+<table><thead><tr><th style="width:7%">STT</th><th>Hạng mục / phạm vi công việc</th><th style="width:12%">ĐVT</th><th class="num" style="width:10%">SL</th><th class="num" style="width:20%">Thành tiền (VNĐ)</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><strong>Khung thép thang máy</strong><br><span class="note">Cột đứng thép tấm 4 mm chấn định hình; đà ngang 4 mm; đà đỡ bệ máy 5 mm; bản mã chân cột 8 mm; bản mã liên kết, tăng cứng và bản mã bắt rail theo cấu hình được duyệt. Bao gồm thanh treo móc thi công, bulông, ecu, nở thép, sơn tĩnh điện và lắp ghép.</span></td><td>Bộ</td><td class="num">1</td><td class="num"><input data-money="frame" value="48000000" inputmode="numeric" aria-label="Giá khung thép"></td></tr>
+<tr><td>2</td><td>Dán màng PVC bảo vệ mặt ngoài</td><td>Bộ</td><td class="num">1</td><td class="num"><input data-money="pvc" value="1000000" inputmode="numeric" aria-label="Giá PVC"></td></tr>
+<tr><td>3</td><td>Vận chuyển đến công trình Hải Phòng</td><td>Lô</td><td class="num">1</td><td class="num"><input data-money="transport" value="2800000" inputmode="numeric" aria-label="Giá vận chuyển"></td></tr>
+<tr><td>4</td><td>Nhân công lắp đặt, căn chỉnh và hoàn thiện</td><td>Bộ</td><td class="num">1</td><td class="num"><input data-money="labor" value="10200000" inputmode="numeric" aria-label="Giá nhân công"></td></tr>
+</tbody></table>
+<div class="total">
+<div><span>Tạm tính</span><strong id="subtotal">62.000.000 đ</strong></div>
+<div><span>VAT</span><span><select data-field="vat" id="vat"><option value="0">Chưa bao gồm VAT</option><option value="8">8%</option><option value="10">10%</option></select></span></div>
+<div id="vatrow" style="display:none"><span>Tiền VAT</span><strong id="vatamount">0 đ</strong></div>
+<div class="grand"><span>TỔNG THANH TOÁN</span><strong id="grand">62.000.000 đ</strong></div>
+</div>
+<p><strong>Bằng chữ:</strong> <span id="words">Sáu mươi hai triệu đồng chẵn.</span></p>
+</section>
+<section class="section">
+<div class="section-title">02 · THÔNG SỐ KỸ THUẬT VÀ PHẠM VI</div>
+<div class="field"><label>Thông số / ghi chú kỹ thuật</label><textarea data-field="specs">Kích thước phủ bì khung 1540 × 1540 mm. Máy đặt trên khung thép. Cột, đà, bản mã theo cấu hình được duyệt; sơn tĩnh điện theo màu phê duyệt. Kèm vật tư liên kết và bản mã bắt rail theo hồ sơ kỹ thuật đã thống nhất.</textarea></div>
+<div class="field" style="margin-top:10px"><label>Điều kiện / phần việc loại trừ</label><textarea data-field="exclusions">Chủ đầu tư xác nhận kích thước và điều kiện hiện trường trước khi sản xuất. Các thay đổi ngoài cấu hình được duyệt, công tác xây dựng và hạng mục không liệt kê trong báo giá sẽ được xác nhận, báo giá riêng trước khi thực hiện.</textarea></div>
+</section>
+<section class="section">
+<div class="section-title">03 · TIẾN ĐỘ, THANH TOÁN VÀ BẢO HÀNH</div>
+<ul>
+<li><strong>Tiến độ dự kiến:</strong> sản xuất 8–10 ngày kể từ khi chốt thiết kế và nhận đặt cọc; thi công lắp đặt 3–5 ngày, tùy điều kiện hiện trường.</li>
+<li><strong>Thanh toán:</strong> 40% khi xác nhận đặt hàng; 50% khi vật tư được vận chuyển đến công trường; 10% trong vòng 07 ngày kể từ khi hoàn thiện lắp đặt.</li>
+<li><strong>Bảo hành:</strong> 12 tháng đối với lỗi sản xuất, theo điều kiện bảo hành được thống nhất trong hợp đồng.</li>
+<li><strong>Hiệu lực báo giá:</strong> 07 ngày kể từ ngày báo giá, trừ khi có thỏa thuận khác bằng văn bản.</li>
+<li><strong>Thuế:</strong> giá trên chưa bao gồm VAT; mức thuế áp dụng sẽ được xác nhận khi xuất hóa đơn.</li>
+</ul>
+<p class="note">Giá bán mẫu này được tính theo phương án dự toán nội bộ; cần xác nhận giá nhà cung cấp, cấu hình kết cấu và chi phí hiện trường trước khi gửi khách hàng.</p>
+</section>
+<div class="signatures"><div><strong>ĐẠI DIỆN KHÁCH HÀNG</strong><p>(Ký, ghi rõ họ tên)</p></div><div><strong>ĐẠI DIỆN GROVA HOLDINGS</strong><p>(Ký, ghi rõ họ tên)</p></div></div>
+<footer class="foot">GROVA HOLDINGS · BÁO GIÁ KHUNG THÉP THANG MÁY · Tài liệu dự thảo, chỉ có hiệu lực sau khi được GROVA xác nhận</footer>
+</main>
+<script>
+const fmt=n=>Math.round(n).toLocaleString('vi-VN')+' đ';
+function num(el){return Number(String(el.value||'0').replace(/[^\d-]/g,''))||0}
+function recalc(){
+ const subtotal=[...document.querySelectorAll('[data-money]')].reduce((s,e)=>s+num(e),0);
+ const rate=Number(document.getElementById('vat').value||0), tax=Math.round(subtotal*rate/100);
+ document.getElementById('subtotal').textContent=fmt(subtotal);
+ document.getElementById('vatamount').textContent=fmt(tax);
+ document.getElementById('vatrow').style.display=rate?'flex':'none';
+ document.getElementById('grand').textContent=fmt(subtotal+tax);
+ document.getElementById('words').textContent=numberWords(subtotal+(tax||0));
+}
+function numberWords(n){
+ if(n===0)return 'Không đồng.';
+ const units=['',' nghìn',' triệu',' tỷ',' nghìn tỷ',' triệu tỷ'];
+ const ones=['không','một','hai','ba','bốn','năm','sáu','bảy','tám','chín'];
+ function triad(x,full){let h=Math.floor(x/100),t=Math.floor(x%100/10),u=x%10,s='';if(h||full)s+=ones[h]+' trăm ';if(t>1){s+=ones[t]+' mươi ';if(u===1)s+='mốt';else if(u===5)s+='lăm';else if(u)s+=ones[u]}else if(t===1){s+='mười ';if(u===5)s+='lăm';else if(u)s+=ones[u]}else if(u){if(h||full)s+='lẻ ';s+=ones[u]}return s.trim()}
+ let parts=[],i=0;while(n>0&&i<units.length){let x=n%1000;if(x)parts.unshift(triad(x,parts.length>0)+units[i]);n=Math.floor(n/1000);i++}
+ return parts.join(' ').replace(/\s+/g,' ').trim().replace(/^./,c=>c.toUpperCase())+' đồng.';
+}
+function values(){const o={};document.querySelectorAll('[data-field],[data-money]').forEach(e=>o[e.dataset.field||e.dataset.money]=e.value);return o}
+function apply(o){document.querySelectorAll('[data-field],[data-money]').forEach(e=>{const k=e.dataset.field||e.dataset.money;if(o[k]!==undefined)e.value=o[k]});recalc()}
+function saveDraft(){localStorage.setItem('grova_steel_quote_draft',JSON.stringify(values()));alert('Đã lưu nháp trên thiết bị này.')}
+function loadDraft(){const x=localStorage.getItem('grova_steel_quote_draft');if(!x){alert('Chưa có nháp đã lưu trên thiết bị này.');return}apply(JSON.parse(x))}
+document.querySelectorAll('[data-money],#vat').forEach(e=>e.addEventListener('input',recalc));recalc();
+</script>
+</body></html>
