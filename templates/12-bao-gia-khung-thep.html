@@ -19,11 +19,11 @@ h2{text-align:center;font-size:23px;letter-spacing:1px;margin:25px 0 4px;color:v
 .fields{display:grid;grid-template-columns:1fr 1fr;gap:10px 18px}.field label{display:block;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:4px}
 input,textarea,select{width:100%;font:inherit;border:1px solid var(--line);border-radius:4px;padding:8px;background:#fff;color:var(--ink)}
 textarea{min-height:64px;resize:vertical}.full{grid-column:1/-1}
-table{width:100%;border-collapse:collapse;margin-top:8px}th,td{border:1px solid var(--line);padding:9px;text-align:left;vertical-align:top}th{background:#edf3ef;color:var(--green);font-size:12px}td.num,th.num{text-align:right;white-space:nowrap}
+table{width:100%;border-collapse:collapse;margin-top:8px}th,td{border:1px solid var(--line);padding:5px 7px;text-align:left;vertical-align:top}th{background:#edf3ef;color:var(--green);font-size:12px}td.num,th.num{text-align:right;white-space:nowrap}
 .total{margin:16px 0 0 auto;max-width:360px}.total div{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line)}.total .grand{font-size:19px;font-weight:800;color:var(--green);border-bottom:2px solid var(--green)}
-.note{font-size:12px;color:var(--muted)}.floor-row{display:grid;grid-template-columns:1fr 180px 150px;gap:8px;align-items:center;margin:6px 0}.floor-row input{min-width:0}.internal{border:1px dashed #b99a55;background:#fffaf0;padding:14px;border-radius:8px}.internal h3{margin:0 0 8px;color:#765c20}.internal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.warning{background:#fff4dc;border-left:4px solid #c38b23;padding:10px 12px;font-size:12px}.tech-table input{padding:5px}.tech-table td{font-size:12px}.no-print .internal{display:block}@media(max-width:650px){.floor-row{grid-template-columns:1fr 100px}.floor-row .elevation{grid-column:1/-1}.internal-grid{grid-template-columns:1fr}}.signatures{display:grid;grid-template-columns:1fr 1fr;text-align:center;gap:30px;margin-top:36px;min-height:95px}.signatures strong{display:block}.foot{border-top:1px solid var(--line);margin-top:25px;padding-top:10px;font-size:11px;color:var(--muted);text-align:center}
+.note{font-size:12px;color:var(--muted)}.floor-row{display:grid;grid-template-columns:1fr 180px 150px;gap:8px;align-items:center;margin:6px 0}.floor-row input{min-width:0}.internal{border:1px dashed #b99a55;background:#fffaf0;padding:14px;border-radius:8px}.internal h3{margin:0 0 8px;color:#765c20}.internal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.warning{background:#fff4dc;border-left:4px solid #c38b23;padding:10px 12px;font-size:12px}.tech-table input{padding:5px}.tech-table td{font-size:11px;line-height:1.3}.tech-table th{font-size:11px}.tech-table td:nth-child(2){min-width:220px}.no-print .internal{display:block}@media(max-width:650px){.floor-row{grid-template-columns:1fr 100px}.floor-row .elevation{grid-column:1/-1}.internal-grid{grid-template-columns:1fr}}.signatures{display:grid;grid-template-columns:1fr 1fr;text-align:center;gap:30px;margin-top:36px;min-height:95px}.signatures strong{display:block}.foot{border-top:1px solid var(--line);margin-top:25px;padding-top:10px;font-size:11px;color:var(--muted);text-align:center}
 @media(max-width:650px){.sheet{padding:22px 16px;margin:0}.brand{display:block}.fields{grid-template-columns:1fr}.full{grid-column:auto}.toolbar{padding:0 12px}.total{max-width:none}}
-@media print{@page{size:A4;margin:12mm}body{background:#fff;font-size:11px}.toolbar,.no-print{display:none!important}#printFloorSummary{display:block!important}.sheet{max-width:none;margin:0;padding:0;box-shadow:none}input,textarea,select{border:0;border-bottom:1px dotted #aaa;border-radius:0;padding:2px 0;background:transparent;appearance:none}textarea{min-height:30px}th,td{padding:6px}.section{break-inside:avoid}.signatures{break-inside:avoid}}
+@media print{@page{size:A4;margin:12mm}body{background:#fff;font-size:11px}.toolbar,.no-print{display:none!important}#printFloorSummary{display:block!important}.sheet{max-width:none;margin:0;padding:0;box-shadow:none}input,textarea,select{border:0;border-bottom:1px dotted #aaa;border-radius:0;padding:2px 0;background:transparent;appearance:none}textarea{min-height:30px}th,td{padding:4px 5px}.section{break-inside:avoid}.signatures{break-inside:avoid}}
 </style>
 </head>
 <body>
@@ -38,7 +38,7 @@ table{width:100%;border-collapse:collapse;margin-top:8px}th,td{border:1px solid 
 <div style="text-align:right"><strong>CÔNG TY CỔ PHẦN GROVA HOLDINGS</strong><p>MST: 0202328361</p><p>49A/348 Trần Nguyên Hãn, Phường An Biên, Hải Phòng</p></div>
 </header>
 <h2>BÁO GIÁ KHUNG THÉP THANG MÁY</h2>
-<p class="subtitle">Báo giá cấu kiện khung thép thang máy · Chi phí vận chuyển và nhân công được tính trong giá bán, không tách dòng trên báo giá khách hàng</p>
+<p class="subtitle">Báo giá cấu kiện khung thép thang máy</p>
 <div class="fields">
 <div class="field"><label>Số báo giá</label><input data-field="quoteNo" value="BG-KT-20261013-001"></div>
 <div class="field"><label>Ngày báo giá</label><input data-field="quoteDate" type="date" value="2026-10-13"></div>
@@ -60,19 +60,19 @@ table{width:100%;border-collapse:collapse;margin-top:8px}th,td{border:1px solid 
 </div>
 <div id="floorRows"></div>
 <div class="fields"><div class="field"><label>Tổng chênh cao các khoảng tầng</label><input id="totalRise" readonly value="13.500 mm"></div><div class="field"><label>Kích thước phủ bì hiện tại</label><input id="sizeSummary" readonly value="1540 × 1540 mm"></div></div>
-<div class="warning">Bộ tính lấy khối lượng tham chiếu từ bảng Central cho cấu hình 1540 × 1540 mm, sau đó quy đổi theo kích thước và chiều cao đầu vào. Đây là dự toán theo bảng tham chiếu, không thay thế bản vẽ kết cấu được duyệt.</div>
+
 </section>
 <p id="printFloorSummary" class="note"></p>
 <section class="section">
-<div class="section-title">01A · BẢNG THÔNG SỐ VÀ KHỐI LƯỢNG KỸ THUẬT</div>
-<p class="note">Khối lượng và thành tiền được tự tính theo bảng tham chiếu Central. Anh chỉ nhập thông số công trình và đơn giá thép; hệ thống quy đổi các cấu kiện tham chiếu theo kích thước, số tầng và chiều cao.</p>
+<div class="section-title">01 · CHI TIẾT CẤU KIỆN VÀ KHỐI LƯỢNG</div>
+
 <table class="tech-table"><thead><tr><th>STT</th><th>Cấu kiện / quy cách</th><th>ĐVT</th><th class="num">Chiều dài / SL</th><th class="num">Khối lượng (kg)</th><th class="num">Thành tiền (VNĐ)</th></tr></thead><tbody id="autoTechRows"></tbody><tfoot><tr><th colspan="4">TỔNG KHỐI LƯỢNG THÉP ƯỚC TÍNH</th><th class="num" id="autoTotalKg">0</th><th class="num" id="autoSteelCost">0 đ</th></tr></tfoot></table>
 </section>
 <section class="section">
-<div class="section-title">01 · CHI TIẾT BÁO GIÁ</div>
+<div class="section-title">02 · TỔNG HỢP BÁO GIÁ</div>
 <table><thead><tr><th style="width:7%">STT</th><th>Hạng mục / phạm vi công việc</th><th style="width:12%">ĐVT</th><th class="num" style="width:10%">SL</th><th class="num" style="width:20%">Thành tiền (VNĐ)</th></tr></thead>
 <tbody>
-<tr><td>1</td><td><strong>Khung thép thang máy — tính tự động theo khối lượng</strong><br><span class="note">Chi tiết cấu kiện, chiều dài, khối lượng và giá thép được tính từ thông số đầu vào và định mức cấu kiện trong bộ tính.</span></td><td>Bộ</td><td class="num">1</td><td class="num"><span id="autoFramePrice">—</span></td></tr>
+<tr><td>1</td><td><strong>Khung thép thang máy — tính tự động theo khối lượng</strong><br></td><td>Bộ</td><td class="num">1</td><td class="num"><span id="autoFramePrice">—</span></td></tr>
 <tr><td>2</td><td>Dán màng PVC bảo vệ mặt ngoài</td><td>Bộ</td><td class="num">1</td><td class="num"><span id="autoPvcPrice">—</span></td></tr>
 </tbody></table>
 <div class="total">
@@ -85,13 +85,13 @@ table{width:100%;border-collapse:collapse;margin-top:8px}th,td{border:1px solid 
 </section>
 <section class="section internal no-print">
 <h3>GIÁ VỐN NỘI BỘ — KHÔNG IN TRÊN BẢN GỬI KHÁCH</h3>
-<p class="note">Giá vốn nội bộ gồm thép, phụ liệu/gia công, PVC, nhân công lắp đặt 2.000.000 VNĐ × số khoảng tầng và vận chuyển cố định 3.000.000 VNĐ/công trình. Hai khoản nhân công và vận chuyển được tính vào giá vốn, nhưng không tách thành dòng trên báo giá khách hàng. Định mức cấu kiện là dự toán tham chiếu, cần đối chiếu bản vẽ trước khi chốt sản xuất.</p>
+<p class="note">Giá vốn nội bộ gồm thép, phụ liệu/gia công, PVC, nhân công và vận chuyển. Có thể sửa trực tiếp đơn giá nhân công/tầng và chi phí vận chuyển cho từng công trình; hai khoản này được tính vào giá vốn nhưng không tách thành dòng trên báo giá khách hàng.</p>
 <div class="internal-grid">
 <div class="field"><label>Đơn giá thép đầu vào (VNĐ/kg)</label><input data-field="steelRate" id="steelRateCost" type="number" value="26500"></div>
 <div class="field"><label>Chi phí phụ liệu / gia công theo kg (%)</label><input data-field="fabricationPct" id="fabricationPct" type="number" value="18" min="0" max="200"></div>
 <div class="field"><label>Giá vốn PVC (VNĐ)</label><input data-field="pvcCost" id="pvcCost" type="number" value="1000000"></div>
-<div class="field"><label>Nhân công lắp đặt (VNĐ/tầng)</label><input data-field="laborPerFloor" id="laborPerFloor" type="number" value="2000000" readonly></div>
-<div class="field"><label>Vận chuyển (VNĐ/công trình)</label><input data-field="transportCost" id="transportCost" type="number" value="3000000" readonly></div>
+<div class="field"><label>Nhân công lắp đặt (VNĐ/tầng)</label><input data-field="laborPerFloor" id="laborPerFloor" type="number" min="0" step="100000" value="2000000"></div>
+<div class="field"><label>Vận chuyển (VNĐ/công trình)</label><input data-field="transportCost" id="transportCost" type="number" min="0" step="100000" value="3000000"></div>
 <div class="field"><label>Biên lợi nhuận mục tiêu trên doanh thu (%)</label><input data-field="margin" id="margin" type="number" min="0" max="90" value="13.5"></div>
 </div>
 <div class="total">
@@ -104,12 +104,12 @@ table{width:100%;border-collapse:collapse;margin-top:8px}th,td{border:1px solid 
 </div>
 </section>
 <section class="section">
-<div class="section-title">02 · THÔNG SỐ KỸ THUẬT VÀ PHẠM VI</div>
+<div class="section-title">03 · THÔNG SỐ KỸ THUẬT VÀ PHẠM VI</div>
 <div class="field"><label>Thông số / ghi chú kỹ thuật</label><textarea data-field="specs">Kích thước phủ bì theo thông số nhập tại báo giá. Chiều cao từng khoảng tầng được liệt kê trong bảng thông số hình học. Máy đặt trên khung thép. Cột, đà, bản mã theo bản vẽ kết cấu được duyệt; sơn tĩnh điện theo màu phê duyệt. Kèm vật tư liên kết và bản mã bắt rail theo hồ sơ kỹ thuật đã thống nhất.</textarea></div>
 <div class="field" style="margin-top:10px"><label>Điều kiện / phần việc loại trừ</label><textarea data-field="exclusions">Chủ đầu tư xác nhận kích thước và điều kiện hiện trường trước khi sản xuất. Các thay đổi ngoài cấu hình được duyệt, công tác xây dựng và hạng mục không liệt kê trong báo giá sẽ được xác nhận, báo giá riêng trước khi thực hiện.</textarea></div>
 </section>
 <section class="section">
-<div class="section-title">03 · TIẾN ĐỘ, THANH TOÁN VÀ BẢO HÀNH</div>
+<div class="section-title">04 · TIẾN ĐỘ, THANH TOÁN VÀ BẢO HÀNH</div>
 <ul>
 <li><strong>Tiến độ dự kiến:</strong> sản xuất theo tiến độ được xác nhận sau khi chốt bản vẽ và đặt hàng.</li>
 <li><strong>Thanh toán:</strong> Theo thỏa thuận xác nhận trong hợp đồng/đơn đặt hàng.</li>
@@ -117,7 +117,7 @@ table{width:100%;border-collapse:collapse;margin-top:8px}th,td{border:1px solid 
 <li><strong>Hiệu lực báo giá:</strong> 07 ngày kể từ ngày báo giá, trừ khi có thỏa thuận khác bằng văn bản.</li>
 <li><strong>Thuế:</strong> giá trên chưa bao gồm VAT; mức thuế áp dụng sẽ được xác nhận khi xuất hóa đơn.</li>
 </ul>
-<p class="note">Giá bán được tính từ khối lượng tham chiếu, đơn giá thép, phụ liệu/gia công, PVC, nhân công 2.000.000 VNĐ/tầng và vận chuyển 3.000.000 VNĐ/công trình. Nhân công và vận chuyển đã được tính vào giá bán nhưng không tách dòng trên báo giá khách hàng.</p>
+
 </section>
 <div class="signatures"><div><strong>ĐẠI DIỆN KHÁCH HÀNG</strong><p>(Ký, ghi rõ họ tên)</p></div><div><strong>ĐẠI DIỆN GROVA HOLDINGS</strong><p>(Ký, ghi rõ họ tên)</p></div></div>
 <footer class="foot">GROVA HOLDINGS · BÁO GIÁ KHUNG THÉP THANG MÁY · Tài liệu dự thảo, chỉ có hiệu lực sau khi được GROVA xác nhận</footer>
@@ -159,7 +159,7 @@ function calcAuto(){
  profiles.push({name:'Đà treo móc thi công C120×45×20×4 mm',unit:'m',qty:base.lifting.length*base.lifting.qty*planScale,kg:base.lifting.kg*planScale,note:'Theo nhóm đà treo móc trong bảng tham chiếu.'});
  base.plates.forEach(p=>profiles.push({name:p.name,unit:'cái',qty:p.qty*levelScale,kg:p.kg*levelScale,note:'Số lượng/khối lượng quy đổi theo bảng tham chiếu Central; cần kiểm tra theo bản vẽ.'}));
  let totalKg=0,steelCost=0;const body=document.getElementById('autoTechRows');body.innerHTML='';
- profiles.forEach((p,i)=>{const kg=p.kg,cost=kg*rate;totalKg+=kg;steelCost+=cost;const tr=document.createElement('tr');tr.innerHTML=`<td>${i+1}</td><td>${p.name}<div class="note">${p.note}</div></td><td>${p.unit}</td><td class="num">${p.qty.toLocaleString('vi-VN',{maximumFractionDigits:2})}</td><td class="num">${kg.toLocaleString('vi-VN',{maximumFractionDigits:2})}</td><td class="num">${fmt(cost)}</td>`;body.appendChild(tr)});
+ profiles.forEach((p,i)=>{const kg=p.kg,cost=kg*rate;totalKg+=kg;steelCost+=cost;const tr=document.createElement('tr');tr.innerHTML=`<td>${i+1}</td><td>${p.name}</td><td>${p.unit}</td><td class="num">${p.qty.toLocaleString('vi-VN',{maximumFractionDigits:2})}</td><td class="num">${kg.toLocaleString('vi-VN',{maximumFractionDigits:2})}</td><td class="num">${fmt(cost)}</td>`;body.appendChild(tr)});
  const frameCost=Math.round(steelCost*(1+fab)),totalCost=frameCost+pvc+labor+transport,sell=Math.round(totalCost/(1-margin/100));
  document.getElementById('autoTotalKg').textContent=valid?totalKg.toLocaleString('vi-VN',{maximumFractionDigits:2}):'—';document.getElementById('autoSteelCost').textContent=valid?fmt(steelCost):'—';
  document.getElementById('autoFramePrice').textContent=valid?fmt(Math.round(sell-pvc)):'—';document.getElementById('autoPvcPrice').textContent=fmt(pvc);document.getElementById('subtotal').textContent=valid?fmt(sell):'—';
