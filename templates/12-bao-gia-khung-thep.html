@@ -44,22 +44,22 @@ table{width:100%;border-collapse:collapse;margin-top:8px}th,td{border:1px solid 
 <div class="field"><label>Ngày báo giá</label><input data-field="quoteDate" type="date" value="2026-10-13"></div>
 <div class="field"><label>Khách hàng</label><input data-field="customer" placeholder="Nhập tên khách hàng"></div>
 <div class="field"><label>Điện thoại</label><input data-field="phone" placeholder="Nhập số điện thoại"></div>
-<div class="field full"><label>Địa chỉ công trình</label><input data-field="site" value="Hải Phòng"></div>
-<div class="field"><label>Số tầng / Stop</label><input data-field="stops" value="4 tầng"></div>
-<div class="field"><label>Chiều rộng phủ bì (mm)</label><input data-field="width" id="width" type="number" min="1" value="1540"></div><div class="field"><label>Chiều sâu phủ bì (mm)</label><input data-field="depth" id="depth" type="number" min="1" value="1540"></div>
-<div class="field"><label>Vị trí máy</label><input data-field="machine" value="Máy đặt trên khung thép"></div>
-<div class="field"><label>Màu sơn</label><input data-field="paint" placeholder="Theo màu được phê duyệt"></div>
+<div class="field full"><label>Địa chỉ công trình</label><input data-field="site" value=""></div>
+<div class="field"><label>Số tầng / Stop</label><input data-field="stops" value="0"></div>
+<div class="field"><label>Chiều rộng phủ bì (mm)</label><input data-field="width" id="width" type="number" min="0" value="0"></div><div class="field"><label>Chiều sâu phủ bì (mm)</label><input data-field="depth" id="depth" type="number" min="0" value="0"></div>
+<div class="field"><label>Vị trí máy</label><input data-field="machine" value=""></div>
+<div class="field"><label>Màu sơn</label><input data-field="paint" placeholder="Nhập màu sơn"></div>
 </div>
 <section class="section no-print">
 <div class="section-title">THÔNG SỐ HÌNH HỌC — NHẬP RIÊNG TỪNG KHOẢNG TẦNG</div>
 <div class="fields">
-<div class="field"><label>Số khoảng tầng</label><select id="floorCount" data-field="floorCount"><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select></div>
-<div class="field"><label>Độ sâu pit (mm)</label><input data-field="pit" id="pit" type="number" value="400"></div>
-<div class="field"><label>Chiều cao OH (mm)</label><input data-field="oh" id="oh" type="number" value="4500"></div>
-<div class="field"><label>Đơn giá thép tham chiếu (VNĐ/kg)</label><input data-field="steelRate" id="steelRate" type="number" value="26500"></div>
+<div class="field"><label>Số khoảng tầng</label><select id="floorCount" data-field="floorCount"><option value="0" selected>00</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select></div>
+<div class="field"><label>Độ sâu pit (mm)</label><input data-field="pit" id="pit" type="number" value="0"></div>
+<div class="field"><label>Chiều cao OH (mm)</label><input data-field="oh" id="oh" type="number" value="0"></div>
+<div class="field"><label>Đơn giá thép tham chiếu (VNĐ/kg)</label><input data-field="steelRate" id="steelRate" type="number" value="0"></div>
 </div>
 <div id="floorRows"></div>
-<div class="fields"><div class="field"><label>Tổng chênh cao các khoảng tầng</label><input id="totalRise" readonly value="13.500 mm"></div><div class="field"><label>Kích thước phủ bì hiện tại</label><input id="sizeSummary" readonly value="1540 × 1540 mm"></div></div>
+<div class="fields"><div class="field"><label>Tổng chênh cao các khoảng tầng</label><input id="totalRise" readonly value="0 mm"></div><div class="field"><label>Kích thước phủ bì hiện tại</label><input id="sizeSummary" readonly value="0 × 0 mm"></div></div>
 
 </section>
 <p id="printFloorSummary" class="note"></p>
@@ -89,12 +89,12 @@ table{width:100%;border-collapse:collapse;margin-top:8px}th,td{border:1px solid 
 <h3>GIÁ VỐN NỘI BỘ — KHÔNG IN TRÊN BẢN GỬI KHÁCH</h3>
 <p class="note">Giá vốn nội bộ gồm thép, phụ liệu/gia công, PVC, nhân công và vận chuyển. Có thể sửa trực tiếp đơn giá nhân công/tầng và chi phí vận chuyển cho từng công trình; hai khoản này được tính vào giá vốn nhưng không tách thành dòng trên báo giá khách hàng.</p>
 <div class="internal-grid">
-<div class="field"><label>Đơn giá thép đầu vào (VNĐ/kg)</label><input data-field="steelRate" id="steelRateCost" type="number" value="26500"></div>
-<div class="field"><label>Chi phí phụ liệu / gia công theo kg (%)</label><input data-field="fabricationPct" id="fabricationPct" type="number" value="18" min="0" max="200"></div>
-<div class="field"><label>Giá vốn PVC (VNĐ)</label><input data-field="pvcCost" id="pvcCost" type="number" value="1000000"></div>
-<div class="field"><label>Nhân công lắp đặt (VNĐ/tầng)</label><input data-field="laborPerFloor" id="laborPerFloor" type="number" min="0" step="100000" value="2000000"></div>
-<div class="field"><label>Vận chuyển (VNĐ/công trình)</label><input data-field="transportCost" id="transportCost" type="number" min="0" step="100000" value="3000000"></div>
-<div class="field"><label>Biên lợi nhuận mục tiêu trên doanh thu (%)</label><input data-field="margin" id="margin" type="number" min="0" max="90" value="13.5"></div>
+<div class="field"><label>Đơn giá thép đầu vào (VNĐ/kg)</label><input data-field="steelRate" id="steelRateCost" type="number" value="0"></div>
+<div class="field"><label>Chi phí phụ liệu / gia công theo kg (%)</label><input data-field="fabricationPct" id="fabricationPct" type="number" value="0" min="0" max="200"></div>
+<div class="field"><label>Giá vốn PVC (VNĐ)</label><input data-field="pvcCost" id="pvcCost" type="number" value="0"></div>
+<div class="field"><label>Nhân công lắp đặt (VNĐ/tầng)</label><input data-field="laborPerFloor" id="laborPerFloor" type="number" min="0" step="100000" value="0"></div>
+<div class="field"><label>Vận chuyển (VNĐ/công trình)</label><input data-field="transportCost" id="transportCost" type="number" min="0" step="100000" value="0"></div>
+<div class="field"><label>Biên lợi nhuận mục tiêu trên doanh thu (%)</label><input data-field="margin" id="margin" type="number" min="0" max="90" value="0"></div>
 </div>
 <div class="total">
 <div><span>Chi phí nhân công (nội bộ)</span><strong id="laborTotal">8.000.000 đ</strong></div>
@@ -127,7 +127,7 @@ table{width:100%;border-collapse:collapse;margin-top:8px}th,td{border:1px solid 
 <script>
 const fmt=n=>Math.round(n).toLocaleString('vi-VN')+' đ';
 function num(el){return Number(String(el?.value||'0').replace(/[^\d.-]/g,''))||0}
-function buildFloors(existing){const count=Math.max(1,Math.min(12,Number(document.getElementById('floorCount').value)||4));const root=document.getElementById('floorRows');const vals=existing||[3600,3300,3300,3300];root.innerHTML='';for(let i=0;i<count;i++){const row=document.createElement('div');row.className='floor-row';row.innerHTML=`<label>Khoảng tầng ${i+1} → ${i+2} (mm)</label><input type="number" min="1" data-floor="${i}" value="${vals[i]??''}" placeholder="Nhập chiều cao"><input class="elevation" readonly data-elevation="${i}" value="Cao độ sàn trên: —">`;root.appendChild(row)}root.querySelectorAll('[data-floor]').forEach(e=>e.addEventListener('input',recalcGeometry));recalcGeometry()}
+function buildFloors(existing){const count=Math.max(0,Math.min(12,Number(document.getElementById('floorCount').value)||0));const root=document.getElementById('floorRows');const vals=existing||[];root.innerHTML='';for(let i=0;i<count;i++){const row=document.createElement('div');row.className='floor-row';row.innerHTML=`<label>Khoảng tầng ${i+1} → ${i+2} (mm)</label><input type="number" min="1" data-floor="${i}" value="${vals[i]??''}" placeholder="Nhập chiều cao"><input class="elevation" readonly data-elevation="${i}" value="Cao độ sàn trên: —">`;root.appendChild(row)}root.querySelectorAll('[data-floor]').forEach(e=>e.addEventListener('input',recalcGeometry));recalcGeometry()}
 function recalcGeometry(){let z=0;document.querySelectorAll('[data-floor]').forEach((e,i)=>{const h=num(e);z+=h;const out=document.querySelector(`[data-elevation="${i}"]`);out.value='Cao độ sàn trên: '+(h>0?z.toLocaleString('vi-VN')+' mm':'Chưa đủ dữ liệu')});document.getElementById('totalRise').value=z.toLocaleString('vi-VN')+' mm';document.getElementById('printFloorSummary').textContent='Chiều cao các khoảng tầng: '+[...document.querySelectorAll('[data-floor]')].map((e,i)=>`Tầng ${i+1}→${i+2}: ${num(e).toLocaleString('vi-VN')} mm`).join('; ')+'. Tổng chênh cao: '+z.toLocaleString('vi-VN')+' mm; Pit: '+num(document.getElementById('pit')).toLocaleString('vi-VN')+' mm; OH: '+num(document.getElementById('oh')).toLocaleString('vi-VN')+' mm.';document.getElementById('sizeSummary').value=(num(document.getElementById('width'))||'—')+' × '+(num(document.getElementById('depth'))||'—')+' mm';const w=num(document.getElementById('width')),d=num(document.getElementById('depth'));document.querySelector('[data-field="size"]')?.setAttribute('value',`${w} × ${d} mm`);const sizeInput=document.querySelector('[data-field="specs"]');if(sizeInput&&!sizeInput.dataset.userEdited){sizeInput.value=`Kích thước phủ bì khung ${w} × ${d} mm. Chiều cao từng khoảng tầng: `+[...document.querySelectorAll('[data-floor]')].map((e,i)=>`Tầng ${i+1}→${i+2}: ${num(e).toLocaleString('vi-VN')} mm`).join('; ')+`. Pit ${num(document.getElementById('pit')).toLocaleString('vi-VN')} mm; OH ${num(document.getElementById('oh')).toLocaleString('vi-VN')} mm. Máy đặt trên khung thép. Cột, đà, bản mã theo bản vẽ kết cấu được duyệt; sơn tĩnh điện theo màu phê duyệt. Kèm vật tư liên kết và bản mã bắt rail theo hồ sơ kỹ thuật đã thống nhất.`}}
 function sectionKgPerM(profile){const t=profile.t/1000;return profile.developed*t*7850}
 function calcAuto(){
