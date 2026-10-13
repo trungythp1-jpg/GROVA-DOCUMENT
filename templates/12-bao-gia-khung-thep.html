@@ -38,7 +38,7 @@ table{width:100%;border-collapse:collapse;margin-top:8px}th,td{border:1px solid 
 <div style="text-align:right"><strong>CÔNG TY CỔ PHẦN GROVA HOLDINGS</strong><p>MST: 0202328361</p><p>49A/348 Trần Nguyên Hãn, Phường An Biên, Hải Phòng</p></div>
 </header>
 <h2>BÁO GIÁ KHUNG THÉP THANG MÁY</h2>
-<p class="subtitle">Báo giá cung cấp, vận chuyển và lắp đặt khung thép</p>
+<p class="subtitle">Báo giá cấu kiện khung thép thang máy · Chi phí vận chuyển và nhân công được tính trong giá bán, không tách dòng trên báo giá khách hàng</p>
 <div class="fields">
 <div class="field"><label>Số báo giá</label><input data-field="quoteNo" value="BG-KT-20261013-001"></div>
 <div class="field"><label>Ngày báo giá</label><input data-field="quoteDate" type="date" value="2026-10-13"></div>
@@ -60,32 +60,20 @@ table{width:100%;border-collapse:collapse;margin-top:8px}th,td{border:1px solid 
 </div>
 <div id="floorRows"></div>
 <div class="fields"><div class="field"><label>Tổng chênh cao các khoảng tầng</label><input id="totalRise" readonly value="13.500 mm"></div><div class="field"><label>Kích thước phủ bì hiện tại</label><input id="sizeSummary" readonly value="1540 × 1540 mm"></div></div>
-<div class="warning">Lưu ý: cao độ sàn được cộng dồn từ chiều cao từng khoảng tầng. Cao độ đà ngang, chiều dài cột thực tế, số lượng bản mã và cấu kiện phải theo bản vẽ/định mức đã duyệt; hệ thống không tự suy đoán các thông số kết cấu này.</div>
+<div class="warning">Bộ tính lấy khối lượng tham chiếu từ bảng Central cho cấu hình 1540 × 1540 mm, sau đó quy đổi theo kích thước và chiều cao đầu vào. Đây là dự toán theo bảng tham chiếu, không thay thế bản vẽ kết cấu được duyệt.</div>
 </section>
 <p id="printFloorSummary" class="note"></p>
 <section class="section">
 <div class="section-title">01A · BẢNG THÔNG SỐ VÀ KHỐI LƯỢNG KỸ THUẬT</div>
-<p class="note">Giữ bảng chi tiết trong hồ sơ báo giá. Nhập khối lượng/định mức theo bản vẽ hoặc bảng định mức được duyệt; để trống nếu chưa xác nhận.</p>
-<table class="tech-table"><thead><tr><th>STT</th><th>Cấu kiện / quy cách tham chiếu</th><th>ĐVT</th><th class="num">Khối lượng / SL</th><th>Ghi chú</th></tr></thead><tbody id="techRows">
-<tr><td>1</td><td>Cột đứng thép chấn định hình 120×120×45×20×4 mm</td><td>m / kg</td><td><input data-tech="columns" placeholder="Theo bản vẽ"></td><td>Chiều dài từng đoạn và nối cột cần xác nhận</td></tr>
-<tr><td>2</td><td>Đà ngang C120×45×20×4 mm</td><td>m / kg</td><td><input data-tech="beams" placeholder="Theo bản vẽ"></td><td>Nhập theo từng cao độ/vị trí đã duyệt</td></tr>
-<tr><td>3</td><td>Đà đỡ bệ máy 50×160×80×25×5 mm</td><td>m / kg</td><td><input data-tech="machineBeams" placeholder="Theo bản vẽ"></td><td>Phụ thuộc phương án đặt máy</td></tr>
-<tr><td>4</td><td>Đà treo móc thi công C120×45×20×4 mm</td><td>m / kg</td><td><input data-tech="liftingBeams" placeholder="Theo bản vẽ"></td><td>Số lượng và chiều dài cần xác nhận</td></tr>
-<tr><td>5</td><td>Bản mã chân cột dày 8 mm</td><td>cái / kg</td><td><input data-tech="basePlates" placeholder="Theo bản vẽ"></td><td>Kích thước và số lượng cần xác nhận</td></tr>
-<tr><td>6</td><td>Bản mã đầu/nối cột, đà ngang dày 4–6 mm</td><td>cái / kg</td><td><input data-tech="jointPlates" placeholder="Theo bản vẽ"></td><td>Tách theo loại khi có định mức</td></tr>
-<tr><td>7</td><td>Bản mã tăng cứng cột và đà máy</td><td>cái / kg</td><td><input data-tech="stiffeners" placeholder="Theo bản vẽ"></td><td>Khoảng cách/điểm tăng cứng theo thiết kế</td></tr>
-<tr><td>8</td><td>Bản mã bắt rail dày 8 mm</td><td>cái / kg</td><td><input data-tech="railPlates" placeholder="Theo bản vẽ"></td><td>Phải đối chiếu bố trí rail</td></tr>
-<tr><td>9</td><td>Bulong, ecu, nở thép và vật tư phụ</td><td>bộ</td><td><input data-tech="fasteners" placeholder="Theo định mức"></td><td>Quy cách và số lượng theo hồ sơ</td></tr>
-</tbody></table>
+<p class="note">Khối lượng và thành tiền được tự tính theo bảng tham chiếu Central. Anh chỉ nhập thông số công trình và đơn giá thép; hệ thống quy đổi các cấu kiện tham chiếu theo kích thước, số tầng và chiều cao.</p>
+<table class="tech-table"><thead><tr><th>STT</th><th>Cấu kiện / quy cách</th><th>ĐVT</th><th class="num">Chiều dài / SL</th><th class="num">Khối lượng (kg)</th><th class="num">Thành tiền (VNĐ)</th></tr></thead><tbody id="autoTechRows"></tbody><tfoot><tr><th colspan="4">TỔNG KHỐI LƯỢNG THÉP ƯỚC TÍNH</th><th class="num" id="autoTotalKg">0</th><th class="num" id="autoSteelCost">0 đ</th></tr></tfoot></table>
 </section>
 <section class="section">
 <div class="section-title">01 · CHI TIẾT BÁO GIÁ</div>
 <table><thead><tr><th style="width:7%">STT</th><th>Hạng mục / phạm vi công việc</th><th style="width:12%">ĐVT</th><th class="num" style="width:10%">SL</th><th class="num" style="width:20%">Thành tiền (VNĐ)</th></tr></thead>
 <tbody>
-<tr><td>1</td><td><strong>Khung thép thang máy</strong><br><span class="note">Cột đứng thép tấm 4 mm chấn định hình; đà ngang 4 mm; đà đỡ bệ máy 5 mm; bản mã chân cột 8 mm; bản mã liên kết, tăng cứng và bản mã bắt rail theo cấu hình được duyệt. Bao gồm thanh treo móc thi công, bulông, ecu, nở thép, sơn tĩnh điện và lắp ghép.</span></td><td>Bộ</td><td class="num">1</td><td class="num"><input data-money="frame" value="48000000" inputmode="numeric" aria-label="Giá khung thép"></td></tr>
-<tr><td>2</td><td>Dán màng PVC bảo vệ mặt ngoài</td><td>Bộ</td><td class="num">1</td><td class="num"><input data-money="pvc" value="1000000" inputmode="numeric" aria-label="Giá PVC"></td></tr>
-<tr><td>3</td><td>Vận chuyển đến công trình Hải Phòng</td><td>Lô</td><td class="num">1</td><td class="num"><input data-money="transport" value="2800000" inputmode="numeric" aria-label="Giá vận chuyển"></td></tr>
-<tr><td>4</td><td>Nhân công lắp đặt, căn chỉnh và hoàn thiện</td><td>Bộ</td><td class="num">1</td><td class="num"><input data-money="labor" value="10200000" inputmode="numeric" aria-label="Giá nhân công"></td></tr>
+<tr><td>1</td><td><strong>Khung thép thang máy — tính tự động theo khối lượng</strong><br><span class="note">Chi tiết cấu kiện, chiều dài, khối lượng và giá thép được tính từ thông số đầu vào và định mức cấu kiện trong bộ tính.</span></td><td>Bộ</td><td class="num">1</td><td class="num"><span id="autoFramePrice">—</span></td></tr>
+<tr><td>2</td><td>Dán màng PVC bảo vệ mặt ngoài</td><td>Bộ</td><td class="num">1</td><td class="num"><span id="autoPvcPrice">—</span></td></tr>
 </tbody></table>
 <div class="total">
 <div><span>Tạm tính</span><strong id="subtotal">62.000.000 đ</strong></div>
@@ -97,17 +85,19 @@ table{width:100%;border-collapse:collapse;margin-top:8px}th,td{border:1px solid 
 </section>
 <section class="section internal no-print">
 <h3>GIÁ VỐN NỘI BỘ — KHÔNG IN TRÊN BẢN GỬI KHÁCH</h3>
-<p class="note">Các khoản giá vốn là dữ liệu quản trị nhập vào, không tự suy ra từ thông số hình học khi chưa có định mức kết cấu được duyệt.</p>
+<p class="note">Giá vốn nội bộ gồm thép, phụ liệu/gia công, PVC, nhân công lắp đặt 2.000.000 VNĐ × số khoảng tầng và vận chuyển cố định 3.000.000 VNĐ/công trình. Hai khoản nhân công và vận chuyển được tính vào giá vốn, nhưng không tách thành dòng trên báo giá khách hàng. Định mức cấu kiện là dự toán tham chiếu, cần đối chiếu bản vẽ trước khi chốt sản xuất.</p>
 <div class="internal-grid">
-<div class="field"><label>Giá vốn cấu kiện / gia công (VNĐ)</label><input data-cost="frameCost" type="number" value="39805450"></div>
-<div class="field"><label>Giá vốn PVC (VNĐ)</label><input data-cost="pvcCost" type="number" value="1000000"></div>
-<div class="field"><label>Giá vốn vận chuyển (VNĐ)</label><input data-cost="transportCost" type="number" value="2800000"></div>
-<div class="field"><label>Giá vốn nhân công (VNĐ)</label><input data-cost="laborCost" type="number" value="10000000"></div>
-<div class="field"><label>Chi phí bổ sung/dự phòng (VNĐ)</label><input data-cost="otherCost" type="number" value="0"></div>
+<div class="field"><label>Đơn giá thép đầu vào (VNĐ/kg)</label><input data-field="steelRate" id="steelRateCost" type="number" value="26500"></div>
+<div class="field"><label>Chi phí phụ liệu / gia công theo kg (%)</label><input data-field="fabricationPct" id="fabricationPct" type="number" value="18" min="0" max="200"></div>
+<div class="field"><label>Giá vốn PVC (VNĐ)</label><input data-field="pvcCost" id="pvcCost" type="number" value="1000000"></div>
+<div class="field"><label>Nhân công lắp đặt (VNĐ/tầng)</label><input data-field="laborPerFloor" id="laborPerFloor" type="number" value="2000000" readonly></div>
+<div class="field"><label>Vận chuyển (VNĐ/công trình)</label><input data-field="transportCost" id="transportCost" type="number" value="3000000" readonly></div>
 <div class="field"><label>Biên lợi nhuận mục tiêu trên doanh thu (%)</label><input data-field="margin" id="margin" type="number" min="0" max="90" value="13.5"></div>
 </div>
 <div class="total">
-<div><span>Tổng giá vốn nội bộ</span><strong id="costTotal">53.605.450 đ</strong></div>
+<div><span>Chi phí nhân công (nội bộ)</span><strong id="laborTotal">8.000.000 đ</strong></div>
+<div><span>Chi phí vận chuyển (nội bộ)</span><strong id="transportTotal">3.000.000 đ</strong></div>
+<div><span>Tổng giá vốn nội bộ</span><strong id="costTotal">64.605.450 đ</strong></div>
 <div><span>Giá bán đề xuất trước VAT</span><strong id="suggestedPrice">61.971.618 đ</strong></div>
 <div><span>Giá bán đang nhập</span><strong id="actualSell">62.000.000 đ</strong></div>
 <div><span>Lợi nhuận gộp dự kiến</span><strong id="grossProfit">8.394.550 đ</strong></div>
@@ -121,13 +111,13 @@ table{width:100%;border-collapse:collapse;margin-top:8px}th,td{border:1px solid 
 <section class="section">
 <div class="section-title">03 · TIẾN ĐỘ, THANH TOÁN VÀ BẢO HÀNH</div>
 <ul>
-<li><strong>Tiến độ dự kiến:</strong> sản xuất 8–10 ngày kể từ khi chốt thiết kế và nhận đặt cọc; thi công lắp đặt 3–5 ngày, tùy điều kiện hiện trường.</li>
-<li><strong>Thanh toán:</strong> 40% khi xác nhận đặt hàng; 50% khi vật tư được vận chuyển đến công trường; 10% trong vòng 07 ngày kể từ khi hoàn thiện lắp đặt.</li>
+<li><strong>Tiến độ dự kiến:</strong> sản xuất theo tiến độ được xác nhận sau khi chốt bản vẽ và đặt hàng.</li>
+<li><strong>Thanh toán:</strong> Theo thỏa thuận xác nhận trong hợp đồng/đơn đặt hàng.</li>
 <li><strong>Bảo hành:</strong> 12 tháng đối với lỗi sản xuất, theo điều kiện bảo hành được thống nhất trong hợp đồng.</li>
 <li><strong>Hiệu lực báo giá:</strong> 07 ngày kể từ ngày báo giá, trừ khi có thỏa thuận khác bằng văn bản.</li>
 <li><strong>Thuế:</strong> giá trên chưa bao gồm VAT; mức thuế áp dụng sẽ được xác nhận khi xuất hóa đơn.</li>
 </ul>
-<p class="note">Giá bán mẫu này được tính theo phương án dự toán nội bộ; cần xác nhận giá nhà cung cấp, cấu hình kết cấu và chi phí hiện trường trước khi gửi khách hàng.</p>
+<p class="note">Giá bán được tính từ khối lượng tham chiếu, đơn giá thép, phụ liệu/gia công, PVC, nhân công 2.000.000 VNĐ/tầng và vận chuyển 3.000.000 VNĐ/công trình. Nhân công và vận chuyển đã được tính vào giá bán nhưng không tách dòng trên báo giá khách hàng.</p>
 </section>
 <div class="signatures"><div><strong>ĐẠI DIỆN KHÁCH HÀNG</strong><p>(Ký, ghi rõ họ tên)</p></div><div><strong>ĐẠI DIỆN GROVA HOLDINGS</strong><p>(Ký, ghi rõ họ tên)</p></div></div>
 <footer class="foot">GROVA HOLDINGS · BÁO GIÁ KHUNG THÉP THANG MÁY · Tài liệu dự thảo, chỉ có hiệu lực sau khi được GROVA xác nhận</footer>
@@ -137,13 +127,53 @@ const fmt=n=>Math.round(n).toLocaleString('vi-VN')+' đ';
 function num(el){return Number(String(el?.value||'0').replace(/[^\d.-]/g,''))||0}
 function buildFloors(existing){const count=Math.max(1,Math.min(12,Number(document.getElementById('floorCount').value)||4));const root=document.getElementById('floorRows');const vals=existing||[3600,3300,3300,3300];root.innerHTML='';for(let i=0;i<count;i++){const row=document.createElement('div');row.className='floor-row';row.innerHTML=`<label>Khoảng tầng ${i+1} → ${i+2} (mm)</label><input type="number" min="1" data-floor="${i}" value="${vals[i]??''}" placeholder="Nhập chiều cao"><input class="elevation" readonly data-elevation="${i}" value="Cao độ sàn trên: —">`;root.appendChild(row)}root.querySelectorAll('[data-floor]').forEach(e=>e.addEventListener('input',recalcGeometry));recalcGeometry()}
 function recalcGeometry(){let z=0;document.querySelectorAll('[data-floor]').forEach((e,i)=>{const h=num(e);z+=h;const out=document.querySelector(`[data-elevation="${i}"]`);out.value='Cao độ sàn trên: '+(h>0?z.toLocaleString('vi-VN')+' mm':'Chưa đủ dữ liệu')});document.getElementById('totalRise').value=z.toLocaleString('vi-VN')+' mm';document.getElementById('printFloorSummary').textContent='Chiều cao các khoảng tầng: '+[...document.querySelectorAll('[data-floor]')].map((e,i)=>`Tầng ${i+1}→${i+2}: ${num(e).toLocaleString('vi-VN')} mm`).join('; ')+'. Tổng chênh cao: '+z.toLocaleString('vi-VN')+' mm; Pit: '+num(document.getElementById('pit')).toLocaleString('vi-VN')+' mm; OH: '+num(document.getElementById('oh')).toLocaleString('vi-VN')+' mm.';document.getElementById('sizeSummary').value=(num(document.getElementById('width'))||'—')+' × '+(num(document.getElementById('depth'))||'—')+' mm';const w=num(document.getElementById('width')),d=num(document.getElementById('depth'));document.querySelector('[data-field="size"]')?.setAttribute('value',`${w} × ${d} mm`);const sizeInput=document.querySelector('[data-field="specs"]');if(sizeInput&&!sizeInput.dataset.userEdited){sizeInput.value=`Kích thước phủ bì khung ${w} × ${d} mm. Chiều cao từng khoảng tầng: `+[...document.querySelectorAll('[data-floor]')].map((e,i)=>`Tầng ${i+1}→${i+2}: ${num(e).toLocaleString('vi-VN')} mm`).join('; ')+`. Pit ${num(document.getElementById('pit')).toLocaleString('vi-VN')} mm; OH ${num(document.getElementById('oh')).toLocaleString('vi-VN')} mm. Máy đặt trên khung thép. Cột, đà, bản mã theo bản vẽ kết cấu được duyệt; sơn tĩnh điện theo màu phê duyệt. Kèm vật tư liên kết và bản mã bắt rail theo hồ sơ kỹ thuật đã thống nhất.`}}
-function recalc(){const subtotal=[...document.querySelectorAll('[data-money]')].reduce((s,e)=>s+num(e),0);const rate=Number(document.getElementById('vat').value||0),tax=Math.round(subtotal*rate/100);document.getElementById('subtotal').textContent=fmt(subtotal);document.getElementById('vatamount').textContent=fmt(tax);document.getElementById('vatrow').style.display=rate?'flex':'none';document.getElementById('grand').textContent=fmt(subtotal+tax);document.getElementById('words').textContent=numberWords(subtotal+tax);recalcCost()}
-function recalcCost(){const cost=[...document.querySelectorAll('[data-cost]')].reduce((s,e)=>s+num(e),0);const margin=Math.max(0,Math.min(90,num(document.getElementById('margin'))));const suggested=margin<100?Math.round(cost/(1-margin/100)):0;const sell=[...document.querySelectorAll('[data-money]')].reduce((s,e)=>s+num(e),0);document.getElementById('costTotal').textContent=fmt(cost);document.getElementById('suggestedPrice').textContent=fmt(suggested);document.getElementById('actualSell').textContent=fmt(sell);document.getElementById('grossProfit').textContent=fmt(sell-cost)}
+function sectionKgPerM(profile){const t=profile.t/1000;return profile.developed*t*7850}
+function calcAuto(){
+ const w=num(document.getElementById('width'))/1000,d=num(document.getElementById('depth'))/1000;
+ const pit=num(document.getElementById('pit'))/1000,oh=num(document.getElementById('oh'))/1000;
+ const hs=[...document.querySelectorAll('[data-floor]')].map(e=>num(e)/1000),rise=hs.reduce((a,b)=>a+b,0),levels=hs.length;
+ const rate=num(document.getElementById('steelRate'))||num(document.getElementById('steelRateCost'));
+ const fab=Math.max(0,num(document.getElementById('fabricationPct')))/100,pvc=Math.max(0,num(document.getElementById('pvcCost')));
+ const laborPerFloor=Math.max(0,num(document.getElementById('laborPerFloor'))),labor=laborPerFloor*levels;
+ const transport=Math.max(0,num(document.getElementById('transportCost')));
+ const margin=Math.max(0,Math.min(90,num(document.getElementById('margin'))));
+ // Central reference quantities for 1540x1540 mm, 4 floor intervals.
+ // Profile kg/m values are derived from the source table's listed length, quantity and total kg.
+ const base={w:1.54,d:1.54,levels:4,totalColumnLength:18.55,
+   columnKgm:782.9/(18.55*4),
+   beamA:{length:1.3,qty:23,kg:209.2}, beamB:{length:1.3,qty:24,kg:218.3},
+   machineA:{length:1.3,qty:2,kg:31.3}, machineB:{length:1.3,qty:2,kg:31.3},
+   lifting:{length:1.45,qty:2,kg:20.3},
+   plates:[{name:'Bản mã chân cột dày 8 mm',qty:4,kg:10.4},{name:'Bản mã đỉnh cột dày 4 mm',qty:4,kg:7.2},{name:'Bản mã nối cột dày 6 mm',qty:40,kg:14.9},{name:'Bản mã tăng cứng cột dày 4 mm',qty:40,kg:9.4},{name:'Bản mã đà ngang dày 6 mm',qty:98,kg:21.0},{name:'Bản mã thanh đà đỡ bệ máy dày 8 mm',qty:8,kg:3.6},{name:'Bản mã tăng cứng đà đỡ bệ máy dày 8 mm',qty:8,kg:4.0},{name:'Bản mã thanh ngang treo móc dày 6 mm',qty:2,kg:1.6},{name:'Bản mã bắt rail dày 8 mm',qty:130,kg:42.9},{name:'Bản mã ghim/chêm khung dày 3–4 mm',qty:70,kg:7.0}]};
+ const valid=w>0&&d>0&&rise>0&&rate>0;
+ const heightScale=(rise+pit+oh)/base.totalColumnLength;
+ const planScale=((w+d)/(base.w+base.d));
+ const levelScale=levels/base.levels;
+ const profiles=[];
+ profiles.push({name:'Cột đứng thép chấn định hình 120×120×45×20×4 mm',unit:'m',qty:4*(rise+pit+oh),kg:4*(rise+pit+oh)*base.columnKgm,note:'Chiều dài dự toán: 4 cột × (tổng khoảng tầng + pit + OH); đối chiếu cao độ chân/đỉnh theo bản vẽ.'});
+ const beamAKgm=base.beamA.kg/(base.beamA.length*base.beamA.qty), beamBKgm=base.beamB.kg/(base.beamB.length*base.beamB.qty);
+ profiles.push({name:'Đà ngang C120×45×20×4 mm — nhóm A',unit:'m',qty:base.beamA.length*base.beamA.qty*planScale*levelScale,kg:base.beamA.kg*planScale*levelScale,note:'Quy đổi theo nhóm đà tham chiếu Central; số lượng thực tế theo bố trí đà trong bản vẽ.'});
+ profiles.push({name:'Đà ngang C120×45×20×4 mm — nhóm B',unit:'m',qty:base.beamB.length*base.beamB.qty*planScale*levelScale,kg:base.beamB.kg*planScale*levelScale,note:'Quy đổi theo nhóm đà tham chiếu Central; số lượng thực tế theo bố trí đà trong bản vẽ.'});
+ profiles.push({name:'Đà đỡ bệ máy 50×160×80×25×5 mm — nhóm A',unit:'m',qty:base.machineA.length*base.machineA.qty*planScale,kg:base.machineA.kg*planScale,note:'Theo số lượng và khối lượng trong bảng tham chiếu; cần đối chiếu phương án đặt máy.'});
+ profiles.push({name:'Đà đỡ bệ máy 50×160×80×25×5 mm — nhóm B',unit:'m',qty:base.machineB.length*base.machineB.qty*planScale,kg:base.machineB.kg*planScale,note:'Theo số lượng và khối lượng trong bảng tham chiếu; cần đối chiếu phương án đặt máy.'});
+ profiles.push({name:'Đà treo móc thi công C120×45×20×4 mm',unit:'m',qty:base.lifting.length*base.lifting.qty*planScale,kg:base.lifting.kg*planScale,note:'Theo nhóm đà treo móc trong bảng tham chiếu.'});
+ base.plates.forEach(p=>profiles.push({name:p.name,unit:'cái',qty:p.qty*levelScale,kg:p.kg*levelScale,note:'Số lượng/khối lượng quy đổi theo bảng tham chiếu Central; cần kiểm tra theo bản vẽ.'}));
+ let totalKg=0,steelCost=0;const body=document.getElementById('autoTechRows');body.innerHTML='';
+ profiles.forEach((p,i)=>{const kg=p.kg,cost=kg*rate;totalKg+=kg;steelCost+=cost;const tr=document.createElement('tr');tr.innerHTML=`<td>${i+1}</td><td>${p.name}<div class="note">${p.note}</div></td><td>${p.unit}</td><td class="num">${p.qty.toLocaleString('vi-VN',{maximumFractionDigits:2})}</td><td class="num">${kg.toLocaleString('vi-VN',{maximumFractionDigits:2})}</td><td class="num">${fmt(cost)}</td>`;body.appendChild(tr)});
+ const frameCost=Math.round(steelCost*(1+fab)),totalCost=frameCost+pvc+labor+transport,sell=Math.round(totalCost/(1-margin/100));
+ document.getElementById('autoTotalKg').textContent=valid?totalKg.toLocaleString('vi-VN',{maximumFractionDigits:2}):'—';document.getElementById('autoSteelCost').textContent=valid?fmt(steelCost):'—';
+ document.getElementById('autoFramePrice').textContent=valid?fmt(Math.round(sell-pvc)):'—';document.getElementById('autoPvcPrice').textContent=fmt(pvc);document.getElementById('subtotal').textContent=valid?fmt(sell):'—';
+ const vr=num(document.getElementById('vat')),tax=Math.round(sell*vr/100);document.getElementById('vatamount').textContent=fmt(tax);document.getElementById('vatrow').style.display=vr?'flex':'none';document.getElementById('grand').textContent=valid?fmt(sell+tax):'—';document.getElementById('words').textContent=valid?numberWords(sell+tax):'Chưa đủ thông số để tính giá';
+ document.getElementById('laborTotal').textContent=valid?fmt(labor):'—';document.getElementById('transportTotal').textContent=valid?fmt(transport):'—';document.getElementById('costTotal').textContent=valid?fmt(totalCost):'—';document.getElementById('suggestedPrice').textContent=valid?fmt(sell):'—';document.getElementById('actualSell').textContent=valid?fmt(sell):'—';document.getElementById('grossProfit').textContent=valid?fmt(sell-totalCost):'—';
+ const sum=document.getElementById('printFloorSummary');sum.textContent='Chiều cao từng khoảng tầng: '+hs.map((h,i)=>`Tầng ${i+1}→${i+2}: ${(h*1000).toLocaleString('vi-VN')} mm`).join('; ')+`. Tổng chênh cao ${rise.toLocaleString('vi-VN')} m; kích thước ${w*1000} × ${d*1000} mm; pit ${pit*1000} mm; OH ${oh*1000} mm.`;
+}
+function recalc(){calcAuto()}
+function recalcCost(){calcAuto()}
 function numberWords(n){if(n===0)return 'Không đồng.';const units=['',' nghìn',' triệu',' tỷ',' nghìn tỷ',' triệu tỷ'];const ones=['không','một','hai','ba','bốn','năm','sáu','bảy','tám','chín'];function triad(x,full){let h=Math.floor(x/100),t=Math.floor(x%100/10),u=x%10,s='';if(h||full)s+=ones[h]+' trăm ';if(t>1){s+=ones[t]+' mươi ';if(u===1)s+='mốt';else if(u===5)s+='lăm';else if(u)s+=ones[u]}else if(t===1){s+='mười ';if(u===5)s+='lăm';else if(u)s+=ones[u]}else if(u){if(h||full)s+='lẻ ';s+=ones[u]}return s.trim()}let parts=[],i=0;while(n>0&&i<units.length){let x=n%1000;if(x)parts.unshift(triad(x,parts.length>0)+units[i]);n=Math.floor(n/1000);i++}return parts.join(' ').replace(/\s+/g,' ').trim().replace(/^./,c=>c.toUpperCase())+' đồng.'}
 function values(){const o={floors:[...document.querySelectorAll('[data-floor]')].map(e=>e.value),tech:{}};document.querySelectorAll('[data-field],[data-money],[data-cost],[data-tech]').forEach(e=>{const k=e.dataset.field||e.dataset.money||e.dataset.cost||e.dataset.tech;o[k]=e.value});return o}
 function apply(o){document.querySelectorAll('[data-field],[data-money],[data-cost],[data-tech]').forEach(e=>{const k=e.dataset.field||e.dataset.money||e.dataset.cost||e.dataset.tech;if(o[k]!==undefined)e.value=o[k]});if(o.floors){buildFloors(o.floors);document.querySelectorAll('[data-floor]').forEach((e,i)=>e.value=o.floors[i]??'')}recalcGeometry();recalc()}
 function saveDraft(){localStorage.setItem('grova_steel_quote_draft_v2',JSON.stringify(values()));alert('Đã lưu nháp trên thiết bị này.')}
 function loadDraft(){const x=localStorage.getItem('grova_steel_quote_draft_v2');if(!x){alert('Chưa có nháp đã lưu trên thiết bị này.');return}apply(JSON.parse(x))}
-document.getElementById('floorCount').addEventListener('change',()=>buildFloors([...document.querySelectorAll('[data-floor]')].map(e=>num(e))));document.querySelectorAll('[data-money],#vat,[data-cost],#margin,#width,#depth,#pit,#oh').forEach(e=>e.addEventListener('input',()=>{recalcGeometry();recalc()}));document.querySelector('[data-field="specs"]').addEventListener('input',e=>e.target.dataset.userEdited='1');buildFloors();recalc();
+document.getElementById('floorCount').addEventListener('change',()=>buildFloors([...document.querySelectorAll('[data-floor]')].map(e=>num(e))));document.querySelectorAll('#vat,#margin,#width,#depth,#pit,#oh,#steelRate,#steelRateCost,#fabricationPct,#pvcCost,#laborPerFloor,#transportCost').forEach(e=>e.addEventListener('input',()=>{if(e.id==='steelRateCost')document.getElementById('steelRate').value=e.value;if(e.id==='steelRate')document.getElementById('steelRateCost').value=e.value;if(e.id==='pvcCost'){}recalcGeometry();recalc()}));document.querySelector('[data-field="specs"]').addEventListener('input',e=>e.target.dataset.userEdited='1');document.getElementById("steelRateCost").value=document.getElementById("steelRate").value;buildFloors();recalc();
 </script>
 </body></html>
