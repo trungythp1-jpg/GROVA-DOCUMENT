@@ -69,6 +69,22 @@
  .field-print-value{display:block!important;border-bottom:1px dotted #b7c0ba;padding:2px 0;min-height:1em}
  .spec-table .field-print-value{border:0;padding:0;min-height:0}
 }
+
+.photo-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px}
+.photo-card{margin:0;border:1px solid #dfe4e0;border-radius:7px;overflow:hidden;break-inside:avoid;page-break-inside:avoid;background:#fff}
+.photo-card img{display:block;width:100%;height:155px;object-fit:contain;background:#fff;padding:5px}
+.photo-card figcaption{display:flex;flex-direction:column;gap:3px;padding:7px 8px;border-top:1px solid #edf0ed;font-size:10px;line-height:1.3}
+.photo-card figcaption span{color:#59645e;font-size:9px}
+.photo-note{font-size:9px;line-height:1.4;color:#59645e;margin-top:12px}
+@media screen and (max-width:700px){.photo-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.photo-card img{height:130px}}
+@media print{
+.photo-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px}
+.photo-card img{height:135px;padding:3px}
+.photo-card figcaption{font-size:9px;padding:5px 6px}
+.photo-card figcaption span{font-size:8px}
+.photo-note{font-size:8px}
+}
+
 </style></head>
 <body>
 <div class="toolbar screen-only"><button class="secondary" onclick="saveDraft()">Lưu nháp</button><button class="secondary" onclick="loadDraft()">Tải nháp</button><button class="secondary" onclick="toggleInternal()">Ẩn/hiện giá vốn nội bộ</button><button onclick="window.print()">Xuất PDF / In báo giá</button></div>
@@ -125,6 +141,25 @@
 </tbody></table></div><p class="note">Các thông số chưa nhập hoặc chưa được xác nhận sẽ không được hiểu là thông số thiết kế cuối cùng. Cấu hình thiết bị thực tế phải phù hợp bản vẽ, hồ sơ kỹ thuật và hợp đồng được hai bên duyệt.</p></div>
 <div class="foot">GROVA HOLDINGS · PHỤ LỤC KỸ THUẬT · Tài liệu dự thảo, cấu hình cuối cùng theo hồ sơ được duyệt</div>
 </section>
+
+<section class="sheet photo-sheet" id="photoAppendix">
+<header class="brand"><div><div class="brand-name">GROVA</div><div class="tagline">THƯ VIỆN HÌNH ẢNH CẤU HÌNH</div></div><div class="company"><strong id="photoQuoteNo">BÁO GIÁ</strong><br><span id="photoCustomer">Khách hàng</span></div></header>
+<div class="hero" style="padding-bottom:8px"><h1>HÌNH ẢNH THIẾT BỊ & VẬT LIỆU</h1><p>Hình ảnh tham khảo tự động theo cấu hình đã chọn trong báo giá</p></div>
+<div class="photo-grid">
+<figure class="photo-card"><img id="photoMotor" src="" alt="Máy kéo"><figcaption><strong>Máy kéo</strong><span id="photoMotorLabel"></span></figcaption></figure>
+<figure class="photo-card"><img id="photoController" src="" alt="Tủ điều khiển"><figcaption><strong>Tủ điều khiển</strong><span id="photoControllerLabel"></span></figcaption></figure>
+<figure class="photo-card"><img id="photoDoor" src="" alt="Mẫu cửa tầng"><figcaption><strong>Cửa tầng</strong><span id="photoDoorLabel"></span></figcaption></figure>
+<figure class="photo-card"><img id="photoCeiling" src="" alt="Trần giả cabin"><figcaption><strong>Trần giả</strong><span id="photoCeilingLabel"></span></figcaption></figure>
+<figure class="photo-card"><img id="photoHandrail" src="" alt="Tay vịn cabin"><figcaption><strong>Tay vịn cabin</strong><span id="photoHandrailLabel"></span></figcaption></figure>
+<figure class="photo-card"><img id="photoButton1" src="" alt="Nút bấm mẫu 001"><figcaption><strong>Nút bấm 001</strong><span>DA-001</span></figcaption></figure>
+<figure class="photo-card"><img id="photoButton2" src="" alt="Nút bấm mẫu 002"><figcaption><strong>Nút bấm 002</strong><span>DA-002</span></figcaption></figure>
+<figure class="photo-card"><img id="photoButton3" src="" alt="Nút bấm mẫu 003"><figcaption><strong>Nút bấm 003</strong><span>DA-003</span></figcaption></figure>
+<figure class="photo-card"><img id="photoButton4" src="" alt="Nút bấm mẫu 004"><figcaption><strong>Nút bấm 004</strong><span>DA-004</span></figcaption></figure>
+</div>
+<p class="photo-note">Hình ảnh mang tính minh họa lựa chọn. Mẫu mã, màu sắc và thông số cuối cùng cần được khách hàng xác nhận trước khi sản xuất/lắp đặt.</p>
+<div class="foot">GROVA HOLDINGS · THƯ VIỆN HÌNH ẢNH · Ảnh tham khảo theo cấu hình đã chọn</div>
+</section>
+
 <div class="internal screen-only" id="internalPanel"><h3>GIÁ VỐN NỘI BỘ — KHÔNG IN TRÊN BẢN GỬI KHÁCH</h3><p class="note">Đơn giá đầu vào, giá vốn và biên lợi nhuận chỉ phục vụ tính giá nội bộ. Khi xuất PDF, toàn bộ khu vực này được ẩn.</p>
 <div class="checkrow"><input type="checkbox" id="includeFrame"><label for="includeFrame">Bao gồm khung thép (tùy chọn)</label></div>
 <div class="cost-grid"><div class="field"><label>Giá vốn thang máy / bộ (VNĐ)</label><input id="costLift" type="number" min="0" value="0"></div><div class="field"><label>Giá vốn khung thép / bộ (VNĐ)</label><input id="costFrame" type="number" min="0" value="0"></div><div class="field"><label>Chi phí bổ sung / bộ (VNĐ)</label><input id="costExtra" type="number" min="0" value="0"></div><div class="field"><label>Tên hạng mục bổ sung</label><input id="extraLabel" placeholder="Ví dụ: hoàn thiện / hạng mục khác"></div><div class="field"><label>Biên lợi nhuận mục tiêu (%)</label><input id="margin" type="number" min="0" max="90" step="0.1" value="0"></div><div class="field"><label>Giá bán thang máy override (VNĐ, tùy chọn)</label><input id="overrideLift" type="number" min="0" placeholder="Để trống = tự tính"></div><div class="field"><label>Giá bán khung thép override (VNĐ, tùy chọn)</label><input id="overrideFrame" type="number" min="0" placeholder="Để trống = tự tính"></div><div class="field"><label>Giá bán hạng mục bổ sung override (VNĐ)</label><input id="overrideExtra" type="number" min="0" placeholder="Để trống = tự tính"></div><div class="field"><label>Đơn giá đầu vào</label><div class="note">Không xuất hiện trong PDF khách hàng.</div></div></div>
@@ -158,7 +193,36 @@ function choiceValue(id){
 function spellNumber(n){n=Math.round(Number(n)||0);if(n===0)return'Không đồng.';const d=['không','một','hai','ba','bốn','năm','sáu','bảy','tám','chín'];function block(x){let s='';let h=Math.floor(x/100),t=Math.floor(x%100/10),u=x%10;if(h)s+=d[h]+' trăm';else if(t||u)s+='không trăm';if(t>1)s+=' '+d[t]+' mươi'+(u===1?' mốt':u===5?' lăm':u?' '+d[u]:'');else if(t===1)s+=' mười'+(u===5?' lăm':u?' '+d[u]:'');else if(u)s+=' '+(h||t?(u===5?'lăm':d[u]):d[u]);return s.trim()}let units=['',' nghìn',' triệu',' tỷ',' nghìn tỷ'];let parts=[],i=0;while(n>0&&i<units.length){let b=n%1000;if(b)parts.unshift(block(b)+units[i]);n=Math.floor(n/1000);i++}return parts.join(' ').replace(/\s+/g,' ').trim().replace(/^./,c=>c.toUpperCase())+' đồng.'}
 function price(cost){let m=Math.min(90,num('margin'))/100;return cost>0?(m===0?cost:cost/(1-m)):0}
 function calculate(){let q=Math.max(1,num('quantity')||1),liftCost=num('costLift')*q,frameOn=$('includeFrame').checked,frameCost=frameOn?num('costFrame')*q:0,extraCost=num('costExtra')*q;let lift=val('overrideLift')!==''?num('overrideLift')*q:price(num('costLift'))*q;let frame=frameOn?(val('overrideFrame')!==''?num('overrideFrame')*q:price(num('costFrame'))*q):0;let extra=val('overrideExtra')!==''?num('overrideExtra')*q:price(num('costExtra'))*q;let subtotal=lift+frame+extra,vat=subtotal*num('vatRate')/100; $('saleLift').textContent=money(lift);$('saleFrame').textContent=money(frame);$('saleExtra').textContent=money(extra);$('clientQty').textContent=q;$('frameQty').textContent=q;$('frameSaleRow').classList.toggle('hidden',!frameOn);$('extraSaleRow').classList.toggle('hidden',extra<=0);$('extraNo').textContent=frameOn?'3':'2';$('extraName').textContent=val('extraLabel')||'Hạng mục bổ sung';$('subtotal').textContent=money(subtotal);$('vatAmount').textContent=money(vat);$('grandTotal').textContent=money(subtotal+vat);$('words').textContent=spellNumber(subtotal+vat);$('internalCost').textContent=money(liftCost+frameCost+extraCost);$('internalSale').textContent=money(subtotal);$('internalProfit').textContent=money(subtotal-liftCost-frameCost-extraCost);$('clientConfig').textContent=`${num('capacity')} kg · ${num('stops')} stop · ${num('speed')} m/phút`;$('clientEquipment').textContent=`Máy kéo ${choiceValue('motor')||'Chưa chọn'}; tủ điều khiển ${choiceValue('controller')||'Chưa chọn'}; rail ${choiceValue('rails')||'T78'}`;$('appendixQuoteNo').textContent=val('quoteNo')||'BÁO GIÁ';$('appendixCustomer').textContent=val('customer')||'Khách hàng';$('specType').textContent=val('liftType');$('specCode').textContent=`GROVA · ${num('capacity')} kg · ${num('stops')} stop`; $('specQty').textContent=q+' thang';$('specCapacity').textContent=num('capacity')+' kg';$('specSpeed').textContent=num('speed')+' m/phút';$('specStops').textContent=num('stops')+' stop';$('specDoors').textContent=num('doors')+' cửa';$('specRoom').textContent=choiceValue('machineRoom');$('specShaft').textContent=(num('shaftW')&&num('shaftD'))?`${num('shaftW')} × ${num('shaftD')} mm`:'Chưa nhập';$('specPitOh').textContent=`PIT ${num('pit')||'chưa nhập'} mm / OH ${num('oh')||'chưa nhập'} mm`;}
-function syncAll(){calculate();customizableSelectIds.forEach(id=>{const el=$(id),p=$(id+'Print'),m=$(id+'Custom');if(el&&p)p.textContent=el.value==='__custom__'?(m?.value.trim()||'Chưa nhập'):(el.options[el.selectedIndex]?.text||'');if(m)m.classList.toggle('active',el.value==='__custom__');});}document.querySelectorAll('input,select,textarea').forEach(el=>el.addEventListener('input',syncAll));document.querySelectorAll('input,select,textarea').forEach(el=>el.addEventListener('change',syncAll));setupCustomChoices();function toggleInternal(){ $('internalPanel').classList.toggle('hidden') }
+
+const GROVA_ASSET='https://trungythp1-jpg.github.io/GROVA-DOCUMENT/assets/elevator/';
+function setPhoto(id,path,labelId,label){const im=$(id);if(!im)return;im.src=GROVA_ASSET+path;im.onerror=()=>{im.onerror=null;im.style.visibility='hidden';};im.style.visibility='visible';if(labelId)$(labelId).textContent=label||'';}
+function syncPhotoAppendix(){
+ const motor=val('motor'), controller=val('controller'), handrail=val('handrail'), ceiling=val('ceiling');
+ let motorFile='may-keo/faxi.jpg';
+ if(/torin/i.test(motor))motorFile='may-keo/torin.jpg';
+ else if(/ziehl/i.test(motor))motorFile='may-keo/ziehl-abegg.jpg';
+ else if(/montanari|mgv25/i.test(motor))motorFile='may-keo/montanari-mgv25s.jpg';
+ setPhoto('photoMotor',motorFile,'photoMotorLabel',motor);
+ const controllerFile=/step/i.test(controller)?'tu-dien/step.jpg':'tu-dien/nice-3000.jpg';
+ setPhoto('photoController',controllerFile,'photoControllerLabel',controller);
+ let doorFile='cua-tang/cua-tang-inox-guong-trang.jpg', doorLabel=val('doorType')+' · Inox gương trắng';
+ const materials=[val('wallRight'),val('wallLeft'),val('wallRear')].join(' ');
+ if(/kính cường lực/i.test(materials)){doorFile='cua-tang/cua-tang-kinh-nep-inox-guong-trang.jpg';doorLabel+=' · Kính, nẹp inox gương trắng';}
+ else if(/inox vàng gương/i.test(materials)){doorFile='cua-tang/cua-tang-inox-guong-vang.jpg';doorLabel+=' · Inox gương vàng';}
+ else if(/sọc nhuyễn/i.test(materials)){doorFile='cua-tang/cua-tang-inox-matte.jpg';doorLabel+=' · Inox xước/mờ';}
+ setPhoto('photoDoor',doorFile,'photoDoorLabel',doorLabel);
+ let ceilingFile='tran-gia/tran-gia-001.jpg';
+ if(/002|mẫu 2|mẫu số 2/i.test(ceiling))ceilingFile='tran-gia/tran-gia-002.jpg';
+ else if(/003|mẫu 3|mẫu số 3/i.test(ceiling))ceilingFile='tran-gia/tran-gia-003.jpg';
+ setPhoto('photoCeiling',ceilingFile,'photoCeilingLabel',ceiling||'Mẫu tham khảo 001');
+ const handrailFile=/dẹt/i.test(handrail)?'tay-vin/tay-vin-det-002.jpg':'tay-vin/tay-vin-tron-001.jpg';
+ setPhoto('photoHandrail',handrailFile,'photoHandrailLabel',handrail);
+ for(let n=1;n<=4;n++)setPhoto('photoButton'+n,'nut-bam/nut-bam-da-00'+n+'.jpg',null,'');
+ $('photoQuoteNo').textContent=val('quoteNo')||'BÁO GIÁ';
+ $('photoCustomer').textContent=val('customer')||'Khách hàng';
+}
+
+function syncAll(){calculate();syncPhotoAppendix();customizableSelectIds.forEach(id=>{const el=$(id),p=$(id+'Print'),m=$(id+'Custom');if(el&&p)p.textContent=el.value==='__custom__'?(m?.value.trim()||'Chưa nhập'):(el.options[el.selectedIndex]?.text||'');if(m)m.classList.toggle('active',el.value==='__custom__');});}document.querySelectorAll('input,select,textarea').forEach(el=>el.addEventListener('input',syncAll));document.querySelectorAll('input,select,textarea').forEach(el=>el.addEventListener('change',syncAll));setupCustomChoices();function toggleInternal(){ $('internalPanel').classList.toggle('hidden') }
 function saveDraft(){let data={};document.querySelectorAll('input,select,textarea').forEach(el=>{if(el.id)data[el.id]=el.type==='checkbox'?el.checked:el.value});try{localStorage.setItem('grovaElevatorQuoteDraft',JSON.stringify(data));alert('Đã lưu nháp trên trình duyệt này.')}catch(e){alert('Không lưu được nháp trên trình duyệt.')}}
 function loadDraft(){try{let d=JSON.parse(localStorage.getItem('grovaElevatorQuoteDraft')||'null');if(!d){alert('Chưa có bản nháp đã lưu.');return}Object.keys(d).forEach(id=>{let el=$(id);if(el){if(el.type==='checkbox')el.checked=d[id];else el.value=d[id]}});syncAll();alert('Đã tải nháp.')}catch(e){alert('Không đọc được bản nháp.')}}
 function setupPlainTextPrint(){
