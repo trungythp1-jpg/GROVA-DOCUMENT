@@ -195,7 +195,7 @@ window.GROVA_DATA = {
       code: "BG-TM",
       name: "Báo giá thang máy GROVA",
       title: "BÁO GIÁ THANG MÁY GROVA",
-      description: "Báo giá thang máy GROVA, tính giá bán và VAT, kèm phụ lục kỹ thuật chi tiết.",
+      description: "Báo giá thang máy GROVA; có lựa chọn nhập tay cho thiết bị, tùy chọn kỹ thuật và bản in/PDF hiển thị giá trị đã chọn gọn gàng.",
       category: "Báo giá",
       icon: "🛗",
       file: "./templates/13-bao-gia-thang-may-grova.html",
