@@ -1,6 +1,6 @@
 /* =========================================================
    GROVA DOCUMENT
-   DATA.JS — VERSION 200
+   DATA.JS — VERSION 201
 ========================================================= */
 
 window.GROVA_DATA = {
@@ -13,7 +13,7 @@ window.GROVA_DATA = {
     name: "GROVA DOCUMENT",
     shortName: "GROVA DOC",
     description: "Hệ thống quản lý văn bản và hồ sơ GROVA HOLDINGS",
-    version: "200"
+    version: "201"
   },
 
   /* =======================================================
@@ -199,6 +199,18 @@ window.GROVA_DATA = {
       category: "Báo giá",
       icon: "🛗",
       file: "./templates/13-bao-gia-thang-may-grova.html",
+      enabled: true
+    },
+
+    {
+      id: "14",
+      code: "BG-DA",
+      name: "Báo giá thang máy Đức Anh",
+      title: "BÁO GIÁ THANG MÁY ĐỨC ANH",
+      description: "Báo giá thang máy Đức Anh Việt Nam; cấu hình thiết bị, lựa chọn vật liệu, tự tính giá trị và VAT, lưu nháp, in/xuất PDF.",
+      category: "Báo giá",
+      icon: "🛗",
+      file: "./templates/14-bao-gia-thang-may-duc-anh.html",
       enabled: true
     },
 
