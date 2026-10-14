@@ -188,7 +188,19 @@ window.GROVA_DATA = {
       icon: "🧾",
       file: "./templates/12-bao-gia-khung-thep.html",
       enabled: true
-    }
+    },
+
+    {
+      id: "13",
+      code: "BG-TM",
+      name: "Báo giá thang máy GROVA",
+      title: "BÁO GIÁ THANG MÁY GROVA",
+      description: "Báo giá thang máy GROVA, tính giá bán và VAT, kèm phụ lục kỹ thuật chi tiết.",
+      category: "Báo giá",
+      icon: "🛗",
+      file: "./templates/13-bao-gia-thang-may-grova.html",
+      enabled: true
+    },
 
   ],
 
