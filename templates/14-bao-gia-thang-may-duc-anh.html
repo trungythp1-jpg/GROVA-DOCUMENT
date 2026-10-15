@@ -40,21 +40,21 @@
  .signature{margin-top:20px;min-height:58px;gap:20px;break-inside:avoid;page-break-inside:avoid}
  .foot{margin-top:12px;padding-top:6px;font-size:9px}
  .spec-table td:first-child{width:31%}
- /* Technical appendix: larger typography and roomier rows to improve readability and reduce empty space. */
- .sheet:nth-of-type(2) .brand{padding-bottom:12px}
- .sheet:nth-of-type(2) .brand-name{font-size:20px}
+ /* Technical appendix: compact typography to save print pages while remaining readable. */
+ .sheet:nth-of-type(2) .brand{padding-bottom:7px}
+ .sheet:nth-of-type(2) .brand-name{font-size:17px}
  .sheet:nth-of-type(2) .tagline,.sheet:nth-of-type(2) .company{font-size:10px}
- .sheet:nth-of-type(2) .hero{padding:24px 0 20px}
- .sheet:nth-of-type(2) .hero h1{font-size:24px;margin-bottom:7px}
- .sheet:nth-of-type(2) .hero p{font-size:12px}
- .sheet:nth-of-type(2) .section{margin-top:22px}
- .sheet:nth-of-type(2) .section h2{font-size:14px;margin-bottom:8px;padding-bottom:6px}
- .sheet:nth-of-type(2) .spec-table{font-size:12.5px;line-height:1.48}
- .sheet:nth-of-type(2) .spec-table th,.sheet:nth-of-type(2) .spec-table td{padding:9px 10px;line-height:1.48}
+ .sheet:nth-of-type(2) .hero{padding:12px 0 8px}
+ .sheet:nth-of-type(2) .hero h1{font-size:20px;margin-bottom:3px}
+ .sheet:nth-of-type(2) .hero p{font-size:11px}
+ .sheet:nth-of-type(2) .section{margin-top:10px}
+ .sheet:nth-of-type(2) .section h2{font-size:12px;margin-bottom:6px;padding-bottom:4px}
+ .sheet:nth-of-type(2) .spec-table{font-size:11.5px;line-height:1.32}
+ .sheet:nth-of-type(2) .spec-table th,.sheet:nth-of-type(2) .spec-table td{padding:6px 8px;line-height:1.32}
  .sheet:nth-of-type(2) .spec-table td:first-child{width:36%}
- .sheet:nth-of-type(2) .field-print-value{font-size:12.5px;line-height:1.48}
- .sheet:nth-of-type(2) .note{font-size:11px;line-height:1.45;margin-top:18px}
- .sheet:nth-of-type(2) .foot{font-size:9.5px;margin-top:22px;padding-top:10px}
+ .sheet:nth-of-type(2) .field-print-value{font-size:11.5px;line-height:1.32}
+ .sheet:nth-of-type(2) .note{font-size:10px;line-height:1.32;margin-top:8px}
+ .sheet:nth-of-type(2) .foot{font-size:9px;margin-top:10px;padding-top:6px}
  /* Appendix: increase readable type and use more of the A4 page without changing page breaks elsewhere. */
  .gallery-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.gallery-card img{height:120px;padding:5px}.gallery-card figcaption{padding:5px 7px}.gallery-card strong{font-size:9px}.gallery-card span{font-size:8px}
  .sheet:last-of-type .brand{padding-bottom:10px}
@@ -99,9 +99,9 @@
 <div class="field"><label>Hố thang rộng (mm)</label><input id="shaftW" type="number" placeholder="Nhập theo bản vẽ"></div><div class="field"><label>Hố thang sâu (mm)</label><input id="shaftD" type="number" placeholder="Nhập theo bản vẽ"></div>
 <div class="field"><label>PIT (mm)</label><input id="pit" type="number" placeholder="Nhập theo bản vẽ"></div><div class="field"><label>OH (mm)</label><input id="oh" type="number" placeholder="Nhập theo bản vẽ"></div>
 <div class="field"><label>Phòng máy</label><select id="machineRoom"><option>Không phòng máy</option><option>Có phòng máy</option></select></div>
-</div><p class="note">Thông số khởi đầu: 350 kg · 4 stop · 60 m/phút · máy kéo và tủ điều khiển chọn theo cấu hình thực tế. Kích thước hố, PIT, OH và thông số khác cần nhập theo bản vẽ được duyệt.</p></div>
+</div><p class="note">Thông số khởi đầu: 350 kg · 4 stop · 40 m/phút · máy kéo và tủ điều khiển chọn theo cấu hình thực tế. Kích thước hố, PIT, OH và thông số khác cần nhập theo bản vẽ được duyệt.</p></div>
 <div class="section"><h2>02 · Tổng hợp báo giá</h2><div class="table-wrap"><table><thead><tr><th style="width:42px">STT</th><th>Hạng mục / phạm vi cung cấp</th><th style="width:55px">ĐVT</th><th class="num" style="width:55px">SL</th><th class="num" style="width:150px">Thành tiền (VNĐ)</th></tr></thead><tbody>
-<tr><td>1</td><td><strong>Thang máy Đức Anh</strong><br><span id="clientConfig" class="muted">350 kg · 4 stop · 60 m/phút</span><br><span id="clientEquipment" class="muted">Máy kéo Faxi; tủ điều khiển Nice</span></td><td>Bộ</td><td class="num" id="clientQty">1</td><td class="num" id="saleLift">0 đ</td></tr>
+<tr><td>1</td><td><strong>Thang máy Đức Anh</strong><br><span id="clientConfig" class="muted">350 kg · 4 stop · 40 m/phút</span><br><span id="clientEquipment" class="muted">Máy kéo Faxi; tủ điều khiển Nice</span></td><td>Bộ</td><td class="num" id="clientQty">1</td><td class="num" id="saleLift">0 đ</td></tr>
 <tr id="frameSaleRow" class="hidden"><td>2</td><td>Khung thép định hình dựng hố thang</td><td>Bộ</td><td class="num" id="frameQty">1</td><td class="num" id="saleFrame">0 đ</td></tr>
 <tr id="extraSaleRow" class="hidden"><td id="extraNo">2</td><td id="extraName">Hạng mục bổ sung</td><td>Bộ</td><td class="num">1</td><td class="num" id="saleExtra">0 đ</td></tr>
 </tbody></table></div>
@@ -114,7 +114,7 @@
 <header class="brand"><div class="brand-left"><div class="brand-name">ĐỨC ANH</div><div class="tagline">PHỤ LỤC KỸ THUẬT</div></div><div class="company"><strong id="appendixQuoteNo">BÁO GIÁ</strong><br><span id="appendixCustomer">Khách hàng</span></div></header>
 <div class="hero" style="padding-bottom:10px"><h1>PHỤ LỤC ĐẶC TÍNH KỸ THUẬT</h1><p>Thông số cấu hình dự kiến — chốt theo bản vẽ và hồ sơ kỹ thuật được duyệt</p></div>
 <div class="section"><h2>05 · Đặc tính chung</h2><div class="table-wrap"><table class="spec-table"><tbody>
-<tr><td>Loại thang</td><td id="specType">Thang khách</td></tr><tr><td>Mã cấu hình</td><td id="specCode">ĐỨC ANH · 350 kg · 4 stop</td></tr><tr><td>Số lượng</td><td id="specQty">1 thang</td></tr><tr><td>Tải trọng</td><td id="specCapacity">350 kg</td></tr><tr><td>Tốc độ</td><td id="specSpeed">60 m/phút</td></tr><tr><td>Số tầng / điểm dừng</td><td id="specStops">4 stop</td></tr><tr><td>Số cửa tầng</td><td id="specDoors">4 cửa</td></tr><tr><td>Phòng máy</td><td id="specRoom">Không phòng máy</td></tr><tr><td>Kích thước hố thang</td><td id="specShaft">Chưa nhập</td></tr><tr><td>PIT / OH</td><td id="specPitOh">Chưa nhập</td></tr><tr><td>Nguồn điện</td><td><input id="power" value="3 pha, 380 VAC, 50 Hz (xác nhận theo cấu hình thiết bị)" style="width:100%;border:0;background:transparent;font:inherit"></td></tr>
+<tr><td>Loại thang</td><td id="specType">Thang khách</td></tr><tr><td>Mã cấu hình</td><td id="specCode">ĐỨC ANH · 350 kg · 4 stop</td></tr><tr><td>Số lượng</td><td id="specQty">1 thang</td></tr><tr><td>Tải trọng</td><td id="specCapacity">350 kg</td></tr><tr><td>Tốc độ</td><td id="specSpeed">40 m/phút</td></tr><tr><td>Số tầng / điểm dừng</td><td id="specStops">4 stop</td></tr><tr><td>Số cửa tầng</td><td id="specDoors">4 cửa</td></tr><tr><td>Phòng máy</td><td id="specRoom">Không phòng máy</td></tr><tr><td>Kích thước hố thang</td><td id="specShaft">Chưa nhập</td></tr><tr><td>PIT / OH</td><td id="specPitOh">Chưa nhập</td></tr><tr><td>Nguồn điện</td><td><input id="power" value="3 pha, 380 VAC, 50 Hz (xác nhận theo cấu hình thiết bị)" style="width:100%;border:0;background:transparent;font:inherit"></td></tr>
 <tr><td>Poid đối trọng</td><td><select id="counterweight"><option value="Bê tông">Bê tông</option><option value="Thép">Thép</option></select></td></tr>
 </tbody></table></div></div>
 <div class="section"><h2>06 · Thiết bị chính & hoàn thiện</h2><div class="table-wrap"><table class="spec-table"><tbody>
