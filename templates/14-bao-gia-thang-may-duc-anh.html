@@ -133,6 +133,10 @@
 <tr><td>Nút bấm</td><td><select id="buttonModel"><option value="nut-bam-da-001">DA-001</option><option value="nut-bam-da-002">DA-002</option><option value="nut-bam-da-003">DA-003</option><option value="nut-bam-da-004">DA-004</option></select></td></tr>
 <tr><td>Cable</td><td><select id="cableType"><option value="Cable tròn">Cable tròn</option><option value="Cable dẹt">Cable dẹt</option></select></td></tr>
 <tr><td>Xuất xứ cable</td><td><input id="cableOrigin" value="Trung Quốc" placeholder="Nhập xuất xứ cable"></td></tr>
+<tr><td>Rail cabin</td><td><select id="cabinRail"><option value="Rail thép T78">Rail thép T78</option><option value="Rail thép T89">Rail thép T89</option><option value="Rail thép T119">Rail thép T119</option></select></td></tr>
+<tr><td>Xuất xứ rail cabin</td><td><input id="cabinRailOrigin" value="Trung Quốc" placeholder="Nhập xuất xứ rail cabin"></td></tr>
+<tr><td>Rail đối trọng</td><td><select id="counterweightRail"><option value="Rail thép T78">Rail thép T78</option><option value="Rail thép T89">Rail thép T89</option><option value="Rail thép T119">Rail thép T119</option></select></td></tr>
+<tr><td>Xuất xứ rail đối trọng</td><td><input id="counterweightRailOrigin" value="Trung Quốc" placeholder="Nhập xuất xứ rail đối trọng"></td></tr>
 <tr><td>Thiết bị an toàn</td><td><textarea id="safety" rows="2">Photocell cửa, hệ thống cứu hộ / liên lạc khẩn cấp, chuông báo quá tải và các thiết bị an toàn theo cấu hình được duyệt.</textarea></td></tr>
 <tr><td>Ghi chú kỹ thuật</td><td><textarea id="technicalNotes" rows="3" placeholder="Ghi chú hoặc yêu cầu riêng của công trình"></textarea></td></tr>
 </tbody></table></div><p class="note">Mẫu ảnh chỉ mang tính tham khảo theo lựa chọn hiện tại. Kích thước và cấu hình cuối cùng phải theo bản vẽ, hồ sơ kỹ thuật và xác nhận của hai bên.</p></div>
@@ -159,7 +163,7 @@
 <script>
 const $=id=>document.getElementById(id);const money=n=>Math.round(Number(n)||0).toLocaleString('vi-VN')+' đ';const num=id=>Math.max(0,Number($(id).value)||0);const val=id=>($(id).value||'').trim();
 
-const customizableSelectIds=['liftType','machineRoom','motor','controller','doorType','ceiling','floorFinish','handrail','counterweight','cableType'];
+const customizableSelectIds=['liftType','machineRoom','motor','controller','doorType','ceiling','floorFinish','handrail','counterweight','cableType','cabinRail','counterweightRail'];
 function setupCustomChoices(){
   customizableSelectIds.forEach(id=>{
     const el=$(id); if(!el || el.dataset.customReady) return;
