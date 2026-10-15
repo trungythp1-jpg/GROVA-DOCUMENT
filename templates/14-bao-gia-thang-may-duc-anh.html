@@ -115,6 +115,7 @@
 <div class="hero" style="padding-bottom:10px"><h1>PHỤ LỤC ĐẶC TÍNH KỸ THUẬT</h1><p>Thông số cấu hình dự kiến — chốt theo bản vẽ và hồ sơ kỹ thuật được duyệt</p></div>
 <div class="section"><h2>05 · Đặc tính chung</h2><div class="table-wrap"><table class="spec-table"><tbody>
 <tr><td>Loại thang</td><td id="specType">Thang khách</td></tr><tr><td>Mã cấu hình</td><td id="specCode">ĐỨC ANH · 350 kg · 4 stop</td></tr><tr><td>Số lượng</td><td id="specQty">1 thang</td></tr><tr><td>Tải trọng</td><td id="specCapacity">350 kg</td></tr><tr><td>Tốc độ</td><td id="specSpeed">40 m/phút</td></tr><tr><td>Số tầng / điểm dừng</td><td id="specStops">4 stop</td></tr><tr><td>Số cửa tầng</td><td id="specDoors">4 cửa</td></tr><tr><td>Phòng máy</td><td id="specRoom">Không phòng máy</td></tr><tr><td>Kích thước hố thang</td><td id="specShaft">Chưa nhập</td></tr><tr><td>PIT / OH</td><td id="specPitOh">Chưa nhập</td></tr><tr><td>Nguồn điện</td><td><input id="power" value="3 pha, 380 VAC, 50 Hz (xác nhận theo cấu hình thiết bị)" style="width:100%;border:0;background:transparent;font:inherit"></td></tr>
+<tr><td>Poid đối trọng</td><td><select id="counterweight"><option value="Bê tông">Bê tông</option><option value="Thép">Thép</option></select></td></tr>
 </tbody></table></div></div>
 <div class="section"><h2>06 · Thiết bị chính & hoàn thiện</h2><div class="table-wrap"><table class="spec-table"><tbody>
 <tr><td>Máy kéo</td><td><select id="motor"><option value="faxi">Faxi không hộp số</option><option value="torin">Torin</option><option value="montanari">Montanari MGV25S</option><option value="ziehl-abegg">Ziehl-Abegg</option><option value="custom">Khác / theo duyệt</option></select></td></tr>
@@ -123,10 +124,15 @@
 <tr><td>Mẫu cửa tầng</td><td><select id="doorType"><option value="cua-tang-inox-guong-trang">Mẫu 001 · Inox gương trắng</option><option value="cua-tang-inox-guong-vang">Mẫu 002 · Inox gương vàng</option><option value="cua-tang-kinh-nep-inox-guong-trang">Mẫu 003 · Cửa kính nẹp inox gương trắng</option><option value="cua-tang-inox-matte">Inox mờ</option><option value="cua-tang-inox-xuoc-vang">Inox xước vàng</option><option value="cua-tang-kinh-khung-vang">Cửa kính khung vàng</option><option value="custom">Khác / theo duyệt</option></select></td></tr>
 <tr><td>Kích thước cửa (rộng × cao)</td><td><input id="doorSize" placeholder="Nhập theo bản vẽ được duyệt"></td></tr>
 <tr><td>Kích thước cabin (rộng × sâu × cao)</td><td><input id="cabinSize" placeholder="Nhập theo bản vẽ được duyệt"></td></tr>
+<tr><td>Vách hông trái</td><td><input id="leftWall" value="Tấm inox gương trắng lớn ở giữa, nẹp inox xước 2 bên" placeholder="Nhập vật liệu / màu sắc / mẫu vách hông trái"></td></tr>
+<tr><td>Vách hông phải</td><td><input id="rightWall" value="Tấm inox gương trắng lớn ở giữa, nẹp inox xước 2 bên" placeholder="Nhập vật liệu / màu sắc / mẫu vách hông phải"></td></tr>
+<tr><td>Vách sau cabin</td><td><input id="rearWall" value="Tấm inox gương trắng lớn ở giữa, nẹp inox xước 2 bên" placeholder="Nhập vật liệu / màu sắc / mẫu vách sau cabin"></td></tr>
 <tr><td>Trần giả / chiếu sáng</td><td><select id="ceiling"><option value="tran-gia-001">Mẫu 001</option><option value="tran-gia-002">Mẫu 002</option><option value="tran-gia-003">Mẫu 003</option><option value="custom">Khác / theo duyệt</option></select></td></tr>
 <tr><td>Sàn cabin</td><td><select id="floorFinish"><option value="san-cabin-001">Mẫu 001</option><option value="san-cabin-002">Mẫu 002</option><option value="san-cabin-003">Mẫu 003 · Trắng đen</option><option value="custom">Khác / theo duyệt</option></select></td></tr>
 <tr><td>Tay vịn</td><td><select id="handrail"><option value="tay-vin-tron-001">Tay vịn tròn</option><option value="tay-vin-det-002">Tay vịn dẹt</option></select></td></tr>
 <tr><td>Nút bấm</td><td><select id="buttonModel"><option value="nut-bam-da-001">DA-001</option><option value="nut-bam-da-002">DA-002</option><option value="nut-bam-da-003">DA-003</option><option value="nut-bam-da-004">DA-004</option></select></td></tr>
+<tr><td>Cable</td><td><select id="cableType"><option value="Cable tròn">Cable tròn</option><option value="Cable dẹt">Cable dẹt</option></select></td></tr>
+<tr><td>Xuất xứ cable</td><td><input id="cableOrigin" value="Trung Quốc" placeholder="Nhập xuất xứ cable"></td></tr>
 <tr><td>Thiết bị an toàn</td><td><textarea id="safety" rows="2">Photocell cửa, hệ thống cứu hộ / liên lạc khẩn cấp, chuông báo quá tải và các thiết bị an toàn theo cấu hình được duyệt.</textarea></td></tr>
 <tr><td>Ghi chú kỹ thuật</td><td><textarea id="technicalNotes" rows="3" placeholder="Ghi chú hoặc yêu cầu riêng của công trình"></textarea></td></tr>
 </tbody></table></div><p class="note">Mẫu ảnh chỉ mang tính tham khảo theo lựa chọn hiện tại. Kích thước và cấu hình cuối cùng phải theo bản vẽ, hồ sơ kỹ thuật và xác nhận của hai bên.</p></div>
@@ -153,7 +159,7 @@
 <script>
 const $=id=>document.getElementById(id);const money=n=>Math.round(Number(n)||0).toLocaleString('vi-VN')+' đ';const num=id=>Math.max(0,Number($(id).value)||0);const val=id=>($(id).value||'').trim();
 
-const customizableSelectIds=['liftType','machineRoom','motor','controller','doorType','ceiling','floorFinish','handrail'];
+const customizableSelectIds=['liftType','machineRoom','motor','controller','doorType','ceiling','floorFinish','handrail','counterweight','cableType'];
 function setupCustomChoices(){
   customizableSelectIds.forEach(id=>{
     const el=$(id); if(!el || el.dataset.customReady) return;
