@@ -210,7 +210,7 @@ function updatePaymentPlan(){
     const balance=total-120000000;
     lines=[
       'Đợt 1: 100.000.000 đ sau khi ký hợp đồng.',
-      `Đợt 2: ${fmt(balance)} khi hàng về đến công trình (phần giá trị còn lại sau khi trừ đợt 1 và đợt cuối).`,
+      `Đợt 2: ${fmt(balance)} khi hàng về đến công trình.`,
       'Đợt 3: 20.000.000 đ khi hoàn thành, bàn giao thang máy.'
     ];
     if(balance<0) lines[1]='Đợt 2: Điều chỉnh theo giá trị hợp đồng thực tế; tổng các đợt không vượt tổng thanh toán.';
@@ -219,8 +219,8 @@ function updatePaymentPlan(){
     const balance=total-30000000-second-20000000;
     lines=[
       'Đợt 1: 30.000.000 đ sau khi ký hợp đồng.',
-      `Đợt 2: ${fmt(second)} sau khi Chủ đầu tư xây xong phần thô${frameOn?' (áp dụng công trình có khung thép)':' (áp dụng công trình không có khung thép)'}.`,
-      `Đợt 3: ${fmt(balance)} khi hàng về đến công trình (phần giá trị còn lại sau khi trừ các đợt 1, 2 và đợt cuối).`,
+      `Đợt 2: ${fmt(second)} sau khi Chủ đầu tư xây xong phần thô.`,
+      `Đợt 3: ${fmt(balance)} khi hàng về đến công trình.`,
       'Đợt 4: 20.000.000 đ khi hoàn thành, bàn giao thang máy.'
     ];
     if(balance<0) lines[2]='Đợt 3: Điều chỉnh theo giá trị hợp đồng thực tế; tổng các đợt không vượt tổng thanh toán.';
