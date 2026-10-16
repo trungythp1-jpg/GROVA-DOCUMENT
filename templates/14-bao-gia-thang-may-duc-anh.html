@@ -176,6 +176,40 @@ body.quote-auth-pending .wrap,body.quote-auth-pending .toolbar{visibility:hidden
   .gallery-card span { display: block; line-height: 1.25; margin-top: 2px; }
 }
 
+
+/* Final PDF pagination refinement based on the customer-exported PDF. */
+@media print {
+  .sheet:first-of-type .section.scope-section {
+    break-before: page !important;
+    page-break-before: always !important;
+  }
+  .sheet:nth-of-type(2) .spec-table {
+    font-size: 9px !important;
+    line-height: 1.2 !important;
+  }
+  .sheet:nth-of-type(2) .spec-table td,
+  .sheet:nth-of-type(2) .spec-table th {
+    padding: 3px 6px !important;
+  }
+  .sheet:nth-of-type(2) .section {
+    margin-top: 5px !important;
+  }
+  .sheet:nth-of-type(2) .hero {
+    padding: 6px 0 5px !important;
+  }
+  #imageGallerySheet .gallery-grid {
+    gap: 9px 12px !important;
+  }
+  #imageGallerySheet .gallery-card img {
+    height: 128px !important;
+    padding: 5px !important;
+  }
+  #imageGallerySheet .gallery-card figcaption {
+    min-height: 38px !important;
+    padding: 6px 8px !important;
+  }
+}
+
 </style>
 
 
@@ -222,7 +256,7 @@ body.quote-auth-pending .wrap,body.quote-auth-pending .toolbar{visibility:hidden
 </tbody></table></div>
 <div class="totals"><div class="line"><span>Tạm tính</span><strong id="subtotal">0 đ</strong></div><div class="line"><span>VAT <select id="vatRate" style="border:0;background:transparent;font:inherit;color:inherit"><option value="0">0%</option><option value="5">5%</option><option value="8">8%</option><option value="10">10%</option></select></span><strong id="vatAmount">0 đ</strong></div><div class="line grand"><span>TỔNG THANH TOÁN</span><span id="grandTotal">0 đ</span></div></div><div class="amount-words"><strong>Bằng chữ:</strong> <span id="words">Không đồng.</span></div>
 </div>
-<div class="section"><h2>03 · Phạm vi cung cấp</h2><div class="field"><textarea id="scope" rows="4">Khảo sát và tư vấn cấu hình; thiết kế bản vẽ kỹ thuật theo thông số công trình; cung cấp thiết bị theo phụ lục kỹ thuật; vận chuyển đến công trình; lắp đặt, hiệu chỉnh và bàn giao theo phạm vi được xác nhận trong hợp đồng.</textarea></div><div class="field keep" style="margin-top:10px"><label>Hạng mục không bao gồm / khách hàng chuẩn bị</label><textarea id="exclusions" rows="3">Xây dựng hố thang và hoàn thiện xây dựng; nguồn điện cấp đến vị trí theo yêu cầu kỹ thuật; các hạng mục ngoài phạm vi nêu trong báo giá, trừ khi được ghi rõ là đã bao gồm.</textarea></div></div>
+<div class="section scope-section"><h2>03 · Phạm vi cung cấp</h2><div class="field"><textarea id="scope" rows="4">Khảo sát và tư vấn cấu hình; thiết kế bản vẽ kỹ thuật theo thông số công trình; cung cấp thiết bị theo phụ lục kỹ thuật; vận chuyển đến công trình; lắp đặt, hiệu chỉnh và bàn giao theo phạm vi được xác nhận trong hợp đồng.</textarea></div><div class="field keep" style="margin-top:10px"><label>Hạng mục không bao gồm / khách hàng chuẩn bị</label><textarea id="exclusions" rows="3">Xây dựng hố thang và hoàn thiện xây dựng; nguồn điện cấp đến vị trí theo yêu cầu kỹ thuật; các hạng mục ngoài phạm vi nêu trong báo giá, trừ khi được ghi rõ là đã bao gồm.</textarea></div></div>
 <div class="section"><h2>04 · Điều khoản thương mại</h2><div class="grid"><div class="field"><label>Tiến độ dự kiến</label><input id="leadTime" placeholder="Ví dụ: theo tiến độ hợp đồng"></div><div class="field"><label>Hiệu lực báo giá</label><input id="validity" value="15 ngày kể từ ngày báo giá"></div><div class="field payment-field" style="grid-column:1/-1"><label>Phương án thanh toán</label><select id="paymentPlan"><option value="3">Chia 3 đợt</option><option value="4">Chia 4 đợt</option></select><label style="margin-top:6px">Nội dung thanh toán</label><textarea id="payment" rows="5"></textarea><div id="paymentValidation" class="payment-validation" role="status" aria-live="polite"></div></div><div class="field"><label>Bảo hành</label><textarea id="warranty" rows="3">Theo điều kiện và thời hạn ghi trong hợp đồng ký kết.</textarea></div></div><div class="signature"><div><strong>ĐẠI DIỆN KHÁCH HÀNG</strong><br>(Ký, ghi rõ họ tên)</div><div><strong>ĐẠI DIỆN THANG MÁY ĐỨC ANH</strong><br>(Ký, ghi rõ họ tên)</div></div><div class="foot">THANG MÁY ĐỨC ANH · BÁO GIÁ THANG MÁY · Giá và phạm vi có hiệu lực theo báo giá được Đức Anh xác nhận</div></div>
 </section>
 <section class="sheet">
