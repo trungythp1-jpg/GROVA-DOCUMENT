@@ -197,9 +197,13 @@ body.quote-auth-pending .wrap,body.quote-auth-pending .toolbar{visibility:hidden
 /* Print action: require authenticated user and export permission, then prepare the print view. */
 function quotePrintNow(){
   var btn=document.getElementById('quotePrintBtn');
-  if(!btn || btn.disabled || document.body.classList.contains('quote-auth-pending')){ alert('Vui lòng đăng nhập tài khoản được cấp quyền xuất PDF.'); return; }
+  if(!btn || btn.disabled || document.body.classList.contains('quote-auth-pending')){
+    alert('Vui lòng đăng nhập tài khoản được cấp quyền xuất PDF.');
+    return;
+  }
+  /* iPad Safari: invoke print synchronously within the tap gesture. */
   if(typeof window.printPrepare==='function') window.printPrepare();
-  window.setTimeout(function(){ window.print(); }, 80);
+  window.print();
 }
 
 (function(){
@@ -338,6 +342,16 @@ function setupPlainTextPrint(){
     el.addEventListener('input',sync); el.addEventListener('change',sync); sync();
   });
 }
-function printPrepare(){syncAll();setupPlainTextPrint();document.querySelectorAll('input:not([type=checkbox]):not([type=radio]),textarea').forEach(el=>{const span=$(el.id+'FieldPrint');if(span)span.textContent=(el.value||'').trim()||el.getAttribute('placeholder')||'';});}
-window.addEventListener('beforeprint',printPrepare);$('quoteDate').value=new Date().toISOString().slice(0,10);setupPlainTextPrint();syncAll();
+function printPrepare(){
+  /* Do not run syncAll/updateGallery here: resetting every image source during printing makes iPad Safari hang or respond inconsistently. */
+  document.querySelectorAll('input:not([type=checkbox]):not([type=radio]),textarea').forEach(el=>{
+    const span=$(el.id+'FieldPrint');
+    if(span) span.textContent=(el.value||'').trim()||el.getAttribute('placeholder')||'';
+  });
+  customizableSelectIds.forEach(id=>{
+    const el=$(id), out=$(id+'Print'), manual=$(id+'Custom');
+    if(el&&out) out.textContent=el.value==='__custom__'?(manual?.value.trim()||'Chưa nhập'):(el.options[el.selectedIndex]?.text||'');
+  });
+}
+$('quoteDate').value=new Date().toISOString().slice(0,10);setupPlainTextPrint();syncAll();
 </script></body></html>
