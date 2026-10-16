@@ -486,6 +486,56 @@ body.quote-auth-pending .wrap,body.quote-auth-pending .toolbar{visibility:hidden
   }
 }
 
+/* Gallery pagination correction: remove forced page height and trailing page break; use balanced card sizing. */
+@media print {
+  #imageGallerySheet {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    break-after: auto !important;
+    page-break-after: auto !important;
+    break-inside: avoid-page !important;
+    page-break-inside: avoid !important;
+  }
+  #imageGallerySheet .gallery-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    grid-template-rows: none !important;
+    grid-auto-rows: auto !important;
+    align-items: start !important;
+    gap: 8px 10px !important;
+  }
+  #imageGallerySheet .gallery-card {
+    display: block !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: hidden !important;
+    align-self: start !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+  #imageGallerySheet .gallery-card img {
+    width: 100% !important;
+    height: 38mm !important;
+    min-height: 0 !important;
+    max-height: 38mm !important;
+    object-fit: contain !important;
+    padding: 4px !important;
+  }
+  #imageGallerySheet .gallery-card figcaption {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    padding: 4px 6px !important;
+    line-height: 1.15 !important;
+  }
+  #imageGallerySheet .note { margin-top: 7px !important; font-size: 8px !important; line-height: 1.2 !important; }
+  #imageGallerySheet .foot { margin-top: 6px !important; padding-top: 4px !important; font-size: 7px !important; }
+  #imageGallerySheet + .sheet { display: none !important; }
+}
 </style>
 
 
