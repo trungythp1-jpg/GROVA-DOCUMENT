@@ -264,6 +264,84 @@ body.quote-auth-pending .wrap,body.quote-auth-pending .toolbar{visibility:hidden
   }
 }
 
+/* Gallery page fit v2: seven cards in three rows, with note and footer on the same A4 page. */
+@media print {
+  #imageGallerySheet {
+    height: 277mm !important;
+    min-height: 277mm !important;
+    max-height: 277mm !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+  }
+  #imageGallerySheet .hero {
+    padding: 3px 0 4px !important;
+    margin: 0 !important;
+  }
+  #imageGallerySheet .hero h1 {
+    font-size: 16px !important;
+    line-height: 1.1 !important;
+    margin: 0 0 2px !important;
+  }
+  #imageGallerySheet .hero p {
+    font-size: 8px !important;
+    line-height: 1.1 !important;
+    margin: 0 !important;
+  }
+  #imageGallerySheet .gallery-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    grid-template-rows: repeat(3, 62mm) !important;
+    grid-auto-rows: 62mm !important;
+    align-items: stretch !important;
+    gap: 4px 9px !important;
+    margin: 0 !important;
+  }
+  #imageGallerySheet .gallery-card {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 62mm !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+  #imageGallerySheet .gallery-card img {
+    flex: 0 0 43mm !important;
+    height: 43mm !important;
+    min-height: 0 !important;
+    width: 100% !important;
+    object-fit: contain !important;
+    padding: 3px !important;
+    box-sizing: border-box !important;
+  }
+  #imageGallerySheet .gallery-card figcaption {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    padding: 3px 5px !important;
+    font-size: 7.5px !important;
+    line-height: 1.08 !important;
+    overflow: hidden !important;
+  }
+  #imageGallerySheet .gallery-card strong,
+  #imageGallerySheet .gallery-card span {
+    display: block !important;
+    font-size: 7.5px !important;
+    line-height: 1.08 !important;
+    margin: 0 !important;
+  }
+  #imageGallerySheet .note {
+    margin: 3px 0 0 !important;
+    font-size: 7px !important;
+    line-height: 1.1 !important;
+  }
+  #imageGallerySheet .foot {
+    margin: 3px 0 0 !important;
+    padding-top: 2px !important;
+    font-size: 6.5px !important;
+    line-height: 1.1 !important;
+  }
+}
 /* Gallery page final fit: force gallery contents to fit within the A4 sheet in print. */
 @media print {
   #imageGallerySheet {
