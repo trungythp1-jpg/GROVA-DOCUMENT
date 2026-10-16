@@ -25,6 +25,8 @@
  .field textarea{border:0;padding:2px 0;resize:none;overflow:visible;height:auto;min-height:0;white-space:pre-wrap}
  .field input::placeholder,.field textarea::placeholder{color:transparent}
  .section{margin-top:10px;break-inside:auto;page-break-inside:auto}
+ .section h2{break-after:avoid;page-break-after:avoid}
+ .signature,.foot{break-inside:avoid;page-break-inside:avoid}
  .section h2{font-size:12px;margin:0 0 6px;padding-bottom:5px;break-after:avoid;page-break-after:avoid}
  .section h2 + .field,.keep{break-inside:avoid;page-break-inside:avoid}
  #exclusions{break-inside:avoid;page-break-inside:avoid}
@@ -106,6 +108,27 @@ body.quote-auth-pending .wrap,body.quote-auth-pending .toolbar{visibility:hidden
  .sheet::before{opacity:.035;print-color-adjust:exact;-webkit-print-color-adjust:exact}
 }
 
+
+/* Sales-ready refinements: clear total hierarchy, status hints and payment validation. */
+.hero h1{letter-spacing:.8px}
+.totals{background:linear-gradient(135deg,#fffdf8 0%,#fff 100%);border:1px solid #e7dcc0;border-radius:8px;padding:10px 14px}
+.totals .grand{font-size:20px;background:#f8f2e3;padding:12px 10px;border-radius:5px;margin-top:4px}
+.amount-words{padding:7px 0 0}
+.payment-validation{display:none;margin-top:8px;padding:9px 11px;border-radius:6px;font-size:12px;line-height:1.45;border:1px solid #e5c4a8;background:#fff7f0;color:#8b3f16}
+.payment-validation.show{display:block}
+.payment-validation.ok{border-color:#c9ddce;background:#f3faf4;color:#28613a}
+.payment-validation strong{display:block;margin-bottom:2px}
+.quote-trustline{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin:12px 0 0;color:#75633d;font-size:10px}
+.quote-trustline span{white-space:nowrap}
+@media print{
+ .totals{background:#fff!important;border-color:#d9cba7;padding:7px 10px}
+ .totals .grand{background:#f8f2e3!important}
+ .payment-validation{font-size:10px;padding:6px 8px;break-inside:avoid}
+ .payment-validation.show{display:block!important}
+ .section{orphans:3;widows:3}
+ .amount-words{break-inside:avoid;page-break-inside:avoid}
+}
+
 </style>
 
 
@@ -131,7 +154,7 @@ body.quote-auth-pending .wrap,body.quote-auth-pending .toolbar{visibility:hidden
 <div class="wrap">
 <section class="sheet">
 <header class="brand"><div class="brand-left"><div class="brand-name">ĐỨC ANH</div><div class="tagline">GIẢI PHÁP THANG MÁY CHO CÔNG TRÌNH HIỆN ĐẠI</div></div><div class="company"><strong>CÔNG TY TNHH THANG MÁY ĐỨC ANH VIỆT NAM</strong><br>MST: 0201879133<br>Địa chỉ thuế: HP81, Royal Island, Đảo Vũ Yên, Phường Thủy Nguyên, TP Hải Phòng, Việt Nam<br>Địa chỉ: HP81, Royal Island, Đảo Vũ Yên, Phường Thủy Nguyên, Thành phố Hải Phòng</div></header>
-<div class="hero"><h1>BÁO GIÁ THANG MÁY</h1><p>Giải pháp cung cấp và lắp đặt thang máy Đức Anh</p></div>
+<div class="hero"><h1>BÁO GIÁ THANG MÁY</h1><p>Giải pháp cung cấp và lắp đặt thang máy Đức Anh</p></div><div class="quote-trustline"><span>✓ Cấu hình theo công trình</span><span>✓ Thông số minh bạch</span><span>✓ Phạm vi cung cấp rõ ràng</span></div>
 <div class="grid">
 <div class="field"><label>Số báo giá</label><input id="quoteNo" placeholder="Tự nhập số báo giá"></div><div class="field"><label>Ngày báo giá</label><input id="quoteDate" type="date"></div>
 <div class="field"><label>Khách hàng</label><input id="customer" placeholder="Tên khách hàng / doanh nghiệp"></div><div class="field"><label>Điện thoại</label><input id="phone" placeholder="Số điện thoại"></div>
@@ -153,7 +176,7 @@ body.quote-auth-pending .wrap,body.quote-auth-pending .toolbar{visibility:hidden
 <div class="totals"><div class="line"><span>Tạm tính</span><strong id="subtotal">0 đ</strong></div><div class="line"><span>VAT <select id="vatRate" style="border:0;background:transparent;font:inherit;color:inherit"><option value="0">0%</option><option value="5">5%</option><option value="8">8%</option><option value="10">10%</option></select></span><strong id="vatAmount">0 đ</strong></div><div class="line grand"><span>TỔNG THANH TOÁN</span><span id="grandTotal">0 đ</span></div></div><div class="amount-words"><strong>Bằng chữ:</strong> <span id="words">Không đồng.</span></div>
 </div>
 <div class="section"><h2>03 · Phạm vi cung cấp</h2><div class="field"><textarea id="scope" rows="4">Khảo sát và tư vấn cấu hình; thiết kế bản vẽ kỹ thuật theo thông số công trình; cung cấp thiết bị theo phụ lục kỹ thuật; vận chuyển đến công trình; lắp đặt, hiệu chỉnh và bàn giao theo phạm vi được xác nhận trong hợp đồng.</textarea></div><div class="field keep" style="margin-top:10px"><label>Hạng mục không bao gồm / khách hàng chuẩn bị</label><textarea id="exclusions" rows="3">Xây dựng hố thang và hoàn thiện xây dựng; nguồn điện cấp đến vị trí theo yêu cầu kỹ thuật; các hạng mục ngoài phạm vi nêu trong báo giá, trừ khi được ghi rõ là đã bao gồm.</textarea></div></div>
-<div class="section"><h2>04 · Điều khoản thương mại</h2><div class="grid"><div class="field"><label>Tiến độ dự kiến</label><input id="leadTime" placeholder="Ví dụ: theo tiến độ hợp đồng"></div><div class="field"><label>Hiệu lực báo giá</label><input id="validity" value="15 ngày kể từ ngày báo giá"></div><div class="field payment-field" style="grid-column:1/-1"><label>Phương án thanh toán</label><select id="paymentPlan"><option value="3">Chia 3 đợt</option><option value="4">Chia 4 đợt</option></select><label style="margin-top:6px">Nội dung thanh toán</label><textarea id="payment" rows="5"></textarea></div><div class="field"><label>Bảo hành</label><textarea id="warranty" rows="3">Theo điều kiện và thời hạn ghi trong hợp đồng ký kết.</textarea></div></div><div class="signature"><div><strong>ĐẠI DIỆN KHÁCH HÀNG</strong><br>(Ký, ghi rõ họ tên)</div><div><strong>ĐẠI DIỆN THANG MÁY ĐỨC ANH</strong><br>(Ký, ghi rõ họ tên)</div></div><div class="foot">THANG MÁY ĐỨC ANH · BÁO GIÁ THANG MÁY · Giá và phạm vi có hiệu lực theo báo giá được Đức Anh xác nhận</div></div>
+<div class="section"><h2>04 · Điều khoản thương mại</h2><div class="grid"><div class="field"><label>Tiến độ dự kiến</label><input id="leadTime" placeholder="Ví dụ: theo tiến độ hợp đồng"></div><div class="field"><label>Hiệu lực báo giá</label><input id="validity" value="15 ngày kể từ ngày báo giá"></div><div class="field payment-field" style="grid-column:1/-1"><label>Phương án thanh toán</label><select id="paymentPlan"><option value="3">Chia 3 đợt</option><option value="4">Chia 4 đợt</option></select><label style="margin-top:6px">Nội dung thanh toán</label><textarea id="payment" rows="5"></textarea><div id="paymentValidation" class="payment-validation" role="status" aria-live="polite"></div></div><div class="field"><label>Bảo hành</label><textarea id="warranty" rows="3">Theo điều kiện và thời hạn ghi trong hợp đồng ký kết.</textarea></div></div><div class="signature"><div><strong>ĐẠI DIỆN KHÁCH HÀNG</strong><br>(Ký, ghi rõ họ tên)</div><div><strong>ĐẠI DIỆN THANG MÁY ĐỨC ANH</strong><br>(Ký, ghi rõ họ tên)</div></div><div class="foot">THANG MÁY ĐỨC ANH · BÁO GIÁ THANG MÁY · Giá và phạm vi có hiệu lực theo báo giá được Đức Anh xác nhận</div></div>
 </section>
 <section class="sheet">
 <header class="brand"><div class="brand-left"><div class="brand-name">ĐỨC ANH</div><div class="tagline">PHỤ LỤC KỸ THUẬT</div></div><div class="company"><strong id="appendixQuoteNo">BÁO GIÁ</strong><br><span id="appendixCustomer">Khách hàng</span></div></header>
@@ -216,6 +239,9 @@ function quotePrintNow(){
     alert('Vui lòng đăng nhập tài khoản được cấp quyền xuất PDF.');
     return;
   }
+  /* Prevent issuing a quote whose installment amounts are inconsistent. */
+  var paymentCheck=typeof validatePaymentPlan==='function'?validatePaymentPlan():{ok:true};
+  if(!paymentCheck.ok){alert('Chưa thể xuất báo giá: vui lòng kiểm tra giá trị báo giá và lịch thanh toán.');return;}
   /* iPad Safari: invoke print synchronously within the tap gesture. */
   if(typeof window.printPrepare==='function') window.printPrepare();
   window.print();
@@ -321,36 +347,66 @@ function updateGallery(){
 }
 function spellNumber(n){n=Math.round(Number(n)||0);if(n===0)return'Không đồng.';const d=['không','một','hai','ba','bốn','năm','sáu','bảy','tám','chín'];function block(x){let s='';let h=Math.floor(x/100),t=Math.floor(x%100/10),u=x%10;if(h)s+=d[h]+' trăm';else if(t||u)s+='không trăm';if(t>1)s+=' '+d[t]+' mươi'+(u===1?' mốt':u===5?' lăm':u?' '+d[u]:'');else if(t===1)s+=' mười'+(u===5?' lăm':u?' '+d[u]:'');else if(u)s+=' '+(h||t?(u===5?'lăm':d[u]):d[u]);return s.trim()}let units=['',' nghìn',' triệu',' tỷ',' nghìn tỷ'];let parts=[],i=0;while(n>0&&i<units.length){let b=n%1000;if(b)parts.unshift(block(b)+units[i]);n=Math.floor(n/1000);i++}return parts.join(' ').replace(/\s+/g,' ').trim().replace(/^./,c=>c.toUpperCase())+' đồng.'}
 function price(cost){let m=Math.min(90,num('margin'))/100;return cost>0?(m===0?cost:cost/(1-m)):0}
-function updatePaymentPlan(){
+function updatePaymentPlan(forceGenerate=false){
   const plan=$('paymentPlan')?.value||'3';
   const total=Number(String($('grandTotal')?.textContent||'0').replace(/[^0-9]/g,''))||0;
   const frameOn=!!$('includeFrame')?.checked;
-  const fmt=n=>Math.max(0,Math.round(n)).toLocaleString('vi-VN')+' đ';
-  let lines=[];
-  if(plan==='3'){
-    const balance=total-120000000;
-    lines=[
-      'Đợt 1: 100.000.000 đ sau khi ký hợp đồng.',
-      `Đợt 2: ${fmt(balance)} khi hàng về đến công trình.`,
-      'Đợt 3: 20.000.000 đ khi hoàn thành, bàn giao thang máy.'
-    ];
-    if(balance<0) lines[1]='Đợt 2: Điều chỉnh theo giá trị hợp đồng thực tế; tổng các đợt không vượt tổng thanh toán.';
-  } else {
-    const second=frameOn?100000000:70000000;
-    const balance=total-30000000-second-20000000;
-    lines=[
-      'Đợt 1: 30.000.000 đ sau khi ký hợp đồng.',
-      `Đợt 2: ${fmt(second)} sau khi Chủ đầu tư xây xong phần thô.`,
-      `Đợt 3: ${fmt(balance)} khi hàng về đến công trình.`,
-      'Đợt 4: 20.000.000 đ khi hoàn thành, bàn giao thang máy.'
-    ];
-    if(balance<0) lines[2]='Đợt 3: Điều chỉnh theo giá trị hợp đồng thực tế; tổng các đợt không vượt tổng thanh toán.';
-  }
   const payment=$('payment');
-  if(payment) payment.value=lines.join('\n');
+  if(!payment)return;
+  // Only generate the default schedule on first load or when the plan selector changes.
+  // Manual edits remain intact while the quote recalculates.
+  if(forceGenerate || !payment.dataset.userEdited){
+    const fmt=n=>Math.max(0,Math.round(n)).toLocaleString('vi-VN')+' đ';
+    let lines=[];
+    if(plan==='3'){
+      const balance=total-120000000;
+      lines=[
+        'Đợt 1: 100.000.000 đ sau khi ký hợp đồng.',
+        balance>=0?`Đợt 2: ${fmt(balance)} khi hàng về đến công trình.`:'Đợt 2: Điều chỉnh theo giá trị hợp đồng thực tế; cần xác nhận lại số tiền trước khi phát hành.',
+        'Đợt 3: 20.000.000 đ khi hoàn thành, bàn giao thang máy.'
+      ];
+    } else {
+      const second=frameOn?100000000:70000000;
+      const balance=total-30000000-second-20000000;
+      lines=[
+        'Đợt 1: 30.000.000 đ sau khi ký hợp đồng.',
+        `Đợt 2: ${fmt(second)} sau khi Chủ đầu tư xây xong phần thô.`,
+        balance>=0?`Đợt 3: ${fmt(balance)} khi hàng về đến công trình.`:'Đợt 3: Điều chỉnh theo giá trị hợp đồng thực tế; cần xác nhận lại số tiền trước khi phát hành.',
+        'Đợt 4: 20.000.000 đ khi hoàn thành, bàn giao thang máy.'
+      ];
+    }
+    payment.value=lines.join('\n');
+  }
+  validatePaymentPlan();
 }
-function calculate(){let q=Math.max(1,num('quantity')||1),liftCost=num('costLift')*q,frameOn=$('includeFrame').checked,frameCost=frameOn?num('costFrame')*q:0,extraCost=num('costExtra')*q;let lift=val('overrideLift')!==''?num('overrideLift')*q:price(num('costLift'))*q;let frame=frameOn?(val('overrideFrame')!==''?num('overrideFrame')*q:price(num('costFrame'))*q):0;let extra=val('overrideExtra')!==''?num('overrideExtra')*q:price(num('costExtra'))*q;let subtotal=lift+frame+extra,vat=subtotal*num('vatRate')/100; $('saleLift').textContent=money(lift);$('saleFrame').textContent=money(frame);$('saleExtra').textContent=money(extra);$('clientQty').textContent=q;$('frameQty').textContent=q;$('frameSaleRow').classList.toggle('hidden',!frameOn);$('extraSaleRow').classList.toggle('hidden',extra<=0);$('extraNo').textContent=frameOn?'3':'2';$('extraName').textContent=val('extraLabel')||'Hạng mục bổ sung';$('subtotal').textContent=money(subtotal);$('vatAmount').textContent=money(vat);$('grandTotal').textContent=money(subtotal+vat);$('words').textContent=spellNumber(subtotal+vat);$('internalCost').textContent=money(liftCost+frameCost+extraCost);$('internalSale').textContent=money(subtotal);$('internalProfit').textContent=money(subtotal-liftCost-frameCost-extraCost);updatePaymentPlan();$('clientConfig').textContent=`${num('capacity')} kg · ${num('stops')} stop · ${num('speed')} m/phút`;$('clientEquipment').textContent=`Máy kéo ${$('motor').options[$('motor').selectedIndex]?.text||'Chưa chọn'}; tủ điều khiển ${$('controller').options[$('controller').selectedIndex]?.text||'Chưa chọn'}; cửa ${$('doorType').options[$('doorType').selectedIndex]?.text||'Chưa chọn'}`;$('appendixQuoteNo').textContent=val('quoteNo')||'BÁO GIÁ';$('appendixCustomer').textContent=val('customer')||'Khách hàng';$('specType').textContent=val('liftType');$('specCode').textContent=`ĐỨC ANH · ${num('capacity')} kg · ${num('stops')} stop`; $('specQty').textContent=q+' thang';$('specCapacity').textContent=num('capacity')+' kg';$('specSpeed').textContent=num('speed')+' m/phút';$('specStops').textContent=num('stops')+' stop';$('specDoors').textContent=num('doors')+' cửa';$('specRoom').textContent=choiceValue('machineRoom');$('specShaft').textContent=(num('shaftW')&&num('shaftD'))?`${num('shaftW')} × ${num('shaftD')} mm`:'Chưa nhập';$('specPitOh').textContent=`PIT ${num('pit')||'chưa nhập'} mm / OH ${num('oh')||'chưa nhập'} mm`;updateGallery();}
-function syncAll(){calculate();customizableSelectIds.forEach(id=>{const el=$(id),p=$(id+'Print'),m=$(id+'Custom');if(el&&p)p.textContent=el.value==='__custom__'?(m?.value.trim()||'Chưa nhập'):(el.options[el.selectedIndex]?.text||'');if(m)m.classList.toggle('active',el.value==='__custom__');});}document.querySelectorAll('input,select,textarea').forEach(el=>el.addEventListener('input',syncAll));document.querySelectorAll('input,select,textarea').forEach(el=>el.addEventListener('change',syncAll));setupCustomChoices();function toggleInternal(){ $('internalPanel').classList.toggle('hidden') }
+function validatePaymentPlan(){
+  const box=$('paymentValidation'), payment=$('payment');
+  if(!box||!payment)return {ok:true,difference:0};
+  const total=Number(String($('grandTotal')?.textContent||'0').replace(/[^0-9]/g,''))||0;
+  // Read only the first currency-like amount on each installment line to avoid dates/other numbers.
+  const lines=payment.value.split(/\n+/).map(x=>x.trim()).filter(Boolean);
+  const installmentLines=lines.filter(x=>/^đợt\s*\d+\s*:/i.test(x));
+  let amounts=[],unreadable=[];
+  installmentLines.forEach(line=>{
+    const m=line.match(/^đợt\s*\d+\s*:\s*([\d.\s,]+)\s*(?:đ|vnđ|vnd)?/i);
+    if(m){const n=Number(m[1].replace(/[.\s,]/g,''));if(Number.isFinite(n))amounts.push(n);else unreadable.push(line)}else unreadable.push(line);
+  });
+  const sum=amounts.reduce((a,b)=>a+b,0),difference=Math.round(sum-total);
+  box.classList.remove('ok');box.classList.add('show');
+  if(total<=0){box.innerHTML='<strong>Chưa thể xác nhận lịch thanh toán</strong>Nhập giá bán/giá trị báo giá trước khi phát hành.';return {ok:false,difference};}
+  if(unreadable.length || amounts.length!==installmentLines.length || !installmentLines.length){
+    box.innerHTML='<strong>Cần kiểm tra lịch thanh toán</strong>Một hoặc nhiều đợt chưa có số tiền cụ thể. Hãy nhập số tiền từng đợt trước khi xuất PDF.';return {ok:false,difference};
+  }
+  if(difference!==0){
+    box.innerHTML='<strong>Tổng thanh toán chưa khớp</strong>Tổng các đợt: '+money(sum)+' · Tổng báo giá: '+money(total)+' · Chênh lệch: '+money(Math.abs(difference))+(difference>0?' (các đợt đang vượt tổng báo giá).':' (các đợt còn thiếu).');
+    return {ok:false,difference};
+  }
+  box.classList.add('ok');box.innerHTML='<strong>Lịch thanh toán đã khớp</strong>Tổng các đợt bằng tổng thanh toán của báo giá: '+money(total)+'.';
+  return {ok:true,difference:0};
+}
+
+function calculate(){let q=Math.max(1,num('quantity')||1),liftCost=num('costLift')*q,frameOn=$('includeFrame').checked,frameCost=frameOn?num('costFrame')*q:0,extraCost=num('costExtra')*q;let lift=val('overrideLift')!==''?num('overrideLift')*q:price(num('costLift'))*q;let frame=frameOn?(val('overrideFrame')!==''?num('overrideFrame')*q:price(num('costFrame'))*q):0;let extra=val('overrideExtra')!==''?num('overrideExtra')*q:price(num('costExtra'))*q;let subtotal=lift+frame+extra,vat=subtotal*num('vatRate')/100; $('saleLift').textContent=money(lift);$('saleFrame').textContent=money(frame);$('saleExtra').textContent=money(extra);$('clientQty').textContent=q;$('frameQty').textContent=q;$('frameSaleRow').classList.toggle('hidden',!frameOn);$('extraSaleRow').classList.toggle('hidden',extra<=0);$('extraNo').textContent=frameOn?'3':'2';$('extraName').textContent=val('extraLabel')||'Hạng mục bổ sung';$('subtotal').textContent=money(subtotal);$('vatAmount').textContent=money(vat);$('grandTotal').textContent=money(subtotal+vat);$('words').textContent=spellNumber(subtotal+vat);$('internalCost').textContent=money(liftCost+frameCost+extraCost);$('internalSale').textContent=money(subtotal);$('internalProfit').textContent=money(subtotal-liftCost-frameCost-extraCost);updatePaymentPlan(false);$('clientConfig').textContent=`${num('capacity')} kg · ${num('stops')} stop · ${num('speed')} m/phút`;$('clientEquipment').textContent=`Máy kéo ${$('motor').options[$('motor').selectedIndex]?.text||'Chưa chọn'}; tủ điều khiển ${$('controller').options[$('controller').selectedIndex]?.text||'Chưa chọn'}; cửa ${$('doorType').options[$('doorType').selectedIndex]?.text||'Chưa chọn'}`;$('appendixQuoteNo').textContent=val('quoteNo')||'BÁO GIÁ';$('appendixCustomer').textContent=val('customer')||'Khách hàng';$('specType').textContent=val('liftType');$('specCode').textContent=`ĐỨC ANH · ${num('capacity')} kg · ${num('stops')} stop`; $('specQty').textContent=q+' thang';$('specCapacity').textContent=num('capacity')+' kg';$('specSpeed').textContent=num('speed')+' m/phút';$('specStops').textContent=num('stops')+' stop';$('specDoors').textContent=num('doors')+' cửa';$('specRoom').textContent=choiceValue('machineRoom');$('specShaft').textContent=(num('shaftW')&&num('shaftD'))?`${num('shaftW')} × ${num('shaftD')} mm`:'Chưa nhập';$('specPitOh').textContent=`PIT ${num('pit')||'chưa nhập'} mm / OH ${num('oh')||'chưa nhập'} mm`;updateGallery();}
+function syncAll(){calculate();customizableSelectIds.forEach(id=>{const el=$(id),p=$(id+'Print'),m=$(id+'Custom');if(el&&p)p.textContent=el.value==='__custom__'?(m?.value.trim()||'Chưa nhập'):(el.options[el.selectedIndex]?.text||'');if(m)m.classList.toggle('active',el.value==='__custom__');});}$('payment').addEventListener('input',function(){this.dataset.userEdited='1';validatePaymentPlan();});$('paymentPlan').addEventListener('change',function(){$('payment').dataset.userEdited='';updatePaymentPlan(true);});document.querySelectorAll('input,select,textarea').forEach(el=>el.addEventListener('input',syncAll));document.querySelectorAll('input,select,textarea').forEach(el=>el.addEventListener('change',syncAll));setupCustomChoices();function toggleInternal(){ $('internalPanel').classList.toggle('hidden') }
 function saveDraft(){let data={};document.querySelectorAll('input,select,textarea').forEach(el=>{if(el.id)data[el.id]=el.type==='checkbox'?el.checked:el.value});try{localStorage.setItem('ducAnhElevatorQuoteDraft',JSON.stringify(data));alert('Đã lưu nháp trên trình duyệt này.')}catch(e){alert('Không lưu được nháp trên trình duyệt.')}}
 function loadDraft(){try{let d=JSON.parse(localStorage.getItem('ducAnhElevatorQuoteDraft')||'null');if(!d){alert('Chưa có bản nháp đã lưu.');return}Object.keys(d).forEach(id=>{let el=$(id);if(el){if(el.type==='checkbox')el.checked=d[id];else el.value=d[id]}});syncAll();alert('Đã tải nháp.')}catch(e){alert('Không đọc được bản nháp.')}}
 function setupPlainTextPrint(){
@@ -374,5 +430,5 @@ function printPrepare(){
     if(el&&out) out.textContent=el.value==='__custom__'?(manual?.value.trim()||'Chưa nhập'):(el.options[el.selectedIndex]?.text||'');
   });
 }
-$('quoteDate').value=new Date().toISOString().slice(0,10);setupPlainTextPrint();syncAll();
+$('quoteDate').value=new Date().toISOString().slice(0,10);setupPlainTextPrint();if(!$('payment').value.trim())updatePaymentPlan(true);syncAll();
 </script></body></html>
