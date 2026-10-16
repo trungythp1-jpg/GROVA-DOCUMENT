@@ -264,6 +264,21 @@ body.quote-auth-pending .wrap,body.quote-auth-pending .toolbar{visibility:hidden
   }
 }
 
+/* Gallery page fit v4: reduce image height a little more to avoid spill onto page 5. */
+@media print {
+  #imageGallerySheet .gallery-grid {
+    grid-template-rows: repeat(3, 52mm) !important;
+    grid-auto-rows: 52mm !important;
+    gap: 3px 9px !important;
+  }
+  #imageGallerySheet .gallery-card {
+    height: 52mm !important;
+  }
+  #imageGallerySheet .gallery-card img {
+    flex-basis: 33mm !important;
+    height: 33mm !important;
+  }
+}
 /* Gallery page fit v3: slightly shorter image areas to keep the final card, note and footer on page 4. */
 @media print {
   #imageGallerySheet .gallery-grid {
