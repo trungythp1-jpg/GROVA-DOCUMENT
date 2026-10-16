@@ -177,6 +177,33 @@ body.quote-auth-pending .wrap,body.quote-auth-pending .toolbar{visibility:hidden
 }
 
 
+/* Gallery page refinement v3: keep the note and footer on the same page as the gallery. */
+@media print {
+  #imageGallerySheet {
+    break-inside: avoid-page !important;
+    page-break-inside: avoid !important;
+  }
+  #imageGallerySheet .gallery-grid {
+    row-gap: 7px !important;
+  }
+  #imageGallerySheet .gallery-card img {
+    height: 145px !important;
+  }
+  #imageGallerySheet .gallery-card figcaption {
+    min-height: 34px !important;
+    padding: 4px 7px !important;
+  }
+  #imageGallerySheet .note {
+    margin-top: 5px !important;
+    line-height: 1.15 !important;
+    font-size: 8px !important;
+  }
+  #imageGallerySheet .foot {
+    margin-top: 4px !important;
+    padding-top: 3px !important;
+    font-size: 7px !important;
+  }
+}
 /* PDF pagination refinement v2: keep full content, compact appendix and enlarge gallery images. */
 @media print {
   .sheet:first-of-type .section.scope-section {
