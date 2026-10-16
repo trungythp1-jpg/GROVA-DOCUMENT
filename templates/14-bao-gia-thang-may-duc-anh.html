@@ -129,6 +129,50 @@ body.quote-auth-pending .wrap,body.quote-auth-pending .toolbar{visibility:hidden
  .amount-words{break-inside:avoid;page-break-inside:avoid}
 }
 
+
+/* Alignment pass: improve print pagination and consistent spacing without changing app logic. */
+@media print {
+  .sheet { overflow: visible; }
+  /* Quote sheet: reduce excess vertical rhythm so totals do not split awkwardly. */
+  .sheet:first-of-type .brand { padding-bottom: 5px; }
+  .sheet:first-of-type .hero { padding: 8px 0 5px; }
+  .sheet:first-of-type .hero h1 { font-size: 19px; margin-bottom: 2px; }
+  .sheet:first-of-type .section { margin-top: 7px; }
+  .sheet:first-of-type .section h2 { margin-bottom: 4px; padding-bottom: 3px; }
+  .sheet:first-of-type .grid { gap: 4px 12px; }
+  .sheet:first-of-type .field label { margin-bottom: 1px; }
+  .sheet:first-of-type .field input,
+  .sheet:first-of-type .field select,
+  .sheet:first-of-type .field textarea { padding-top: 1px; padding-bottom: 1px; }
+  .sheet:first-of-type .totals { margin-top: 5px; padding: 7px 10px; }
+  .sheet:first-of-type .totals .line { padding: 3px 0; }
+  .sheet:first-of-type .totals .grand { font-size: 15px; padding: 6px 8px; }
+  .sheet:first-of-type .amount-words { margin-top: 5px; }
+  .sheet:first-of-type .section:has(#payment) { break-inside: avoid; page-break-inside: avoid; }
+  #paymentValidation { margin-top: 4px !important; padding: 6px 8px !important; }
+  .sheet:first-of-type .signature { margin-top: 14px; }
+  .sheet:first-of-type .foot { margin-top: 8px; }
+
+  /* Technical appendix: keep the specification table compact and aligned. */
+  .sheet:nth-of-type(2) .hero { padding: 7px 0 5px; }
+  .sheet:nth-of-type(2) .section { margin-top: 7px; }
+  .sheet:nth-of-type(2) .section h2 { margin-bottom: 4px; padding-bottom: 3px; }
+  .sheet:nth-of-type(2) .spec-table { font-size: 10.5px; line-height: 1.25; }
+  .sheet:nth-of-type(2) .spec-table th,
+  .sheet:nth-of-type(2) .spec-table td { padding: 4px 6px; }
+  .sheet:nth-of-type(2) .spec-table td:first-child { width: 32%; }
+  .sheet:nth-of-type(2) .foot { margin-top: 8px; }
+
+  /* Gallery: equal card heights and a balanced 3-column layout. */
+  .sheet#imageGallerySheet .hero { padding: 8px 0 8px; }
+  .gallery-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 12px; align-items: stretch; }
+  .gallery-card { display: flex; flex-direction: column; min-height: 0; }
+  .gallery-card img { height: 105px; object-fit: contain; padding: 6px; }
+  .gallery-card figcaption { flex: 1; min-height: 42px; padding: 6px 8px; }
+  .gallery-card strong { line-height: 1.25; }
+  .gallery-card span { display: block; line-height: 1.25; margin-top: 2px; }
+}
+
 </style>
 
 
