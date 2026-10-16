@@ -264,6 +264,79 @@ body.quote-auth-pending .wrap,body.quote-auth-pending .toolbar{visibility:hidden
   }
 }
 
+/* Gallery page final fit: force gallery contents to fit within the A4 sheet in print. */
+@media print {
+  #imageGallerySheet {
+    height: 277mm !important;
+    min-height: 277mm !important;
+    max-height: 277mm !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+  #imageGallerySheet .hero {
+    padding: 4px 0 4px !important;
+    margin: 0 !important;
+  }
+  #imageGallerySheet .hero h1 {
+    margin: 0 0 2px !important;
+    font-size: 17px !important;
+    line-height: 1.15 !important;
+  }
+  #imageGallerySheet .hero p {
+    margin: 0 !important;
+    font-size: 9px !important;
+    line-height: 1.15 !important;
+  }
+  #imageGallerySheet .gallery-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    grid-auto-rows: 1fr !important;
+    gap: 6px 10px !important;
+    margin: 0 !important;
+  }
+  #imageGallerySheet .gallery-card {
+    height: 93mm !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+  #imageGallerySheet .gallery-card img {
+    height: 65mm !important;
+    min-height: 0 !important;
+    width: 100% !important;
+    object-fit: contain !important;
+    padding: 4px !important;
+    box-sizing: border-box !important;
+  }
+  #imageGallerySheet .gallery-card figcaption {
+    min-height: 0 !important;
+    padding: 4px 6px !important;
+    font-size: 8px !important;
+    line-height: 1.1 !important;
+  }
+  #imageGallerySheet .gallery-card strong,
+  #imageGallerySheet .gallery-card span {
+    line-height: 1.1 !important;
+    margin-top: 1px !important;
+  }
+  #imageGallerySheet .note {
+    margin: 4px 0 0 !important;
+    font-size: 7px !important;
+    line-height: 1.1 !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+  #imageGallerySheet .foot {
+    margin: 3px 0 0 !important;
+    padding-top: 3px !important;
+    font-size: 7px !important;
+    line-height: 1.1 !important;
+  }
+}
+
 </style>
 
 
