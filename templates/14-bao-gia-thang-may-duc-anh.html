@@ -448,6 +448,44 @@ body.quote-auth-pending .wrap,body.quote-auth-pending .toolbar{visibility:hidden
   }
 }
 
+/* Remove excessive fixed card frame height; let each gallery card wrap tightly around its image and caption. */
+@media print {
+  #imageGallerySheet .gallery-grid {
+    grid-template-rows: none !important;
+    grid-auto-rows: auto !important;
+    align-items: start !important;
+    gap: 6px 9px !important;
+  }
+  #imageGallerySheet .gallery-card {
+    display: block !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    align-self: start !important;
+    border-radius: 6px !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+  #imageGallerySheet .gallery-card img {
+    display: block !important;
+    width: 100% !important;
+    height: 30mm !important;
+    min-height: 0 !important;
+    max-height: 30mm !important;
+    object-fit: contain !important;
+    padding: 3px !important;
+  }
+  #imageGallerySheet .gallery-card figcaption {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    padding: 3px 5px !important;
+    line-height: 1.1 !important;
+  }
+}
+
 </style>
 
 
