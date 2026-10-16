@@ -132,6 +132,9 @@ body.quote-auth-pending .wrap,body.quote-auth-pending .toolbar{visibility:hidden
 
 /* Alignment pass: improve print pagination and consistent spacing without changing app logic. */
 @media print {
+  /* Customer PDF: hide internal payment validation messages. */
+  #paymentValidation { display: none !important; }
+
   .sheet { overflow: visible; }
   /* Quote sheet: reduce excess vertical rhythm so totals do not split awkwardly. */
   .sheet:first-of-type .brand { padding-bottom: 5px; }
@@ -211,7 +214,7 @@ body.quote-auth-pending .wrap,body.quote-auth-pending .toolbar{visibility:hidden
 <div class="field"><label>Hố thang rộng (mm)</label><input id="shaftW" type="number" placeholder="Nhập theo bản vẽ"></div><div class="field"><label>Hố thang sâu (mm)</label><input id="shaftD" type="number" placeholder="Nhập theo bản vẽ"></div>
 <div class="field"><label>PIT (mm)</label><input id="pit" type="number" placeholder="Nhập theo bản vẽ"></div><div class="field"><label>OH (mm)</label><input id="oh" type="number" placeholder="Nhập theo bản vẽ"></div>
 <div class="field"><label>Phòng máy</label><select id="machineRoom"><option>Không phòng máy</option><option>Có phòng máy</option></select></div>
-</div><p class="note">Thông số khởi đầu: 350 kg · 4 stop · 40 m/phút · máy kéo và tủ điều khiển chọn theo cấu hình thực tế. Kích thước hố, PIT, OH và thông số khác cần nhập theo bản vẽ được duyệt.</p></div>
+</div></div>
 <div class="section"><h2>02 · Tổng hợp báo giá</h2><div class="table-wrap"><table><thead><tr><th style="width:42px">STT</th><th>Hạng mục / phạm vi cung cấp</th><th style="width:55px">ĐVT</th><th class="num" style="width:55px">SL</th><th class="num" style="width:150px">Thành tiền (VNĐ)</th></tr></thead><tbody>
 <tr><td>1</td><td><strong>Thang máy Đức Anh</strong><br><span id="clientConfig" class="muted">350 kg · 4 stop · 40 m/phút</span><br><span id="clientEquipment" class="muted">Máy kéo Faxi; tủ điều khiển Nice</span></td><td>Bộ</td><td class="num" id="clientQty">1</td><td class="num" id="saleLift">0 đ</td></tr>
 <tr id="frameSaleRow" class="hidden"><td>2</td><td>Khung thép định hình dựng hố thang</td><td>Bộ</td><td class="num" id="frameQty">1</td><td class="num" id="saleFrame">0 đ</td></tr>
