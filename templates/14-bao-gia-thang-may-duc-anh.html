@@ -77,12 +77,42 @@
  .field-print-value{display:block!important;border-bottom:1px dotted #b7c0ba;padding:2px 0;min-height:1em}
  .spec-table .field-print-value{border:0;padding:0;min-height:0}
 }
+
+/* GROVA login gate for Đức Anh quotation template */
+body.quote-auth-pending .wrap,body.quote-auth-pending .toolbar{visibility:hidden!important}
+#quoteAuthGate{position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;padding:20px;background:#eef1ee;font-family:Arial,sans-serif}
+#quoteAuthCard{width:min(440px,100%);background:#fff;border:1px solid #dedede;border-radius:16px;box-shadow:0 12px 36px #00000014;padding:28px}
+#quoteAuthCard h1{margin:0 0 6px;color:#8b6a25;font-size:24px;text-align:center}
+#quoteAuthCard .auth-subtitle{text-align:center;color:#666;font-size:13px;margin:0 0 22px}
+#quoteAuthCard label{display:block;font-size:12px;font-weight:700;color:#444;margin:12px 0 5px}
+#quoteAuthCard input{width:100%;padding:12px;border:1px solid #d6d6d6;border-radius:8px;font:inherit;box-sizing:border-box}
+#quoteAuthCard button{width:100%;margin-top:14px;padding:12px;border-radius:8px;background:#8b6a25;color:#fff;font-weight:700;border:0;cursor:pointer}
+#quoteAuthCard button.auth-secondary{background:#fff;color:#8b6a25;border:1px solid #8b6a25}
+#quoteAuthMessage{margin-top:12px;color:#a12b2b;font-size:13px;line-height:1.5;white-space:pre-wrap}
+#quoteAuthUser{font-size:11px;color:#666;margin-left:4px}
+
 </style>
 
 
 </head>
-<body>
-<div class="toolbar screen-only"><button class="secondary" onclick="saveDraft()">Lưu nháp</button><button class="secondary" onclick="loadDraft()">Tải nháp</button><button class="secondary" onclick="toggleInternal()">Ẩn/hiện giá vốn nội bộ</button><button onclick="window.print()">Xuất PDF / In báo giá</button></div>
+<body class="quote-auth-pending">
+<div id="quoteAuthGate" role="dialog" aria-modal="true" aria-labelledby="quoteAuthTitle">
+  <div id="quoteAuthCard">
+    <h1 id="quoteAuthTitle">GROVA DOCUMENT</h1>
+    <p class="auth-subtitle">Đăng nhập để lập báo giá thang máy Đức Anh</p>
+    <form id="quoteLoginForm" autocomplete="on">
+      <label for="quoteLoginEmail">Email công việc</label>
+      <input id="quoteLoginEmail" type="email" autocomplete="username" required placeholder="name@company.com">
+      <label for="quoteLoginPassword">Mật khẩu</label>
+      <input id="quoteLoginPassword" type="password" autocomplete="current-password" required placeholder="Nhập mật khẩu">
+      <button id="quoteLoginSubmit" type="submit">Đăng nhập</button>
+      <button id="quoteLoginSignOut" class="auth-secondary" type="button" style="display:none">Đăng xuất tài khoản hiện tại</button>
+      <div id="quoteAuthMessage" aria-live="polite">Chỉ tài khoản do quản trị viên cấp mới được sử dụng. Không có chức năng tự đăng ký.</div>
+    </form>
+  </div>
+</div>
+
+<div class="toolbar screen-only"><button class="secondary" id="quoteLogoutBtn" style="display:none" type="button">Đăng xuất</button><span id="quoteAuthUser" class="screen-only"></span><button class="secondary" onclick="saveDraft()">Lưu nháp</button><button class="secondary" onclick="loadDraft()">Tải nháp</button><button class="secondary" onclick="toggleInternal()">Ẩn/hiện giá vốn nội bộ</button><button onclick="window.print()">Xuất PDF / In báo giá</button></div>
 <div class="wrap">
 <section class="sheet">
 <header class="brand"><div class="brand-left"><div class="brand-name">ĐỨC ANH</div><div class="tagline">GIẢI PHÁP THANG MÁY CHO CÔNG TRÌNH HIỆN ĐẠI</div></div><div class="company"><strong>CÔNG TY TNHH THANG MÁY ĐỨC ANH VIỆT NAM</strong><br>MST: 0201879133<br>Địa chỉ thuế: HP81, Royal Island, Đảo Vũ Yên, Phường Thủy Nguyên, TP Hải Phòng, Việt Nam<br>Địa chỉ: HP81, Royal Island, Đảo Vũ Yên, Phường Thủy Nguyên, Thành phố Hải Phòng</div></header>
@@ -160,6 +190,57 @@
 <div class="cost-grid"><div class="field"><label>Giá vốn thang máy / bộ (VNĐ)</label><input id="costLift" type="number" min="0" value="0"></div><div class="field"><label>Giá vốn khung thép / bộ (VNĐ)</label><input id="costFrame" type="number" min="0" value="0"></div><div class="field"><label>Chi phí bổ sung / bộ (VNĐ)</label><input id="costExtra" type="number" min="0" value="0"></div><div class="field"><label>Tên hạng mục bổ sung</label><input id="extraLabel" placeholder="Ví dụ: hoàn thiện / hạng mục khác"></div><div class="field"><label>Biên lợi nhuận mục tiêu (%)</label><input id="margin" type="number" min="0" max="90" step="0.1" value="0"></div><div class="field"><label>Giá bán thang máy override (VNĐ, tùy chọn)</label><input id="overrideLift" type="number" min="0" placeholder="Để trống = tự tính"></div><div class="field"><label>Giá bán khung thép override (VNĐ, tùy chọn)</label><input id="overrideFrame" type="number" min="0" placeholder="Để trống = tự tính"></div><div class="field"><label>Giá bán hạng mục bổ sung override (VNĐ)</label><input id="overrideExtra" type="number" min="0" placeholder="Để trống = tự tính"></div><div class="field"><label>Đơn giá đầu vào</label><div class="note">Không xuất hiện trong PDF khách hàng.</div></div></div>
 <div class="totals"><div class="line"><span>Tổng giá vốn nội bộ</span><strong id="internalCost">0 đ</strong></div><div class="line"><span>Giá bán đề xuất trước VAT</span><strong id="internalSale">0 đ</strong></div><div class="line"><span>Lợi nhuận gộp dự kiến</span><strong id="internalProfit">0 đ</strong></div></div></div>
 </div>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+(function(){
+  'use strict';
+  var ADMIN_UID='nJmKgjEILgVOEjWKYWTsuonxbO03';
+  var config={apiKey:'AIzaSyBcqgrkL64utUMwyZz9wmb_cM0gA5Hy8II',authDomain:'grova-document.firebaseapp.com',projectId:'grova-document',storageBucket:'grova-document.firebasestorage.app',messagingSenderId:'220105094085',appId:'1:220105094085:web:5a7263b0653333baed51ac',measurementId:'G-TNVNP286G4'};
+  var gate=document.getElementById('quoteAuthGate'), form=document.getElementById('quoteLoginForm'), msg=document.getElementById('quoteAuthMessage'), submit=document.getElementById('quoteLoginSubmit'), signOutInGate=document.getElementById('quoteLoginSignOut'), logoutBtn=document.getElementById('quoteLogoutBtn'), userLabel=document.getElementById('quoteAuthUser');
+  var auth,db,handling=false;
+  function message(text,isError){msg.textContent=text;msg.style.color=isError?'#a12b2b':'#52645a';}
+  function showGate(text){gate.style.display='flex';document.body.classList.add('quote-auth-pending');if(text)message(text,true);}
+  function openQuote(user,profile){gate.style.display='none';document.body.classList.remove('quote-auth-pending');logoutBtn.style.display='';userLabel.textContent=user.email||'Đã đăng nhập';signOutInGate.style.display='none';
+    var perms=(profile&&profile.permissions&&profile.permissions.documents)||{};
+    var template=(perms.templates&&perms.templates['14'])||{};
+    var isAdmin=user.uid===ADMIN_UID||profile.role==='admin';
+    var canExport=isAdmin||((Object.prototype.hasOwnProperty.call(template,'export'))?template.export===true:perms.export===true);
+    var printButton=document.querySelector('.toolbar button[onclick="window.print()"]');
+    if(printButton) printButton.style.display=canExport?'':'none';
+  }
+  function allowed(profile,user){
+    if(!profile||profile.status!=='active') return {ok:false,reason:'Tài khoản chưa được kích hoạt trong GROVA DOCUMENT. Vui lòng liên hệ Admin.'};
+    if(user.uid===ADMIN_UID||profile.role==='admin') return {ok:true};
+    var perms=profile.permissions&&profile.permissions.documents||{};
+    var templates=perms.templates||{};
+    var t=templates['14']||{};
+    var canView=Object.prototype.hasOwnProperty.call(t,'view')?t.view===true:perms.view===true;
+    var canCreate=Object.prototype.hasOwnProperty.call(t,'create')?t.create===true:perms.create===true;
+    if(!canView||!canCreate) return {ok:false,reason:'Tài khoản đã đăng nhập nhưng chưa được cấp quyền Xem và Tạo báo giá mẫu 14. Vui lòng nhờ Admin cấp quyền.'};
+    return {ok:true};
+  }
+  function checkUser(user){
+    if(!user){showGate('Vui lòng đăng nhập bằng tài khoản GROVA DOCUMENT được cấp.');signOutInGate.style.display='none';return;}
+    handling=true;signOutInGate.style.display='';message('Đang kiểm tra trạng thái tài khoản và quyền lập báo giá…',false);
+    db.collection('users').doc(user.uid).get().then(function(snap){
+      var profile=snap.exists?snap.data():null;var result=allowed(profile,user);
+      if(!result.ok){showGate(result.reason);signOutInGate.style.display='';return;}
+      openQuote(user,profile||{});
+    }).catch(function(err){console.error('GROVA quote permission check failed',err);showGate('Không kiểm tra được quyền trên Firestore. Vui lòng thử lại hoặc liên hệ Admin.');signOutInGate.style.display='';}).finally(function(){handling=false;});
+  }
+  try{
+    if(!window.firebase) throw new Error('Firebase SDK chưa tải được');
+    if(!firebase.apps.length) firebase.initializeApp(config);
+    auth=firebase.auth();db=firebase.firestore();
+  }catch(e){console.error(e);showGate('Không khởi tạo được Firebase. Kiểm tra kết nối mạng và cấu hình hệ thống.');form.querySelectorAll('input,button').forEach(function(el){el.disabled=true;});return;}
+  form.addEventListener('submit',function(e){e.preventDefault();if(handling)return;submit.disabled=true;message('Đang đăng nhập…',false);auth.signInWithEmailAndPassword(document.getElementById('quoteLoginEmail').value.trim(),document.getElementById('quoteLoginPassword').value).then(function(){message('Đăng nhập thành công. Đang kiểm tra quyền…',false);}).catch(function(err){console.warn(err);var text='Đăng nhập không thành công. Kiểm tra email và mật khẩu.';if(err&&['auth/too-many-requests','auth/network-request-failed','auth/invalid-email'].includes(err.code))text=err.code==='auth/too-many-requests'?'Có quá nhiều lần thử. Vui lòng đợi rồi thử lại.':err.code==='auth/network-request-failed'?'Không có kết nối mạng.':'Email không đúng định dạng.';message(text,true);}).finally(function(){submit.disabled=false;});});
+  function doSignOut(){auth.signOut().then(function(){showGate('Đã đăng xuất.');document.getElementById('quoteLoginPassword').value='';logoutBtn.style.display='none';userLabel.textContent='';}).catch(function(){showGate('Không đăng xuất được. Vui lòng thử lại.');});}
+  signOutInGate.addEventListener('click',doSignOut);logoutBtn.addEventListener('click',doSignOut);
+  auth.onAuthStateChanged(checkUser,function(err){console.error(err);showGate('Không xác định được trạng thái đăng nhập. Vui lòng tải lại trang.');});
+})();
+</script>
 <script>
 const $=id=>document.getElementById(id);const money=n=>Math.round(Number(n)||0).toLocaleString('vi-VN')+' đ';const num=id=>Math.max(0,Number($(id).value)||0);const val=id=>($(id).value||'').trim();
 
