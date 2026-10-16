@@ -91,6 +91,14 @@ body.quote-auth-pending .wrap,body.quote-auth-pending .toolbar{visibility:hidden
 #quoteAuthMessage{margin-top:12px;color:#a12b2b;font-size:13px;line-height:1.5;white-space:pre-wrap}
 #quoteAuthUser{font-size:11px;color:#666;margin-left:4px}
 
+/* Print action: require authenticated user and export permission, then prepare the print view. */
+function quotePrintNow(){
+  var btn=document.getElementById('quotePrintBtn');
+  if(!btn || btn.disabled || document.body.classList.contains('quote-auth-pending')){ alert('Vui lòng đăng nhập tài khoản được cấp quyền xuất PDF.'); return; }
+  if(typeof window.printPrepare==='function') window.printPrepare();
+  window.setTimeout(function(){ window.print(); }, 80);
+}
+
 </style>
 
 
@@ -112,7 +120,7 @@ body.quote-auth-pending .wrap,body.quote-auth-pending .toolbar{visibility:hidden
   </div>
 </div>
 
-<div class="toolbar screen-only"><button class="secondary" id="quoteLogoutBtn" style="display:none" type="button">Đăng xuất</button><span id="quoteAuthUser" class="screen-only"></span><button class="secondary" onclick="saveDraft()">Lưu nháp</button><button class="secondary" onclick="loadDraft()">Tải nháp</button><button class="secondary" onclick="toggleInternal()">Ẩn/hiện giá vốn nội bộ</button><button onclick="window.print()">Xuất PDF / In báo giá</button></div>
+<div class="toolbar screen-only"><button class="secondary" id="quoteLogoutBtn" style="display:none" type="button">Đăng xuất</button><span id="quoteAuthUser" class="screen-only"></span><button class="secondary" onclick="saveDraft()">Lưu nháp</button><button class="secondary" onclick="loadDraft()">Tải nháp</button><button class="secondary" onclick="toggleInternal()">Ẩn/hiện giá vốn nội bộ</button><button id="quotePrintBtn" type="button" onclick="quotePrintNow()">Xuất PDF / In báo giá</button></div>
 <div class="wrap">
 <section class="sheet">
 <header class="brand"><div class="brand-left"><div class="brand-name">ĐỨC ANH</div><div class="tagline">GIẢI PHÁP THANG MÁY CHO CÔNG TRÌNH HIỆN ĐẠI</div></div><div class="company"><strong>CÔNG TY TNHH THANG MÁY ĐỨC ANH VIỆT NAM</strong><br>MST: 0201879133<br>Địa chỉ thuế: HP81, Royal Island, Đảo Vũ Yên, Phường Thủy Nguyên, TP Hải Phòng, Việt Nam<br>Địa chỉ: HP81, Royal Island, Đảo Vũ Yên, Phường Thủy Nguyên, Thành phố Hải Phòng</div></header>
@@ -207,8 +215,8 @@ body.quote-auth-pending .wrap,body.quote-auth-pending .toolbar{visibility:hidden
     var template=(perms.templates&&perms.templates['14'])||{};
     var isAdmin=user.uid===ADMIN_UID||profile.role==='admin';
     var canExport=isAdmin||((Object.prototype.hasOwnProperty.call(template,'export'))?template.export===true:perms.export===true);
-    var printButton=document.querySelector('.toolbar button[onclick="window.print()"]');
-    if(printButton) printButton.style.display=canExport?'':'none';
+    var printButton=document.getElementById('quotePrintBtn');
+    if(printButton){ printButton.style.display=canExport?'':'none'; printButton.disabled=!canExport; printButton.setAttribute('aria-disabled',canExport?'false':'true'); }
   }
   function allowed(profile,user){
     if(!profile||profile.status!=='active') return {ok:false,reason:'Tài khoản chưa được kích hoạt trong GROVA DOCUMENT. Vui lòng liên hệ Admin.'};
