@@ -264,6 +264,24 @@ body.quote-auth-pending .wrap,body.quote-auth-pending .toolbar{visibility:hidden
   }
 }
 
+/* Gallery page fit v3: slightly shorter image areas to keep the final card, note and footer on page 4. */
+@media print {
+  #imageGallerySheet .gallery-grid {
+    grid-template-rows: repeat(3, 56mm) !important;
+    grid-auto-rows: 56mm !important;
+    gap: 3px 9px !important;
+  }
+  #imageGallerySheet .gallery-card {
+    height: 56mm !important;
+  }
+  #imageGallerySheet .gallery-card img {
+    flex-basis: 37mm !important;
+    height: 37mm !important;
+  }
+  #imageGallerySheet .gallery-card figcaption {
+    padding: 2px 5px !important;
+  }
+}
 /* Gallery page fit v2: seven cards in three rows, with note and footer on the same A4 page. */
 @media print {
   #imageGallerySheet {
