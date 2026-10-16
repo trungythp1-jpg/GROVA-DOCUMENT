@@ -213,14 +213,17 @@ function quotePrintNow(){
   function openQuote(user,profile){gate.style.display='none';document.body.classList.remove('quote-auth-pending');logoutBtn.style.display='';userLabel.textContent=user.email||'Đã đăng nhập';signOutInGate.style.display='none';
     var perms=(profile&&profile.permissions&&profile.permissions.documents)||{};
     var template=(perms.templates&&perms.templates['14'])||{};
-    var isAdmin=user.uid===ADMIN_UID||profile.role==='admin';
-    var canExport=isAdmin||((Object.prototype.hasOwnProperty.call(template,'export'))?template.export===true:perms.export===true);
+    var role=String(profile.role||'').trim().toLowerCase();
+    var isAdmin=user.uid===ADMIN_UID||role==='admin'||role==='administrator';
+    var canCreate=Object.prototype.hasOwnProperty.call(template,'create')?template.create===true:perms.create===true;
+    var canExport=isAdmin||((Object.prototype.hasOwnProperty.call(template,'export'))?template.export===true:(perms.export===true||canCreate));
     var printButton=document.getElementById('quotePrintBtn');
     if(printButton){ printButton.style.display=canExport?'':'none'; printButton.disabled=!canExport; printButton.setAttribute('aria-disabled',canExport?'false':'true'); }
   }
   function allowed(profile,user){
     if(!profile||profile.status!=='active') return {ok:false,reason:'Tài khoản chưa được kích hoạt trong GROVA DOCUMENT. Vui lòng liên hệ Admin.'};
-    if(user.uid===ADMIN_UID||profile.role==='admin') return {ok:true};
+    var role=String(profile.role||'').trim().toLowerCase();
+    if(user.uid===ADMIN_UID||role==='admin'||role==='administrator') return {ok:true};
     var perms=profile.permissions&&profile.permissions.documents||{};
     var templates=perms.templates||{};
     var t=templates['14']||{};
