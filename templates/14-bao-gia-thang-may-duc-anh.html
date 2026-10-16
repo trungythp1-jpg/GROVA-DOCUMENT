@@ -238,6 +238,12 @@ function quotePrintNow(){
   }
   function checkUser(user){
     if(!user){showGate('Vui lòng đăng nhập bằng tài khoản GROVA DOCUMENT được cấp.');signOutInGate.style.display='none';return;}
+    /* Admin UID is explicitly trusted. Skip the Firestore profile read for this UID so the quote and print button become available immediately after Firebase auth. */
+    if(user.uid===ADMIN_UID){
+      handling=false;
+      openQuote(user,{status:'active',role:'admin',permissions:{documents:{templates:{'14':{view:true,create:true,export:true}}}}});
+      return;
+    }
     handling=true;signOutInGate.style.display='';message('Đang kiểm tra trạng thái tài khoản và quyền lập báo giá…',false);
     db.collection('users').doc(user.uid).get().then(function(snap){
       var profile=snap.exists?snap.data():null;var result=allowed(profile,user);
