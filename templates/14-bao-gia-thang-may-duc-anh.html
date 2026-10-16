@@ -91,14 +91,6 @@ body.quote-auth-pending .wrap,body.quote-auth-pending .toolbar{visibility:hidden
 #quoteAuthMessage{margin-top:12px;color:#a12b2b;font-size:13px;line-height:1.5;white-space:pre-wrap}
 #quoteAuthUser{font-size:11px;color:#666;margin-left:4px}
 
-/* Print action: require authenticated user and export permission, then prepare the print view. */
-function quotePrintNow(){
-  var btn=document.getElementById('quotePrintBtn');
-  if(!btn || btn.disabled || document.body.classList.contains('quote-auth-pending')){ alert('Vui lòng đăng nhập tài khoản được cấp quyền xuất PDF.'); return; }
-  if(typeof window.printPrepare==='function') window.printPrepare();
-  window.setTimeout(function(){ window.print(); }, 80);
-}
-
 </style>
 
 
@@ -165,7 +157,7 @@ function quotePrintNow(){
 <tr><td>Vách hông trái</td><td><input id="leftWall" value="Tấm inox gương trắng lớn ở giữa, nẹp inox xước 2 bên" placeholder="Nhập vật liệu / màu sắc / mẫu vách hông trái"></td></tr>
 <tr><td>Vách hông phải</td><td><input id="rightWall" value="Tấm inox gương trắng lớn ở giữa, nẹp inox xước 2 bên" placeholder="Nhập vật liệu / màu sắc / mẫu vách hông phải"></td></tr>
 <tr><td>Vách sau cabin</td><td><input id="rearWall" value="Tấm inox gương trắng lớn ở giữa, nẹp inox xước 2 bên" placeholder="Nhập vật liệu / màu sắc / mẫu vách sau cabin"></td></tr>
-<tr><td>Trần giả / chiếu sáng</td><td><select id="ceiling"><option value="tran-gia-001">Mẫu 001</option><option value="tran-gia-002">Mẫu 002</option><option value="tran-gia-001">Mẫu 001</option><option value="tran-gia-002">Mẫu 002</option><option value="tran-gia-003">Mẫu 003</option><option value="tran-gia-004">Mẫu 004</option><option value="tran-gia-005">Mẫu 005</option><option value="tran-gia-006">Mẫu 006</option><option value="tran-gia-007">Mẫu 007</option><option value="tran-gia-008">Mẫu 008</option><option value="custom">Khác / theo duyệt</option></select></td></tr>
+<tr><td>Trần giả / chiếu sáng</td><td><select id="ceiling"><option value="tran-gia-001">Mẫu 001</option><option value="tran-gia-002">Mẫu 002</option><option value="tran-gia-003">Mẫu 003</option><option value="tran-gia-004">Mẫu 004</option><option value="tran-gia-005">Mẫu 005</option><option value="tran-gia-006">Mẫu 006</option><option value="tran-gia-007">Mẫu 007</option><option value="tran-gia-008">Mẫu 008</option><option value="custom">Khác / theo duyệt</option></select></td></tr>
 <tr><td>Sàn cabin</td><td><select id="floorFinish"><option value="san-cabin-001">Mẫu 001</option><option value="san-cabin-002">Mẫu 002</option><option value="san-cabin-003">Mẫu 003 · Trắng đen</option><option value="san-cabin-004">Mẫu 004</option><option value="san-cabin-005">Mẫu 005</option><option value="san-cabin-006">Mẫu 006</option><option value="san-cabin-007">Mẫu 007</option><option value="san-cabin-008">Mẫu 008</option><option value="custom">Khác / theo duyệt</option></select></td></tr>
 <tr><td>Tay vịn</td><td><select id="handrail"><option value="tay-vin-tron-001">Tay vịn tròn</option><option value="tay-vin-det-002">Tay vịn dẹt</option></select></td></tr>
 <tr><td>Nút bấm</td><td><select id="buttonModel"><option value="nut-bam-da-001">DA-001</option><option value="nut-bam-da-002">DA-002</option><option value="nut-bam-da-003">DA-003</option><option value="nut-bam-da-004">DA-004</option></select></td></tr>
@@ -202,6 +194,14 @@ function quotePrintNow(){
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
+/* Print action: require authenticated user and export permission, then prepare the print view. */
+function quotePrintNow(){
+  var btn=document.getElementById('quotePrintBtn');
+  if(!btn || btn.disabled || document.body.classList.contains('quote-auth-pending')){ alert('Vui lòng đăng nhập tài khoản được cấp quyền xuất PDF.'); return; }
+  if(typeof window.printPrepare==='function') window.printPrepare();
+  window.setTimeout(function(){ window.print(); }, 80);
+}
+
 (function(){
   'use strict';
   var ADMIN_UID='nJmKgjEILgVOEjWKYWTsuonxbO03';
