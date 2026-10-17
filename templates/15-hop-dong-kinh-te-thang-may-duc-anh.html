@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hợp đồng kinh tế thang máy Đức Anh | GROVA DOCUMENT</title>
+<style>
+:root{--green:#185c46;--gold:#b89a52;--ink:#202820;--line:#cbd4ce;--pale:#edf3ef}
+*{box-sizing:border-box}body{margin:0;background:#edf0ed;color:var(--ink);font:12px/1.45 Arial,sans-serif}
+.toolbar{max-width:1000px;margin:14px auto;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;padding:0 12px}
+button{border:0;border-radius:6px;padding:10px 14px;background:var(--green);color:#fff;font-weight:700;cursor:pointer}.secondary{background:#fff;color:var(--green);border:1px solid var(--green)}
+.wrap{max-width:1000px;margin:0 auto 28px;padding:0 12px}.sheet{position:relative;background:#fff;padding:22px 28px;margin:0 auto 16px;box-shadow:0 2px 12px #0000000d;min-height:190mm;break-after:page;page-break-after:always}
+.brand{text-align:center;border-bottom:2px solid var(--green);padding-bottom:8px;margin-bottom:12px}.brand strong{font-size:17px;color:var(--green)}.brand div{font-size:10px}
+h1,h2,h3{text-align:center;margin:8px 0}h1{font-size:25px;letter-spacing:.5px}h2{font-size:16px;color:var(--green)}h3{font-size:13px}
+.cover{min-height:245mm;padding:24px 28px;border:3px double #9a854c}.cover .brand{margin-bottom:55px}.cover h1{margin-top:55px;font-size:30px;color:#111}.cover .cover-info{margin-top:35px;text-align:center;font-size:18px;font-weight:bold;line-height:1.7}.cover .year{position:absolute;bottom:25px;left:0;right:0;text-align:center;font-style:italic;font-size:17px}
+.field{display:inline-block;border-bottom:1px dotted #87938b;min-width:120px;padding:0 3px;outline:none}.edit{background:#fff9df;border-bottom:1px solid #b89a52}.field.block{display:block;min-height:20px}
+p{margin:5px 0;text-align:justify}.article-title{font-weight:bold;margin-top:10px}.subclause{padding-left:14px;text-indent:-14px;margin:6px 0;text-align:justify}.party{margin:10px 0}.note{font-size:10px;color:#526157}
+table{width:100%;border-collapse:collapse;margin:8px 0;font-size:11px}th,td{border:1px solid #8d9991;padding:5px 6px;vertical-align:top}th{background:var(--pale);text-align:center}td.center{text-align:center}.spec td:first-child{width:6%;text-align:center}.spec td:nth-child(2){width:34%}.signatures{display:grid;grid-template-columns:1fr 1fr;gap:35px;text-align:center;margin-top:35px;min-height:70px}.footer{position:absolute;bottom:8px;left:28px;right:28px;border-top:1px solid #b8c4bb;padding-top:4px;font-size:9px;display:flex;justify-content:space-between;color:#4b5c51}
+.photo{display:block;max-width:220px;max-height:155px;object-fit:contain;margin:8px auto}.signature-space{height:55px}
+@media(max-width:650px){.sheet{padding:16px 12px;min-height:0}.cover{min-height:220mm}.footer{left:12px;right:12px}table{font-size:10px}th,td{padding:4px}}
+@page{size:A4 portrait;margin:12mm}
+@media print{body{background:#fff;font-size:10.5px}.toolbar{display:none}.wrap{max-width:none;margin:0;padding:0}.sheet{box-shadow:none;margin:0;padding:0 0 10mm;min-height:0;width:auto;break-after:page;page-break-after:always}.cover{padding:12mm;border:3px double #9a854c;min-height:270mm}.cover .brand{margin-bottom:45mm}.cover h1{margin-top:35mm}.cover .cover-info{margin-top:22mm}.footer{left:0;right:0;bottom:0}table{font-size:9.5px}th,td{padding:4px}.field{background:transparent!important}.no-print{display:none!important}}
+</style>
+</head>
+<body>
+<div class="toolbar no-print"><button class="secondary" onclick="saveDraft()">Lưu nháp</button><button class="secondary" onclick="loadDraft()">Tải nháp</button><button onclick="window.print()">Xuất PDF / In hợp đồng</button></div>
+<div class="wrap" id="contract">
+<section class="sheet cover">
+<header class="brand"><strong>CÔNG TY TNHH THANG MÁY ĐỨC ANH VIỆT NAM</strong><div>Địa chỉ: HP81, Royal Island, Đảo Vũ Yên, phường Thủy Nguyên, thành phố Hải Phòng</div><div>Tel: 19000252 &nbsp; Fax: 0225.3814859</div><div>Email: thangmayducanhhp@gmail.com &nbsp; Website: thangmayducanh.com</div></header>
+<h1>HỢP ĐỒNG KINH TẾ</h1><h2>Số: <span class="field edit" contenteditable="true" id="contractNo">……/2026/HĐKT-ĐAVN</span></h2>
+<div class="cover-info">CÔNG TRÌNH: <span class="field edit" contenteditable="true" id="projectName">………………………………</span><br>Địa chỉ: <span class="field edit" contenteditable="true" id="projectAddress">………………………………</span></div>
+<div class="cover-info" style="margin-top:35mm">Loại thang: <span class="field edit" contenteditable="true" id="elevatorType">Tải khách</span><br>Load: <span class="field edit" contenteditable="true" id="loadSpec">……kg – ……stop – ……m/phút</span><br>Số lượng: <span class="field edit" contenteditable="true" id="quantity">01 thang</span></div>
+<div class="year">Năm <span contenteditable="true" class="field edit" id="contractYear">2026</span></div><div class="footer"><span>www.thangmayducanh.com</span><span>Trang 1</span></div>
+</section>
+<section class="sheet">
+<header class="brand"><strong>CÔNG TY TNHH THANG MÁY ĐỨC ANH VIỆT NAM</strong><div>Độc lập – Tự do – Hạnh phúc</div></header>
+<p style="text-align:right">Hải Phòng, ngày <span class="field edit" contenteditable="true" id="signDay">……</span> tháng <span class="field edit" contenteditable="true" id="signMonth">……</span> năm <span class="field edit" contenteditable="true" id="signYear">2026</span></p>
+<h2>HỢP ĐỒNG KINH TẾ</h2><p style="text-align:center">Số: <span class="field edit" contenteditable="true" id="contractNo2">……/2026/HĐKT-ĐAVN</span></p>
+<p>- Căn cứ Bộ luật Dân sự số 91/2015/QH13 ngày 24/11/2015 của nước Cộng hòa xã hội chủ nghĩa Việt Nam;</p>
+<p>- Căn cứ vào Luật Thương Mại số 36/2005/QH11 ngày 14/6/2005 của nước Cộng hòa xã hội chủ nghĩa Việt Nam;</p>
+<p>- Căn cứ Luật Xây dựng số 50/2014/QH13 ngày 18/6/2014 của nước Cộng hòa xã hội chủ nghĩa Việt Nam;</p>
+<p>- Căn cứ vào nhu cầu, khả năng của hai bên.</p>
+<p>Hôm nay, ngày <span class="field edit" contenteditable="true">……</span> tháng <span class="field edit" contenteditable="true">……</span> năm <span class="field edit" contenteditable="true">2026</span>, chúng tôi gồm:</p>
+<div class="party"><b>BÊN A: CÔNG TRÌNH TƯ NHÂN</b><p>Đại diện là: <span class="field edit" contenteditable="true" id="partyA">……………………</span> &nbsp; Chức vụ: <span class="field edit" contenteditable="true">Chủ đầu tư</span></p><p>Địa chỉ: <span class="field edit" contenteditable="true" id="partyAAddress">……………………</span></p><p>Số CCCD: <span class="field edit" contenteditable="true">……………………</span> &nbsp; Ngày sinh: <span class="field edit" contenteditable="true">…………</span></p><p>Điện thoại: <span class="field edit" contenteditable="true">……………………</span></p></div>
+<div class="party"><b>BÊN B: CÔNG TY TNHH THANG MÁY ĐỨC ANH VIỆT NAM</b><p>Đại diện là: Ông HÀ VĂN DƯƠNG &nbsp; Chức vụ: Giám đốc</p><p>Địa chỉ: HP81, Royal Island, Đảo Vũ Yên, phường Thủy Nguyên, thành phố Hải Phòng</p><p>Điện thoại: 02253.518163 &nbsp; Mã số thuế: 0201879133</p><p>Chủ tài khoản: CÔNG TY TNHH THANG MÁY ĐỨC ANH VIỆT NAM</p><p>Số tài khoản: 8868126888 &nbsp; Tại Ngân hàng Vietcombank</p></div>
+<p>Sau khi thỏa thuận, hai bên đồng ý ký kết Hợp đồng này với các điều khoản sau:</p>
+<div class="article-title">Điều 1: Nội dung công việc</div>
+<p class="subclause">1.1. Bên B nhận cung cấp, lắp đặt cho bên A một (01) thang máy tải khách, tải trọng <span class="field edit" contenteditable="true">630 kg – 04 stops – 60m/ph</span>.</p><p>(Chi tiết theo Bản đặc tính kỹ thuật đính kèm theo Hợp đồng)</p>
+<p class="subclause">1.2. Cung cấp vật tư và lắp đặt hoàn chỉnh thang máy trên tại công trình: <span class="field edit" contenteditable="true">……………………</span></p><p>Địa chỉ: <span class="field edit" contenteditable="true">……………………</span></p>
+<div class="article-title">Điều 2: Trách nhiệm của bên A</div>
+<p class="subclause">2.1. Xây dựng, hiệu chỉnh hố thang đảm bảo các thông số kỹ thuật cho việc lắp đặt thang máy theo bản vẽ kỹ thuật hố thang do bên B cung cấp.</p>
+<p class="subclause">2.2. Chậm nhất là trong vòng mười lăm (15) ngày kể từ ngày bên B chuyển bản vẽ kỹ thuật, bên A phải ký xác nhận vào bản vẽ kỹ thuật sau khi đã thống nhất để Bên B đặt hàng với Nhà máy. Quá thời hạn trên coi như bên A đã đồng ý với bản vẽ kỹ thuật mà bên B đã chuyển để hai bên thực hiện công việc.</p>
+<p class="subclause">2.3. Bên A giao đầy đủ hồ sơ thiết kế liên quan đến hố thang máy cho Bên B.</p>
+<p class="subclause">2.4. Cử cán bộ có trách nhiệm phối hợp cùng bên B tham gia kiểm tra và ký xác nhận thiết bị thang máy khi lô thiết bị được chuyển về chân công trình. Nếu tại thời điểm hàng về chân công trình, bên A không bố trí được người kiểm tra, bên B vẫn vận chuyển lô thiết bị trên vào kho và lô thiết bị trên coi như đã được kiểm tra đầy đủ, đúng theo danh mục hồ sơ thang máy kèm theo.</p>
+<p class="subclause">2.5. Bố trí kho chứa thiết bị an toàn tại tầng một khi bên B vận chuyển thiết bị đến công trình và đảm bảo an ninh cho kho chứa thiết bị thang máy tại công trình.</p>
+<p class="subclause">2.6. Bàn giao mặt bằng đủ điều kiện để thi công lắp đặt cho bên B đúng tiến độ.</p>
+<p class="subclause">2.7. Cung cấp điểm đấu nối nguồn điện để thi công, lắp đặt thang máy trong khu vực thi công.</p>
+<p class="subclause">2.8. Cung cấp nguồn điện 3 phase 380V/220V và 01 Aptomat 3 phase /1 thang và điểm đấu nối dây tiếp địa tại phòng đặt máy để bên B hiệu chỉnh thang máy.</p>
+<p class="subclause">2.9. Bên A cử cán bộ kỹ thuật thường xuyên phối hợp cùng bên B trong suốt quá trình thi công lắp đặt để giải quyết kịp thời các công việc trong quá trình thực hiện hợp đồng.</p>
+<p class="subclause">2.10. Trước khi bên A hoàn thành toàn bộ nghĩa vụ thanh toán và các bên ký Biên bản nghiệm thu hoàn thành công trình để đưa vào sử dụng, Bên A không được phép để bất kỳ người nào (ngoài người đại diện của bên B) thực hiện bất cứ công việc gì với thiết bị thang máy mà không có sự đồng ý bằng văn bản của bên B.</p>
+<p class="subclause">2.11. Tổ chức nghiệm thu, ký biên bản nghiệm thu giai đoạn (nếu có) và nghiệm thu bàn giao kịp thời khi bên B hoàn tất công việc.</p>
+<p class="subclause">2.12. Thực hiện phần việc xây dựng hoàn thiện sau khi bên B hoàn tất lắp đặt thiết bị thang máy.</p>
+<p class="subclause">2.13. Tạm ứng và thanh toán kịp thời cho Bên B theo điều 6 của Hợp đồng.</p>
+<p class="subclause">2.14. Bên A cho phép bên B khi lắp đặt được khoan vào bê tông 100mm để đảm bảo an toàn cho thang máy. Và bên B không chịu trách nhiệm về phần chống thấm cho bên A.</p>
+<div class="footer"><span>www.thangmayducanh.com</span><span>Trang 2</span></div>
+</section>
+<section class="sheet">
+<div class="article-title">Điều 3: Trách nhiệm của bên B</div>
+<p class="subclause">3.1. Khảo sát và thiết kế bản vẽ hố thang và chuyển cho bên A ký xác nhận làm cơ sở đặt hàng và thực hiện các công việc liên quan.</p>
+<p class="subclause">3.2. Nhập khẩu thiết bị thang máy theo các thông số kỹ thuật của Bản đặc tính kỹ thuật thang máy.</p>
+<p class="subclause">3.3. Trước khi vận chuyển thiết bị về công trình, bên B có trách nhiệm thông báo cho bên A ngày thiết bị về đến công trình để bên A bố trí kho chứa thiết bị tại công trình.</p>
+<p class="subclause">3.4. Vận chuyển thiết bị đến công trình, phối hợp cùng với đại diện của bên A kiểm tra và ký xác nhận vào các biên bản bàn giao vật tư về công trình.</p>
+<p class="subclause">3.5. Cung cấp vật tư lắp đặt và lắp đặt, hiệu chỉnh, đưa thang máy vào sử dụng.</p>
+<p class="subclause">3.6. Việc thi công lắp đặt thang máy chỉ được tiến hành ngay sau khi Bên B nhận đủ tiền thanh toán theo điều 5, điều 6 trong hợp đồng này.</p>
+<p class="subclause">3.7. Có trách nhiệm quản lý, đảm bảo an ninh, an toàn trong quá trình thi công trên công trình và giữ gìn vệ sinh môi trường trong suốt thời gian thi công.</p>
+<p class="subclause">3.8. Đảm bảo và chịu trách nhiệm về các điều kiện an toàn cho con người, an ninh trong khu vực thi công theo quy định chung.</p>
+<p class="subclause">3.9. Cung cấp cho bên A bộ hồ sơ nhập khẩu thiết bị thang máy (đối với các thiết bị chính: Máy kéo, tủ điện), bao gồm: Chứng nhận xuất xứ hàng hoá của Phòng thương mại nước xuất xứ (C/O) – bản sao; Chứng nhận chất lượng của nhà sản xuất (C/Q) – bản sao; List vật tư.</p>
+<p class="subclause">3.10. Hướng dẫn cách sử dụng vận hành thang máy cho bên A.</p><p class="subclause">3.11. Bên B có trách nhiệm bảo hành công trình theo quy định tại điều 7 của Hợp đồng kinh tế.</p>
+<div class="article-title">Điều 4: Tiến độ thực hiện được bên B thực hiện như sau:</div>
+<p class="subclause">4.1. Thời gian thiết bị thang máy được nhập khẩu và vận chuyển đến công trình sau khi bên B nhận được kinh phí tạm ứng kỳ 1 và bên A xác nhận vào bản vẽ kỹ thuật hố thang và chọn đầy đủ mẫu vật tư thang máy là: 60 ngày (không bao gồm ngày lễ, thứ bảy, chủ nhật).</p>
+<p class="subclause">4.2. Thời gian lắp đặt, hiệu chỉnh được thực hiện sau khi bên B nhận được kinh phí thanh toán kỳ 2, bên A bàn giao mặt bằng đầy đủ điều kiện thi công và ký biên bản nghiệm thu thiết bị thang máy trước khi lắp đặt là: 30 ngày.</p>
+<p class="subclause">4.3. Tiến độ trên chỉ được thực hiện với các điều kiện sau:</p>
+<p>- Bên A thanh toán đúng thời hạn và giá trị đã ghi ở điều 5 và điều 6 hợp đồng này.</p>
+<p>- Các chi tiết kỹ thuật của thang máy phải được bên A thống nhất trước khi ký kết hợp đồng kinh tế. Trong trường hợp có những thay đổi về chi tiết kỹ thuật của thang máy từ phía bên A như bổ sung, bỏ bớt hoặc điều chỉnh thì hai bên thống nhất bằng một văn bản hoặc phụ lục hợp đồng bổ sung để hiệu chỉnh giá trị hợp đồng và tiến độ thực hiện nhưng thời gian cho việc thay đổi trong vòng 3 ngày kể từ ngày hợp đồng có hiệu lực.</p>
+<p>- Việc lắp đặt thang máy chỉ được tiến hành sau khi khoản 4.2 nêu trên đã được thực hiện.</p>
+<div class="article-title">Điều 5: Giá trị của hợp đồng kinh tế</div>
+<table><thead><tr><th>STT</th><th>NỘI DUNG</th><th>SL</th><th>ĐƠN GIÁ VNĐ</th><th>THÀNH TIỀN VNĐ</th></tr></thead><tbody><tr><td class="center">1</td><td>Thang máy tải khách<br>- Máy <span class="field edit" contenteditable="true">MGV25S</span><br>- Tủ <span class="field edit" contenteditable="true">Step</span><br>- Tải trọng: <span class="field edit" contenteditable="true">630kg</span><br>- Tốc độ: <span class="field edit" contenteditable="true">60m/phút</span><br>- Số điểm dừng: <span class="field edit" contenteditable="true">04 stops</span></td><td class="center"><span class="field edit" contenteditable="true">01</span></td><td class="center"><span class="field edit" contenteditable="true">360.000.000</span></td><td class="center"><span class="field edit" contenteditable="true">360.000.000</span></td></tr><tr><th colspan="4">Tổng cộng (VNĐ)</th><th><span class="field edit" contenteditable="true">360.000.000</span></th></tr><tr><td colspan="5"><b>Bằng chữ:</b> <span class="field edit" contenteditable="true">Ba trăm sáu mươi triệu đồng chẵn.</span></td></tr></tbody></table>
+<p>* Giá trị hợp đồng trên đã bao gồm: thuế VAT, giá vật tư, thiết bị thang máy tại chân công trình, chi phí lắp đặt, hiệu chỉnh, tổ chức kiểm định và cấp giấy chứng nhận thang máy đủ điều kiện an toàn sử dụng.</p>
+<p>* Giá trị hợp đồng trên chưa bao gồm: Xây cửa ngoài thang máy (do bên mua xây dựng); Aptomat 32A, đường dây điện 3 pha lên đỉnh giếng thang, tiếp địa lên đỉnh giếng thang.</p>
+<div class="article-title">Điều 6: Phương thức thanh toán</div>
+<p>6.1. Bên A tạm ứng, thanh toán giá trị hợp đồng kinh tế quy định tại Điều 5.1 cho bên B theo các kỳ như sau:</p>
+<p><b>Lần 1:</b> Bên A tạm ứng cho bên B số tiền là <span class="field edit" contenteditable="true">100.000.000VNĐ</span> (Bằng chữ: <span class="field edit" contenteditable="true">Một trăm triệu đồng chẵn.</span>) ngay sau khi hợp đồng được hai bên ký kết.</p>
+<p><b>Lần 2:</b> Bên A thanh toán cho bên B số tiền là <span class="field edit" contenteditable="true">240.000.000VNĐ</span> (Bằng chữ: <span class="field edit" contenteditable="true">Hai trăm bốn mươi triệu đồng chẵn.</span>) ngay sau khi bên B chuyển hàng đầy đủ về tới chân công trình (có phiếu xuất kho và chứng từ CO, CQ kèm theo) chuẩn bị lắp đặt phần cơ khí. Bên B chỉ lắp đặt sau khi đã nhận đủ số tiền thanh toán đợt 2 của bên A.</p>
+<p><b>Lần 3:</b> Bên A thanh toán cho bên B nốt số tiền còn lại: <span class="field edit" contenteditable="true">20.000.000VNĐ</span> (Bằng chữ: <span class="field edit" contenteditable="true">Hai mươi triệu đồng chẵn.</span>) ngay sau khi bên B bàn giao thang máy cho bên A đi vào sử dụng.</p>
+<div class="footer"><span>www.thangmayducanh.com</span><span>Trang 3</span></div>
+</section>
+<section class="sheet">
+<p>Bên A sẽ thanh toán cho Bên B theo khối lượng công việc hoàn thành trong tổng giá trị của hợp đồng. Bên B nhận được đủ kinh phí của giai đoạn hoàn thành, Bên B sẽ tiếp tục thực hiện công việc của giai đoạn tiếp theo.</p>
+<p class="subclause">6.2. Trường hợp bên A không thực hiện đầy đủ nghĩa vụ thanh toán như đã thống nhất ở trên, bên B có quyền ngừng thực hiện các công việc liên quan đến hoạt động của thang máy cho đến khi bên A hoàn thành nghĩa vụ thanh toán của mình và đền bù những thiệt hại cho bên B theo lãi suất quá hạn cho vay của Ngân hàng bên B mở tài khoản.</p>
+<p class="subclause">6.3. Trong mọi trường hợp, nếu Bên A chưa thực hiện hoặc thực hiện không đầy đủ nghĩa vụ thanh toán cho Bên B thì: (i) toàn bộ hệ thống thiết bị thang máy; và (ii) tài liệu và chứng từ liên quan; và (iii) phần cứng và phần mềm của thiết bị, đều thuộc quyền sở hữu của Bên B. Bên A không được tự mình và/hoặc để bên thứ ba bất kỳ can thiệp, tác động đối với một phần hoặc toàn bộ hệ thống thang máy mà không được sự đồng ý trước của Bên B. Nếu vi phạm Khoản này, Bên A sẽ phải chịu trách nhiệm trước pháp luật và phải đền bù cho Bên B theo thiệt hại thực tế đã xảy ra.</p>
+<p class="subclause">6.4. Trong trường hợp bên B đã hoàn thành toàn bộ công việc theo như hợp đồng kinh tế đã ký kết mà bên A chưa có nguồn điện chính thức để sử dụng thang máy, hoặc chưa có nhu cầu sử dụng (hoặc các lý do khác tương tự) thì trách nhiệm của bên A là phải hoàn thành nghĩa vụ thanh toán toàn bộ giá trị hợp đồng cho bên B để bên B quyết toán hợp đồng và thực hiện nghĩa vụ nộp thuế theo quy định của Nhà nước.</p>
+<p class="subclause">6.5. Trong trường hợp bên A đã ứng đặt cọc hoặc ứng để bên B nhập thiết bị mà bên A tự ý hủy ngang hợp đồng thì bên B không chịu trách nhiệm hoàn lại số tiền đã tạm ứng.</p>
+<p class="subclause">6.6. Thời điểm xuất hóa đơn sau khi khách hàng thanh toán đủ 100% giá trị và ký biên bản nghiệm thu.</p>
+<div class="article-title">Điều 7: Bảo hành</div>
+<p class="subclause">7.1. Bên B có trách nhiệm bảo hành, bảo trì thiết bị trong vòng 24 tháng kể từ ngày hai bên ký Biên bản nghiệm thu hoàn thành hạng mục công trình để đưa vào sử dụng hoặc kể từ ngày thang máy được kiểm định an toàn, chất lượng hoặc 15 (mười lăm) tháng kể từ ngày hàng về đến kho của bên B tuỳ theo điều kiện nào đến trước. Nếu trong thời gian bảo hành mà thang máy bị hư hỏng, nhận được thông báo của bên A trong thời gian sớm nhất bên B phải cử người đến xử lý và chịu mọi phí tổn sửa chữa nếu xảy ra sự cố kỹ thuật do lỗi của nhà sản xuất hoặc do lỗi khác của bên B.</p>
+<p class="subclause">7.2. Trong suốt thời gian bảo hành Bên B sẽ bảo trì định kỳ thang máy mỗi tháng 01 lần (theo bảng nội dung bảo trì hàng tháng của công ty).</p>
+<div class="article-title">Điều 8: Hiệu lực hợp đồng</div>
+<p class="subclause">8.1. Hợp đồng kinh tế này có hiệu lực kể từ ngày ký.</p>
+<p class="subclause">8.2. Hai bên cam kết thực hiện đúng các điều khoản ghi trong hợp đồng kinh tế. Khi có vướng mắc hai bên cùng trao đổi để khắc phục. Nếu không giải quyết được bằng thương lượng thì các bên đồng ý đưa vụ việc ra trước Tòa án nhân dân khu vực 5 thành phố Hải Phòng. Phán quyết của Toà án Nhân dân khu vực 5 có thẩm quyền tại thành phố Hải Phòng là phán quyết cuối cùng để hai bên thực hiện, mọi chi phí phát sinh và án phí do bên có lỗi chịu trách nhiệm thanh toán.</p>
+<p class="subclause">8.3. Hợp đồng này được lập thành ba (03) bản, bên A giữ hai (02) bản, bên B giữ một (01) bản có nội dung và giá trị pháp lý như nhau.</p>
+<div class="signatures"><div><b>ĐẠI DIỆN BÊN A</b><div class="signature-space"></div><span class="field edit" contenteditable="true">Ký, ghi rõ họ tên</span></div><div><b>ĐẠI DIỆN BÊN B</b><div class="signature-space"></div><span>HÀ VĂN DƯƠNG</span></div></div>
+<div class="footer"><span>www.thangmayducanh.com</span><span>Trang 4</span></div>
+</section>
+<section class="sheet">
+<header class="brand"><strong>ĐẶC TÍNH KỸ THUẬT</strong><div>Thang khách 630kg (4 stop – 60m/p)</div></header>
+<table class="spec"><thead><tr><th>STT</th><th colspan="2">ĐẶC TÍNH CHUNG</th></tr></thead><tbody>
+<tr><td>1</td><td>Loại thang</td><td><span class="field edit" contenteditable="true">Tải khách</span></td></tr>
+<tr><td>2</td><td>Mã hiệu</td><td><span class="field edit" contenteditable="true">DA 630 – CO800 – 4S</span></td></tr>
+<tr><td>3</td><td>Số lượng</td><td><span class="field edit" contenteditable="true">01 thang</span></td></tr>
+<tr><td>4</td><td>Tải trọng</td><td><span class="field edit" contenteditable="true">630kg</span></td></tr>
+<tr><td>5</td><td>Tốc độ</td><td><span class="field edit" contenteditable="true">60m/phút</span></td></tr>
+<tr><td>6</td><td>Số tầng</td><td><span class="field edit" contenteditable="true">4 Stops (1F, 2F, 3F,4F)</span></td></tr>
+<tr><td>7</td><td>Số cửa tầng</td><td>Bốn cửa ở phía trước</td></tr>
+<tr><td>8</td><td>Số điểm dừng</td><td>Bốn điểm thẳng hàng</td></tr>
+<tr><td>9</td><td>Phòng máy</td><td>Không Phòng máy</td></tr>
+<tr><td>10</td><td>Điều kiện môi trường</td><td>Hệ điều khiển được nhiệt đới hoá phù hợp với khí hậu nóng ẩm của Việt Nam.<br>- Nhiệt độ từ 5-40 độ C<br>- Độ ẩm trung bình/ngày đến 95%</td></tr>
+<tr><td>11</td><td>Hố thang (rộng x sâu)</td><td>Kích thước: <span class="field edit" contenteditable="true">1720 mm x 2200 mm</span> (có thể thiết kế theo kích thước thực tế)</td></tr>
+<tr><td>12</td><td>Đối trọng</td><td>Đặt phía sau</td></tr><tr><td>13</td><td>Hành trình</td><td>Theo thực tế</td></tr><tr><td>14</td><td>Pit (chiều âm hố thang)</td><td><span class="field edit" contenteditable="true">1100 mm</span></td></tr><tr><td>15</td><td>OH (Overhead)</td><td><span class="field edit" contenteditable="true">3100 mm + PM 1200mm</span></td></tr><tr><td>16</td><td>Khoảng cách giữa hai tầng</td><td>≥ 2700mm</td></tr><tr><td>17</td><td>Nguồn điện thang máy</td><td>3 Phase, 5 dây, 380VAC, 50Hz (khách hàng cung cấp tới phòng máy)</td></tr><tr><td>18</td><td>Nguồn chiếu sáng</td><td>1 Phase, 220VAC, 50Hz (khách hàng cung cấp tới phòng máy)</td></tr>
+</tbody></table>
+<div class="article-title">ĐỘNG CƠ THANG MÁY – Bảo hành 05 năm</div>
+<table><tbody><tr><td>Động cơ máy kéo</td><td><span class="field edit" contenteditable="true">MGV25S – không hộp số (nhập nguyên đai nguyên kiện mới 100%)</span><img class="photo" src="../assets/elevator/may-keo/mgv25s.jpg" alt="Máy kéo" onerror="this.style.display='none'"></td></tr><tr><td>Xuất xứ</td><td>Ý</td></tr><tr><td>Nguồn điện</td><td>380 Volt x 3 phase x 50Hz</td></tr><tr><td>Công suất</td><td><span class="field edit" contenteditable="true">5.0 Kw</span></td></tr><tr><td>Số lần khởi động</td><td>180 lần/giờ</td></tr><tr><td>Dung sai biến áp cho phép</td><td>±5</td></tr></tbody></table>
+<div class="article-title">TỦ ĐIỀU KHIỂN THANG MÁY</div><p style="text-align:center"><b>TỦ STEP NHẬP NGUYÊN CHIẾC TRUNG QUỐC</b></p><img class="photo" src="../assets/elevator/may-keo/tu-step.jpg" alt="Tủ điều khiển" onerror="this.style.display='none'">
+<div class="footer"><span>www.thangmayducanh.com</span><span>Trang 5</span></div>
+</section>
+<section class="sheet">
+<header class="brand"><strong>ĐẶC TÍNH KỸ THUẬT – PHÒNG THANG (CABIN)</strong></header>
+<table><tbody><tr><td>Kích thước (Rộng x Sâu x Cao)</td><td><span class="field edit" contenteditable="true">W 1300 mm x D 1400 mm x H 2400mm</span></td></tr>
+<tr><td>2 vách hông cabin</td><td><span class="field edit" contenteditable="true">Tấm inox gương trắng ở giữa xen inox sọc nhuyễn trắng hai bên</span><br>(Inox sọc nhuyễn nano không bám vân tay)</td></tr>
+<tr><td>Vách sau cabin</td><td>(Inox sọc nhuyễn nano không bám vân tay)</td></tr>
+<tr><td>Tay vịn inox</td><td>Tay vịn dẹt gắn 2 vách hông</td></tr><tr><td>Trần giả</td><td>Như mẫu:<img class="photo" src="../assets/elevator/tran-gia/tran-gia-001.jpg" alt="Mẫu trần" onerror="this.style.display='none'"></td></tr>
+<tr><td>Đèn chiếu sáng</td><td>Gián tiếp từ trần phòng thang toả xuống</td></tr><tr><td>Sàn phòng thang</td><td>Như mẫu:<img class="photo" src="../assets/elevator/san-cabin/san-cabin-001.jpg" alt="Mẫu sàn" onerror="this.style.display='none'"></td></tr>
+<tr><td>Bảng điều khiển cabin</td><td>Inox gương xen sọc trắng</td></tr><tr><td>Mặt gọi tầng</td><td>Inox gương xen sọc trắng</td></tr><tr><td>Nút nhấn chọn tầng</td><td>Nút ngoại nhập</td></tr><tr><td>Nút đóng mở cửa</td><td>Nút ngoại nhập</td></tr>
+<tr><td>Chuông dừng tầng</td><td>Chuông chuyên dùng cho thang máy. Tín hiệu âm thanh phát ra để nhắc nhở hành khách khi thang chuẩn bị dừng tầng.</td></tr><tr><td>Khoá ưu tiên trong cabin</td><td>Khoá chuyên dùng cho thang máy</td></tr><tr><td>Quạt thông gió</td><td>Quạt chuyên dùng cho thang máy</td></tr><tr><td>Đèn cấp cứu khi mất điện</td><td>Đèn chuyên dùng cho thang máy</td></tr><tr><td>Chuông cấp cứu</td><td>Liên lạc với bên ngoài khi có sự cố</td></tr><tr><td>Intercom liên lạc ra ngoài</td><td>Liên lạc với bên ngoài khi có sự cố</td></tr></tbody></table>
+<div class="footer"><span>www.thangmayducanh.com</span><span>Trang 6</span></div>
+</section>
+<section class="sheet">
+<header class="brand"><strong>HỆ THỐNG CỬA CABIN THANG MÁY</strong></header>
+<table><tbody>
+<tr><td>Bộ truyền cửa</td><td>Ngoại nhập mới 100%</td></tr><tr><td>Motor cửa</td><td>Motor cửa đồng bộ theo bộ truyền</td></tr>
+<tr><td>Hệ điều khiển</td><td>Loại hai cánh đóng mở cửa tự động về hai phía từ trung tâm, điều khiển theo cửa phòng thang, cửa tầng chỉ được mở khi phòng thang dừng đúng tầng. Tự động hoàn toàn, điều khiển tốc độ cửa bằng biến tần VVVF điều khiển tốc độ vô cấp bằng hệ thống thay đổi điện áp và tần số giúp cửa thang máy được đóng mở nhẹ nhàng và êm ái.</td></tr>
+<tr><td>Đầu cửa cabin</td><td>Ngoại nhập</td></tr><tr><td>Kích thước (rộng x cao)</td><td><span class="field edit" contenteditable="true">W 800mm x H 2100mm</span></td></tr><tr><td>Vật liệu</td><td>Tấm inox sọc nhuyễn (Inox sọc nhuyễn nano không bám vân tay)</td></tr><tr><td>Rãnh trượt</td><td>Nhôm định hình chuyên dùng thang máy</td></tr>
+<tr><td>Hệ thống tế bào quang điện ngoại nhập</td><td>Photocell dạng thanh dọc suốt chiều cao cửa, không cho cửa đóng khi có người hoặc vật cản</td></trtr><tr><td>Hệ thống tự động mở lại cửa</td><td>Reopening khi cửa đóng gặp vật cản</td></tr>
+</tbody></table>
+<div class="article-title">HỆ THỐNG CỬA TẦNG</div>
+<table><tbody><tr><td>Loại cửa</td><td>Cửa mở tim, 2 cánh mở về hai phía</td></tr><tr><td>Kích thước</td><td>W 800mm x H 2100mm</td></tr><tr><td>Rãnh trượt</td><td>Nhôm định hình chuyên dùng</td></tr><tr><td>Bao che tầng 1</td><td>Khung bao rộng, inox sọc nhuyễn, không có hiển thị ngang<br>Cánh cửa inox sọc nhuyễn (Inox sọc nhuyễn nano không bám vân tay)<img class="photo" src="../assets/elevator/cua-tang/cua-tang-inox-matte.jpg" alt="Cửa tầng" onerror="this.style.display='none'"></td></tr></tbody></table>
+<div class="footer"><span>www.thangmayducanh.com</span><span>Trang 7</span></div>
+</section>
+<section class="sheet">
+<header class="brand"><strong>ĐẶC TÍNH KỸ THUẬT – THIẾT BỊ VÀ HOÀN THIỆN</strong></header>
+<table><tbody>
+<tr><td>Bao che cửa các tầng khác</td><td>Khung bao hẹp, inox sọc nhuyễn<br>Cánh cửa inox sọc nhuyễn (Inox sọc nhuyễn nano không bám vân tay)<img class="photo" src="../assets/elevator/cua-tang/cua-tang-inox-matte.jpg" alt="Cửa tầng các tầng khác" onerror="this.style.display='none'"></td></tr>
+<tr><td>Bảng điều khiển và tín hiệu</td><td>Dùng đèn ma trận điểm</td></tr><tr><td>Rail cabin</td><td>T78 (8K)</td></tr><tr><td>Rail đối trọng</td><td>T78 (8K)</td></tr><tr><td>Poid đối trọng</td><td>Bê tông</td></tr><tr><td>Shoes dẫn hướng cabin</td><td>China – mới 100%</td></tr><tr><td>Cáp treo</td><td>Ý (sản xuất từ 2024)</td></tr><tr><td>Cáp điện treo cabin</td><td>Đồng bộ theo tủ điện</td></tr>
+<tr><td>Hệ thống chuông báo quá tải</td><td>Chuông chuyên dùng cho thang máy. Khi số người trong thang vượt quá tải trọng định mức, sẽ có âm thanh phát ra, cửa mở. Thang không hoạt động cho đến khi giảm bớt số lượng hành khách trong thang.</td></tr>
+</tbody></table>
+<div class="signatures"><div><b>ĐẠI DIỆN BÊN A</b><div class="signature-space"></div></div><div><b>ĐẠI DIỆN BÊN B</b><div class="signature-space"></div><b>HÀ VĂN DƯƠNG</b></div></div>
+<p class="note">Ghi chú: Các hình ảnh minh họa thiết bị trong bản điện tử cần được đối chiếu với mẫu và bản đặc tính kỹ thuật đã được hai bên xác nhận trước khi đặt hàng.</p>
+<div class="footer"><span>www.thangmayducanh.com</span><span>Trang 8</span></div>
+</section>
+</div>
+<script>
+function saveDraft(){const d={};document.querySelectorAll('[contenteditable="true"]').forEach((e,i)=>d[e.id||'field_'+i]=e.innerText);try{localStorage.setItem('grovaContract15Draft',JSON.stringify(d));alert('Đã lưu nháp trên trình duyệt này.')}catch(e){alert('Không lưu được bản nháp trên thiết bị này.')}}
+function loadDraft(){try{const d=JSON.parse(localStorage.getItem('grovaContract15Draft')||'null');if(!d){alert('Chưa có bản nháp.');return}document.querySelectorAll('[contenteditable="true"]').forEach((e,i)=>{const k=e.id||'field_'+i;if(Object.prototype.hasOwnProperty.call(d,k))e.innerText=d[k]});alert('Đã tải bản nháp.')}catch(e){alert('Không đọc được bản nháp.')}}
+</script>
+</body></html>
