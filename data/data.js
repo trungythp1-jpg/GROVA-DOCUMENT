@@ -214,6 +214,18 @@ window.GROVA_DATA = {
       enabled: true
     },
 
+    {
+      id: "15",
+      code: "HDKT-DA",
+      name: "Hợp đồng kinh tế thang máy Đức Anh",
+      title: "HỢP ĐỒNG KINH TẾ THANG MÁY ĐỨC ANH",
+      description: "Hợp đồng kinh tế thang máy Đức Anh; thông tin công trình, điều khoản, giá trị, thanh toán và phụ lục đặc tính kỹ thuật; lưu nháp và xuất PDF.",
+      category: "Hợp đồng",
+      icon: "📄",
+      file: "./templates/15-hop-dong-kinh-te-thang-may-duc-anh.html",
+      enabled: true
+    },
+
   ],
 
   /* =======================================================
