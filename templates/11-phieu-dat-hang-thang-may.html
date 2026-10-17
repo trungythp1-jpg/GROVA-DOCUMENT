@@ -10,6 +10,8 @@
 
 .material-choice{display:flex;align-items:center;gap:5px;min-width:0}
 .material-choice select{flex:1;min-width:0;width:100%}
+.material-preview{display:none;width:58px;height:44px;object-fit:contain;border:1px solid #c7cec9;border-radius:3px;background:#fff;flex:0 0 58px}
+@media print{.material-preview{display:none!important}}
 .material-choice a{display:inline-block;white-space:nowrap;color:#175c46;font-size:8pt;font-weight:700;text-decoration:underline}
 .material-choice a[aria-disabled="true"]{color:#89928d;text-decoration:none;pointer-events:none}
 @media print{.material-choice{gap:3px}.material-choice a{font-size:6.5pt;color:#174f3e}.dimensions td{overflow-wrap:anywhere}}
@@ -41,11 +43,11 @@
 </tbody></table>
 <div class="section-title">II. Đặc tính hoàn thiện (bắt buộc chọn/nhập)</div>
 <table class="dimensions"><thead><tr><th style="width:7%">STT</th><th style="width:34%">Đặc tính</th><th>Yêu cầu / mẫu lựa chọn</th><th style="width:20%">Trạng thái</th></tr></thead><tbody>
-<tr><td>1</td><td>Trần giả / chiếu sáng</td><td><div class="material-choice"><select id="falseCeiling" aria-label="Mẫu trần giả" required><option value="">-- Chọn mẫu trần --</option><option value="tran-gia-001">Mẫu 001</option><option value="tran-gia-002">Mẫu 002</option><option value="tran-gia-003">Mẫu 003</option><option value="tran-gia-004">Mẫu 004</option><option value="tran-gia-005">Mẫu 005</option><option value="tran-gia-006">Mẫu 006</option><option value="tran-gia-007">Mẫu 007</option><option value="tran-gia-008">Mẫu 008</option></select><a id="ceilingImageLink" href="#" target="_blank" rel="noopener" aria-disabled="true">Xem ảnh</a></div></td><td><select id="falseCeilingStatus" aria-label="Trạng thái mã trần giả" required><option value="">-- Chọn --</option><option>Đã chọn</option><option>Chưa áp dụng</option></select></td></tr>
-<tr><td>2</td><td>Sàn cabin / sàn đá</td><td><div class="material-choice"><select id="stoneFloor" aria-label="Mẫu sàn cabin" required><option value="">-- Chọn mẫu sàn --</option><option value="san-cabin-001">Mẫu 001</option><option value="san-cabin-002">Mẫu 002</option><option value="san-cabin-003">Mẫu 003</option><option value="san-cabin-004">Mẫu 004</option><option value="san-cabin-005">Mẫu 005</option><option value="san-cabin-006">Mẫu 006</option><option value="san-cabin-007">Mẫu 007</option><option value="san-cabin-008">Mẫu 008</option></select><a id="floorImageLink" href="#" target="_blank" rel="noopener" aria-disabled="true">Xem ảnh</a></div></td><td><select id="stoneFloorStatus" aria-label="Trạng thái sàn đá" required><option value="">-- Chọn --</option><option>Đã chọn</option><option>Không sử dụng</option></select></td></tr>
-<tr><td>3</td><td>Tay vịn</td><td><div class="material-choice"><select id="handrail" aria-label="Mẫu tay vịn" required><option value="">-- Chọn tay vịn --</option><option value="tay-vin-tron-001">Tay vịn tròn</option><option value="tay-vin-det-002">Tay vịn dẹt</option></select><a id="handrailImageLink" href="#" target="_blank" rel="noopener" aria-disabled="true">Xem ảnh</a></div></td><td><select id="handrailStatus" aria-label="Trạng thái tay vịn" required><option value="">-- Chọn --</option><option>Đã chọn</option><option>Không sử dụng</option></select></td></tr>
-<tr><td>4</td><td>Mặt gọi / nút bấm</td><td><div class="material-choice"><select id="buttonModel" aria-label="Mẫu mặt gọi / nút bấm" required><option value="">-- Chọn mẫu mặt gọi --</option><option value="nut-bam-da-001">DA-001</option><option value="nut-bam-da-002">DA-002</option><option value="nut-bam-da-003">DA-003</option><option value="nut-bam-da-004">DA-004</option></select></div></td><td><select id="buttonStatus" aria-label="Trạng thái mặt gọi / nút bấm" required><option value="Đã chọn" selected>Đã chọn</option><option>Chưa áp dụng</option></select></td></tr>
-<tr><td>5</td><td>Mẫu cửa tầng</td><td><div class="material-choice"><select id="doorModel" aria-label="Mẫu cửa tầng" required><option value="">-- Chọn mẫu cửa --</option><option value="cua-tang-inox-guong-trang">Mẫu 001 · Inox gương trắng</option><option value="cua-tang-inox-guong-vang">Mẫu 002 · Inox gương vàng</option><option value="cua-tang-kinh-nep-inox-guong-trang">Mẫu 003 · Cửa kính nẹp inox gương trắng</option><option value="cua-tang-inox-matte">Inox mờ</option><option value="cua-tang-inox-xuoc-vang">Inox xước vàng</option><option value="cua-tang-kinh-khung-vang">Cửa kính khung vàng</option></select><a id="doorImageLink" href="#" target="_blank" rel="noopener" aria-disabled="true">Xem ảnh</a></div></td><td><select id="doorModelStatus" aria-label="Trạng thái mẫu cửa" required><option value="">-- Chọn --</option><option>Đã chọn</option><option>Chưa áp dụng</option></select></td></tr>
+<tr><td>1</td><td>Trần giả / chiếu sáng</td><td><div class="material-choice"><select id="falseCeiling" aria-label="Mẫu trần giả" required><option value="">-- Chọn mẫu trần --</option><option value="tran-gia-001">Mẫu 001</option><option value="tran-gia-002">Mẫu 002</option><option value="tran-gia-003">Mẫu 003</option><option value="tran-gia-004">Mẫu 004</option><option value="tran-gia-005">Mẫu 005</option><option value="tran-gia-006">Mẫu 006</option><option value="tran-gia-007">Mẫu 007</option><option value="tran-gia-008">Mẫu 008</option></select><img id="previewCeiling" class="material-preview" alt="Ảnh mẫu trần"><a id="ceilingImageLink" href="#" target="_blank" rel="noopener" aria-disabled="true">Xem ảnh</a></div></td><td><select id="falseCeilingStatus" aria-label="Trạng thái mã trần giả" required><option value="">-- Chọn --</option><option>Đã chọn</option><option>Chưa áp dụng</option></select></td></tr>
+<tr><td>2</td><td>Sàn cabin / sàn đá</td><td><div class="material-choice"><select id="stoneFloor" aria-label="Mẫu sàn cabin" required><option value="">-- Chọn mẫu sàn --</option><option value="san-cabin-001">Mẫu 001</option><option value="san-cabin-002">Mẫu 002</option><option value="san-cabin-003">Mẫu 003</option><option value="san-cabin-004">Mẫu 004</option><option value="san-cabin-005">Mẫu 005</option><option value="san-cabin-006">Mẫu 006</option><option value="san-cabin-007">Mẫu 007</option><option value="san-cabin-008">Mẫu 008</option></select><img id="previewFloor" class="material-preview" alt="Ảnh mẫu sàn"><a id="floorImageLink" href="#" target="_blank" rel="noopener" aria-disabled="true">Xem ảnh</a></div></td><td><select id="stoneFloorStatus" aria-label="Trạng thái sàn đá" required><option value="">-- Chọn --</option><option>Đã chọn</option><option>Không sử dụng</option></select></td></tr>
+<tr><td>3</td><td>Tay vịn</td><td><div class="material-choice"><select id="handrail" aria-label="Mẫu tay vịn" required><option value="">-- Chọn tay vịn --</option><option value="tay-vin-tron-001">Tay vịn tròn</option><option value="tay-vin-det-002">Tay vịn dẹt</option></select><img id="previewHandrail" class="material-preview" alt="Ảnh mẫu tay vịn"><a id="handrailImageLink" href="#" target="_blank" rel="noopener" aria-disabled="true">Xem ảnh</a></div></td><td><select id="handrailStatus" aria-label="Trạng thái tay vịn" required><option value="">-- Chọn --</option><option>Đã chọn</option><option>Không sử dụng</option></select></td></tr>
+<tr><td>4</td><td>Mặt gọi / nút bấm</td><td><div class="material-choice"><select id="buttonModel" aria-label="Mẫu mặt gọi / nút bấm" required><option value="">-- Chọn mẫu mặt gọi --</option><option value="nut-bam-da-001">DA-001</option><option value="nut-bam-da-002">DA-002</option><option value="nut-bam-da-003">DA-003</option><option value="nut-bam-da-004">DA-004</option></select><img id="previewButton" class="material-preview" alt="Ảnh mẫu mặt gọi"></div></td><td><select id="buttonStatus" aria-label="Trạng thái mặt gọi / nút bấm" required><option value="Đã chọn" selected>Đã chọn</option><option>Chưa áp dụng</option></select></td></tr>
+<tr><td>5</td><td>Mẫu cửa tầng</td><td><div class="material-choice"><select id="doorModel" aria-label="Mẫu cửa tầng" required><option value="">-- Chọn mẫu cửa --</option><option value="cua-tang-inox-guong-trang">Mẫu 001 · Inox gương trắng</option><option value="cua-tang-inox-guong-vang">Mẫu 002 · Inox gương vàng</option><option value="cua-tang-kinh-nep-inox-guong-trang">Mẫu 003 · Cửa kính nẹp inox gương trắng</option><option value="cua-tang-inox-matte">Inox mờ</option><option value="cua-tang-inox-xuoc-vang">Inox xước vàng</option><option value="cua-tang-kinh-khung-vang">Cửa kính khung vàng</option></select><img id="previewDoor" class="material-preview" alt="Ảnh mẫu cửa tầng"><a id="doorImageLink" href="#" target="_blank" rel="noopener" aria-disabled="true">Xem ảnh</a></div></td><td><select id="doorModelStatus" aria-label="Trạng thái mẫu cửa" required><option value="">-- Chọn --</option><option>Đã chọn</option><option>Chưa áp dụng</option></select></td></tr>
 
 </tbody></table>
 <div class="section-title">III. Chiều cao tầng (mm)</div>
@@ -87,18 +89,26 @@ const materialImagePaths={
 const materialLinkIds={falseCeiling:'',stoneFloor:'',handrail:'',buttonModel:'',doorModel:''};
 function updateMaterialImageLinks(){
  const map=[
-  ['falseCeiling','appendixCeiling','appendixCeilingLabel',v=>v?'tran-gia/'+v+'.jpg':''],
-  ['stoneFloor','appendixFloor','appendixFloorLabel',v=>v?'san-cabin/'+v+'.jpg':''],
-  ['handrail','appendixHandrail','appendixHandrailLabel',v=>v?'tay-vin/'+v+'.jpg':''],
-  ['buttonModel','appendixButton','appendixButtonLabel',v=>v?'nut-bam/'+v+'.jpg':''],
-  ['doorModel','appendixDoor','appendixDoorLabel',v=>v?'cua-tang/'+v+'.jpg':'']
+  ['falseCeiling','appendixCeiling','appendixCeilingLabel','previewCeiling',v=>v?'tran-gia/'+v+'.jpg':''],
+  ['stoneFloor','appendixFloor','appendixFloorLabel','previewFloor',v=>v?'san-cabin/'+v+'.jpg':''],
+  ['handrail','appendixHandrail','appendixHandrailLabel','previewHandrail',v=>v?'tay-vin/'+v+'.jpg':''],
+  ['buttonModel','appendixButton','appendixButtonLabel','previewButton',v=>v?'nut-bam/'+v+'.jpg':''],
+  ['doorModel','appendixDoor','appendixDoorLabel','previewDoor',v=>v?'cua-tang/'+v+'.jpg':'']
  ];
- map.forEach(([id,imgId,labelId,pathFn])=>{
-  const select=document.getElementById(id),img=document.getElementById(imgId),label=document.getElementById(labelId);
+ map.forEach(([id,imgId,labelId,previewId,pathFn])=>{
+  const select=document.getElementById(id),img=document.getElementById(imgId),label=document.getElementById(labelId),preview=document.getElementById(previewId);
   const opt=select.options[select.selectedIndex],path=pathFn(select.value);
   label.textContent=select.value?(opt?opt.text:''):'Chưa chọn mẫu';
-  if(path){img.src=imageLibraryBase+path;img.alt=label.textContent;img.style.visibility='visible';}
-  else{img.removeAttribute('src');img.alt='Chưa chọn mẫu';img.style.visibility='hidden';}
+  if(path){
+   const imageUrl=imageLibraryBase+path;
+   img.src=imageUrl;img.alt=label.textContent;img.style.visibility='visible';
+   preview.src=imageUrl;preview.alt=label.textContent;preview.style.display='inline-block';
+   preview.onerror=()=>{preview.style.display='none';};
+   img.onerror=()=>{img.style.visibility='hidden';label.textContent+=' (không tải được ảnh)';};
+  }else{
+   img.removeAttribute('src');img.alt='Chưa chọn mẫu';img.style.visibility='hidden';
+   preview.removeAttribute('src');preview.alt='Chưa chọn mẫu';preview.style.display='none';
+  }
  });
  const statusPairs=[
   ['falseCeiling','falseCeilingStatus'],
