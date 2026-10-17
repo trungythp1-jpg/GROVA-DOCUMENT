@@ -130,6 +130,7 @@ machineRoom.addEventListener('change',updateMachineRoom);updateMachineRoom();
  document.getElementById(modelId).addEventListener('change',()=>{
   const model=document.getElementById(modelId),status=document.getElementById(statusId);
   if(model.value)status.value='Đã chọn';
+  updateMaterialImageLinks();
  });
 });
 updateMaterialImageLinks();setToday();
