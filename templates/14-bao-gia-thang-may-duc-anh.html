@@ -42,7 +42,7 @@
  .signature{margin-top:20px;min-height:58px;gap:20px;break-inside:avoid;page-break-inside:avoid}
  .foot{margin-top:12px;padding-top:6px;font-size:9px}
  .spec-table td:first-child{width:31%}
- /* Technical appendix: compact typography to save print pages while remaining readable. */
+ 
  .sheet:nth-of-type(2) .brand{padding-bottom:7px}
  .sheet:nth-of-type(2) .brand-name{font-size:17px}
  .sheet:nth-of-type(2) .tagline,.sheet:nth-of-type(2) .company{font-size:10px}
@@ -57,7 +57,7 @@
  .sheet:nth-of-type(2) .field-print-value{font-size:11.5px;line-height:1.32}
  .sheet:nth-of-type(2) .note{font-size:10px;line-height:1.32;margin-top:8px}
  .sheet:nth-of-type(2) .foot{font-size:9px;margin-top:10px;padding-top:6px}
- /* Image appendix: retain 3 columns and slightly enlarge photos while keeping all seven cards on one A4 page. */
+ 
  .gallery-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px 9px;align-items:start}
  .gallery-card{break-inside:avoid;page-break-inside:avoid;border-radius:6px}
  .gallery-card img{height:112px;padding:4px;object-fit:contain}
@@ -80,7 +80,7 @@
  .spec-table .field-print-value{border:0;padding:0;min-height:0}
 }
 
-/* GROVA login gate for Đức Anh quotation template */
+
 body.quote-auth-pending .wrap,body.quote-auth-pending .toolbar{visibility:hidden!important}
 #quoteAuthGate{position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;padding:20px;background:#eef1ee;font-family:Arial,sans-serif}
 #quoteAuthCard{width:min(440px,100%);background:#fff;border:1px solid #dedede;border-radius:16px;box-shadow:0 12px 36px #00000014;padding:28px}
@@ -94,7 +94,7 @@ body.quote-auth-pending .wrap,body.quote-auth-pending .toolbar{visibility:hidden
 #quoteAuthUser{font-size:11px;color:#666;margin-left:4px}
 
 
-/* Đức Anh watermark: transparent logo, subtle and behind content */
+
 .sheet{position:relative;isolation:isolate;overflow:hidden}
 .sheet::before{
  content:"";position:absolute;z-index:-1;pointer-events:none;
@@ -109,7 +109,7 @@ body.quote-auth-pending .wrap,body.quote-auth-pending .toolbar{visibility:hidden
 }
 
 
-/* Sales-ready refinements: clear total hierarchy, status hints and payment validation. */
+
 .hero h1{letter-spacing:.8px}
 .totals{background:linear-gradient(135deg,#fffdf8 0%,#fff 100%);border:1px solid #e7dcc0;border-radius:8px;padding:10px 14px}
 .totals .grand{font-size:20px;background:#f8f2e3;padding:12px 10px;border-radius:5px;margin-top:4px}
@@ -130,13 +130,13 @@ body.quote-auth-pending .wrap,body.quote-auth-pending .toolbar{visibility:hidden
 }
 
 
-/* Alignment pass: improve print pagination and consistent spacing without changing app logic. */
+
 @media print {
-  /* Customer PDF: hide internal payment validation messages. */
+  
   #paymentValidation { display: none !important; }
 
   .sheet { overflow: visible; }
-  /* Quote sheet: reduce excess vertical rhythm so totals do not split awkwardly. */
+  
   .sheet:first-of-type .brand { padding-bottom: 5px; }
   .sheet:first-of-type .hero { padding: 8px 0 5px; }
   .sheet:first-of-type .hero h1 { font-size: 19px; margin-bottom: 2px; }
@@ -156,7 +156,7 @@ body.quote-auth-pending .wrap,body.quote-auth-pending .toolbar{visibility:hidden
   .sheet:first-of-type .signature { margin-top: 14px; }
   .sheet:first-of-type .foot { margin-top: 8px; }
 
-  /* Technical appendix: keep the specification table compact and aligned. */
+  
   .sheet:nth-of-type(2) .hero { padding: 7px 0 5px; }
   .sheet:nth-of-type(2) .section { margin-top: 7px; }
   .sheet:nth-of-type(2) .section h2 { margin-bottom: 4px; padding-bottom: 3px; }
@@ -166,7 +166,7 @@ body.quote-auth-pending .wrap,body.quote-auth-pending .toolbar{visibility:hidden
   .sheet:nth-of-type(2) .spec-table td:first-child { width: 32%; }
   .sheet:nth-of-type(2) .foot { margin-top: 8px; }
 
-  /* Gallery: equal card heights and a balanced 3-column layout. */
+  
   .sheet#imageGallerySheet .hero { padding: 8px 0 8px; }
   .gallery-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 12px; align-items: stretch; }
   .gallery-card { display: flex; flex-direction: column; min-height: 0; }
@@ -177,7 +177,7 @@ body.quote-auth-pending .wrap,body.quote-auth-pending .toolbar{visibility:hidden
 }
 
 
-/* Gallery page refinement v3: keep the note and footer on the same page as the gallery. */
+
 @media print {
   #imageGallerySheet {
     break-inside: avoid-page !important;
@@ -204,7 +204,7 @@ body.quote-auth-pending .wrap,body.quote-auth-pending .toolbar{visibility:hidden
     font-size: 7px !important;
   }
 }
-/* PDF pagination refinement v2: keep full content, compact appendix and enlarge gallery images. */
+
 @media print {
   .sheet:first-of-type .section.scope-section {
     break-before: page !important;
@@ -264,7 +264,7 @@ body.quote-auth-pending .wrap,body.quote-auth-pending .toolbar{visibility:hidden
   }
 }
 
-/* Gallery page fit v4: reduce image height a little more to avoid spill onto page 5. */
+
 @media print {
   #imageGallerySheet .gallery-grid {
     grid-template-rows: repeat(3, 52mm) !important;
@@ -279,7 +279,7 @@ body.quote-auth-pending .wrap,body.quote-auth-pending .toolbar{visibility:hidden
     height: 33mm !important;
   }
 }
-/* Gallery page fit v3: slightly shorter image areas to keep the final card, note and footer on page 4. */
+
 @media print {
   #imageGallerySheet .gallery-grid {
     grid-template-rows: repeat(3, 56mm) !important;
@@ -297,7 +297,7 @@ body.quote-auth-pending .wrap,body.quote-auth-pending .toolbar{visibility:hidden
     padding: 2px 5px !important;
   }
 }
-/* Gallery page fit v2: seven cards in three rows, with note and footer on the same A4 page. */
+
 @media print {
   #imageGallerySheet {
     height: 277mm !important;
@@ -375,7 +375,7 @@ body.quote-auth-pending .wrap,body.quote-auth-pending .toolbar{visibility:hidden
     line-height: 1.1 !important;
   }
 }
-/* Gallery page final fit: force gallery contents to fit within the A4 sheet in print. */
+
 @media print {
   #imageGallerySheet {
     height: 277mm !important;
@@ -448,7 +448,7 @@ body.quote-auth-pending .wrap,body.quote-auth-pending .toolbar{visibility:hidden
   }
 }
 
-/* Remove excessive fixed card frame height; let each gallery card wrap tightly around its image and caption. */
+
 @media print {
   #imageGallerySheet .gallery-grid {
     grid-template-rows: none !important;
@@ -486,7 +486,7 @@ body.quote-auth-pending .wrap,body.quote-auth-pending .toolbar{visibility:hidden
   }
 }
 
-/* Gallery pagination correction: remove forced page height and trailing page break; use balanced card sizing. */
+
 @media print {
   #imageGallerySheet {
     height: auto !important;
@@ -639,17 +639,17 @@ body.quote-auth-pending .wrap,body.quote-auth-pending .toolbar{visibility:hidden
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
-/* Print action: require authenticated user and export permission, then prepare the print view. */
+
 function quotePrintNow(){
   var btn=document.getElementById('quotePrintBtn');
   if(!btn || btn.disabled || document.body.classList.contains('quote-auth-pending')){
     alert('Vui lòng đăng nhập tài khoản được cấp quyền xuất PDF.');
     return;
   }
-  /* Prevent issuing a quote whose installment amounts are inconsistent. */
+  
   var paymentCheck=typeof validatePaymentPlan==='function'?validatePaymentPlan():{ok:true};
   if(!paymentCheck.ok){alert('Chưa thể xuất báo giá: vui lòng kiểm tra giá trị báo giá và lịch thanh toán.');return;}
-  /* iPad Safari: invoke print synchronously within the tap gesture. */
+  
   if(typeof window.printPrepare==='function') window.printPrepare();
   window.print();
 }
@@ -686,7 +686,7 @@ function quotePrintNow(){
   }
   function checkUser(user){
     if(!user){showGate('Vui lòng đăng nhập bằng tài khoản GROVA DOCUMENT được cấp.');signOutInGate.style.display='none';return;}
-    /* Admin UID is explicitly trusted. Skip the Firestore profile read for this UID so the quote and print button become available immediately after Firebase auth. */
+    
     if(user.uid===ADMIN_UID){
       handling=false;
       openQuote(user,{status:'active',role:'admin',permissions:{documents:{templates:{'14':{view:true,create:true,export:true}}}}});
@@ -760,8 +760,6 @@ function updatePaymentPlan(forceGenerate=false){
   const frameOn=!!$('includeFrame')?.checked;
   const payment=$('payment');
   if(!payment)return;
-  // Only generate the default schedule on first load or when the plan selector changes.
-  // Manual edits remain intact while the quote recalculates.
   if(forceGenerate || !payment.dataset.userEdited){
     const fmt=n=>Math.max(0,Math.round(n)).toLocaleString('vi-VN')+' đ';
     let lines=[];
@@ -790,7 +788,6 @@ function validatePaymentPlan(){
   const box=$('paymentValidation'), payment=$('payment');
   if(!box||!payment)return {ok:true,difference:0};
   const total=Number(String($('grandTotal')?.textContent||'0').replace(/[^0-9]/g,''))||0;
-  // Read only the first currency-like amount on each installment line to avoid dates/other numbers.
   const lines=payment.value.split(/\n+/).map(x=>x.trim()).filter(Boolean);
   const installmentLines=lines.filter(x=>/^đợt\s*\d+\s*:/i.test(x));
   let amounts=[],unreadable=[];
@@ -827,7 +824,7 @@ function setupPlainTextPrint(){
   });
 }
 function printPrepare(){
-  /* Do not run syncAll/updateGallery here: resetting every image source during printing makes iPad Safari hang or respond inconsistently. */
+  
   document.querySelectorAll('input:not([type=checkbox]):not([type=radio]),textarea').forEach(el=>{
     const span=$(el.id+'FieldPrint');
     if(span) span.textContent=(el.value||'').trim()||el.getAttribute('placeholder')||'';
