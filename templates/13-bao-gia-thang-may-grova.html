@@ -577,7 +577,7 @@ body.quote-auth-pending .wrap,body.quote-auth-pending .toolbar{visibility:hidden
   </div>
 </div>
 
-<div class="toolbar screen-only"><button class="secondary" id="quoteLogoutBtn" style="display:none" type="button">Đăng xuất</button><span id="quoteAuthUser" class="screen-only"></span><button class="secondary" onclick="saveDraft()">Lưu nháp</button><button class="secondary" onclick="loadDraft()">Tải nháp</button><button class="secondary" onclick="toggleInternal()">Ẩn/hiện giá vốn nội bộ</button><button id="quotePrintBtn" type="button" onclick="quotePrintNow()">Xuất PDF / In báo giá</button></div>
+<div class="toolbar screen-only"><button class="secondary" id="quoteLogoutBtn" style="display:none" type="button">Đăng xuất</button><span id="quoteAuthUser" class="screen-only"></span><button class="secondary" onclick="saveDraft()">Lưu nháp</button><button class="secondary" onclick="loadDraft()">Tải nháp</button><button class="secondary" onclick="toggleInternal()">Ẩn/hiện giá vốn nội bộ</button><button class="secondary" id="quotePreviewBtn" type="button" onclick="previewQuoteNow()">Xem trước</button><button id="quotePrintBtn" type="button" onclick="quotePrintNow()">Xuất PDF / In báo giá</button></div>
 <div class="wrap">
 <section class="sheet">
 <header class="brand"><div class="brand-left"><img class="brand-logo" src="../data/grova_logo.png" alt="GROVA HOLDINGS"><div class="tagline">GIẢI PHÁP THANG MÁY CHO CÔNG TRÌNH HIỆN ĐẠI</div></div><div class="company"><strong>CÔNG TY CỔ PHẦN GROVA HOLDINGS</strong><br>MST: 0202328361<br>49A/348 Trần Nguyên Hãn, Phường An Biên, Hải Phòng</div></header>
@@ -660,18 +660,29 @@ body.quote-auth-pending .wrap,body.quote-auth-pending .toolbar{visibility:hidden
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
 
-function quotePrintNow(){
+function previewQuoteNow(){
+  if(document.body.classList.contains('quote-auth-pending')){alert('Vui lòng đăng nhập trước.');return;}
+  if(typeof window.printPrepare==='function') window.printPrepare();
+  window.print();
+}
+async function quotePrintNow(){
   var btn=document.getElementById('quotePrintBtn');
   if(!btn || btn.disabled || document.body.classList.contains('quote-auth-pending')){
     alert('Vui lòng đăng nhập tài khoản được cấp quyền xuất PDF.');
     return;
   }
-  
   var paymentCheck=typeof validatePaymentPlan==='function'?validatePaymentPlan():{ok:true};
   if(!paymentCheck.ok){alert('Chưa thể xuất báo giá: vui lòng kiểm tra giá trị báo giá và lịch thanh toán.');return;}
-  
-  if(typeof window.printPrepare==='function') window.printPrepare();
-  window.print();
+  btn.disabled=true;
+  try{
+    var allocated=await allocateGrovaQuoteNumber();
+    if(!allocated) return;
+    if(typeof window.printPrepare==='function') window.printPrepare();
+    window.print();
+  }catch(err){
+    console.error('Lỗi cấp số báo giá GROVA:',err);
+    alert('Chưa cấp được số báo giá. Vui lòng thử lại; chưa mở cửa sổ in.');
+  }finally{btn.disabled=false;}
 }
 
 (function(){
@@ -684,11 +695,12 @@ function quotePrintNow(){
   function showGate(text){gate.style.display='flex';document.body.classList.add('quote-auth-pending');if(text)message(text,true);}
   function allocateGrovaQuoteNumber(){
     var field=document.getElementById('quoteNo');
-    if(!field||field.dataset.allocated==='1')return;
+    if(!field)return Promise.reject(new Error('Không tìm thấy trường số báo giá.'));
+    if(field.dataset.allocated==='1'&&field.value)return Promise.resolve(field.value);
     field.disabled=true;field.value='Đang cấp số...';
     var year=new Date().getFullYear();
     var ref=db.collection('document_counters').doc('grova_quote_'+year);
-    db.runTransaction(function(tx){
+    return db.runTransaction(function(tx){
       return tx.get(ref).then(function(snap){
         var last=snap.exists?Number(snap.data().lastNumber)||0:0;
         var next=last+1;
@@ -698,14 +710,16 @@ function quotePrintNow(){
     }).then(function(next){
       field.value='GROVA-'+year+'-'+String(next).padStart(4,'0');
       field.dataset.allocated='1';field.disabled=false;field.dispatchEvent(new Event('input',{bubbles:true}));field.dispatchEvent(new Event('change',{bubbles:true}));
+      return field.value;
     }).catch(function(err){
       console.error('Không cấp được số báo giá GROVA:',err);
-      field.value='';field.disabled=false;field.placeholder='Không cấp được số tự động — liên hệ Admin';
-      alert('Không cấp được số báo giá tự động. Vui lòng kiểm tra quyền Firestore hoặc liên hệ Admin; không tự nhập số để tránh trùng.');
+      field.value='';field.disabled=false;field.placeholder='Chỉ cấp số khi xuất báo giá';
+      alert('Không cấp được số báo giá khi xuất. Vui lòng kiểm tra quyền Firestore hoặc liên hệ Admin.');
+      throw err;
     });
   }
   function openQuote(user,profile){gate.style.display='none';document.body.classList.remove('quote-auth-pending');logoutBtn.style.display='';userLabel.textContent=user.email||'Đã đăng nhập';signOutInGate.style.display='none';
-    allocateGrovaQuoteNumber();
+    // Số báo giá chỉ được cấp khi người dùng bấm Xuất PDF / In báo giá.
     var perms=(profile&&profile.permissions&&profile.permissions.documents)||{};
     var template=(perms.templates&&perms.templates['13'])||{};
     var role=String(profile.role||'').trim().toLowerCase();
