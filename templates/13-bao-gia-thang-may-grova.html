@@ -704,9 +704,10 @@ function quotePrintNow(){
       alert('Không cấp được số báo giá tự động. Vui lòng kiểm tra quyền Firestore hoặc liên hệ Admin; không tự nhập số để tránh trùng.');
     });
   }
-  function openQuote(user,profile){gate.style.display='none';document.body.classList.remove('quote-auth-pending');logoutBtn.style.display='';userLabel.textContent=user.email||'Đã đăng nhập';signOutInGate.style.display='none';\n    allocateGrovaQuoteNumber();
+  function openQuote(user,profile){gate.style.display='none';document.body.classList.remove('quote-auth-pending');logoutBtn.style.display='';userLabel.textContent=user.email||'Đã đăng nhập';signOutInGate.style.display='none';
+    allocateGrovaQuoteNumber();
     var perms=(profile&&profile.permissions&&profile.permissions.documents)||{};
-    var template=(perms.templates&&perms.templates['14'])||{};
+    var template=(perms.templates&&perms.templates['13'])||{};
     var role=String(profile.role||'').trim().toLowerCase();
     var isAdmin=user.uid===ADMIN_UID||role==='admin'||role==='administrator';
     var canCreate=Object.prototype.hasOwnProperty.call(template,'create')?template.create===true:perms.create===true;
