@@ -687,7 +687,7 @@ function quotePrintNow(){
     if(!field||field.dataset.allocated==='1')return;
     field.disabled=true;field.value='Đang cấp số...';
     var year=new Date().getFullYear();
-    var ref=db.collection('documentCounters').doc('grova_quote_'+year);
+    var ref=db.collection('document_counters').doc('grova_quote_'+year);
     db.runTransaction(function(tx){
       return tx.get(ref).then(function(snap){
         var last=snap.exists?Number(snap.data().lastNumber)||0:0;
