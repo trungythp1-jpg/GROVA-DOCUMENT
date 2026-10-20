@@ -536,6 +536,18 @@ body.quote-auth-pending .wrap,body.quote-auth-pending .toolbar{visibility:hidden
   #imageGallerySheet .foot { margin-top: 6px !important; padding-top: 4px !important; font-size: 7px !important; }
   #imageGallerySheet + .sheet { display: none !important; }
 }
+
+/* FIX PRINT: keep 3-item quote totals and amount-in-words on the same page */
+@media print{
+  .section{margin-bottom:8px!important}
+  .section h2{margin:8px 0 5px!important}
+  .table-wrap table th,.table-wrap table td{padding:5px 6px!important;line-height:1.2!important}
+  .table-wrap table{font-size:11px!important}
+  .totals{margin-top:6px!important;break-inside:avoid!important;page-break-inside:avoid!important}
+  .totals .line{padding:4px 0!important;line-height:1.15!important}
+  .totals .grand{font-size:16px!important;padding:7px 0!important}
+  .amount-words{margin-top:5px!important;line-height:1.2!important;break-before:avoid!important;page-break-before:avoid!important;break-inside:avoid!important;page-break-inside:avoid!important}
+}
 </style>
 
 
