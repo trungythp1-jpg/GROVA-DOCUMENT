@@ -583,7 +583,7 @@ body.quote-auth-pending .wrap,body.quote-auth-pending .toolbar{visibility:hidden
 <header class="brand"><div class="brand-left"><img class="brand-logo" src="../data/grova_logo.png" alt="GROVA HOLDINGS"><div class="tagline">GIẢI PHÁP THANG MÁY CHO CÔNG TRÌNH HIỆN ĐẠI</div></div><div class="company"><strong>CÔNG TY CỔ PHẦN GROVA HOLDINGS</strong><br>MST: 0202328361<br>49A/348 Trần Nguyên Hãn, Phường An Biên, Hải Phòng</div></header>
 <div class="hero"><h1>BÁO GIÁ THANG MÁY</h1><p>Giải pháp cung cấp và lắp đặt thang máy GROVA</p></div>
 <div class="grid">
-<div class="field"><label>Số báo giá</label><input id="quoteNo" placeholder="Tự nhập số báo giá"></div><div class="field"><label>Ngày báo giá</label><input id="quoteDate" type="date"></div>
+<div class="field"><label>Số báo giá (tự động)</label><input id="quoteNo" placeholder="Đang cấp số báo giá..." readonly aria-readonly="true"></div><div class="field"><label>Ngày báo giá</label><input id="quoteDate" type="date"></div>
 <div class="field"><label>Khách hàng</label><input id="customer" placeholder="Tên khách hàng / doanh nghiệp"></div><div class="field"><label>Điện thoại</label><input id="phone" placeholder="Số điện thoại"></div>
 <div class="field" style="grid-column:1/-1"><label>Địa chỉ công trình</label><input id="address" placeholder="Địa chỉ lắp đặt"></div>
 <div class="field"><label>Loại thang</label><select id="liftType"><option>Thang khách</option><option>Thang gia đình</option><option>Thang tải hàng</option><option>Thang bệnh viện</option><option>Khác</option></select></div><div class="field"><label>Số lượng thang</label><input id="quantity" type="number" min="1" value="1"></div>
@@ -682,7 +682,29 @@ function quotePrintNow(){
   var auth,db,handling=false;
   function message(text,isError){msg.textContent=text;msg.style.color=isError?'#a12b2b':'#52645a';}
   function showGate(text){gate.style.display='flex';document.body.classList.add('quote-auth-pending');if(text)message(text,true);}
-  function openQuote(user,profile){gate.style.display='none';document.body.classList.remove('quote-auth-pending');logoutBtn.style.display='';userLabel.textContent=user.email||'Đã đăng nhập';signOutInGate.style.display='none';
+  function allocateGrovaQuoteNumber(){
+    var field=document.getElementById('quoteNo');
+    if(!field||field.dataset.allocated==='1')return;
+    field.disabled=true;field.value='Đang cấp số...';
+    var year=new Date().getFullYear();
+    var ref=db.collection('documentCounters').doc('grova_quote_'+year);
+    db.runTransaction(function(tx){
+      return tx.get(ref).then(function(snap){
+        var last=snap.exists?Number(snap.data().lastNumber)||0:0;
+        var next=last+1;
+        tx.set(ref,{type:'grova_quote',year:year,lastNumber:next,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+        return next;
+      });
+    }).then(function(next){
+      field.value='GROVA-'+year+'-'+String(next).padStart(4,'0');
+      field.dataset.allocated='1';field.disabled=false;field.dispatchEvent(new Event('input',{bubbles:true}));field.dispatchEvent(new Event('change',{bubbles:true}));
+    }).catch(function(err){
+      console.error('Không cấp được số báo giá GROVA:',err);
+      field.value='';field.disabled=false;field.placeholder='Không cấp được số tự động — liên hệ Admin';
+      alert('Không cấp được số báo giá tự động. Vui lòng kiểm tra quyền Firestore hoặc liên hệ Admin; không tự nhập số để tránh trùng.');
+    });
+  }
+  function openQuote(user,profile){gate.style.display='none';document.body.classList.remove('quote-auth-pending');logoutBtn.style.display='';userLabel.textContent=user.email||'Đã đăng nhập';signOutInGate.style.display='none';\n    allocateGrovaQuoteNumber();
     var perms=(profile&&profile.permissions&&profile.permissions.documents)||{};
     var template=(perms.templates&&perms.templates['14'])||{};
     var role=String(profile.role||'').trim().toLowerCase();
