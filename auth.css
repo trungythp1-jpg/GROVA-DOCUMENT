@@ -376,3 +376,51 @@ body.auth-locked {
     font-size: 11px;
   }
 }
+
+
+/* GROVA FUTURE GREEN — login visual refresh only */
+#grovaAuthOverlay {
+  background:
+    radial-gradient(ellipse at 12% 18%, rgba(25, 194, 151, .20), transparent 36%),
+    radial-gradient(ellipse at 90% 82%, rgba(3, 86, 75, .16), transparent 34%),
+    linear-gradient(135deg, #eaf5f2 0%, #f8fbfa 48%, #e4f2ef 100%);
+}
+.grova-auth-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.88);
+  border-radius: 28px;
+  background: rgba(255,255,255,.82);
+  backdrop-filter: blur(24px) saturate(145%);
+  box-shadow: 0 28px 90px rgba(4, 63, 55, .16), inset 0 1px rgba(255,255,255,.95);
+}
+.grova-auth-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #06453d, #13b58b, #8cebd0);
+}
+.grova-auth-eyebrow { color: #087f68; letter-spacing: 2.2px; }
+.grova-auth-title { color: #102722; letter-spacing: -.035em; }
+.grova-auth-subtitle { color: #647a78; }
+.grova-auth-field input {
+  min-height: 50px;
+  border-radius: 14px;
+  border-color: #d7e9e4;
+  background: rgba(250,253,252,.92);
+}
+.grova-auth-field input:focus {
+  border-color: #18a987;
+  box-shadow: 0 0 0 4px rgba(24,169,135,.11);
+}
+.grova-auth-submit {
+  border-radius: 14px;
+  background: linear-gradient(115deg, #07564b, #07866c 62%, #10a984);
+  box-shadow: 0 8px 20px rgba(7, 126, 101, .20);
+}
+.grova-auth-submit:hover { background: linear-gradient(115deg, #06463f, #08745f 62%, #0b9476); }
+.grova-auth-forgot { color: #087f68; }
+@media (max-width: 640px) {
+  .grova-auth-card { border-radius: 22px; padding: 30px 22px 24px; }
+}
