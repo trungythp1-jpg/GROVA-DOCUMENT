@@ -1832,3 +1832,95 @@ textarea {
   .grova-pagination .small-btn { padding: 8px 10px; min-height: 42px; }
   .grova-pagination-info { font-size: 12px; }
 }
+
+
+/* =========================================================
+   GROVA FUTURE GREEN — visual refresh only (no app logic)
+========================================================= */
+:root {
+  --green: #087f68;
+  --green-dark: #063f38;
+  --green-light: #e4f5f0;
+  --text: #102722;
+  --muted: #647a78;
+  --border: #d9ebe6;
+  --bg: #f1f7f6;
+  --shadow: 0 12px 32px rgba(5, 63, 56, .075);
+  --radius: 20px;
+}
+body {
+  background:
+    radial-gradient(ellipse at 78% 0%, rgba(32, 180, 143, .07), transparent 32%),
+    linear-gradient(135deg, #f5faf9 0%, #edf5f4 100%);
+}
+.app-shell { background: transparent; }
+.sidebar {
+  background: linear-gradient(165deg, #073d38 0%, #052e2c 60%, #06483e 100%);
+  border-right: 1px solid rgba(133, 221, 198, .22);
+  box-shadow: 8px 0 28px rgba(4, 53, 47, .08);
+  color: #effbf8;
+}
+.sidebar .brand { border-bottom-color: rgba(211, 250, 240, .16); }
+.sidebar .brand-text b,
+.sidebar .brand-text span { color: #f3fffc; }
+.sidebar a, .sidebar button, .sidebar .nav-item {
+  transition: background .2s ease, color .2s ease, transform .2s ease, box-shadow .2s ease;
+}
+.sidebar a:hover, .sidebar button:hover, .sidebar .nav-item:hover {
+  background: rgba(72, 209, 174, .12);
+}
+.sidebar .active, .sidebar a.active, .sidebar .nav-item.active {
+  background: linear-gradient(110deg, rgba(14, 174, 132, .42), rgba(77, 221, 185, .13));
+  box-shadow: inset 3px 0 #45e0b5, inset 0 0 0 1px rgba(135, 255, 220, .12);
+  color: #fff;
+}
+.sidebar a, .sidebar button, .sidebar .nav-item { color: #d7eee8; }
+.sidebar hr, .sidebar .sidebar-footer { border-color: rgba(211, 250, 240, .16); }
+.main-content, .main, .content { background: transparent; }
+.topbar {
+  background: rgba(248, 252, 251, .78);
+  border-bottom-color: rgba(185, 219, 210, .62);
+  backdrop-filter: blur(22px) saturate(145%);
+}
+button, .btn, .button, a.btn {
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+}
+button:not(:disabled):hover, .btn:hover, a.btn:hover {
+  box-shadow: 0 8px 22px rgba(8, 127, 104, .14);
+}
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible {
+  outline: 3px solid rgba(27, 190, 151, .28);
+  outline-offset: 2px;
+}
+input, select, textarea {
+  border-color: #d6e8e3;
+  border-radius: 13px;
+  background: rgba(255,255,255,.86);
+}
+input:focus, select:focus, textarea:focus {
+  border-color: #18a987;
+  box-shadow: 0 0 0 4px rgba(24,169,135,.10);
+}
+.card, .stat-card, .stat-box, .template-card, .document-card, .panel, .dashboard-card {
+  border: 1px solid rgba(211, 232, 226, .92);
+  border-radius: 20px;
+  box-shadow: 0 8px 26px rgba(11, 65, 57, .045);
+  background: rgba(255, 255, 255, .84);
+  backdrop-filter: blur(14px);
+}
+.card:hover, .template-card:hover, .document-card:hover {
+  border-color: rgba(30, 174, 139, .38);
+  box-shadow: 0 14px 32px rgba(8, 96, 79, .09);
+  transform: translateY(-2px);
+}
+h1, h2, h3 { letter-spacing: -.025em; }
+.badge, .status, .tag { border-radius: 999px; }
+@media (max-width: 900px) {
+  .topbar { padding-left: 18px; padding-right: 18px; }
+  .card, .stat-card, .stat-box, .template-card, .document-card, .panel, .dashboard-card {
+    border-radius: 16px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+}
