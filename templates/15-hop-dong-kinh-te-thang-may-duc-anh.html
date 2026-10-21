@@ -32,6 +32,27 @@ table{width:100%;border-collapse:collapse;margin:8px 0;font-size:11pt}th,td{bord
 header.brand{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 .sheet::before{background-image:url("../data/Logo-DucAnh.png")!important;opacity:.045!important;background-repeat:no-repeat!important;background-position:center!important;background-size:contain!important}
 @media print{.brand-logo{width:112px;height:34px}header.brand{gap:10px}.sheet::before{opacity:.045!important;print-color-adjust:exact;-webkit-print-color-adjust:exact}}
+
+/* Fix trang trắng cuối PDF: chỉ ngắt trang ở các trang được yêu cầu,
+   không giữ lại break hoặc khoảng trống sau trang nội dung cuối. */
+@media print {
+  html, body, #contract, #contract.wrap {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+  #contract > .sheet:last-child {
+    break-after: auto !important;
+    page-break-after: auto !important;
+    margin-bottom: 0 !important;
+  }
+  #contract > .sheet:last-child::after {
+    content: none !important;
+    display: none !important;
+  }
+}
+
 </style>
 </head>
 <body>
