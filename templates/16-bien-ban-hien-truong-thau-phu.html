@@ -42,7 +42,17 @@
  .draftbadge{display:none}
  a{color:#111;text-decoration:none}
 }
-</style>
+.sig-open{display:block;width:100%;margin-top:7px;padding:10px;border:1px solid #b9d5ca;border-radius:9px;background:#f3faf6;color:#075b4d;font-weight:700;cursor:pointer}
+.sig-modal{position:fixed;inset:0;z-index:9999;background:#fff;display:none;flex-direction:column;padding:env(safe-area-inset-top) 16px env(safe-area-inset-bottom);color:#202724}
+.sig-modal.active{display:flex}
+.sig-modal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:1px solid #d7e0db}
+.sig-modal-title{font-size:18px;font-weight:800}
+.sig-modal-help{font-size:14px;color:#66736d;margin:12px 0}
+.sig-modal-canvas-wrap{flex:1;min-height:0;border:2px dashed #9db9ad;border-radius:12px;overflow:hidden;background:#fff}
+.sig-modal-canvas{display:block;width:100%;height:100%;touch-action:none}
+.sig-modal-actions{display:flex;gap:10px;padding:14px 0}
+.sig-modal-actions .btn{flex:1;padding:14px 10px}
+@media print{.sig-open,.sig-modal{display:none!important}}</style>
 </head>
 <body>
 <header class="top"><div><div class="brand">GROVA DOCUMENT</div><small>Biểu mẫu 16 · Ký trực tiếp trên điện thoại</small></div><div class="actions"><button class="btn" onclick="history.back()">← Quay lại</button><button class="btn" type="button" id="clearFormBtn">Xóa nội dung</button><button class="btn primary" id="exportBtn">Xuất PDF</button></div></header>
@@ -75,8 +85,8 @@ Bề mặt khung không bị trầy xước, không móp méo, không han gỉ.<
 <div class="field"><label>Kết luận / lưu ý</label><textarea data-bind="conclusion" placeholder="Nội dung kết luận, các điểm cần lưu ý...">Bàn giao tại công trình cho chủ đầu tư bảo quản.
 Mọi vấn đề về trầy xước, móp méo, han gỉ cần được ghi nhận tại thời điểm bàn giao.</textarea></div>
 <div class="section">Ký trên điện thoại</div>
-<div class="signpanel"><div class="signhead"><span>Đội lắp đặt</span><button class="btn" data-clear="crew">Xóa</button></div><canvas class="sigcanvas" id="sig-crew" aria-label="Khung ký đội lắp đặt"></canvas><div class="field" style="margin:9px 0 0"><label>Họ tên người ký</label><input data-name="crew" placeholder="Nhập họ tên"></div><div class="hint">Ký bằng ngón tay hoặc bút cảm ứng.</div></div>
-<div class="signpanel"><div class="signhead"><span>Đại diện chủ đầu tư</span><button class="btn" data-clear="owner">Xóa</button></div><canvas class="sigcanvas" id="sig-owner" aria-label="Khung ký chủ đầu tư"></canvas><div class="field" style="margin:9px 0 0"><label>Họ tên người ký</label><input data-name="owner" placeholder="Nhập họ tên"></div></div>
+<div class="signpanel"><div class="signhead"><span>Đội lắp đặt</span><button class="btn" data-clear="crew">Xóa</button></div><canvas class="sigcanvas" id="sig-crew" aria-label="Khung ký đội lắp đặt"></canvas><button type="button" class="sig-open" data-open-sign="crew">Ký toàn màn hình</button><div class="field" style="margin:9px 0 0"><label>Họ tên người ký</label><input data-name="crew" placeholder="Nhập họ tên"></div><div class="hint">Ký bằng ngón tay hoặc bút cảm ứng.</div></div>
+<div class="signpanel"><div class="signhead"><span>Đại diện chủ đầu tư</span><button class="btn" data-clear="owner">Xóa</button></div><canvas class="sigcanvas" id="sig-owner" aria-label="Khung ký chủ đầu tư"></canvas><button type="button" class="sig-open" data-open-sign="owner">Ký toàn màn hình</button><div class="field" style="margin:9px 0 0"><label>Họ tên người ký</label><input data-name="owner" placeholder="Nhập họ tên"></div></div>
 <div class="hint">Đại diện Công ty ký trực tiếp trên bản in; không cần ký online.</div>
 <p class="hint">Chữ ký được đưa vào bản PDF khi xuất. Nội dung tự lưu trên trình duyệt của thiết bị này. <span id="draftSaveStatus">Bản nháp được lưu tự động</span></p>
 </div></section>
@@ -107,6 +117,12 @@ Mọi vấn đề về trầy xước, móp méo, han gỉ cần được ghi nh
 </div>
 </section></main>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<div class="sig-modal" id="sigModal" role="dialog" aria-modal="true" aria-label="Ký tên toàn màn hình">
+ <div class="sig-modal-head"><div class="sig-modal-title" id="sigModalTitle">Ký tên</div><button type="button" class="btn" id="sigModalCancel">Đóng</button></div>
+ <div class="sig-modal-help">Ký bằng ngón tay hoặc bút cảm ứng trong vùng trắng bên dưới.</div>
+ <div class="sig-modal-canvas-wrap"><canvas id="sigModalCanvas" class="sig-modal-canvas"></canvas></div>
+ <div class="sig-modal-actions"><button type="button" class="btn" id="sigModalClear">Xóa chữ ký</button><button type="button" class="btn primary" id="sigModalSave">Dùng chữ ký này</button></div>
+</div>
 <script>
 (function(){
 const DRAFT_KEY="grova_template16_draft_v1";
@@ -185,6 +201,39 @@ canvas.addEventListener("pointerdown",e=>{e.preventDefault();canvas.setPointerCa
 canvas.addEventListener("pointermove",e=>{if(!canvases[key].drawing)return;e.preventDefault();const p=point(e);ctx.lineTo(p.x,p.y);ctx.stroke();canvases[key].ink=true;updateSignaturePreview(key)});
 function stop(){canvases[key].drawing=false;updateSignaturePreview(key)}canvas.addEventListener("pointerup",stop);canvas.addEventListener("pointercancel",stop)}
 function updateSignaturePreview(key){const c=canvases[key].canvas;const img=document.getElementById("pvSig"+key[0].toUpperCase()+key.slice(1));img.src=canvases[key].ink?c.toDataURL("image/png"):"";const name=document.querySelector('[data-name="'+key+'"]').value;document.getElementById("pvName"+key[0].toUpperCase()+key.slice(1)).textContent=name;if(typeof saveDraft==="function")saveDraft()}
+// Ký trong chế độ toàn màn hình để thao tác dễ hơn trên điện thoại.
+let activeSignKey=null, modalInk=false;
+const sigModal=document.getElementById("sigModal"), modalCanvas=document.getElementById("sigModalCanvas"), modalCtx=modalCanvas.getContext("2d");
+function sizeModalCanvas(){
+ const ratio=Math.max(window.devicePixelRatio||1,1), rect=modalCanvas.getBoundingClientRect();
+ const previous=modalInk?modalCanvas.toDataURL("image/png"):null;
+ modalCanvas.width=Math.max(1,Math.round(rect.width*ratio));modalCanvas.height=Math.max(1,Math.round(rect.height*ratio));
+ modalCtx.setTransform(ratio,0,0,ratio,0,0);modalCtx.lineWidth=3;modalCtx.lineCap="round";modalCtx.lineJoin="round";modalCtx.strokeStyle="#153f32";
+ if(previous){const im=new Image();im.onload=()=>modalCtx.drawImage(im,0,0,rect.width,rect.height);im.src=previous;}
+}
+function openSignatureModal(key){
+ activeSignKey=key;modalInk=false;
+ document.getElementById("sigModalTitle").textContent=key==="crew"?"Ký tên — Đội lắp đặt":"Ký tên — Đại diện chủ đầu tư";
+ sigModal.classList.add("active");document.body.style.overflow="hidden";
+ requestAnimationFrame(()=>{
+  sizeModalCanvas();
+  const source=canvases[key];
+  if(source&&source.ink){const im=new Image();im.onload=()=>{const r=modalCanvas.getBoundingClientRect();modalCtx.drawImage(im,0,0,r.width,r.height);modalInk=true};im.src=source.canvas.toDataURL("image/png");}
+ });
+}
+function closeSignatureModal(){sigModal.classList.remove("active");document.body.style.overflow="";activeSignKey=null;}
+document.querySelectorAll("[data-open-sign]").forEach(btn=>btn.addEventListener("click",()=>openSignatureModal(btn.dataset.openSign)));
+document.getElementById("sigModalCancel").addEventListener("click",closeSignatureModal);
+document.getElementById("sigModalClear").addEventListener("click",()=>{const r=modalCanvas.getBoundingClientRect();modalCtx.clearRect(0,0,r.width,r.height);modalInk=false;});
+modalCanvas.addEventListener("pointerdown",e=>{e.preventDefault();modalCanvas.setPointerCapture(e.pointerId);const r=modalCanvas.getBoundingClientRect();modalCtx.beginPath();modalCtx.moveTo(e.clientX-r.left,e.clientY-r.top);modalInk=true;});
+modalCanvas.addEventListener("pointermove",e=>{if(!modalCanvas.hasPointerCapture(e.pointerId))return;e.preventDefault();const r=modalCanvas.getBoundingClientRect();modalCtx.lineTo(e.clientX-r.left,e.clientY-r.top);modalCtx.stroke();});
+document.getElementById("sigModalSave").addEventListener("click",()=>{
+ if(!activeSignKey)return;
+ const key=activeSignKey, source=canvases[key], image=new Image();
+ image.onload=()=>{const {canvas,ctx}=source;ctx.clearRect(0,0,canvas.width,canvas.height);ctx.drawImage(image,0,0,canvas.clientWidth,canvas.clientHeight);source.ink=modalInk;updateSignaturePreview(key);saveDraft();closeSignatureModal();};
+ image.src=modalCanvas.toDataURL("image/png");
+});
+window.addEventListener("resize",()=>{if(sigModal.classList.contains("active"))sizeModalCanvas();});
 ["crew","owner"].forEach(key=>{setupSignature(key);document.querySelector('[data-name="'+key+'"]').addEventListener("input",()=>updateSignaturePreview(key));document.querySelector('[data-clear="'+key+'"]').addEventListener("click",()=>{const {canvas,ctx}=canvases[key];ctx.clearRect(0,0,canvas.width,canvas.height);canvases[key].ink=false;updateSignaturePreview(key);saveDraft()})});
 document.querySelectorAll("[data-name]").forEach(el=>el.addEventListener("input",saveDraft));
 document.getElementById("numberInput").addEventListener("input",saveDraft);
