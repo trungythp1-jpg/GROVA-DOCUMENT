@@ -7417,7 +7417,7 @@
       console.error("GROVA AI: Cloudflare Worker request failed.", error);
       const detail = String(error?.message || "");
       let message = "Không thể kết nối GROVA AI. Vui lòng thử lại.";
-      if (detail) message += "\\nChi tiết: " + detail;
+      if (detail) message += "\nChi tiết: " + detail;
       appendGrovaAIMessage("assistant", message);
     } finally {
       grovaAiBusy = false;
