@@ -52,6 +52,13 @@
 .sig-modal-canvas{display:block;width:100%;height:100%;touch-action:none}
 .sig-modal-actions{display:flex;gap:10px;padding:14px 0}
 .sig-modal-actions .btn{flex:1;padding:14px 10px}
+.sig-modal-help{line-height:1.4}
+@media (orientation:landscape) and (max-height:600px){
+ .sig-modal-head{padding:6px 0}
+ .sig-modal-help{margin:5px 0;font-size:12px}
+ .sig-modal-actions{padding:6px 0}
+ .sig-modal-actions .btn{padding:9px}
+}
 @media print{.sig-open,.sig-modal{display:none!important}}</style>
 </head>
 <body>
@@ -119,9 +126,9 @@ Mọi vấn đề về trầy xước, móp méo, han gỉ cần được ghi nh
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <div class="sig-modal" id="sigModal" role="dialog" aria-modal="true" aria-label="Ký tên toàn màn hình">
  <div class="sig-modal-head"><div class="sig-modal-title" id="sigModalTitle">Ký tên</div><button type="button" class="btn" id="sigModalCancel">Đóng</button></div>
- <div class="sig-modal-help">Ký bằng ngón tay hoặc bút cảm ứng trong vùng trắng bên dưới.</div>
+ <div class="sig-modal-help">Ký bằng ngón tay hoặc bút cảm ứng. Có thể xoay điện thoại ngang để có vùng ký rộng hơn.</div>
  <div class="sig-modal-canvas-wrap"><canvas id="sigModalCanvas" class="sig-modal-canvas"></canvas></div>
- <div class="sig-modal-actions"><button type="button" class="btn" id="sigModalClear">Xóa chữ ký</button><button type="button" class="btn primary" id="sigModalSave">Dùng chữ ký này</button></div>
+ <div class="sig-modal-actions"><button type="button" class="btn" id="sigModalUndo">Hoàn tác</button><button type="button" class="btn" id="sigModalClear">Xóa chữ ký</button><button type="button" class="btn primary" id="sigModalSave">Xác nhận chữ ký</button></div>
 </div>
 <script>
 (function(){
@@ -202,7 +209,7 @@ canvas.addEventListener("pointermove",e=>{if(!canvases[key].drawing)return;e.pre
 function stop(){canvases[key].drawing=false;updateSignaturePreview(key)}canvas.addEventListener("pointerup",stop);canvas.addEventListener("pointercancel",stop)}
 function updateSignaturePreview(key){const c=canvases[key].canvas;const img=document.getElementById("pvSig"+key[0].toUpperCase()+key.slice(1));img.src=canvases[key].ink?c.toDataURL("image/png"):"";const name=document.querySelector('[data-name="'+key+'"]').value;document.getElementById("pvName"+key[0].toUpperCase()+key.slice(1)).textContent=name;if(typeof saveDraft==="function")saveDraft()}
 // Ký trong chế độ toàn màn hình để thao tác dễ hơn trên điện thoại.
-let activeSignKey=null, modalInk=false;
+let activeSignKey=null, modalInk=false, modalHistory=[];
 const sigModal=document.getElementById("sigModal"), modalCanvas=document.getElementById("sigModalCanvas"), modalCtx=modalCanvas.getContext("2d");
 function sizeModalCanvas(){
  const ratio=Math.max(window.devicePixelRatio||1,1), rect=modalCanvas.getBoundingClientRect();
@@ -212,7 +219,7 @@ function sizeModalCanvas(){
  if(previous){const im=new Image();im.onload=()=>modalCtx.drawImage(im,0,0,rect.width,rect.height);im.src=previous;}
 }
 function openSignatureModal(key){
- activeSignKey=key;modalInk=false;
+ activeSignKey=key;modalInk=false;modalHistory=[];
  document.getElementById("sigModalTitle").textContent=key==="crew"?"Ký tên — Đội lắp đặt":"Ký tên — Đại diện chủ đầu tư";
  sigModal.classList.add("active");document.body.style.overflow="hidden";
  requestAnimationFrame(()=>{
@@ -225,8 +232,9 @@ function closeSignatureModal(){sigModal.classList.remove("active");document.body
 document.querySelectorAll("[data-open-sign]").forEach(btn=>btn.addEventListener("click",()=>openSignatureModal(btn.dataset.openSign)));
 document.querySelectorAll(".sigcanvas").forEach(canvas=>canvas.addEventListener("pointerdown",e=>{e.preventDefault();e.stopImmediatePropagation();openSignatureModal(canvas.id==="sig-crew"?"crew":"owner");},true));
 document.getElementById("sigModalCancel").addEventListener("click",closeSignatureModal);
-document.getElementById("sigModalClear").addEventListener("click",()=>{const r=modalCanvas.getBoundingClientRect();modalCtx.clearRect(0,0,r.width,r.height);modalInk=false;});
-modalCanvas.addEventListener("pointerdown",e=>{e.preventDefault();modalCanvas.setPointerCapture(e.pointerId);const r=modalCanvas.getBoundingClientRect();modalCtx.beginPath();modalCtx.moveTo(e.clientX-r.left,e.clientY-r.top);modalInk=true;});
+document.getElementById("sigModalUndo").addEventListener("click",()=>{const previous=modalHistory.pop();if(!previous)return;modalCtx.putImageData(previous,0,0);modalInk=modalHistory.length>0||!!(canvases[activeSignKey]&&canvases[activeSignKey].ink);});
+document.getElementById("sigModalClear").addEventListener("click",()=>{modalHistory.push(modalCtx.getImageData(0,0,modalCanvas.width,modalCanvas.height));const r=modalCanvas.getBoundingClientRect();modalCtx.clearRect(0,0,r.width,r.height);modalInk=false;});
+modalCanvas.addEventListener("pointerdown",e=>{e.preventDefault();modalCanvas.setPointerCapture(e.pointerId);try{const r=modalCanvas.getBoundingClientRect();modalHistory.push(modalCtx.getImageData(0,0,modalCanvas.width,modalCanvas.height));if(modalHistory.length>30)modalHistory.shift();modalCtx.beginPath();modalCtx.moveTo(e.clientX-r.left,e.clientY-r.top);modalInk=true;}catch(err){modalHistory=[];const r=modalCanvas.getBoundingClientRect();modalCtx.beginPath();modalCtx.moveTo(e.clientX-r.left,e.clientY-r.top);modalInk=true;}});
 modalCanvas.addEventListener("pointermove",e=>{if(!modalCanvas.hasPointerCapture(e.pointerId))return;e.preventDefault();const r=modalCanvas.getBoundingClientRect();modalCtx.lineTo(e.clientX-r.left,e.clientY-r.top);modalCtx.stroke();});
 document.getElementById("sigModalSave").addEventListener("click",()=>{
  if(!activeSignKey)return;
