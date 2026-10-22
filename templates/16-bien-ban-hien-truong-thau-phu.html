@@ -105,8 +105,20 @@ async function loadProjectOptions(){
   const auth=firebase.auth();let user=auth.currentUser;
   if(!user)await new Promise(resolve=>{let done=false;const finish=()=>{if(done)return;done=true;resolve()};const unsub=auth.onAuthStateChanged(u=>{user=u;unsub();finish()});setTimeout(finish,7000)});
   if(!user)throw new Error("Anh cần đăng nhập GROVA DOCUMENT trước khi chọn công trình.");
-  const snap=await firebase.firestore().collection("projects").get();
-  projectOptions=snap.docs.map(doc=>({id:doc.id,...doc.data()})).sort((a,b)=>String(a.name||"").localeCompare(String(b.name||""),"vi"));
+  const db=firebase.firestore();
+  const snap=await db.collection("projects").get();
+  const [employeeSnap,customerSnap]=await Promise.all([
+   db.collection("employees").get().catch(()=>null),
+   db.collection("customers").get().catch(()=>null)
+  ]);
+  const employeeMap=new Map((employeeSnap?employeeSnap.docs:[]).map(doc=>[String(doc.id),{id:doc.id,...doc.data()}]));
+  const customerMap=new Map((customerSnap?customerSnap.docs:[]).map(doc=>[String(doc.id),{id:doc.id,...doc.data()}]));
+  projectOptions=snap.docs.map(doc=>{
+   const p={id:doc.id,...doc.data()};
+   p._responsible=employeeMap.get(String(p.employeeId||""))||{};
+   p._customer=customerMap.get(String(p.customerId||""))||{};
+   return p;
+  }).sort((a,b)=>String(a.name||"").localeCompare(String(b.name||""),"vi"));
   picker.innerHTML='<option value="">— Chọn công trình —</option>';
   projectOptions.forEach((p,index)=>{const o=document.createElement("option");o.value=String(index);o.textContent=[p.name||"Công trình chưa đặt tên",p.customer?" — "+p.customer:"",p.code?" ("+p.code+")":""].join("");picker.appendChild(o)});
   projectsLoaded=true;pickerHint.textContent=projectOptions.length?"Đã tải "+projectOptions.length+" công trình từ danh mục Công trình.":"Chưa có công trình nào trong danh mục.";
@@ -118,9 +130,11 @@ picker.addEventListener("change",()=>{const p=projectOptions[Number(picker.value
 const first=(...values)=>values.find(v=>typeof v==="string"&&v.trim())?.trim()||"";
 setBoundValue("project",first(p.name,p.projectName,p.buildingName));
 setBoundValue("place",first(p.address,p.location,p.siteAddress,p.projectAddress));
-setBoundValue("companyName",first(p.customer,p.customerName,p.clientName,p.ownerName,p.investorName,p.customer?.name));
-const lead=first(p.responsiblePerson,p.personInCharge,p.projectManager,p.managerName,p.contactPerson,p.contactName,p.technicianName,p.supervisorName,p.crewLeader,p.teamLeader,p.installationLead,p.installationManager,p.siteManager,p.representative,p.representativeName,p.owner?.name);
-if(lead){setBoundValue("crewPerson1",lead.toLocaleUpperCase("vi-VN"));}
+setBoundValue("companyName",first(p._customer.name,p.customer,p.customerName,p.clientName,p.ownerName,p.investorName,p._customer.companyName));
+const lead=first(p._responsible.name,p.responsiblePerson,p.personInCharge,p.projectManager,p.managerName,p.contactPerson,p.contactName,p.technicianName,p.supervisorName,p.crewLeader,p.teamLeader,p.installationLead,p.installationManager,p.siteManager,p.representative,p.representativeName,p.owner?.name);
+const role=first(p._responsible.position,p._responsible.jobTitle,p._responsible.role,p.responsiblePosition,p.responsibleRole,p.personInChargePosition,p.projectManagerPosition,p.managerPosition,p.supervisorPosition);
+setBoundValue("crewPerson1",lead.toLocaleUpperCase("vi-VN"));
+setBoundValue("crewRole1",role.toLocaleUpperCase("vi-VN"));
 pickerHint.textContent="ĐÃ CHỌN: "+first(p.name,p.projectName,p.buildingName)+" — ĐÃ ĐIỀN THÔNG TIN CÔNG TRÌNH VÀ NGƯỜI PHỤ TRÁCH NẾU CÓ."});
 
 
