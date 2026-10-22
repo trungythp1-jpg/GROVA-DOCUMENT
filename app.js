@@ -7328,12 +7328,63 @@
 
     const body = document.createElement("div");
     body.className = "grova-ai-message-body";
-    body.textContent = String(text || "");
+    if (role === "assistant") {
+      renderGrovaAIMarkdown(body, String(text || ""));
+    } else {
+      body.textContent = String(text || "");
+    }
 
     item.appendChild(label);
     item.appendChild(body);
     container.appendChild(item);
     container.scrollTop = container.scrollHeight;
+  }
+
+  function renderGrovaAIMarkdown(container, markdown) {
+    container.replaceChildren();
+    const lines = String(markdown || "").replace(/\r/g, "").split("\n");
+    let list = null;
+
+    function inline(parent, value) {
+      const parts = String(value).split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g);
+      for (const part of parts) {
+        if (!part) continue;
+        if (part.startsWith("**") && part.endsWith("**")) {
+          const el = document.createElement("strong");
+          el.textContent = part.slice(2, -2);
+          parent.appendChild(el);
+        } else if (part.startsWith("*") && part.endsWith("*")) {
+          const el = document.createElement("em");
+          el.textContent = part.slice(1, -1);
+          parent.appendChild(el);
+        } else {
+          parent.appendChild(document.createTextNode(part));
+        }
+      }
+    }
+
+    for (const raw of lines) {
+      const line = raw.trim();
+      if (!line) { list = null; continue; }
+      const heading = line.match(/^#{1,4}\s+(.+)$/);
+      const bullet = line.match(/^(?:[-*]|•)\s+(.+)$/);
+      const numbered = line.match(/^\d+[.)]\s+(.+)$/);
+      if (bullet || numbered) {
+        const tag = bullet ? "ul" : "ol";
+        if (!list || list.tagName.toLowerCase() !== tag) {
+          list = document.createElement(tag);
+          container.appendChild(list);
+        }
+        const li = document.createElement("li");
+        inline(li, (bullet || numbered)[1]);
+        list.appendChild(li);
+        continue;
+      }
+      list = null;
+      const p = document.createElement(heading ? "h4" : "p");
+      inline(p, heading ? heading[1] : line.replace(/^>\s?/, ""));
+      container.appendChild(p);
+    }
   }
 
   function renderGrovaAI() {
@@ -7391,10 +7442,34 @@
     if (status) status.textContent = "Đang kết nối GROVA AI...";
 
     try {
+      const contextParts = [];
+      if (hasPermission("projects", "view")) {
+        const projects = getProjects();
+        contextParts.push("DỮ LIỆU CÔNG TRÌNH ĐƯỢC PHÉP XEM: tổng " + projects.length + " công trình.");
+        contextParts.push("Danh sách công trình gần đây: " + JSON.stringify(projects.slice(0, 40).map(p => ({
+          tên: p.name || p.projectName || "",
+          trạng_thái: p.status || p.stage || "",
+          tiến_độ: p.progress ?? null,
+          ngày_cập_nhật: p.updatedAt || p.createdAt || ""
+        }))));
+      }
+      if (hasPermission("customers", "view")) {
+        const customers = getCustomers();
+        contextParts.push("DỮ LIỆU KHÁCH HÀNG ĐƯỢC PHÉP XEM: tổng " + customers.length + " khách hàng.");
+        contextParts.push("Tên khách hàng: " + JSON.stringify(customers.slice(0, 40).map(x => x.name || x.companyName || "").filter(Boolean)));
+      }
+      if (hasPermission("employees", "view")) {
+        const employees = getEmployees();
+        contextParts.push("DỮ LIỆU NHÂN SỰ ĐƯỢC PHÉP XEM: tổng " + employees.length + " nhân sự.");
+      }
+      const prompt = contextParts.length
+        ? question + "\\n\\n[NGỮ CẢNH GROVA DOCUMENT — chỉ dùng để trả lời câu hỏi, không suy đoán dữ liệu thiếu]\\n" + contextParts.join("\\n")
+        : question;
+
       const response = await fetch("https://grova-ai-api.vuthanhtrung0189.workers.dev/ask", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question })
+        body: JSON.stringify({ question: prompt })
       });
 
       let data = {};
@@ -7425,7 +7500,7 @@
         button.disabled = false;
         button.textContent = "Gửi";
       }
-      if (status) status.textContent = "GROVA AI đang chạy qua Cloudflare Workers AI. Hiện tại trợ lý trả lời theo câu hỏi; chưa tự đọc dữ liệu công trình/khách hàng trong Firestore.";
+      if (status) status.textContent = "GROVA AI kết nối Cloudflare Workers AI; ngữ cảnh dữ liệu chỉ gồm các mục mà tài khoản hiện tại được phép xem.";
       input?.focus();
     }
   }
