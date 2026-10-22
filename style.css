@@ -1858,3 +1858,52 @@ body{background:radial-gradient(ellipse at 78% 0%,rgba(32,180,143,.07),transpare
 button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid rgba(27,190,151,.28);outline-offset:2px}
 @media(max-width:760px){.hero{min-height:230px;padding:24px;background-position:center right}}
 @media(prefers-reduced-motion:reduce){.sidebar .nav-item,.stat{transition:none!important}}
+
+
+/* GROVA FUTURE GREEN — consistent styling for every application tab */
+.page-head{align-items:center;margin-bottom:24px;gap:18px}
+.page-head h2{color:#102722;letter-spacing:-.035em}
+.page-head p{color:#647a78;line-height:1.55}
+.page-head small{display:inline-block;margin-bottom:5px;color:#087f68;letter-spacing:1.7px}
+.toolbar{padding:16px;border:1px solid #d9ebe6;border-radius:19px;background:rgba(255,255,255,.84);box-shadow:0 8px 26px rgba(11,65,57,.035);gap:12px}
+.toolbar input,.toolbar select{min-height:48px;border-color:#dce9e5;background:rgba(255,255,255,.96);border-radius:14px}
+.doc-card{border:1px solid #d9ebe6;border-radius:20px;background:rgba(255,255,255,.9);box-shadow:0 8px 26px rgba(11,65,57,.045);transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+.doc-card:hover{transform:translateY(-2px);border-color:#a8ddce;box-shadow:0 14px 32px rgba(8,96,79,.085)}
+.doc-card h3{color:#102722;letter-spacing:-.015em}
+.doc-card p{color:#647a78;line-height:1.55}
+.list-box,.form-card,.report-card{border:1px solid #d9ebe6;border-radius:19px;background:rgba(255,255,255,.88);box-shadow:0 8px 26px rgba(11,65,57,.035)}
+.history-item{border-bottom-color:#e6f0ec}
+.history-icon{background:#e4f5f0;color:#087f68;border-radius:12px}
+.history-content b{color:#17332c}
+.history-content span,.history-time{color:#70847e}
+.report-grid{gap:16px}
+.report-card{transition:transform .18s ease,box-shadow .18s ease}
+.report-card:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(8,96,79,.07)}
+.report-card small{color:#647a78}
+.report-card strong{color:#087f68}
+.report-table{overflow:hidden;border-radius:15px;border-color:#d9ebe6}
+.report-table th{background:#edf7f3;color:#315b50}
+.report-table td{border-bottom-color:#e6f0ec}
+.form-card{padding:22px}
+.form-card h3{color:#17332c}
+.modal-card{border:1px solid #d9ebe6;border-radius:22px;box-shadow:0 24px 70px rgba(7,47,41,.22)}
+.modal-head{background:linear-gradient(120deg,#f0faf6,#fff);border-bottom-color:#e0eee8}
+.modal-head h2{color:#102722}
+.modal-foot{background:#fbfdfc;border-top-color:#e0eee8}
+#modalBody{background:#fff}
+.modal-form label{color:#38574f;font-weight:650}
+input,select,textarea{border-color:#d9e8e2;border-radius:13px}
+input:focus,select:focus,textarea:focus{border-color:#38a98b;box-shadow:0 0 0 3px rgba(11,151,116,.11)}
+.empty-state{border:1px dashed #c9e3d9;border-radius:18px;background:rgba(255,255,255,.56);padding:28px}
+.empty-state-icon{background:#e4f5f0;color:#087f68;border-radius:16px}
+.status{border-radius:999px;padding:5px 10px;font-weight:700}
+.secondary{color:#08745f;border-color:#d6e8e1}
+.secondary:hover{background:#eaf7f2;border-color:#a8ddce}
+.danger-outline{border-radius:12px}
+.grova-pagination{border-top-color:#dcebe5}
+@media(max-width:760px){
+ .page-head{align-items:flex-start}
+ .toolbar{padding:12px;border-radius:16px}
+ .form-card{padding:16px}
+ .report-grid{gap:12px}
+}
