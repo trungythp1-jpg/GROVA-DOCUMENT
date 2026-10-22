@@ -6,7 +6,7 @@
 <title>GROVA DOCUMENT — Biên bản làm việc tại hiện trường với thầu phụ</title>
 <style>
 :root{--g:#08745f;--gd:#064c40;--mint:#eaf6f1;--ink:#202724;--muted:#66736d;--line:#d7e0db}
-*{box-sizing:border-box}body{margin:0;background:#f1f5f3;color:var(--ink);font:15px Arial,Helvetica,sans-serif}
+*{box-sizing:border-box}body{margin:0;background:#f1f5f3;color:var(--ink);font:15px Arial,Helvetica,sans-serif;text-transform:uppercase} input,textarea,select,button{ text-transform:uppercase } .paper{ text-transform:uppercase }
 .top{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--line);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
 .brand{font-weight:800;color:var(--g);font-size:14px}.actions{display:flex;gap:8px;flex-wrap:wrap}.btn{border:1px solid var(--line);border-radius:10px;padding:11px 14px;background:#fff;color:var(--gd);font-weight:700;cursor:pointer}.btn.primary{background:var(--g);color:#fff;border-color:var(--g)}
 .layout{max-width:1250px;margin:20px auto;padding:0 14px;display:grid;grid-template-columns:minmax(270px,340px) minmax(0,1fr);gap:18px;align-items:start}
@@ -114,7 +114,14 @@ async function loadProjectOptions(){
  finally{pickBtn.disabled=false;pickBtn.textContent="↻ Tải / chọn công trình"}
 }
 pickBtn.addEventListener("click",()=>{if(picker.style.display==="none"||!projectsLoaded)loadProjectOptions();else picker.style.display="none"});
-picker.addEventListener("change",()=>{const p=projectOptions[Number(picker.value)];if(!p)return;setBoundValue("project",p.name||"");setBoundValue("place",p.address||p.location||"");setBoundValue("companyName",String(p.customer||p.customerName||"").trim());pickerHint.textContent="Đã chọn: "+(p.name||"Công trình")+" — thông tin được đưa vào biên bản."});
+picker.addEventListener("change",()=>{const p=projectOptions[Number(picker.value)];if(!p)return;
+const first=(...values)=>values.find(v=>typeof v==="string"&&v.trim())?.trim()||"";
+setBoundValue("project",first(p.name,p.projectName,p.buildingName));
+setBoundValue("place",first(p.address,p.location,p.siteAddress,p.projectAddress));
+setBoundValue("companyName",first(p.customer,p.customerName,p.clientName,p.ownerName,p.investorName,p.customer?.name));
+const lead=first(p.responsiblePerson,p.personInCharge,p.projectManager,p.managerName,p.contactPerson,p.contactName,p.technicianName,p.supervisorName,p.crewLeader,p.teamLeader,p.installationLead,p.installationManager,p.siteManager,p.representative,p.representativeName,p.owner?.name);
+if(lead){setBoundValue("crewPerson1",lead.toLocaleUpperCase("vi-VN"));}
+pickerHint.textContent="ĐÃ CHỌN: "+first(p.name,p.projectName,p.buildingName)+" — ĐÃ ĐIỀN THÔNG TIN CÔNG TRÌNH VÀ NGƯỜI PHỤ TRÁCH NẾU CÓ."});
 
 
 document.querySelectorAll("[data-bind]").forEach(input=>{const key=input.dataset.bind;const target=document.querySelector('[data-preview="'+key+'"]');const update=()=>{if(target)target.textContent=input.value||"................................";if(key==="condition")document.getElementById("pvCondition").textContent=input.value;if(key==="conclusion")document.getElementById("pvConclusion").textContent=input.value};input.addEventListener("input",update);update()});
