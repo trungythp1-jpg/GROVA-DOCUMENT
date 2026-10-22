@@ -134,7 +134,31 @@ canvas.addEventListener("pointermove",e=>{if(!canvases[key].drawing)return;e.pre
 function stop(){canvases[key].drawing=false;updateSignaturePreview(key)}canvas.addEventListener("pointerup",stop);canvas.addEventListener("pointercancel",stop)}
 function updateSignaturePreview(key){const c=canvases[key].canvas;const img=document.getElementById("pvSig"+key[0].toUpperCase()+key.slice(1));img.src=canvases[key].ink?c.toDataURL("image/png"):"";const name=document.querySelector('[data-name="'+key+'"]').value;document.getElementById("pvName"+key[0].toUpperCase()+key.slice(1)).textContent=name}
 ["crew","owner","company"].forEach(key=>{setupSignature(key);document.querySelector('[data-name="'+key+'"]').addEventListener("input",()=>updateSignaturePreview(key));document.querySelector('[data-clear="'+key+'"]').addEventListener("click",()=>{const {canvas,ctx}=canvases[key];ctx.clearRect(0,0,canvas.width,canvas.height);canvases[key].ink=false;updateSignaturePreview(key)})});
-document.getElementById("exportBtn").addEventListener("click",async()=>{const btn=document.getElementById("exportBtn");try{btn.disabled=true;btn.textContent="Đang chuẩn bị PDF…";await reserveNumber();document.body.classList.add("printing");window.print()}catch(e){alert(e.message||"Không thể cấp số văn bản.");}finally{btn.disabled=false;btn.textContent="Xuất PDF"}});
+const exportBtn=document.getElementById("exportBtn");
+let readyToPrint=false;
+exportBtn.addEventListener("click",async()=>{
+ if(readyToPrint){
+  // Keep print() directly inside a fresh user gesture; important for iOS Safari.
+  window.print();
+  return;
+ }
+ try{
+  exportBtn.disabled=true;exportBtn.textContent="Đang chuẩn bị PDF…";
+  await reserveNumber();
+  readyToPrint=true;
+  exportBtn.disabled=false;
+  exportBtn.textContent="Mở bản in / Lưu PDF";
+  const hint=document.getElementById("exportHint");
+  if(hint)hint.textContent="Đã cấp số văn bản. Bấm “Mở bản in / Lưu PDF” lần nữa để mở hộp thoại in trên điện thoại.";
+  else{
+   const note=document.createElement("p");note.id="exportHint";note.className="hint no-print";note.textContent="Đã cấp số văn bản. Bấm “Mở bản in / Lưu PDF” lần nữa để mở hộp thoại in trên điện thoại.";
+   exportBtn.parentElement.appendChild(note);
+  }
+ }catch(e){
+  alert(e.message||"Không thể chuẩn bị PDF. Kiểm tra đăng nhập và kết nối mạng rồi thử lại.");
+  exportBtn.disabled=false;exportBtn.textContent="Xuất PDF";
+ }
+});
 window.addEventListener("afterprint",()=>{});
 })();
 </script>
