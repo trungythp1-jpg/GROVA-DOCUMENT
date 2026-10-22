@@ -19,7 +19,7 @@
 </style>
 </head>
 <body>
-<header class="top"><div><div class="brand">GROVA DOCUMENT</div><small>Biểu mẫu 16 · Ký trực tiếp trên điện thoại</small></div><div class="actions"><button class="btn" onclick="history.back()">← Quay lại</button><button class="btn primary" id="exportBtn">Xuất PDF</button></div></header>
+<header class="top"><div><div class="brand">GROVA DOCUMENT</div><small>Biểu mẫu 16 · Ký trực tiếp trên điện thoại</small></div><div class="actions"><button class="btn" onclick="history.back()">← Quay lại</button><button class="btn" type="button" id="clearFormBtn">Xóa nội dung</button><button class="btn primary" id="exportBtn">Xuất PDF</button></div></header>
 <main class="layout">
 <section class="panel form-panel">
 <div class="panelhead"><h2>Thông tin biên bản</h2><p>Nhập thông tin bên trái; nội dung sẽ cập nhật trực tiếp vào biên bản A4 bên phải. Có thể ký bằng ngón tay trên điện thoại.</p></div>
@@ -53,7 +53,7 @@ Mọi vấn đề về trầy xước, móp méo, han gỉ cần được ghi nh
 <div class="signpanel"><div class="signhead"><span>Đội lắp đặt</span><button class="btn" data-clear="crew">Xóa</button></div><canvas class="sigcanvas" id="sig-crew" aria-label="Khung ký đội lắp đặt"></canvas><div class="field" style="margin:9px 0 0"><label>Họ tên người ký</label><input data-name="crew" placeholder="Nhập họ tên"></div><div class="hint">Ký bằng ngón tay hoặc bút cảm ứng.</div></div>
 <div class="signpanel"><div class="signhead"><span>Đại diện chủ đầu tư</span><button class="btn" data-clear="owner">Xóa</button></div><canvas class="sigcanvas" id="sig-owner" aria-label="Khung ký chủ đầu tư"></canvas><div class="field" style="margin:9px 0 0"><label>Họ tên người ký</label><input data-name="owner" placeholder="Nhập họ tên"></div></div>
 <div class="signpanel"><div class="signhead"><span>Đại diện Công ty</span><button class="btn" data-clear="company">Xóa</button></div><canvas class="sigcanvas" id="sig-company" aria-label="Khung ký công ty"></canvas><div class="field" style="margin:9px 0 0"><label>Họ tên người ký</label><input data-name="company" placeholder="Nhập họ tên"></div></div>
-<p class="hint">Chữ ký được đưa vào bản PDF khi xuất. Trước khi đóng trang, hãy xuất/lưu PDF để giữ lại bản đã ký.</p>
+<p class="hint">Chữ ký được đưa vào bản PDF khi xuất. Nội dung tự lưu trên trình duyệt của thiết bị này. <span id="draftSaveStatus">Bản nháp được lưu tự động</span></p>
 </div></section>
 <section class="paper" id="paper">
 <div class="headgrid"><div><div>CÔNG TY TNHH THANG MÁY<br>ĐỨC ANH VIỆT NAM</div><div class="docno">Số: <span id="pvNumber">........................</span></div></div><div><div>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div><div class="sub"><u>Độc lập - Tự do - Hạnh phúc</u></div><div class="sub" style="margin-top:14px">Hải Phòng, ngày <span data-preview="date">..... tháng ..... năm 20.....</span></div></div></div>
@@ -143,15 +143,25 @@ const now=new Date();
 const today=new Intl.DateTimeFormat("vi-VN",{day:"2-digit",month:"2-digit",year:"numeric",timeZone:"Asia/Ho_Chi_Minh"}).format(now);
 dateInput.value=today;
 dateInput.readOnly=true;
-document.querySelectorAll("[data-bind]").forEach(input=>{const key=input.dataset.bind;const target=document.querySelector('[data-preview="'+key+'"]');const update=()=>{if(target)target.textContent=input.value||"................................";if(key==="condition")document.getElementById("pvCondition").textContent=input.value;if(key==="conclusion")document.getElementById("pvConclusion").textContent=input.value};input.addEventListener("input",update);update()});
-const canvases={};
+restoreFields();
+document.querySelectorAll("[data-bind]").forEach(input=>{const key=input.dataset.bind;const target=document.querySelector('[data-preview="'+key+'"]');const update=()=>{if(target)target.textContent=input.value||"................................";if(key==="condition")document.getElementById("pvCondition").textContent=input.value;if(key==="conclusion")document.getElementById("pvConclusion").textContent=input.value};input.addEventListener("input",update);input.addEventListener("input",saveDraft);update()});
+const DRAFT_KEY="grova_template16_draft_v1";
+let restoreDraft={};
+function collectDraft(){const fields={};document.querySelectorAll("[data-bind], [data-name], #numberInput").forEach(el=>{const key=el.dataset.bind?"bind:"+el.dataset.bind:el.dataset.name?"name:"+el.dataset.name:"number";fields[key]=el.value});const signatures={};Object.keys(canvases).forEach(key=>{signatures[key]={ink:canvases[key].ink,data:canvases[key].ink?canvases[key].canvas.toDataURL("image/png"):""}});return {fields,signatures,updatedAt:new Date().toISOString()}}
+function saveDraft(){try{localStorage.setItem(DRAFT_KEY,JSON.stringify(collectDraft()));const s=document.getElementById("draftSaveStatus");if(s)s.textContent="Đã tự lưu trên thiết bị"}catch(e){}}
+function restoreFields(){try{restoreDraft=JSON.parse(localStorage.getItem(DRAFT_KEY)||"{}")||{};Object.entries(restoreDraft.fields||{}).forEach(([key,value])=>{let el=null;if(key.startsWith("bind:"))el=document.querySelector('[data-bind="'+key.slice(5)+'"]');else if(key.startsWith("name:"))el=document.querySelector('[data-name="'+key.slice(5)+'"]');else if(key==="number")el=document.getElementById("numberInput");if(el&&el.id!=="documentDate"&&typeof value==="string")el.value=value})}catch(e){restoreDraft={}}}
+document.getElementById("clearFormBtn").addEventListener("click",()=>{if(!confirm("Xóa toàn bộ nội dung đã nhập và chữ ký đã lưu trên thiết bị cho mẫu số 16?"))return;try{localStorage.removeItem(DRAFT_KEY)}catch(e){}document.querySelectorAll("[data-bind]").forEach(el=>{if(el.id!=="documentDate"&&el.dataset.bind!=="condition"&&el.dataset.bind!=="conclusion")el.value=""});document.querySelectorAll("[data-name]").forEach(el=>el.value="");document.getElementById("numberInput").value="";document.querySelectorAll("[data-bind]").forEach(el=>el.dispatchEvent(new Event("input",{bubbles:true})));Object.keys(canvases).forEach(key=>{const {canvas,ctx}=canvases[key];ctx.clearRect(0,0,canvas.width,canvas.height);canvases[key].ink=false;updateSignaturePreview(key)});const s=document.getElementById("draftSaveStatus");if(s)s.textContent="Đã xóa bản nháp"});const canvases={};
 function setupSignature(key){const canvas=document.getElementById("sig-"+key),ctx=canvas.getContext("2d");canvases[key]={canvas,ctx,drawing:false,ink:false};function resize(){const ratio=Math.max(window.devicePixelRatio||1,1),old=canvases[key].ink?canvas.toDataURL():null;canvas.width=canvas.clientWidth*ratio;canvas.height=canvas.clientHeight*ratio;ctx.setTransform(ratio,0,0,ratio,0,0);ctx.lineWidth=2.2;ctx.lineCap="round";ctx.lineJoin="round";ctx.strokeStyle="#153f32";if(old){const img=new Image();img.onload=()=>ctx.drawImage(img,0,0,canvas.clientWidth,canvas.clientHeight);img.src=old}}resize();window.addEventListener("resize",resize);
 function point(e){const r=canvas.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}}
 canvas.addEventListener("pointerdown",e=>{e.preventDefault();canvas.setPointerCapture(e.pointerId);const p=point(e);canvases[key].drawing=true;ctx.beginPath();ctx.moveTo(p.x,p.y)});
 canvas.addEventListener("pointermove",e=>{if(!canvases[key].drawing)return;e.preventDefault();const p=point(e);ctx.lineTo(p.x,p.y);ctx.stroke();canvases[key].ink=true;updateSignaturePreview(key)});
 function stop(){canvases[key].drawing=false;updateSignaturePreview(key)}canvas.addEventListener("pointerup",stop);canvas.addEventListener("pointercancel",stop)}
 function updateSignaturePreview(key){const c=canvases[key].canvas;const img=document.getElementById("pvSig"+key[0].toUpperCase()+key.slice(1));img.src=canvases[key].ink?c.toDataURL("image/png"):"";const name=document.querySelector('[data-name="'+key+'"]').value;document.getElementById("pvName"+key[0].toUpperCase()+key.slice(1)).textContent=name}
-["crew","owner","company"].forEach(key=>{setupSignature(key);document.querySelector('[data-name="'+key+'"]').addEventListener("input",()=>updateSignaturePreview(key));document.querySelector('[data-clear="'+key+'"]').addEventListener("click",()=>{const {canvas,ctx}=canvases[key];ctx.clearRect(0,0,canvas.width,canvas.height);canvases[key].ink=false;updateSignaturePreview(key)})});
+["crew","owner","company"].forEach(key=>{setupSignature(key);document.querySelector('[data-name="'+key+'"]').addEventListener("input",()=>updateSignaturePreview(key));document.querySelector('[data-clear="'+key+'"]').addEventListener("click",()=>{const {canvas,ctx}=canvases[key];ctx.clearRect(0,0,canvas.width,canvas.height);canvases[key].ink=false;updateSignaturePreview(key);saveDraft()})});
+document.querySelectorAll("[data-name]").forEach(el=>el.addEventListener("input",saveDraft));
+document.getElementById("numberInput").addEventListener("input",saveDraft);
+Object.keys(canvases).forEach(key=>{const sig=restoreDraft.signatures&&restoreDraft.signatures[key];if(sig&&sig.ink&&sig.data){const img=new Image();img.onload=()=>{const {canvas,ctx}=canvases[key];ctx.drawImage(img,0,0,canvas.clientWidth,canvas.clientHeight);canvases[key].ink=true;updateSignaturePreview(key)};img.src=sig.data;}});
+window.addEventListener("beforeunload",saveDraft);
 const exportBtn=document.getElementById("exportBtn");
 let readyToPrint=false;
 exportBtn.addEventListener("click",async()=>{
