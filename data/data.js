@@ -226,6 +226,18 @@ window.GROVA_DATA = {
       enabled: true
     },
 
+    {
+      id: "16",
+      code: "BBHTP",
+      name: "Biên bản làm việc tại hiện trường với thầu phụ",
+      title: "BIÊN BẢN LÀM VIỆC TẠI HIỆN TRƯỜNG",
+      description: "Biên bản kiểm tra tình trạng khung thang máy, ghi nhận kết luận và ký trực tiếp trên điện thoại.",
+      category: "Thi công",
+      icon: "📝",
+      file: "./templates/16-bien-ban-hien-truong-thau-phu.html",
+      enabled: true
+    },
+
   ],
 
   /* =======================================================
