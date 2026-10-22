@@ -81,7 +81,7 @@ Mọi vấn đề về trầy xước, móp méo, han gỉ cần được ghi nh
 <div class="section">Ký trên điện thoại</div>
 <div class="signpanel"><div class="signhead"><span>Đội lắp đặt</span><button class="btn" data-clear="crew">Xóa</button></div><canvas class="sigcanvas" id="sig-crew" aria-label="Khung ký đội lắp đặt"></canvas><div class="field" style="margin:9px 0 0"><label>Họ tên người ký</label><input data-name="crew" placeholder="Nhập họ tên"></div><div class="hint">Ký bằng ngón tay hoặc bút cảm ứng.</div></div>
 <div class="signpanel"><div class="signhead"><span>Đại diện chủ đầu tư</span><button class="btn" data-clear="owner">Xóa</button></div><canvas class="sigcanvas" id="sig-owner" aria-label="Khung ký chủ đầu tư"></canvas><div class="field" style="margin:9px 0 0"><label>Họ tên người ký</label><input data-name="owner" placeholder="Nhập họ tên"></div></div>
-<div class="signpanel"><div class="signhead"><span>Đại diện Công ty</span><button class="btn" data-clear="company">Xóa</button></div><canvas class="sigcanvas" id="sig-company" aria-label="Khung ký công ty"></canvas><div class="field" style="margin:9px 0 0"><label>Họ tên người ký</label><input data-name="company" placeholder="Nhập họ tên"></div></div>
+<div class="hint">Đại diện Công ty ký trực tiếp trên bản in; không cần ký online.</div>
 <p class="hint">Chữ ký được đưa vào bản PDF khi xuất. Nội dung tự lưu trên trình duyệt của thiết bị này. <span id="draftSaveStatus">Bản nháp được lưu tự động</span></p>
 </div></section>
 <section class="paper" id="paper">
@@ -106,7 +106,7 @@ Mọi vấn đề về trầy xước, móp méo, han gỉ cần được ghi nh
 <div class="signatures">
 <div class="sigslot"><div>ĐỘI LẮP ĐẶT</div><div class="role"></div><div class="sigimage"><img id="pvSigCrew" alt=""></div><div class="signame" id="pvNameCrew"></div></div>
 <div class="sigslot"><div>ĐẠI DIỆN CHỦ ĐẦU TƯ</div><div class="role"></div><div class="sigimage"><img id="pvSigOwner" alt=""></div><div class="signame" id="pvNameOwner"></div></div>
-<div class="sigslot"><div>CÔNG TY TNHH<br>THANG MÁY ĐỨC ANH</div><div class="role"></div><div class="sigimage"><img id="pvSigCompany" alt=""></div><div class="signame" id="pvNameCompany"></div></div>
+<div class="sigslot"><div>CÔNG TY TNHH<br>THANG MÁY ĐỨC ANH</div><div class="role"></div><div class="sigimage"></div><div class="signame"></div></div>
 </div>
 </section></main>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -188,7 +188,7 @@ canvas.addEventListener("pointerdown",e=>{e.preventDefault();canvas.setPointerCa
 canvas.addEventListener("pointermove",e=>{if(!canvases[key].drawing)return;e.preventDefault();const p=point(e);ctx.lineTo(p.x,p.y);ctx.stroke();canvases[key].ink=true;updateSignaturePreview(key)});
 function stop(){canvases[key].drawing=false;updateSignaturePreview(key)}canvas.addEventListener("pointerup",stop);canvas.addEventListener("pointercancel",stop)}
 function updateSignaturePreview(key){const c=canvases[key].canvas;const img=document.getElementById("pvSig"+key[0].toUpperCase()+key.slice(1));img.src=canvases[key].ink?c.toDataURL("image/png"):"";const name=document.querySelector('[data-name="'+key+'"]').value;document.getElementById("pvName"+key[0].toUpperCase()+key.slice(1)).textContent=name;if(typeof saveDraft==="function")saveDraft()}
-["crew","owner","company"].forEach(key=>{setupSignature(key);document.querySelector('[data-name="'+key+'"]').addEventListener("input",()=>updateSignaturePreview(key));document.querySelector('[data-clear="'+key+'"]').addEventListener("click",()=>{const {canvas,ctx}=canvases[key];ctx.clearRect(0,0,canvas.width,canvas.height);canvases[key].ink=false;updateSignaturePreview(key);saveDraft()})});
+["crew","owner"].forEach(key=>{setupSignature(key);document.querySelector('[data-name="'+key+'"]').addEventListener("input",()=>updateSignaturePreview(key));document.querySelector('[data-clear="'+key+'"]').addEventListener("click",()=>{const {canvas,ctx}=canvases[key];ctx.clearRect(0,0,canvas.width,canvas.height);canvases[key].ink=false;updateSignaturePreview(key);saveDraft()})});
 document.querySelectorAll("[data-name]").forEach(el=>el.addEventListener("input",saveDraft));
 document.getElementById("numberInput").addEventListener("input",saveDraft);
 Object.keys(canvases).forEach(key=>{const sig=restoreDraft.signatures&&restoreDraft.signatures[key];if(sig&&sig.ink&&sig.data){const img=new Image();img.onload=()=>{const {canvas,ctx}=canvases[key];ctx.drawImage(img,0,0,canvas.clientWidth,canvas.clientHeight);canvases[key].ink=true;updateSignaturePreview(key)};img.src=sig.data;}});
