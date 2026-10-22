@@ -7514,9 +7514,15 @@
         ...contextWarnings.map(w => "CẢNH BÁO DỮ LIỆU: " + w)
       ].join("\n");
 
+      // Cloudflare Worker currently accepts at most 4,000 characters in question.
+      // Reserve space for the user's question and the context header to avoid
+      // rejecting otherwise valid questions when Firestore data is attached.
+      const contextHeader = "\n\n[NGỮ CẢNH GROVA DOCUMENT — DỮ LIỆU ĐỌC TRỰC TIẾP TỪ FIRESTORE]\n";
+      const maxPromptLength = 3900;
+      const availableContextLength = Math.max(0, maxPromptLength - question.length - contextHeader.length);
       const prompt = contextParts.length || contextWarnings.length
-        ? question + "\n\n[NGỮ CẢNH GROVA DOCUMENT — DỮ LIỆU ĐỌC TRỰC TIẾP TỪ FIRESTORE]\n" + contextText
-        : question;
+        ? question + contextHeader + contextText.slice(0, availableContextLength)
+        : question.slice(0, maxPromptLength);
 
       const response = await fetch("https://grova-ai-api.vuthanhtrung0189.workers.dev/ask", {
         method: "POST",
