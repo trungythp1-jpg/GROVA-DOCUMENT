@@ -84,6 +84,8 @@ Mọi vấn đề về trầy xước, móp méo, han gỉ cần được ghi nh
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
 (function(){
+const DRAFT_KEY="grova_template16_draft_v1";
+let restoreDraft={};
 const FIREBASE_CONFIG={apiKey:"AIzaSyBcqgrkL64utUMwyZz9wmb_cM0gA5Hy8II",authDomain:"grova-document.firebaseapp.com",projectId:"grova-document",storageBucket:"grova-document.firebasestorage.app",messagingSenderId:"220105094085",appId:"1:220105094085:web:5a7263b0653333baed51ac",measurementId:"G-TNVNP286G4"};
 function syncManualNumber(){
  const value=document.getElementById("numberInput").value.trim();
@@ -120,7 +122,7 @@ async function loadProjectOptions(){
    return p;
   }).sort((a,b)=>String(a.name||"").localeCompare(String(b.name||""),"vi"));
   picker.innerHTML='<option value="">— Chọn công trình —</option>';
-  projectOptions.forEach((p,index)=>{const o=document.createElement("option");o.value=String(index);o.textContent=[p.name||"Công trình chưa đặt tên",p.customer?" — "+p.customer:"",p.code?" ("+p.code+")":""].join("");picker.appendChild(o)});
+  projectOptions.forEach((p,index)=>{const o=document.createElement("option");o.value=String(index);o.textContent=[p.name||"Công trình chưa đặt tên",(p._customer.name||p.customer||p.customerName)?" — "+(p._customer.name||p.customer||p.customerName):"",p.code?" ("+p.code+")":""].join("");picker.appendChild(o)});
   projectsLoaded=true;pickerHint.textContent=projectOptions.length?"Đã tải "+projectOptions.length+" công trình từ danh mục Công trình.":"Chưa có công trình nào trong danh mục.";
  }catch(e){picker.innerHTML='<option value="">Không tải được danh sách</option>';pickerHint.textContent=e.message||"Không thể tải công trình. Anh vẫn có thể nhập thủ công."}
  finally{pickBtn.disabled=false;pickBtn.textContent="↻ Tải / chọn công trình"}
@@ -130,7 +132,7 @@ picker.addEventListener("change",()=>{const p=projectOptions[Number(picker.value
 const first=(...values)=>values.find(v=>typeof v==="string"&&v.trim())?.trim()||"";
 setBoundValue("project",first(p.name,p.projectName,p.buildingName));
 setBoundValue("place",first(p.address,p.location,p.siteAddress,p.projectAddress));
-setBoundValue("companyName",first(p._customer.name,p.customer,p.customerName,p.clientName,p.ownerName,p.investorName,p._customer.companyName));
+setBoundValue("companyName",first(p._customer.name,p._customer.companyName,p.customer,p.customerName,p.clientName,p.ownerName,p.investorName));
 const lead=first(p._responsible.name,p.responsiblePerson,p.personInCharge,p.projectManager,p.managerName,p.contactPerson,p.contactName,p.technicianName,p.supervisorName,p.crewLeader,p.teamLeader,p.installationLead,p.installationManager,p.siteManager,p.representative,p.representativeName,p.owner?.name);
 const role=first(p._responsible.position,p._responsible.jobTitle,p._responsible.role,p.responsiblePosition,p.responsibleRole,p.personInChargePosition,p.projectManagerPosition,p.managerPosition,p.supervisorPosition);
 setBoundValue("crewPerson1",lead.toLocaleUpperCase("vi-VN"));
@@ -145,8 +147,6 @@ dateInput.value=today;
 dateInput.readOnly=true;
 restoreFields();
 document.querySelectorAll("[data-bind]").forEach(input=>{const key=input.dataset.bind;const target=document.querySelector('[data-preview="'+key+'"]');const update=()=>{if(target)target.textContent=input.value||"................................";if(key==="condition")document.getElementById("pvCondition").textContent=input.value;if(key==="conclusion")document.getElementById("pvConclusion").textContent=input.value};input.addEventListener("input",update);input.addEventListener("input",saveDraft);update()});
-const DRAFT_KEY="grova_template16_draft_v1";
-let restoreDraft={};
 function collectDraft(){const fields={};document.querySelectorAll("[data-bind], [data-name], #numberInput").forEach(el=>{const key=el.dataset.bind?"bind:"+el.dataset.bind:el.dataset.name?"name:"+el.dataset.name:"number";fields[key]=el.value});const signatures={};Object.keys(canvases).forEach(key=>{signatures[key]={ink:canvases[key].ink,data:canvases[key].ink?canvases[key].canvas.toDataURL("image/png"):""}});return {fields,signatures,updatedAt:new Date().toISOString()}}
 function saveDraft(){try{localStorage.setItem(DRAFT_KEY,JSON.stringify(collectDraft()));const s=document.getElementById("draftSaveStatus");if(s)s.textContent="Đã tự lưu trên thiết bị"}catch(e){}}
 function restoreFields(){try{restoreDraft=JSON.parse(localStorage.getItem(DRAFT_KEY)||"{}")||{};Object.entries(restoreDraft.fields||{}).forEach(([key,value])=>{let el=null;if(key.startsWith("bind:"))el=document.querySelector('[data-bind="'+key.slice(5)+'"]');else if(key.startsWith("name:"))el=document.querySelector('[data-name="'+key.slice(5)+'"]');else if(key==="number")el=document.getElementById("numberInput");if(el&&el.id!=="documentDate"&&typeof value==="string")el.value=value})}catch(e){restoreDraft={}}}
