@@ -14,37 +14,33 @@
 .paper{background:#fff;border:1px solid #e0e5e2;box-shadow:0 10px 30px #1b453014;padding:34px 40px;min-height:1050px;font-family:"Times New Roman",serif;font-size:15px;line-height:1.42}
 .headgrid{display:grid;grid-template-columns:1fr 1.4fr;gap:18px;text-align:center;font-weight:bold}.headgrid .sub{font-weight:normal;font-style:italic;margin-top:5px}.docno{margin-top:8px;font-weight:normal}.date{text-align:right;font-style:italic;margin:18px 0 24px}.paper h1{text-align:center;font-size:23px;margin:0 0 2px}.paper h2{text-align:center;font-size:16px;margin:0 0 15px;font-weight:bold}.paper p{margin:7px 0}.linefield{display:inline-block;min-width:0;border-bottom:0;min-height:0}.fill{border:0;outline:none;background:transparent;font:inherit;width:100%;min-width:0}.fill.short{width:45%}.paper input,.paper textarea{font-family:"Times New Roman",serif;font-size:15px}.partyrow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:6px 0}.address{margin:6px 0}.subheading{font-weight:bold;margin-top:12px!important}.notes{width:100%;border:0;border-bottom:1px dotted #555;resize:none;min-height:48px;background:transparent;outline:none}.signatures{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;text-align:center;margin-top:38px;break-inside:avoid}.sigslot{font-weight:bold;font-size:13px}.sigslot .role{height:28px}.sigimage{height:90px;display:flex;align-items:center;justify-content:center}.sigimage img{max-width:100%;max-height:85px;object-fit:contain}.signame{border-bottom:0;min-height:22px;font-weight:normal;font-size:13px}.draftbadge{color:#8a6a18;font:700 11px Arial;text-align:right;margin-top:8px}
 @media(max-width:800px){.layout{display:flex;flex-direction:column;margin:10px auto}.layout>section{width:100%}.fields{max-height:none}.paper{padding:22px 17px;min-height:auto;font-size:14px}.headgrid{grid-template-columns:1fr 1fr;gap:8px;font-size:12px}.paper h1{font-size:20px}.partyrow{grid-template-columns:1fr}.signatures{gap:5px;margin-top:26px}.sigslot{font-size:10px}.sigimage{height:65px}.sigimage img{max-height:62px}.top{align-items:flex-start;flex-direction:column}.actions{width:100%}.actions .btn{flex:1}.date{text-align:center}}
-@page{size:A4;margin:14mm}
-@media print{body{background:#fff}.top,.form-panel,.no-print{display:none!important}.layout{display:block;max-width:none;margin:0;padding:0}.paper{border:0;box-shadow:none;padding:0;min-height:0;font-size:12pt}.paper h1{font-size:18pt}.paper h2{font-size:12pt}.paper input,.paper textarea{color:#000}.signatures{break-inside:avoid}.draftbadge{display:none}
- /* A4 văn bản hành chính: Times New Roman, cỡ chữ dễ đọc, giãn dòng thoáng */
- .paper{width:100%;padding:0!important;font-size:11.5pt!important;line-height:1.35!important}
- .headgrid{gap:14px;font-size:11pt}
- .paper h1{font-size:15.5pt!important;margin:5px 0 4px!important}
- .paper h2{font-size:11.5pt!important;margin-bottom:12px!important}
- .paper p{margin:7px 0!important}
- .date{margin:12px 0 18px!important}
- .partyrow{gap:12px;margin:7px 0!important}
- .linefield{min-height:19px}
- .signatures{margin-top:28px!important;gap:12px}
- .sigslot{font-size:10.5pt}
- .sigslot .role{height:24px}
- .sigimage{height:68px}
- .sigimage img{max-height:64px}
- .signame{min-height:20px}
- .address{margin:7px 0!important}
- .subheading{margin-top:10px!important}
- .paper{font-size:11pt!important;line-height:1.28!important}
- .headgrid{font-size:10.5pt}
- .paper h1{font-size:15pt!important}
- .paper h2{font-size:11pt!important;margin-bottom:9px!important}
+@page{size:A4 portrait;margin:15mm 17mm 14mm}
+@media print{
+ body{background:#fff;color:#111}
+ .top,.form-panel,.no-print{display:none!important}
+ .layout{display:block;max-width:none;margin:0;padding:0}
+ .paper{width:100%;border:0;box-shadow:none;padding:0!important;min-height:0;font-family:"Times New Roman",serif;font-size:11pt!important;line-height:1.32!important}
+ .headgrid{grid-template-columns:1fr 1.15fr;gap:20px;text-align:center;font-size:10.5pt;line-height:1.25;margin-bottom:12px}
+ .docno{margin-top:8px!important}
+ .headgrid .sub{margin-top:5px!important}
+ .paper h1{font-size:16pt!important;letter-spacing:.3px;text-align:center;margin:8px 0 3px!important}
+ .paper h2{font-size:11.5pt!important;text-align:center;line-height:1.3;margin:0 0 10px!important}
  .paper p{margin:5px 0!important}
- .date{margin:9px 0 13px!important}
- .partyrow{margin:5px 0!important}
- .signatures{margin-top:18px!important}
- .sigslot .role{height:18px}
+ .paper p[style*="text-align:center"]{margin:8px 0 12px!important}
+ .subheading{font-weight:bold;margin-top:9px!important;margin-bottom:5px!important}
+ .partyrow{grid-template-columns:1fr 1fr;gap:14px;margin:5px 0!important}
+ .linefield{display:inline;min-width:0;min-height:0;border:0}
+ .address{margin:5px 0!important}
+ .paper [data-preview="project"],.paper [data-preview="place"],.paper [data-preview="companyName"]{font-weight:bold;text-transform:uppercase}
+ #pvCondition,#pvConclusion{white-space:pre-line;line-height:1.3!important}
+ .signatures{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:24px!important;break-inside:avoid;page-break-inside:avoid}
+ .sigslot{font-size:10.5pt;line-height:1.25}
+ .sigslot .role{height:20px}
  .sigimage{height:48px}
  .sigimage img{max-height:46px}
- .signame{min-height:18px}
+ .signame{border:0;min-height:18px}
+ .draftbadge{display:none}
+ a{color:#111;text-decoration:none}
 }
 </style>
 </head>
