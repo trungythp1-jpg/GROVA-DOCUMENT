@@ -34,7 +34,8 @@
 <div class="field"><label>Người đại diện 2</label><input data-bind="companyPerson2" placeholder="Họ và tên"></div>
 <div class="field"><label>Chức vụ 2</label><input data-bind="companyRole2" placeholder="Chức vụ"></div>
 <div class="section">Đội thi công lắp đặt cơ khí</div>
-<div class="field"><label>Công trình</label><input data-bind="project" placeholder="Tên / địa chỉ công trình"></div>
+<div class="field"><label>Công trình</label><input data-bind="project" id="projectInput" placeholder="Tên công trình"></div>
+<div class="field"><button class="btn" type="button" id="pickProjectBtn" style="width:100%">＋ Chọn từ tab Công trình</button><select id="projectPicker" style="display:none;width:100%;margin-top:8px;border:1px solid #d5dfd9;border-radius:9px;padding:11px;background:#fff;font:inherit"><option value="">Đang tải danh sách công trình…</option></select><div class="hint" id="projectPickerHint">Có thể chọn công trình đã lưu trong GROVA DOCUMENT hoặc nhập thủ công.</div></div>
 <div class="field"><label>Người đại diện 1</label><input data-bind="crewPerson1" placeholder="Họ và tên"></div>
 <div class="field"><label>Chức vụ 1</label><input data-bind="crewRole1" placeholder="Chức vụ"></div>
 <div class="field"><label>Người đại diện 2</label><input data-bind="crewPerson2" placeholder="Họ và tên"></div>
@@ -96,6 +97,30 @@ async function reserveNumber(){
  const u=new URL(location.href);u.searchParams.delete("grovaDraft");u.searchParams.set("grovaDocumentNo",state.number);history.replaceState(null,"",u);
  return state.number;
 }
+
+// Chọn công trình đã lưu trong tab Công trình; không thay đổi schema.
+const pickBtn=document.getElementById("pickProjectBtn"), picker=document.getElementById("projectPicker"), pickerHint=document.getElementById("projectPickerHint");
+let projectOptions=[], projectsLoaded=false;
+function setBoundValue(key,value){const input=document.querySelector('[data-bind="'+key+'"]');if(!input)return;input.value=value||"";input.dispatchEvent(new Event("input",{bubbles:true}))}
+async function loadProjectOptions(){
+ picker.style.display="block";pickBtn.disabled=true;pickBtn.textContent="Đang tải công trình…";
+ try{
+  if(typeof firebase==="undefined")throw new Error("Không tải được kết nối dữ liệu.");
+  if(!firebase.apps.length)firebase.initializeApp(FIREBASE_CONFIG);
+  const auth=firebase.auth();let user=auth.currentUser;
+  if(!user)await new Promise(resolve=>{let done=false;const finish=()=>{if(done)return;done=true;resolve()};const unsub=auth.onAuthStateChanged(u=>{user=u;unsub();finish()});setTimeout(finish,7000)});
+  if(!user)throw new Error("Anh cần đăng nhập GROVA DOCUMENT trước khi chọn công trình.");
+  const snap=await firebase.firestore().collection("projects").get();
+  projectOptions=snap.docs.map(doc=>({id:doc.id,...doc.data()})).sort((a,b)=>String(a.name||"").localeCompare(String(b.name||""),"vi"));
+  picker.innerHTML='<option value="">— Chọn công trình —</option>';
+  projectOptions.forEach((p,index)=>{const o=document.createElement("option");o.value=String(index);o.textContent=[p.name||"Công trình chưa đặt tên",p.customer?" — "+p.customer:"",p.code?" ("+p.code+")":""].join("");picker.appendChild(o)});
+  projectsLoaded=true;pickerHint.textContent=projectOptions.length?"Đã tải "+projectOptions.length+" công trình từ danh mục Công trình.":"Chưa có công trình nào trong danh mục.";
+ }catch(e){picker.innerHTML='<option value="">Không tải được danh sách</option>';pickerHint.textContent=e.message||"Không thể tải công trình. Anh vẫn có thể nhập thủ công."}
+ finally{pickBtn.disabled=false;pickBtn.textContent="↻ Tải / chọn công trình"}
+}
+pickBtn.addEventListener("click",()=>{if(picker.style.display==="none"||!projectsLoaded)loadProjectOptions();else picker.style.display="none"});
+picker.addEventListener("change",()=>{const p=projectOptions[Number(picker.value)];if(!p)return;setBoundValue("project",p.name||"");setBoundValue("place",p.address||p.location||"");pickerHint.textContent="Đã chọn: "+(p.name||"Công trình")+" — thông tin được đưa vào biên bản."});
+
 const params=new URLSearchParams(location.search);if(params.get("grovaDocumentNo")){state.official=true;state.number=params.get("grovaDocumentNo");setNumber(state.number)}
 document.querySelectorAll("[data-bind]").forEach(input=>{const key=input.dataset.bind;const target=document.querySelector('[data-preview="'+key+'"]');const update=()=>{if(target)target.textContent=input.value||"................................";if(key==="condition")document.getElementById("pvCondition").textContent=input.value;if(key==="conclusion")document.getElementById("pvConclusion").textContent=input.value};input.addEventListener("input",update);update()});
 const canvases={};
