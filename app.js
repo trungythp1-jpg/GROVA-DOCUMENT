@@ -7378,12 +7378,6 @@
       return;
     }
 
-    const functions = getGrovaFunctions();
-    if (!functions) {
-      showToast("Firebase Functions chưa sẵn sàng.");
-      return;
-    }
-
     appendGrovaAIMessage("user", question);
     input.value = "";
 
@@ -7394,21 +7388,36 @@
       button.disabled = true;
       button.textContent = "Đang xử lý...";
     }
-    if (status) status.textContent = "GROVA AI đang phân tích dữ liệu được phép truy cập...";
+    if (status) status.textContent = "Đang kết nối GROVA AI...";
 
     try {
-      const callable = functions.httpsCallable("grovaAiAsk");
-      const result = await callable({ question });
-      const answer = result?.data?.answer || "GROVA AI không trả về nội dung trả lời.";
+      const response = await fetch("https://grova-ai-api.vuthanhtrung0189.workers.dev/ask", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question })
+      });
+
+      let data = {};
+      try {
+        data = await response.json();
+      } catch (_) {
+        throw new Error("API không trả về dữ liệu JSON hợp lệ.");
+      }
+
+      if (!response.ok) {
+        throw new Error(data?.error || `API trả về lỗi HTTP ${response.status}.`);
+      }
+
+      const answer = String(data?.answer || "").trim();
+      if (!answer) {
+        throw new Error("GROVA AI chưa trả về câu trả lời.");
+      }
       appendGrovaAIMessage("assistant", answer);
     } catch (error) {
-      console.error("GROVA AI: ask failed.", error);
-      const code = String(error?.code || "");
-      let message = "Không thể kết nối GROVA AI.";
-      if (code === "functions/unauthenticated") message = "Phiên đăng nhập không hợp lệ. Vui lòng đăng nhập lại.";
-      if (code === "functions/permission-denied") message = "Tài khoản hiện tại chưa được cấp quyền sử dụng GROVA AI.";
-      if (code === "functions/failed-precondition") message = "GROVA AI chưa được cấu hình API trên Firebase.";
-      if (code === "functions/resource-exhausted") message = "GROVA AI đang vượt giới hạn sử dụng. Vui lòng thử lại sau.";
+      console.error("GROVA AI: Cloudflare Worker request failed.", error);
+      const detail = String(error?.message || "");
+      let message = "Không thể kết nối GROVA AI. Vui lòng thử lại.";
+      if (detail) message += "\\nChi tiết: " + detail;
       appendGrovaAIMessage("assistant", message);
     } finally {
       grovaAiBusy = false;
@@ -7416,7 +7425,7 @@
         button.disabled = false;
         button.textContent = "Gửi";
       }
-      if (status) status.textContent = "AI chỉ đọc dữ liệu theo quyền của tài khoản.";
+      if (status) status.textContent = "GROVA AI đang chạy qua Cloudflare Workers AI. Hiện tại trợ lý trả lời theo câu hỏi; chưa tự đọc dữ liệu công trình/khách hàng trong Firestore.";
       input?.focus();
     }
   }
