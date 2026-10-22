@@ -7443,27 +7443,79 @@
 
     try {
       const contextParts = [];
+      const contextWarnings = [];
+
+      // Refresh from Firestore for this question; do not rely only on the UI cache.
       if (hasPermission("projects", "view")) {
-        const projects = getProjects();
-        contextParts.push("DỮ LIỆU CÔNG TRÌNH ĐƯỢC PHÉP XEM: tổng " + projects.length + " công trình.");
-        contextParts.push("Danh sách công trình gần đây: " + JSON.stringify(projects.slice(0, 40).map(p => ({
-          tên: p.name || p.projectName || "",
-          trạng_thái: p.status || p.stage || "",
-          tiến_độ: p.progress ?? null,
-          ngày_cập_nhật: p.updatedAt || p.createdAt || ""
-        }))));
+        try {
+          const projects = await readCloudProjects();
+          if (Array.isArray(projects)) {
+            contextParts.push("DỮ LIỆU CÔNG TRÌNH FIRESTORE: tổng " + projects.length + " công trình.");
+            contextParts.push("Danh sách công trình: " + JSON.stringify(projects.map(p => ({
+              mã: p.code || p.id || "",
+              tên: p.name || p.projectName || "",
+              khách_hàng: p.customer || "",
+              trạng_thái: p.status || p.stage || "",
+              ngày_bắt_đầu: p.startDate || "",
+              ngày_cập_nhật: p.updatedAt || p.createdAt || ""
+            }))));
+          } else {
+            contextWarnings.push("Không thể làm mới dữ liệu công trình từ Firestore; không sử dụng số liệu công trình từ cache làm số liệu chắc chắn.");
+          }
+        } catch (error) {
+          console.warn("GROVA AI: Firestore project refresh failed.", error);
+          contextWarnings.push("Không thể đọc mới dữ liệu công trình từ Firestore trong phiên này.");
+        }
       }
+
       if (hasPermission("customers", "view")) {
-        const customers = getCustomers();
-        contextParts.push("DỮ LIỆU KHÁCH HÀNG ĐƯỢC PHÉP XEM: tổng " + customers.length + " khách hàng.");
-        contextParts.push("Tên khách hàng: " + JSON.stringify(customers.slice(0, 40).map(x => x.name || x.companyName || "").filter(Boolean)));
+        try {
+          const customers = await readCloudCustomers();
+          if (Array.isArray(customers)) {
+            contextParts.push("DỮ LIỆU KHÁCH HÀNG FIRESTORE: tổng " + customers.length + " khách hàng.");
+            contextParts.push("Danh sách khách hàng: " + JSON.stringify(customers.map(x => ({
+              tên: x.name || x.companyName || "",
+              mã: x.code || x.id || "",
+              trạng_thái: x.status || "",
+              ngày_cập_nhật: x.updatedAt || x.createdAt || ""
+            }))));
+          } else {
+            contextWarnings.push("Không thể làm mới dữ liệu khách hàng từ Firestore; không sử dụng số liệu khách hàng từ cache làm số liệu chắc chắn.");
+          }
+        } catch (error) {
+          console.warn("GROVA AI: Firestore customer refresh failed.", error);
+          contextWarnings.push("Không thể đọc mới dữ liệu khách hàng từ Firestore trong phiên này.");
+        }
       }
+
       if (hasPermission("employees", "view")) {
-        const employees = getEmployees();
-        contextParts.push("DỮ LIỆU NHÂN SỰ ĐƯỢC PHÉP XEM: tổng " + employees.length + " nhân sự.");
+        try {
+          const employees = await readCloudEmployees();
+          if (Array.isArray(employees)) {
+            contextParts.push("DỮ LIỆU NHÂN SỰ FIRESTORE: tổng " + employees.length + " nhân sự.");
+            contextParts.push("Danh sách nhân sự: " + JSON.stringify(employees.map(x => ({
+              tên: x.name || "",
+              chức_vụ: x.position || "",
+              phòng_ban: x.department || "",
+              trạng_thái: x.status || ""
+            }))));
+          } else {
+            contextWarnings.push("Không thể làm mới dữ liệu nhân sự từ Firestore trong phiên này.");
+          }
+        } catch (error) {
+          console.warn("GROVA AI: Firestore employee refresh failed.", error);
+          contextWarnings.push("Không thể đọc mới dữ liệu nhân sự từ Firestore trong phiên này.");
+        }
       }
-      const prompt = contextParts.length
-        ? question + "\\n\\n[NGỮ CẢNH GROVA DOCUMENT — chỉ dùng để trả lời câu hỏi, không suy đoán dữ liệu thiếu]\\n" + contextParts.join("\\n")
+
+      const contextText = [
+        "NGUYÊN TẮC: Chỉ khẳng định số liệu có trong dữ liệu bên dưới. Nếu thiếu dữ liệu hoặc có cảnh báo làm mới, hãy nói rõ giới hạn; không tự suy đoán.",
+        ...contextParts,
+        ...contextWarnings.map(w => "CẢNH BÁO DỮ LIỆU: " + w)
+      ].join("\n");
+
+      const prompt = contextParts.length || contextWarnings.length
+        ? question + "\n\n[NGỮ CẢNH GROVA DOCUMENT — DỮ LIỆU ĐỌC TRỰC TIẾP TỪ FIRESTORE]\n" + contextText
         : question;
 
       const response = await fetch("https://grova-ai-api.vuthanhtrung0189.workers.dev/ask", {
