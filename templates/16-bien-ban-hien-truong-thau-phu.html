@@ -32,7 +32,19 @@
  .sigimage img{max-height:64px}
  .signame{min-height:20px}
  .address{margin:7px 0!important}
- .subheading{margin-top:12px!important}
+ .subheading{margin-top:10px!important}
+ .paper{font-size:11pt!important;line-height:1.28!important}
+ .headgrid{font-size:10.5pt}
+ .paper h1{font-size:15pt!important}
+ .paper h2{font-size:11pt!important;margin-bottom:9px!important}
+ .paper p{margin:5px 0!important}
+ .date{margin:9px 0 13px!important}
+ .partyrow{margin:5px 0!important}
+ .signatures{margin-top:18px!important}
+ .sigslot .role{height:18px}
+ .sigimage{height:48px}
+ .sigimage img{max-height:46px}
+ .signame{min-height:18px}
 }
 </style>
 </head>
@@ -59,8 +71,7 @@
 <div class="field"><button class="btn" type="button" id="pickProjectBtn" style="width:100%">＋ Chọn từ tab Công trình</button><select id="projectPicker" style="display:none;width:100%;margin-top:8px;border:1px solid #d5dfd9;border-radius:9px;padding:11px;background:#fff;font:inherit"><option value="">Đang tải danh sách công trình…</option></select><div class="hint" id="projectPickerHint">Có thể chọn công trình đã lưu trong GROVA DOCUMENT hoặc nhập thủ công.</div></div>
 <div class="field"><label>Người đại diện 1</label><input data-bind="crewPerson1" placeholder="Họ và tên"></div>
 <div class="field"><label>Chức vụ 1</label><input data-bind="crewRole1" placeholder="Chức vụ"></div>
-<div class="field"><label>Người đại diện 2</label><input data-bind="crewPerson2" placeholder="Họ và tên"></div>
-<div class="field"><label>Chức vụ 2</label><input data-bind="crewRole2" placeholder="Chức vụ"></div>
+
 <div class="section">Tình trạng và kết luận</div>
 <div class="field"><label>Ghi nhận tình trạng khung thang</label><textarea data-bind="condition" placeholder="Tình trạng lắp đặt, bọc khung, bề mặt, các vấn đề cần ghi nhận...">Đã lắp đặt xong phần khung thép/khung nhôm của thang máy.
 Bọc khung sạch sẽ.
@@ -74,11 +85,11 @@ Mọi vấn đề về trầy xước, móp méo, han gỉ cần được ghi nh
 <p class="hint">Chữ ký được đưa vào bản PDF khi xuất. Nội dung tự lưu trên trình duyệt của thiết bị này. <span id="draftSaveStatus">Bản nháp được lưu tự động</span></p>
 </div></section>
 <section class="paper" id="paper">
-<div class="headgrid"><div><div>CÔNG TY TNHH THANG MÁY<br>ĐỨC ANH VIỆT NAM</div><div class="docno">Số: <span id="pvNumber">........................</span></div></div><div><div>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div><div class="sub"><u>Độc lập - Tự do - Hạnh phúc</u></div><div class="sub" style="margin-top:14px">Hải Phòng, ngày <span data-preview="date">..... tháng ..... năm 20.....</span></div></div></div>
+<div class="headgrid"><div><div>CÔNG TY TNHH THANG MÁY<br>ĐỨC ANH VIỆT NAM</div><div class="docno">Số: <span id="pvNumber"></span></div></div><div><div>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div><div class="sub"><u>Độc lập - Tự do - Hạnh phúc</u></div><div class="sub" style="margin-top:14px">Hải Phòng, ngày <span data-preview="date"></span></div></div></div>
 <div class="draftbadge" id="draftBadge">BẢN NHÁP — CHƯA CẤP SỐ</div>
 <h1>BIÊN BẢN</h1><h2>(V/v: Làm việc tại hiện trường với thầu phụ)</h2>
-<p style="text-align:center;font-style:italic">Hôm nay, ngày <span data-preview="date">..... tháng ..... năm 20.....</span>, chúng tôi gồm có:</p>
-<p class="subheading">I/ ĐẠI DIỆN <span data-preview="companyName">................................</span>:</p>
+<p style="text-align:center;font-style:italic">Hôm nay, ngày <span data-preview="date"></span>, chúng tôi gồm có:</p>
+<p class="subheading">I/ ĐẠI DIỆN <span data-preview="companyName"></span>:</p>
 <div class="partyrow"><div>Ông (Bà): <span class="linefield" data-preview="companyPerson1"></span></div><div>Chức vụ: <span class="linefield" data-preview="companyRole1"></span></div></div>
 <div class="partyrow"><div>Ông (Bà): <span class="linefield" data-preview="companyPerson2"></span></div><div>Chức vụ: <span class="linefield" data-preview="companyRole2"></span></div></div>
 <p class="address">Địa chỉ: HP81, Royal Island, Đảo Vũ Yên, phường Thủy Nguyên, Thành phố Hải Phòng</p><p>Điện thoại: (0225) 3518163 <span style="float:right">Fax: (0225) 3814859</span></p>
@@ -86,7 +97,6 @@ Mọi vấn đề về trầy xước, móp méo, han gỉ cần được ghi nh
 <p><b>CÔNG TRÌNH:</b> <span class="linefield" style="min-width:60%" data-preview="project"></span></p>
 <p><b>ĐỊA ĐIỂM CÔNG TRÌNH:</b> <span class="linefield" style="min-width:48%" data-preview="place"></span></p>
 <div class="partyrow"><div>Ông (Bà): <span class="linefield" data-preview="crewPerson1"></span></div><div>Chức vụ: <span class="linefield" data-preview="crewRole1"></span></div></div>
-<div class="partyrow"><div>Ông (Bà): <span class="linefield" data-preview="crewPerson2"></span></div><div>Chức vụ: <span class="linefield" data-preview="crewRole2"></span></div></div>
 <p style="margin-top:14px">Sau khi đã kiểm tra, xem xét toàn bộ hệ thống thang máy tải khách, chúng tôi xác nhận như sau:</p>
 <p class="subheading">1. Tình trạng thang máy:</p><div id="pvCondition" style="white-space:pre-line">- Đã lắp đặt xong phần khung thép/khung nhôm của thang máy.
 - Bọc khung sạch sẽ.
@@ -107,7 +117,7 @@ let restoreDraft={};
 const FIREBASE_CONFIG={apiKey:"AIzaSyBcqgrkL64utUMwyZz9wmb_cM0gA5Hy8II",authDomain:"grova-document.firebaseapp.com",projectId:"grova-document",storageBucket:"grova-document.firebasestorage.app",messagingSenderId:"220105094085",appId:"1:220105094085:web:5a7263b0653333baed51ac",measurementId:"G-TNVNP286G4"};
 function syncManualNumber(){
  const value=document.getElementById("numberInput").value.trim();
- document.getElementById("pvNumber").textContent=value||"........................";
+ document.getElementById("pvNumber").textContent=value||"";
  document.getElementById("draftBadge").style.display="none";
 }
 document.getElementById("numberInput").addEventListener("input",syncManualNumber);
@@ -167,7 +177,7 @@ dateInput.value=today;
 dateInput.readOnly=true;
 document.querySelectorAll('[data-preview="date"]').forEach(el=>el.textContent=today);
 restoreFields();
-document.querySelectorAll("[data-bind]").forEach(input=>{const key=input.dataset.bind;const target=document.querySelector('[data-preview="'+key+'"]');const update=()=>{if(target)target.textContent=input.value||"................................";if(key==="condition")document.getElementById("pvCondition").textContent=input.value;if(key==="conclusion")document.getElementById("pvConclusion").textContent=input.value};input.addEventListener("input",update);input.addEventListener("input",saveDraft);update()});
+document.querySelectorAll("[data-bind]").forEach(input=>{const key=input.dataset.bind;const target=document.querySelector('[data-preview="'+key+'"]');const update=()=>{if(target)target.textContent=input.value||"";if(key==="condition")document.getElementById("pvCondition").textContent=input.value;if(key==="conclusion")document.getElementById("pvConclusion").textContent=input.value};input.addEventListener("input",update);input.addEventListener("input",saveDraft);update()});
 function collectDraft(){const fields={};document.querySelectorAll("[data-bind], [data-name], #numberInput").forEach(el=>{const key=el.dataset.bind?"bind:"+el.dataset.bind:el.dataset.name?"name:"+el.dataset.name:"number";fields[key]=el.value});const signatures={};Object.keys(canvases).forEach(key=>{signatures[key]={ink:canvases[key].ink,data:canvases[key].ink?canvases[key].canvas.toDataURL("image/png"):""}});return {fields,signatures,updatedAt:new Date().toISOString()}}
 function saveDraft(){try{localStorage.setItem(DRAFT_KEY,JSON.stringify(collectDraft()));const s=document.getElementById("draftSaveStatus");if(s)s.textContent="Đã tự lưu trên thiết bị"}catch(e){}}
 function restoreFields(){try{restoreDraft=JSON.parse(localStorage.getItem(DRAFT_KEY)||"{}")||{};Object.entries(restoreDraft.fields||{}).forEach(([key,value])=>{let el=null;if(key.startsWith("bind:"))el=document.querySelector('[data-bind="'+key.slice(5)+'"]');else if(key.startsWith("name:"))el=document.querySelector('[data-name="'+key.slice(5)+'"]');else if(key==="number")el=document.getElementById("numberInput");if(el&&el.id!=="documentDate"&&typeof value==="string")el.value=value})}catch(e){restoreDraft={}}}
