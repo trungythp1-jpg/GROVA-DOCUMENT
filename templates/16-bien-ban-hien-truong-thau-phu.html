@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>GROVA DOCUMENT — Biên bản làm việc tại hiện trường với thầu phụ</title>
+<style>
+:root{--g:#08745f;--gd:#064c40;--mint:#eaf6f1;--ink:#202724;--muted:#66736d;--line:#d7e0db}
+*{box-sizing:border-box}body{margin:0;background:#f1f5f3;color:var(--ink);font:15px Arial,Helvetica,sans-serif}
+.top{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--line);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.brand{font-weight:800;color:var(--g);font-size:14px}.actions{display:flex;gap:8px;flex-wrap:wrap}.btn{border:1px solid var(--line);border-radius:10px;padding:11px 14px;background:#fff;color:var(--gd);font-weight:700;cursor:pointer}.btn.primary{background:var(--g);color:#fff;border-color:var(--g)}
+.layout{max-width:1250px;margin:20px auto;padding:0 14px;display:grid;grid-template-columns:minmax(270px,340px) minmax(0,1fr);gap:18px;align-items:start}
+.panel{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden}.panelhead{padding:17px 18px;border-bottom:1px solid #edf1ef}.panelhead h2{font-size:18px;margin:0 0 6px}.panelhead p{font-size:13px;color:var(--muted);line-height:1.5;margin:0}.fields{padding:16px;max-height:calc(100vh - 150px);overflow:auto}.section{font-size:12px;letter-spacing:.5px;text-transform:uppercase;font-weight:800;color:var(--g);border-bottom:1px solid #e7eeea;padding:12px 0 7px;margin:8px 0 12px}.field{margin-bottom:12px}.field label{display:block;font-size:12px;font-weight:700;margin-bottom:5px}.field input,.field textarea{width:100%;border:1px solid #d5dfd9;border-radius:9px;padding:10px;font:inherit;background:#fff}.field textarea{min-height:76px;resize:vertical}.signpanel{border:1px solid #d8e4de;border-radius:12px;padding:10px;margin-bottom:14px}.signhead{display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:700;font-size:13px;margin-bottom:8px}.signhead button{font-size:12px;padding:7px 9px}.sigcanvas{display:block;width:100%;height:130px;background:#fff;border:1px dashed #9db9ad;border-radius:8px;touch-action:none}.hint{font-size:11px;color:var(--muted);margin-top:6px}
+.paper{background:#fff;border:1px solid #e0e5e2;box-shadow:0 10px 30px #1b453014;padding:34px 40px;min-height:1050px;font-family:"Times New Roman",serif;font-size:15px;line-height:1.42}
+.headgrid{display:grid;grid-template-columns:1fr 1.4fr;gap:18px;text-align:center;font-weight:bold}.headgrid .sub{font-weight:normal;font-style:italic;margin-top:5px}.docno{margin-top:8px;font-weight:normal}.date{text-align:right;font-style:italic;margin:18px 0 24px}.paper h1{text-align:center;font-size:23px;margin:0 0 2px}.paper h2{text-align:center;font-size:16px;margin:0 0 15px;font-weight:bold}.paper p{margin:7px 0}.linefield{display:inline-block;min-width:170px;border-bottom:1px dotted #444;min-height:20px}.fill{border:0;border-bottom:1px dotted #555;outline:none;background:transparent;font:inherit;width:100%;min-width:0}.fill.short{width:45%}.paper input,.paper textarea{font-family:"Times New Roman",serif;font-size:15px}.partyrow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:6px 0}.address{margin:6px 0}.subheading{font-weight:bold;margin-top:12px!important}.notes{width:100%;border:0;border-bottom:1px dotted #555;resize:none;min-height:48px;background:transparent;outline:none}.signatures{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;text-align:center;margin-top:38px;break-inside:avoid}.sigslot{font-weight:bold;font-size:13px}.sigslot .role{height:28px}.sigimage{height:90px;display:flex;align-items:center;justify-content:center}.sigimage img{max-width:100%;max-height:85px;object-fit:contain}.signame{border-bottom:1px dotted #777;min-height:22px;font-weight:normal;font-size:13px}.draftbadge{color:#8a6a18;font:700 11px Arial;text-align:right;margin-top:8px}
+@media(max-width:800px){.layout{display:flex;flex-direction:column;margin:10px auto}.layout>section{width:100%}.fields{max-height:none}.paper{padding:22px 17px;min-height:auto;font-size:14px}.headgrid{grid-template-columns:1fr 1fr;gap:8px;font-size:12px}.paper h1{font-size:20px}.partyrow{grid-template-columns:1fr}.signatures{gap:5px;margin-top:26px}.sigslot{font-size:10px}.sigimage{height:65px}.sigimage img{max-height:62px}.top{align-items:flex-start;flex-direction:column}.actions{width:100%}.actions .btn{flex:1}.date{text-align:center}}
+@page{size:A4;margin:14mm}
+@media print{body{background:#fff}.top,.form-panel,.no-print{display:none!important}.layout{display:block;max-width:none;margin:0;padding:0}.paper{border:0;box-shadow:none;padding:0;min-height:0;font-size:12pt}.paper h1{font-size:18pt}.paper h2{font-size:12pt}.paper input,.paper textarea{color:#000}.signatures{break-inside:avoid}.draftbadge{display:none}}
+</style>
+</head>
+<body>
+<header class="top"><div><div class="brand">GROVA DOCUMENT</div><small>Biểu mẫu 16 · Ký trực tiếp trên điện thoại</small></div><div class="actions"><button class="btn" onclick="history.back()">← Quay lại</button><button class="btn primary" id="exportBtn">Xuất PDF</button></div></header>
+<main class="layout">
+<section class="panel form-panel">
+<div class="panelhead"><h2>Thông tin biên bản</h2><p>Nhập thông tin bên trái; nội dung sẽ cập nhật trực tiếp vào biên bản A4 bên phải. Có thể ký bằng ngón tay trên điện thoại.</p></div>
+<div class="fields">
+<div class="section">Thông tin chung</div>
+<div class="field"><label>Số biên bản (tự cấp khi xuất PDF)</label><input id="numberInput" value="DỰ THẢO" readonly></div>
+<div class="field"><label>Địa điểm</label><input data-bind="place" placeholder="Ví dụ: Công trình ..."></div>
+<div class="field"><label>Ngày</label><input data-bind="date" placeholder="..... tháng ..... năm 20....."></div>
+<div class="section">Đại diện Công ty</div>
+<div class="field"><label>Người đại diện 1</label><input data-bind="companyPerson1" placeholder="Họ và tên"></div>
+<div class="field"><label>Chức vụ 1</label><input data-bind="companyRole1" placeholder="Chức vụ"></div>
+<div class="field"><label>Người đại diện 2</label><input data-bind="companyPerson2" placeholder="Họ và tên"></div>
+<div class="field"><label>Chức vụ 2</label><input data-bind="companyRole2" placeholder="Chức vụ"></div>
+<div class="section">Đội thi công lắp đặt cơ khí</div>
+<div class="field"><label>Công trình</label><input data-bind="project" placeholder="Tên / địa chỉ công trình"></div>
+<div class="field"><label>Người đại diện 1</label><input data-bind="crewPerson1" placeholder="Họ và tên"></div>
+<div class="field"><label>Chức vụ 1</label><input data-bind="crewRole1" placeholder="Chức vụ"></div>
+<div class="field"><label>Người đại diện 2</label><input data-bind="crewPerson2" placeholder="Họ và tên"></div>
+<div class="field"><label>Chức vụ 2</label><input data-bind="crewRole2" placeholder="Chức vụ"></div>
+<div class="section">Tình trạng và kết luận</div>
+<div class="field"><label>Ghi nhận tình trạng khung thang</label><textarea data-bind="condition" placeholder="Tình trạng lắp đặt, bọc khung, bề mặt, các vấn đề cần ghi nhận...">Đã lắp đặt xong phần khung thép/khung nhôm của thang máy.
+Bọc khung sạch sẽ.
+Bề mặt khung không bị trầy xước, không móp méo, không han gỉ.</textarea></div>
+<div class="field"><label>Kết luận / lưu ý</label><textarea data-bind="conclusion" placeholder="Nội dung kết luận, các điểm cần lưu ý...">Bàn giao tại công trình cho chủ đầu tư bảo quản.
+Mọi vấn đề về trầy xước, móp méo, han gỉ cần được ghi nhận tại thời điểm bàn giao.</textarea></div>
+<div class="section">Ký trên điện thoại</div>
+<div class="signpanel"><div class="signhead"><span>Đội lắp đặt</span><button class="btn" data-clear="crew">Xóa</button></div><canvas class="sigcanvas" id="sig-crew" aria-label="Khung ký đội lắp đặt"></canvas><div class="field" style="margin:9px 0 0"><label>Họ tên người ký</label><input data-name="crew" placeholder="Nhập họ tên"></div><div class="hint">Ký bằng ngón tay hoặc bút cảm ứng.</div></div>
+<div class="signpanel"><div class="signhead"><span>Đại diện chủ đầu tư</span><button class="btn" data-clear="owner">Xóa</button></div><canvas class="sigcanvas" id="sig-owner" aria-label="Khung ký chủ đầu tư"></canvas><div class="field" style="margin:9px 0 0"><label>Họ tên người ký</label><input data-name="owner" placeholder="Nhập họ tên"></div></div>
+<div class="signpanel"><div class="signhead"><span>Đại diện Công ty</span><button class="btn" data-clear="company">Xóa</button></div><canvas class="sigcanvas" id="sig-company" aria-label="Khung ký công ty"></canvas><div class="field" style="margin:9px 0 0"><label>Họ tên người ký</label><input data-name="company" placeholder="Nhập họ tên"></div></div>
+<p class="hint">Chữ ký được đưa vào bản PDF khi xuất. Trước khi đóng trang, hãy xuất/lưu PDF để giữ lại bản đã ký.</p>
+</div></section>
+<section class="paper" id="paper">
+<div class="headgrid"><div><div>CÔNG TY TNHH THANG MÁY<br>ĐỨC ANH VIỆT NAM</div><div class="docno">Số: <span id="pvNumber">DỰ THẢO</span>/BB-ĐAVN</div></div><div><div>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div><div class="sub"><u>Độc lập - Tự do - Hạnh phúc</u></div><div class="sub" style="margin-top:14px">Hải Phòng, ngày <span data-preview="date">..... tháng ..... năm 20.....</span></div></div></div>
+<div class="draftbadge" id="draftBadge">BẢN NHÁP — CHƯA CẤP SỐ</div>
+<h1>BIÊN BẢN</h1><h2>(V/v: Làm việc tại hiện trường với thầu phụ)</h2>
+<p style="text-align:center;font-style:italic">Hôm nay, ngày <span data-preview="date">..... tháng ..... năm 20.....</span>, chúng tôi gồm có:</p>
+<p class="subheading">I/ ĐẠI DIỆN CÔNG TY TNHH THANG MÁY ĐỨC ANH VIỆT NAM:</p>
+<div class="partyrow"><div>Ông (Bà): <span class="linefield" data-preview="companyPerson1"></span></div><div>Chức vụ: <span class="linefield" data-preview="companyRole1"></span></div></div>
+<div class="partyrow"><div>Ông (Bà): <span class="linefield" data-preview="companyPerson2"></span></div><div>Chức vụ: <span class="linefield" data-preview="companyRole2"></span></div></div>
+<p class="address">Địa chỉ: HP81, Royal Island, Đảo Vũ Yên, phường Thủy Nguyên, Thành phố Hải Phòng</p><p>Điện thoại: (0225) 3518163 <span style="float:right">Fax: (0225) 3814859</span></p>
+<p class="subheading">II/ ĐẠI DIỆN ĐỘI THI CÔNG LẮP ĐẶT CƠ KHÍ</p>
+<p><b>CÔNG TRÌNH:</b> <span class="linefield" style="min-width:60%" data-preview="project"></span></p>
+<div class="partyrow"><div>Ông (Bà): <span class="linefield" data-preview="crewPerson1"></span></div><div>Chức vụ: <span class="linefield" data-preview="crewRole1"></span></div></div>
+<div class="partyrow"><div>Ông (Bà): <span class="linefield" data-preview="crewPerson2"></span></div><div>Chức vụ: <span class="linefield" data-preview="crewRole2"></span></div></div>
+<p style="margin-top:14px">Sau khi đã kiểm tra, xem xét toàn bộ hệ thống thang máy tải khách, chúng tôi xác nhận như sau:</p>
+<p class="subheading">1. Tình trạng thang máy:</p><div id="pvCondition" style="white-space:pre-line">- Đã lắp đặt xong phần khung thép/khung nhôm của thang máy.
+- Bọc khung sạch sẽ.
+- Bề mặt khung không bị trầy xước, không móp méo, không han gỉ.</div>
+<p class="subheading">2. Kết luận:</p><div id="pvConclusion" style="white-space:pre-line">- Bàn giao tại công trình cho chủ đầu tư bảo quản.
+- Mọi vấn đề về trầy xước, móp méo, han gỉ cần được ghi nhận tại thời điểm bàn giao.</div>
+<div class="signatures">
+<div class="sigslot"><div>ĐỘI LẮP ĐẶT</div><div class="role"></div><div class="sigimage"><img id="pvSigCrew" alt=""></div><div class="signame" id="pvNameCrew"></div></div>
+<div class="sigslot"><div>ĐẠI DIỆN CHỦ ĐẦU TƯ</div><div class="role"></div><div class="sigimage"><img id="pvSigOwner" alt=""></div><div class="signame" id="pvNameOwner"></div></div>
+<div class="sigslot"><div>CÔNG TY TNHH<br>THANG MÁY ĐỨC ANH</div><div class="role"></div><div class="sigimage"><img id="pvSigCompany" alt=""></div><div class="signame" id="pvNameCompany"></div></div>
+</div>
+</section></main>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+(function(){
+const TEMPLATE_ID="16", CODE="BBHTP";
+const FIREBASE_CONFIG={apiKey:"AIzaSyBcqgrkL64utUMwyZz9wmb_cM0gA5Hy8II",authDomain:"grova-document.firebaseapp.com",projectId:"grova-document",storageBucket:"grova-document.firebasestorage.app",messagingSenderId:"220105094085",appId:"1:220105094085:web:5a7263b0653333baed51ac",measurementId:"G-TNVNP286G4"};
+const state={official:false,number:null};
+function setNumber(v){document.getElementById("numberInput").value=v||"DỰ THẢO";document.getElementById("pvNumber").textContent=v||"DỰ THẢO";document.getElementById("draftBadge").style.display=v?"none":"block"}
+async function reserveNumber(){
+ if(state.official&&state.number)return state.number;
+ if(typeof firebase==="undefined")throw new Error("Không tải được Firebase.");
+ if(!firebase.apps.length)firebase.initializeApp(FIREBASE_CONFIG);
+ const auth=firebase.auth(),db=firebase.firestore();let user=auth.currentUser;
+ if(!user){await new Promise(resolve=>{const unsub=auth.onAuthStateChanged(u=>{user=u;unsub();resolve()});setTimeout(resolve,5000)});}
+ if(!user)throw new Error("Phiên đăng nhập đã hết hạn. Hãy quay lại đăng nhập GROVA DOCUMENT.");
+ const ref=db.collection("document_counters").doc("template_"+TEMPLATE_ID);
+ const n=await db.runTransaction(async tx=>{const snap=await tx.get(ref);const cur=snap.exists?Math.max(0,Number(snap.data().current)||0):0;const next=cur+1;tx.set(ref,{current:next,templateId:TEMPLATE_ID,documentCode:CODE,counterType:"document_type_sequence",updatedAt:new Date().toISOString(),updatedBy:user.uid},{merge:true});return next});
+ state.number=String(n).padStart(3,"0")+"-"+CODE;state.official=true;setNumber(state.number);
+ const u=new URL(location.href);u.searchParams.delete("grovaDraft");u.searchParams.set("grovaDocumentNo",state.number);history.replaceState(null,"",u);
+ return state.number;
+}
+const params=new URLSearchParams(location.search);if(params.get("grovaDocumentNo")){state.official=true;state.number=params.get("grovaDocumentNo");setNumber(state.number)}
+document.querySelectorAll("[data-bind]").forEach(input=>{const key=input.dataset.bind;const target=document.querySelector('[data-preview="'+key+'"]');const update=()=>{if(target)target.textContent=input.value||"................................";if(key==="condition")document.getElementById("pvCondition").textContent=input.value;if(key==="conclusion")document.getElementById("pvConclusion").textContent=input.value};input.addEventListener("input",update);update()});
+const canvases={};
+function setupSignature(key){const canvas=document.getElementById("sig-"+key),ctx=canvas.getContext("2d");canvases[key]={canvas,ctx,drawing:false,ink:false};function resize(){const ratio=Math.max(window.devicePixelRatio||1,1),old=canvases[key].ink?canvas.toDataURL():null;canvas.width=canvas.clientWidth*ratio;canvas.height=canvas.clientHeight*ratio;ctx.setTransform(ratio,0,0,ratio,0,0);ctx.lineWidth=2.2;ctx.lineCap="round";ctx.lineJoin="round";ctx.strokeStyle="#153f32";if(old){const img=new Image();img.onload=()=>ctx.drawImage(img,0,0,canvas.clientWidth,canvas.clientHeight);img.src=old}}resize();window.addEventListener("resize",resize);
+function point(e){const r=canvas.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}}
+canvas.addEventListener("pointerdown",e=>{e.preventDefault();canvas.setPointerCapture(e.pointerId);const p=point(e);canvases[key].drawing=true;ctx.beginPath();ctx.moveTo(p.x,p.y)});
+canvas.addEventListener("pointermove",e=>{if(!canvases[key].drawing)return;e.preventDefault();const p=point(e);ctx.lineTo(p.x,p.y);ctx.stroke();canvases[key].ink=true;updateSignaturePreview(key)});
+function stop(){canvases[key].drawing=false;updateSignaturePreview(key)}canvas.addEventListener("pointerup",stop);canvas.addEventListener("pointercancel",stop)}
+function updateSignaturePreview(key){const c=canvases[key].canvas;const img=document.getElementById("pvSig"+key[0].toUpperCase()+key.slice(1));img.src=canvases[key].ink?c.toDataURL("image/png"):"";const name=document.querySelector('[data-name="'+key+'"]').value;document.getElementById("pvName"+key[0].toUpperCase()+key.slice(1)).textContent=name}
+["crew","owner","company"].forEach(key=>{setupSignature(key);document.querySelector('[data-name="'+key+'"]').addEventListener("input",()=>updateSignaturePreview(key));document.querySelector('[data-clear="'+key+'"]').addEventListener("click",()=>{const {canvas,ctx}=canvases[key];ctx.clearRect(0,0,canvas.width,canvas.height);canvases[key].ink=false;updateSignaturePreview(key)})});
+document.getElementById("exportBtn").addEventListener("click",async()=>{const btn=document.getElementById("exportBtn");try{btn.disabled=true;btn.textContent="Đang chuẩn bị PDF…";await reserveNumber();document.body.classList.add("printing");window.print()}catch(e){alert(e.message||"Không thể cấp số văn bản.");}finally{btn.disabled=false;btn.textContent="Xuất PDF"}});
+window.addEventListener("afterprint",()=>{});
+})();
+</script>
+</body></html>
