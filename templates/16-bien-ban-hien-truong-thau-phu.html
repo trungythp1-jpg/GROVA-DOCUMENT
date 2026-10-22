@@ -26,7 +26,8 @@
 <div class="fields">
 <div class="section">Thông tin chung</div>
 <div class="field"><label>Số biên bản (tự cấp khi xuất PDF)</label><input id="numberInput" value="DỰ THẢO" readonly></div>
-<div class="field"><label>Địa điểm</label><input data-bind="place" placeholder="Ví dụ: Công trình ..."></div>
+<div class="field"><label>Địa điểm công trình</label><input data-bind="place" placeholder="Địa chỉ công trình"></div>
+<div class="field"><label>Chủ đầu tư / khách hàng</label><input data-bind="customer" placeholder="Tên khách hàng hoặc chủ đầu tư"></div>
 <div class="field"><label>Ngày</label><input data-bind="date" placeholder="..... tháng ..... năm 20....."></div>
 <div class="section">Đại diện Công ty</div>
 <div class="field"><label>Người đại diện 1</label><input data-bind="companyPerson1" placeholder="Họ và tên"></div>
@@ -63,6 +64,8 @@ Mọi vấn đề về trầy xước, móp méo, han gỉ cần được ghi nh
 <p class="address">Địa chỉ: HP81, Royal Island, Đảo Vũ Yên, phường Thủy Nguyên, Thành phố Hải Phòng</p><p>Điện thoại: (0225) 3518163 <span style="float:right">Fax: (0225) 3814859</span></p>
 <p class="subheading">II/ ĐẠI DIỆN ĐỘI THI CÔNG LẮP ĐẶT CƠ KHÍ</p>
 <p><b>CÔNG TRÌNH:</b> <span class="linefield" style="min-width:60%" data-preview="project"></span></p>
+<p><b>CHỦ ĐẦU TƯ / KHÁCH HÀNG:</b> <span class="linefield" style="min-width:48%" data-preview="customer"></span></p>
+<p><b>ĐỊA ĐIỂM CÔNG TRÌNH:</b> <span class="linefield" style="min-width:48%" data-preview="place"></span></p>
 <div class="partyrow"><div>Ông (Bà): <span class="linefield" data-preview="crewPerson1"></span></div><div>Chức vụ: <span class="linefield" data-preview="crewRole1"></span></div></div>
 <div class="partyrow"><div>Ông (Bà): <span class="linefield" data-preview="crewPerson2"></span></div><div>Chức vụ: <span class="linefield" data-preview="crewRole2"></span></div></div>
 <p style="margin-top:14px">Sau khi đã kiểm tra, xem xét toàn bộ hệ thống thang máy tải khách, chúng tôi xác nhận như sau:</p>
@@ -119,7 +122,7 @@ async function loadProjectOptions(){
  finally{pickBtn.disabled=false;pickBtn.textContent="↻ Tải / chọn công trình"}
 }
 pickBtn.addEventListener("click",()=>{if(picker.style.display==="none"||!projectsLoaded)loadProjectOptions();else picker.style.display="none"});
-picker.addEventListener("change",()=>{const p=projectOptions[Number(picker.value)];if(!p)return;setBoundValue("project",p.name||"");setBoundValue("place",p.address||p.location||"");pickerHint.textContent="Đã chọn: "+(p.name||"Công trình")+" — thông tin được đưa vào biên bản."});
+picker.addEventListener("change",()=>{const p=projectOptions[Number(picker.value)];if(!p)return;setBoundValue("project",p.name||"");setBoundValue("place",p.address||p.location||"");setBoundValue("customer",p.customer||p.customerName||"");pickerHint.textContent="Đã chọn: "+(p.name||"Công trình")+" — thông tin được đưa vào biên bản."});
 
 const params=new URLSearchParams(location.search);if(params.get("grovaDocumentNo")){state.official=true;state.number=params.get("grovaDocumentNo");setNumber(state.number)}
 document.querySelectorAll("[data-bind]").forEach(input=>{const key=input.dataset.bind;const target=document.querySelector('[data-preview="'+key+'"]');const update=()=>{if(target)target.textContent=input.value||"................................";if(key==="condition")document.getElementById("pvCondition").textContent=input.value;if(key==="conclusion")document.getElementById("pvConclusion").textContent=input.value};input.addEventListener("input",update);update()});
