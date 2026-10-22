@@ -243,11 +243,21 @@ window.addEventListener("beforeunload",saveDraft);
 const exportBtn=document.getElementById("exportBtn");
 // Gọi print đồng bộ ngay trong thao tác bấm để Safari iOS không chặn.
 exportBtn.textContent="Mở bản in / Lưu PDF";
-exportBtn.addEventListener("click",()=>{
+exportBtn.type="button";
+exportBtn.addEventListener("click",(event)=>{
+ event.preventDefault();
  try{
-  // Các trường và chữ ký đã tự lưu khi thay đổi; tránh serialize lại toàn bộ canvas
-  // ngay trước khi in vì có thể làm chậm đáng kể trên iPad/iPhone.
+  // Đồng bộ nội dung đang nhập trước khi in, đặc biệt sau khi chọn công trình.
+  document.querySelectorAll("[data-bind]").forEach(input=>{
+   const key=input.dataset.bind;
+   const target=document.querySelector('[data-preview="'+key+'"]');
+   if(target)target.textContent=input.value||"";
+   if(key==="condition")document.getElementById("pvCondition").textContent=input.value;
+   if(key==="conclusion")document.getElementById("pvConclusion").textContent=input.value;
+  });
   syncManualNumber();
+  // Đóng bàn phím/đóng trạng thái focus nhưng gọi print đồng bộ trong cùng lần chạm.
+  if(document.activeElement&&typeof document.activeElement.blur==="function")document.activeElement.blur();
   window.print();
  }catch(e){
   alert("Không mở được hộp thoại in. Hãy thử mở trang bằng Safari rồi bấm lại. "+(e.message||e));
