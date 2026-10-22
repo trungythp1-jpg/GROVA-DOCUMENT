@@ -19,26 +19,26 @@
  body{background:#fff;color:#111}
  .top,.form-panel,.no-print{display:none!important}
  .layout{display:block;max-width:none;margin:0;padding:0}
- .paper{width:100%;border:0;box-shadow:none;padding:0!important;min-height:0;font-family:"Times New Roman",serif;font-size:11pt!important;line-height:1.32!important}
- .headgrid{grid-template-columns:1fr 1.15fr;gap:20px;text-align:center;font-size:10.5pt;line-height:1.25;margin-bottom:12px}
- .docno{margin-top:8px!important}
+ .paper{width:100%;border:0;box-shadow:none;padding:0!important;min-height:0;font-family:"Times New Roman",serif;font-size:11pt!important;line-height:1.3!important}
+ .headgrid{grid-template-columns:1fr 1.15fr;gap:18px;text-align:center;font-size:10.5pt;line-height:1.25;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #444}
+ .docno{margin-top:7px!important}
  .headgrid .sub{margin-top:5px!important}
- .paper h1{font-size:16pt!important;letter-spacing:.3px;text-align:center;margin:8px 0 3px!important}
- .paper h2{font-size:11.5pt!important;text-align:center;line-height:1.3;margin:0 0 10px!important}
- .paper p{margin:5px 0!important}
- .paper p[style*="text-align:center"]{margin:8px 0 12px!important}
- .subheading{font-weight:bold;margin-top:9px!important;margin-bottom:5px!important}
- .partyrow{grid-template-columns:1fr 1fr;gap:14px;margin:5px 0!important}
+ .paper h1{font-size:16pt!important;letter-spacing:.25px;text-align:center;margin:8px 0 3px!important}
+ .paper h2{font-size:11.5pt!important;text-align:center;line-height:1.25;margin:0 0 9px!important}
+ .paper p{margin:4px 0!important}
+ .paper p[style*="text-align:center"]{margin:7px 0 10px!important}
+ .subheading{font-weight:bold;margin-top:8px!important;margin-bottom:4px!important}
+ .partyrow{grid-template-columns:1fr 1fr;gap:12px;margin:4px 0!important}
  .linefield{display:inline;min-width:0;min-height:0;border:0}
- .address{margin:5px 0!important}
+ .address{margin:4px 0!important}
  .paper [data-preview="project"],.paper [data-preview="place"],.paper [data-preview="companyName"]{font-weight:bold;text-transform:uppercase}
- #pvCondition,#pvConclusion{white-space:pre-line;line-height:1.3!important}
- .signatures{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:24px!important;break-inside:avoid;page-break-inside:avoid}
+ #pvCondition,#pvConclusion{white-space:pre-line;line-height:1.25!important}
+ .signatures{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:20px!important;break-inside:avoid;page-break-inside:avoid;border-top:1px solid #777;padding-top:10px}
  .sigslot{font-size:10.5pt;line-height:1.25}
- .sigslot .role{height:20px}
- .sigimage{height:48px}
- .sigimage img{max-height:46px}
- .signame{border:0;min-height:18px}
+ .sigslot .role{height:18px}
+ .sigimage{height:44px}
+ .sigimage img{max-height:42px}
+ .signame{border:0;min-height:16px}
  .draftbadge{display:none}
  a{color:#111;text-decoration:none}
 }
@@ -89,11 +89,12 @@ Mọi vấn đề về trầy xước, móp méo, han gỉ cần được ghi nh
 <div class="partyrow"><div>Ông (Bà): <span class="linefield" data-preview="companyPerson1"></span></div><div>Chức vụ: <span class="linefield" data-preview="companyRole1"></span></div></div>
 <div class="partyrow"><div>Ông (Bà): <span class="linefield" data-preview="companyPerson2"></span></div><div>Chức vụ: <span class="linefield" data-preview="companyRole2"></span></div></div>
 <p class="address">Địa chỉ: HP81, Royal Island, Đảo Vũ Yên, phường Thủy Nguyên, Thành phố Hải Phòng</p><p>Điện thoại: (0225) 3518163 <span style="float:right">Fax: (0225) 3814859</span></p>
-<p class="subheading">II/ ĐẠI DIỆN ĐỘI THI CÔNG LẮP ĐẶT CƠ KHÍ</p>
-<p><b>CÔNG TRÌNH:</b> <span class="linefield" style="min-width:60%" data-preview="project"></span></p>
-<p><b>ĐỊA ĐIỂM CÔNG TRÌNH:</b> <span class="linefield" style="min-width:48%" data-preview="place"></span></p>
-<div class="partyrow"><div>Ông (Bà): <span class="linefield" data-preview="crewPerson1"></span></div><div>Chức vụ: <span class="linefield" data-preview="crewRole1"></span></div></div>
-<p style="margin-top:14px">Sau khi đã kiểm tra, xem xét toàn bộ hệ thống thang máy tải khách, chúng tôi xác nhận như sau:</p>
+<p class="subheading">II/ THÔNG TIN CÔNG TRÌNH VÀ ĐỘI THI CÔNG</p>
+<p><b>Công trình:</b> <span data-preview="project"></span></p>
+<p><b>Địa điểm:</b> <span data-preview="place"></span></p>
+<div class="partyrow"><div>Đại diện đội lắp đặt: <span data-preview="crewPerson1"></span></div><div>Chức vụ: <span data-preview="crewRole1"></span></div></div>
+<p class="subheading">III/ NỘI DUNG KIỂM TRA VÀ BÀN GIAO</p>
+<p style="margin-top:6px">Sau khi kiểm tra hệ thống thang máy tải khách, các bên ghi nhận như sau:</p>
 <p class="subheading">1. Tình trạng thang máy:</p><div id="pvCondition" style="white-space:pre-line">- Đã lắp đặt xong phần khung thép/khung nhôm của thang máy.
 - Bọc khung sạch sẽ.
 - Bề mặt khung không bị trầy xước, không móp méo, không han gỉ.</div>
