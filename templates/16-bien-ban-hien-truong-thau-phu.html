@@ -223,6 +223,7 @@ function openSignatureModal(key){
 }
 function closeSignatureModal(){sigModal.classList.remove("active");document.body.style.overflow="";activeSignKey=null;}
 document.querySelectorAll("[data-open-sign]").forEach(btn=>btn.addEventListener("click",()=>openSignatureModal(btn.dataset.openSign)));
+document.querySelectorAll(".sigcanvas").forEach(canvas=>canvas.addEventListener("pointerdown",e=>{e.preventDefault();e.stopImmediatePropagation();openSignatureModal(canvas.id==="sig-crew"?"crew":"owner");},true));
 document.getElementById("sigModalCancel").addEventListener("click",closeSignatureModal);
 document.getElementById("sigModalClear").addEventListener("click",()=>{const r=modalCanvas.getBoundingClientRect();modalCtx.clearRect(0,0,r.width,r.height);modalInk=false;});
 modalCanvas.addEventListener("pointerdown",e=>{e.preventDefault();modalCanvas.setPointerCapture(e.pointerId);const r=modalCanvas.getBoundingClientRect();modalCtx.beginPath();modalCtx.moveTo(e.clientX-r.left,e.clientY-r.top);modalInk=true;});
