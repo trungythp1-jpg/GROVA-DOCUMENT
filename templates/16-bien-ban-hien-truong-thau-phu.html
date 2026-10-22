@@ -28,7 +28,7 @@
 <div class="field"><label>Số biên bản (nhập tay)</label><input id="numberInput" placeholder="Nhập số biên bản, ví dụ: 01/BB-ĐAVN"></div>
 <div class="field"><label>Địa điểm công trình</label><input data-bind="place" placeholder="Địa chỉ công trình"></div>
 
-<div class="field"><label>Ngày</label><input data-bind="date" placeholder="..... tháng ..... năm 20....."></div>
+<div class="field"><label>Ngày lập biên bản (tự động)</label><input data-bind="date" id="documentDate" readonly></div>
 <div class="section">Bên A — Công ty Đức Anh</div>
 <div class="field"><label>Tên khách hàng / Bên A (lấy từ Công trình)</label><input data-bind="companyName" placeholder="Chọn công trình để điền tên khách hàng"></div>
 <div class="section">Người đại diện Bên A</div>
@@ -124,6 +124,11 @@ if(lead){setBoundValue("crewPerson1",lead.toLocaleUpperCase("vi-VN"));}
 pickerHint.textContent="ĐÃ CHỌN: "+first(p.name,p.projectName,p.buildingName)+" — ĐÃ ĐIỀN THÔNG TIN CÔNG TRÌNH VÀ NGƯỜI PHỤ TRÁCH NẾU CÓ."});
 
 
+const dateInput=document.getElementById("documentDate");
+const now=new Date();
+const today=new Intl.DateTimeFormat("vi-VN",{day:"2-digit",month:"2-digit",year:"numeric",timeZone:"Asia/Ho_Chi_Minh"}).format(now);
+dateInput.value=today;
+dateInput.readOnly=true;
 document.querySelectorAll("[data-bind]").forEach(input=>{const key=input.dataset.bind;const target=document.querySelector('[data-preview="'+key+'"]');const update=()=>{if(target)target.textContent=input.value||"................................";if(key==="condition")document.getElementById("pvCondition").textContent=input.value;if(key==="conclusion")document.getElementById("pvConclusion").textContent=input.value};input.addEventListener("input",update);update()});
 const canvases={};
 function setupSignature(key){const canvas=document.getElementById("sig-"+key),ctx=canvas.getContext("2d");canvases[key]={canvas,ctx,drawing:false,ink:false};function resize(){const ratio=Math.max(window.devicePixelRatio||1,1),old=canvases[key].ink?canvas.toDataURL():null;canvas.width=canvas.clientWidth*ratio;canvas.height=canvas.clientHeight*ratio;ctx.setTransform(ratio,0,0,ratio,0,0);ctx.lineWidth=2.2;ctx.lineCap="round";ctx.lineJoin="round";ctx.strokeStyle="#153f32";if(old){const img=new Image();img.onload=()=>ctx.drawImage(img,0,0,canvas.clientWidth,canvas.clientHeight);img.src=old}}resize();window.addEventListener("resize",resize);
