@@ -7613,7 +7613,7 @@
     "03-de-nghi-thi-cong.html", "04-xac-nhan-phat-sinh.html",
     "05-nghiem-thu-ban-giao.html", "06-de-nghi-thanh-toan.html",
     "07-doi-chieu-cong-no.html", "08-hop-dong-lao-dong.html",
-    "09-thanh-ly-hop-dong.html"
+    "09-thanh-ly-hop-dong.html", "16-bien-ban-hien-truong-thau-phu.html"
   ];
 
   const SYSTEM_BACKUP_COLLECTIONS = [
