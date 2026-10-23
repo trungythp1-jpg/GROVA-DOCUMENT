@@ -27,6 +27,57 @@
 @media(max-width:900px){.finish-gallery-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media print{.image-appendix{width:auto;min-height:0;height:auto;margin:0;padding:0;box-shadow:none;break-before:page;page-break-before:always;break-after:page;page-break-after:always}.finish-gallery-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:6px}.finish-gallery-card{padding:5px}.finish-gallery-card img{height:42mm}.finish-gallery-card figcaption{font-size:8pt;padding-top:3px}.finish-gallery-card figcaption strong{font-size:8pt}.gallery-footer{font-size:7pt;margin-top:7px}}
 
+
+/* PRINT FIX: keep the complete order form on one A4 landscape page */
+@media print {
+  @page { size: A4 landscape; margin: 4mm; }
+  html, body { width: auto !important; height: auto !important; margin: 0 !important; padding: 0 !important; }
+  .sheet {
+    width: 100% !important;
+    height: 202mm !important;
+    min-height: 0 !important;
+    max-height: 202mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    box-shadow: none !important;
+    font-size: 7pt !important;
+    break-after: auto !important;
+    page-break-after: auto !important;
+  }
+  .company { font-size: 9pt !important; line-height: 1.1 !important; }
+  .contacts { font-size: 6.5pt !important; margin: 1px 0 2px !important; line-height: 1.1 !important; }
+  .title { font-size: 11pt !important; margin: 2px 0 4px !important; line-height: 1.1 !important; }
+  .meta { gap: 2px 8px !important; margin-bottom: 3px !important; }
+  .field { gap: 2px !important; line-height: 1.1 !important; }
+  .field label { font-size: 6.7pt !important; }
+  .field input, .field select, .field textarea { padding: 0 2px !important; line-height: 1.05 !important; height: auto !important; min-height: 0 !important; }
+  .section-title { margin: 3px 0 2px !important; padding: 2px 4px !important; font-size: 7.2pt !important; line-height: 1.05 !important; }
+  table { font-size: 6.8pt !important; line-height: 1.05 !important; }
+  th, td { padding: 1px 3px !important; line-height: 1.05 !important; height: auto !important; }
+  td input, td select { padding: 0 !important; line-height: 1.05 !important; height: 12px !important; }
+  .lower { gap: 5px !important; margin-top: 2px !important; break-inside: avoid !important; page-break-inside: avoid !important; }
+  .notes { height: 18px !important; min-height: 18px !important; padding: 2px 4px !important; resize: none !important; }
+  .signatures { margin-top: 3px !important; gap: 8px !important; line-height: 1.05 !important; break-inside: avoid !important; page-break-inside: avoid !important; }
+  .signatures small { margin-top: 1px !important; }
+  .small, .footer { font-size: 6pt !important; line-height: 1.05 !important; }
+  .footer { margin-top: 3px !important; }
+  .image-appendix {
+    width: 100% !important;
+    height: 202mm !important;
+    min-height: 0 !important;
+    max-height: 202mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    break-before: page !important;
+    page-break-before: always !important;
+    break-after: auto !important;
+    page-break-after: auto !important;
+  }
+  .finish-gallery-card img { height: 38mm !important; }
+}
+
 </style></head><body>
 <div class="toolbar"><button class="primary" onclick="if(validateOrder()){preparePrint();window.print()}">Xuất PDF / In A4 ngang</button><button class="secondary" onclick="resetForm()">Xóa nội dung nhập</button></div>
 <main class="sheet">
