@@ -4684,11 +4684,13 @@
           <input
             id="modalProjectCode"
             type="text"
-            placeholder="${project ? "Mã đã cấp" : "Tự động cấp khi lưu"}"
-            value="${escapeHTML(project?.code || "")}" 
-            readonly
-            aria-readonly="true"
+            placeholder="${project ? "Nhập mã công trình" : "Tự động cấp khi lưu"}"
+            value="${escapeHTML(project?.code || "")}"
+            ${project ? "" : "readonly aria-readonly=\"true\""}
+            maxlength="40"
+            autocomplete="off"
           >
+          <small style="display:block;color:#7a6a4f;margin-top:5px;">${project ? "Có thể sửa mã công trình. Mã phải là duy nhất." : "Mã mới vẫn được hệ thống cấp tự động."}</small>
 
         </label>
 
@@ -5065,7 +5067,9 @@
       name,
 
       code:
-        existingProject?.code || "",
+        existingProject
+          ? ($("#modalProjectCode")?.value || "").trim()
+          : "",
 
       customerId:
         $("#modalProjectCustomerId")?.value || "",
@@ -5110,6 +5114,25 @@
           .trim() || ""
 
     };
+
+    if (modalEditId) {
+      const normalizedCode = String(data.code || "").trim().toUpperCase();
+      if (!normalizedCode) {
+        showToast("Vui lòng nhập mã công trình.");
+        $("#modalProjectCode")?.focus();
+        return;
+      }
+      const duplicateCode = projects.find((item) =>
+        String(item.id) !== String(modalEditId) &&
+        String(item.code || "").trim().toUpperCase() === normalizedCode
+      );
+      if (duplicateCode) {
+        showToast("Mã công trình này đã được sử dụng. Vui lòng nhập mã khác.");
+        $("#modalProjectCode")?.focus();
+        return;
+      }
+      data.code = normalizedCode;
+    }
 
     const oldEmployeeId = String(existingProject?.employeeId || "");
     const newEmployeeId = String(data.employeeId || "");
