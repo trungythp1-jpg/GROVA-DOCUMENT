@@ -3,7 +3,7 @@
 ## Trạng thái
 - Nhánh phát triển: `feature/debt-ledger-safe-rebuild`
 - Điểm xuất phát: bản ZIP ổn định `a0b215d50c7140f0b9a0f89154e2a1ebefc3936b`
-- Chưa tích hợp vào `main`; chưa thay đổi Firestore Rules hoặc dữ liệu thật.
+- Chưa tích hợp vào `main`; không thay đổi Firestore Rules hoặc dữ liệu thật. Yêu cầu hiện tại: chỉ ẩn menu Công nợ với tài khoản không phải Admin; không sửa Firestore Rules.
 - Module này chỉ được bật sau khi kiểm thử quyền truy cập và các tình huống ghi đồng thời.
 
 ## Nguyên tắc không được phá vỡ
@@ -45,7 +45,7 @@
 ## Quyền hạn đề xuất
 - Chỉ Admin được truy cập toàn bộ chức năng công nợ: xem danh sách, tạo/sửa hồ sơ, ghi nhận thu/chi, xem lịch sử và thực hiện điều chỉnh có audit.
 - Tài khoản không phải Admin không được xem, tạo, sửa, ghi nhận thu/chi hoặc truy cập dữ liệu công nợ; phải chặn ở cả giao diện và Firestore Rules.
-- Firestore Rules phải xác minh người dùng đang đăng nhập, profile đang active, vai trò/quyền được phép, dữ liệu đầu vào hợp lệ, và các trường bất biến.
+- Theo yêu cầu hiện tại, không chỉnh sửa hoặc triển khai Firestore Rules cho phân hệ này. Việc ẩn menu chỉ là kiểm soát hiển thị, không phải ranh giới bảo mật; chỉ dùng khi Admin chấp nhận rủi ro này.
 - Không mở quyền rộng theo kiểu `allow read, write: if signedIn()`.
 
 ## Kế hoạch triển khai an toàn
@@ -62,6 +62,6 @@
 - Không tạo dữ liệu thật trong quá trình kiểm thử.
 - Không thể tạo hai hồ sơ cho cùng một công trình.
 - Retry không tạo giao dịch thứ hai.
-- Tài khoản không đủ quyền bị từ chối cả ở giao diện lẫn Firestore.
+- Menu Công nợ chỉ hiển thị với Admin; không thay đổi Firestore Rules.
 - Không mất lịch sử thanh toán; giao dịch đã ghi sổ không bị xóa vật lý.
 - Các tài khoản và module cũ vẫn hoạt động bình thường.
