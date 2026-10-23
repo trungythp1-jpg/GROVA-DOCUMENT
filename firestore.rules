@@ -362,6 +362,19 @@ service cloud.firestore {
     }
 
     /* =====================================================
+       GROVA DEBT & CASHFLOW — ADMIN ONLY
+       Isolated collections; existing collections/rules unchanged.
+       ===================================================== */
+
+    match /project_debt_records/{recordId} {
+      allow read, create, update, delete: if isAdmin();
+    }
+
+    match /debt_partner_settings/{partnerId} {
+      allow read, create, update, delete: if isAdmin();
+    }
+
+    /* =====================================================
        DEFAULT DENY
        ===================================================== */
 

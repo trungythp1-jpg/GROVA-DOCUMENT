@@ -224,6 +224,17 @@
 
         <button
           class="nav-item"
+          data-page="debt"
+          type="button"
+          style="display:none"
+          aria-hidden="true"
+        >
+          <span class="nav-icon">▤</span>
+          <span>Công nợ & Dòng tiền</span>
+        </button>
+
+        <button
+          class="nav-item"
           data-page="customers"
           type="button"
         >
@@ -669,6 +680,8 @@
 
           <div class="toolbar">
 
+            <button class="secondary" type="button" data-page-target="debt" id="openProjectDebtButton" style="display:none">💰 Công nợ công trình</button>
+
             <input
               id="projectSearch"
               type="search"
@@ -723,6 +736,21 @@
             class="data-list"
           ></div>
 
+        </section>
+
+        <!-- =================================================
+             DEBT & CASHFLOW — ADMIN ONLY
+        ================================================== -->
+
+        <section id="page-debt" class="page">
+          <div class="page-head">
+            <div>
+              <small>ADMIN ONLY</small>
+              <h2>Công nợ & Dòng tiền</h2>
+              <p>Quản lý phải thu, phải trả, các đợt thanh toán và dữ liệu lịch sử theo công trình.</p>
+            </div>
+          </div>
+          <div id="debtModuleRoot"></div>
         </section>
 
         <!-- =================================================
@@ -1298,6 +1326,7 @@
   <script
     src="./app.js?v=238"
   ></script>
+  <script src="./js/debt-cashflow-module.js?v=1" defer></script>
   <!-- =====================================================
        SERVICE WORKER
        ===================================================== -->
