@@ -46,6 +46,11 @@
       subtitle: "Quản lý công trình và tiến độ"
     },
 
+    debt: {
+      title: "Công nợ & Dòng tiền",
+      subtitle: "Theo dõi công nợ và lịch thanh toán — chỉ Admin"
+    },
+
     customers: {
       title: "Khách hàng",
       subtitle: "Quản lý thông tin khách hàng"
@@ -1401,6 +1406,10 @@
       renderProjects();
     }
 
+    if (currentPage === "debt" && window.GROVA_DEBT_CASHFLOW) {
+      window.GROVA_DEBT_CASHFLOW.render();
+    }
+
     if (currentPage === "reports") {
       renderReports();
     }
@@ -2570,6 +2579,7 @@
   }
 
   function canViewPage(page) {
+    if (page === "debt") return isAdminUser();
     const required = getPagePermission(page);
     if (!required) return true;
     return hasPermission(required[0], required[1]);
@@ -2579,6 +2589,7 @@
     const labels = {
       documents: "Văn bản",
       projects: "Công trình",
+      debt: "Công nợ & Dòng tiền",
       customers: "Khách hàng",
       employees: "Nhân sự",
       history: "Lịch sử",
@@ -2609,9 +2620,9 @@
       });
     });
 
-    $$(".nav-item[data-page]").forEach((button) => {
+    $(".nav-item[data-page]").forEach((button) => {
       const page = button.dataset.page;
-      const allowed = canViewPage(page);
+      const allowed = page === "debt" ? isAdminUser() : canViewPage(page);
       button.style.display = allowed ? "" : "none";
       button.setAttribute("aria-hidden", allowed ? "false" : "true");
     });
@@ -2681,6 +2692,10 @@
 
     if (page === "projects") {
       renderProjects();
+    }
+
+    if (page === "debt") {
+      if (window.GROVA_DEBT_CASHFLOW) window.GROVA_DEBT_CASHFLOW.render();
     }
 
     if (page === "customers") {
