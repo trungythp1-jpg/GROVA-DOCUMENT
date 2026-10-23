@@ -46,6 +46,11 @@
       subtitle: "Quản lý công trình và tiến độ"
     },
 
+    debts: {
+      title: "Công nợ",
+      subtitle: "Theo dõi phải thu, phải trả và lịch sử thanh toán"
+    },
+
     customers: {
       title: "Khách hàng",
       subtitle: "Quản lý thông tin khách hàng"
@@ -2597,12 +2602,19 @@
       });
     });
 
-    $$(".nav-item[data-page]").forEach((button) => {
+    $(".nav-item[data-page]").forEach((button) => {
       const page = button.dataset.page;
       const allowed = canViewPage(page);
       button.style.display = allowed ? "" : "none";
       button.setAttribute("aria-hidden", allowed ? "false" : "true");
     });
+
+    const debtNav = $("#debtNavItem");
+    if (debtNav) {
+      const visible = isAdminUser();
+      debtNav.style.display = visible ? "" : "none";
+      debtNav.setAttribute("aria-hidden", visible ? "false" : "true");
+    }
 
     if (currentUserProfile?.status !== "active" && !isAdminUser()) {
       $$(".nav-item[data-page]").forEach((button) => {
@@ -2620,6 +2632,12 @@
   function showPage(page) {
 
     if (!PAGE_INFO[page]) {
+      page = "dashboard";
+    }
+
+    if (page === "debts" && !isAdminUser()) {
+      refreshPermissionUI();
+      showToast("Mục Công nợ chỉ dành cho Admin.");
       page = "dashboard";
     }
 
@@ -2669,6 +2687,19 @@
 
     if (page === "projects") {
       renderProjects();
+    }
+
+    if (page === "debts" && window.GROVA_DEBT_UI) {
+      window.GROVA_DEBT_CONTEXT = {
+        isAdmin: () => isAdminUser(),
+        getDb: () => {
+          if (!initializeFirestore()) return null;
+          return firestoreDb;
+        },
+        getProjects: () => getProjects(),
+        toast: (message) => showToast(message)
+      };
+      void window.GROVA_DEBT_UI.render();
     }
 
     if (page === "customers") {
@@ -8593,6 +8624,16 @@
   /* =======================================================
      PHASE 5A PUBLIC PERMISSION BRIDGE
   ======================================================= */
+
+  window.GROVA_DEBT_CONTEXT = {
+    isAdmin: () => isAdminUser(),
+    getDb: () => {
+      if (!initializeFirestore()) return null;
+      return firestoreDb;
+    },
+    getProjects: () => getProjects(),
+    toast: (message) => showToast(message)
+  };
 
   window.GROVA_PERMISSIONS = {
     getCurrentUserProfile,
