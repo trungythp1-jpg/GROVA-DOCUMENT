@@ -63,8 +63,8 @@
     records = recordsSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
     settings = settingsSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
     try {
-      if (window.GROVA_FIRESTORE && typeof window.GROVA_FIRESTORE.getProjects === "function") {
-        projects = await window.GROVA_FIRESTORE.getProjects();
+      if (window.GROVA_PERMISSIONS && typeof window.GROVA_PERMISSIONS.getProjects === "function") {
+        projects = window.GROVA_PERMISSIONS.getProjects();
       } else {
         projects = [];
       }
