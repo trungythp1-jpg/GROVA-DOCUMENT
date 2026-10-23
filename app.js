@@ -1228,19 +1228,8 @@
 
   }
 
-  function getVietnamDateKey(date = new Date()) {
-    const parts = new Intl.DateTimeFormat("en-GB", {
-      timeZone: "Asia/Ho_Chi_Minh",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit"
-    }).formatToParts(date);
-    const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
-    return `${values.year}${values.month}${values.day}`;
-  }
-
-  function formatProjectCode(dateKey, sequence) {
-    return `CT-${dateKey}-${String(sequence).padStart(3, "0")}`;
+  function formatProjectCode(sequence) {
+    return `CT-${String(sequence).padStart(3, "0")}`;
   }
 
   async function createCloudProjectWithDailyCode(project, user) {
@@ -1254,28 +1243,27 @@
     const projectsCollection = getProjectsCollection();
     if (!projectsCollection) throw new Error("FIRESTORE_UNAVAILABLE");
 
-    // Freeze the date key for this save attempt so a midnight boundary cannot
-    // make the counter path and displayed code disagree.
-    const dateKey = getVietnamDateKey(new Date());
-    const counterRef = firestoreDb.collection("project_daily_counters").doc(dateKey);
+    // Global sequential project codes. Existing 21 projects are expected to be
+    // migrated to CT-001..CT-021 before this counter is used in production.
+    // Keep the counter update and project creation in one transaction.
+    const counterRef = firestoreDb.collection("system_counters").doc("project_code_sequence");
     const projectRef = projectsCollection.doc(String(project.id));
 
     const created = await firestoreDb.runTransaction(async (transaction) => {
       const counterSnapshot = await transaction.get(counterRef);
       const current = counterSnapshot.exists
         ? Math.max(0, Number(counterSnapshot.data()?.current) || 0)
-        : 0;
+        : 21;
       const next = current + 1;
-      const code = formatProjectCode(dateKey, next);
+      const code = formatProjectCode(next);
       const projectWithCode = { ...project, code };
       const data = buildProjectData(projectWithCode, user, true);
 
       transaction.set(counterRef, {
-        dateKey,
         current: next,
         updatedAt: nowISO(),
         updatedBy: String(user.uid || ""),
-        counterType: "project_daily_sequence"
+        counterType: "global_project_sequence"
       }, { merge: true });
       transaction.set(projectRef, data);
 
