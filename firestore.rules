@@ -163,35 +163,6 @@ service cloud.firestore {
     }
 
     /* =====================================================
-       GLOBAL PROJECT CODE SEQUENCE
-       Used for CT-001, CT-002, ... across all dates.
-       ===================================================== */
-
-    match /system_counters/{counterId} {
-      allow read: if counterId == "project_code_sequence"
-        && hasPermission("projects", "create");
-      allow create: if counterId == "project_code_sequence"
-        && hasPermission("projects", "create")
-        && request.resource.data.keys().hasOnly([
-          "current", "updatedAt", "updatedBy", "counterType"
-        ])
-        && request.resource.data.current is int
-        && request.resource.data.current >= 22
-        && request.resource.data.updatedBy == request.auth.uid
-        && request.resource.data.counterType == "global_project_sequence";
-      allow update: if counterId == "project_code_sequence"
-        && hasPermission("projects", "create")
-        && request.resource.data.keys().hasOnly([
-          "current", "updatedAt", "updatedBy", "counterType"
-        ])
-        && request.resource.data.current is int
-        && request.resource.data.current == resource.data.current + 1
-        && request.resource.data.updatedBy == request.auth.uid
-        && request.resource.data.counterType == "global_project_sequence";
-      allow delete: if false;
-    }
-
-    /* =====================================================
        PROJECTS
        ===================================================== */
 
