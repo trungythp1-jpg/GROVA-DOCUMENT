@@ -43,8 +43,8 @@
 - Xóa công trình không được tự động xóa lịch sử thu/chi; cần kiểm tra liên kết và chính sách lưu trữ riêng.
 
 ## Quyền hạn đề xuất
-- Admin: tạo/sửa hồ sơ, ghi nhận giao dịch, điều chỉnh có audit.
-- Nhân viên: chỉ xem theo quyền được cấp; quyền ghi giao dịch phải được xác định rõ trong ma trận quyền trước khi bật.
+- Chỉ Admin được truy cập toàn bộ chức năng công nợ: xem danh sách, tạo/sửa hồ sơ, ghi nhận thu/chi, xem lịch sử và thực hiện điều chỉnh có audit.
+- Tài khoản không phải Admin không được xem, tạo, sửa, ghi nhận thu/chi hoặc truy cập dữ liệu công nợ; phải chặn ở cả giao diện và Firestore Rules.
 - Firestore Rules phải xác minh người dùng đang đăng nhập, profile đang active, vai trò/quyền được phép, dữ liệu đầu vào hợp lệ, và các trường bất biến.
 - Không mở quyền rộng theo kiểu `allow read, write: if signedIn()`.
 
