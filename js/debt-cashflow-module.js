@@ -427,6 +427,10 @@
       const allowed = authObject.currentUser?.uid === ADMIN_UID || !!window.GROVA_PERMISSIONS?.isAdminUser?.();
       if (nav) { nav.style.display = allowed ? "" : "none"; nav.setAttribute("aria-hidden", allowed ? "false" : "true"); }
       if (button) button.style.display = allowed ? "" : "none";
+      if (document.querySelector("#page-debt.active") && window.GROVA_DEBT_CASHFLOW) {
+        // Clear any previously rendered financial data immediately when the session/role changes.
+        window.GROVA_DEBT_CASHFLOW.render();
+      }
     });
     document.addEventListener("click", (event) => {
       const target = event.target.closest('[data-page-target="debt"]');
