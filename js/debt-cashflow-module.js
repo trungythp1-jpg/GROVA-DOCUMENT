@@ -74,10 +74,16 @@
     }
   }
 
+  function installmentPaid(item) {
+    const tx = Array.isArray(item.transactions) ? item.transactions : [];
+    // Legacy records use paidAmount; the transaction ledger is authoritative when present.
+    return tx.length ? tx.reduce((sum, t) => sum + (t.status === "void" ? 0 : (Number(t.amount) || 0)), 0) : (Number(item.paidAmount) || 0);
+  }
+
   function totals(record) {
     const installments = Array.isArray(record.installments) ? record.installments : [];
     const due = installments.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
-    const paid = installments.reduce((sum, item) => sum + (Number(item.paidAmount) || 0), 0);
+    const paid = installments.reduce((sum, item) => sum + installmentPaid(item), 0);
     return { due, paid, balance: Math.max(0, due - paid) };
   }
 
@@ -246,7 +252,7 @@
       const get = (name) => $('[data-field="' + name + '"]', box)?.value || "";
       const percent = Number(get("percent")) || 0;
       return {
-        id: box.dataset.installmentId || crypto.randomUUID(),
+        id: box.dataset.installmentId || ((window.crypto && crypto.randomUUID) ? crypto.randomUUID() : ("inst-" + Date.now() + "-" + Math.random().toString(36).slice(2, 9))),
         name: get("name").trim(),
         percent,
         amount: Math.round(contractValue * percent / 100),
