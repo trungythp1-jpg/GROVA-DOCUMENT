@@ -898,4 +898,5 @@ function printPrepare(){
   });
 }
 $('quoteDate').value=new Date().toISOString().slice(0,10);setupPlainTextPrint();if(!$('payment').value.trim())updatePaymentPlan(true);syncAll();
-</script></body></html>
+</script><script src="../js/pwa-pdf-fallback.js"></script>
+</body></html>
