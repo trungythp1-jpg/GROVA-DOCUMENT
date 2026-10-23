@@ -216,11 +216,46 @@
         <label>Ngày dự kiến (nếu biết)<input data-field="expectedDate" type="date" value="${esc(item.expectedDate || "")}"></label>
       </div>
       <div class="debt-muted" data-amount-preview>Giá trị đợt được tính khi lưu.</div>
+      <div style="margin-top:12px"><b>Sổ giao dịch thực tế</b><div class="debt-muted">Ghi nhận từng khoản thu/chi; ngày dự kiến không phải giao dịch thực tế.</div><div data-tx-list></div><div class="debt-fields" style="margin-top:8px"><label>Ngày giao dịch<input data-tx-date type="date"></label><label>Số tiền (VNĐ)<input data-tx-amount type="number" min="1" step="1"></label><label>Phương thức<input data-tx-method placeholder="Chuyển khoản / tiền mặt"></label><label>Mã chứng từ<input data-tx-ref placeholder="Số phiếu / UNC"></label><label class="full">Ghi chú<input data-tx-note></label><div class="full"><button type="button" class="debt-btn debt-btn-secondary" data-add-tx>＋ Ghi nhận thu/chi</button></div></div></div>
     `;
+    div.dataset.transactions = JSON.stringify(Array.isArray(item.transactions) ? item.transactions : []);
+    renderTransactions(div);
+    $("[data-add-tx]", div).addEventListener("click", () => addTransaction(div));
     $("[data-remove-installment]", div).addEventListener("click", () => { div.remove(); updatePercentSummary(); });
     const pct = $("[data-field='percent']", div);
     pct.addEventListener("input", updatePercentSummary);
     return div;
+  }
+
+  function renderTransactions(box) {
+    const list = $("[data-tx-list]", box);
+    if (!list) return;
+    let tx = [];
+    try { tx = JSON.parse(box.dataset.transactions || "[]"); } catch (_) {}
+    list.innerHTML = tx.length ? tx.map((t, i) => '<div class="debt-record"><div><b>' + money(t.amount) + '</b><div class="debt-muted">' + esc(fmtDate(t.date)) + ' · ' + esc(t.method || "Chưa nhập phương thức") + '</div><div class="debt-muted">' + esc(t.reference || "Không có mã chứng từ") + (t.note ? " · " + esc(t.note) : "") + (t.status === "void" ? " · ĐÃ HỦY" : "") + '</div></div><button type="button" class="debt-btn debt-btn-secondary" data-void-tx="' + i + '" ' + (t.status === "void" ? "disabled" : "") + '>Hủy giao dịch</button></div>').join("") : '<div class="debt-muted">Chưa có giao dịch thực tế.</div>';
+    list.querySelectorAll("[data-void-tx]").forEach((button) => button.addEventListener("click", () => {
+      let items = []; try { items = JSON.parse(box.dataset.transactions || "[]"); } catch (_) {}
+      const i = Number(button.dataset.voidTx);
+      if (!items[i] || items[i].status === "void") return;
+      items[i] = { ...items[i], status: "void", voidedAt: stamp(), voidedBy: auth()?.currentUser?.uid || "", voidReason: "Hủy bởi Admin" };
+      box.dataset.transactions = JSON.stringify(items); renderTransactions(box); updatePercentSummary();
+    }));
+  }
+
+  function addTransaction(box) {
+    const date = $("[data-tx-date]", box).value;
+    const amount = Number($("[data-tx-amount]", box).value);
+    const method = $("[data-tx-method]", box).value.trim();
+    const reference = $("[data-tx-ref]", box).value.trim();
+    const note = $("[data-tx-note]", box).value.trim();
+    if (!date || !Number.isFinite(amount) || amount <= 0) return toast("Nhập ngày và số tiền giao dịch hợp lệ.");
+    let items = []; try { items = JSON.parse(box.dataset.transactions || "[]"); } catch (_) {}
+    if (reference && items.some((t) => t.status !== "void" && t.reference && t.reference.toLowerCase() === reference.toLowerCase())) return toast("Mã chứng từ trùng trong đợt; hãy kiểm tra lại.");
+    const id = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : ("tx-" + Date.now() + "-" + Math.random().toString(36).slice(2, 9));
+    items.push({ id, date, amount, method, reference, note, status: "posted", createdAt: stamp(), createdBy: auth()?.currentUser?.uid || "" });
+    box.dataset.transactions = JSON.stringify(items);
+    ["[data-tx-date]", "[data-tx-amount]", "[data-tx-method]", "[data-tx-ref]", "[data-tx-note]"].forEach((sel) => { $(sel, box).value = ""; });
+    renderTransactions(box); updatePercentSummary();
   }
 
   function updatePercentSummary() {
@@ -248,7 +283,7 @@
     const contractValue = Number(form.elements.contractValue.value);
     if (!Number.isFinite(contractValue) || contractValue < 0) return toast("Giá trị nghĩa vụ không hợp lệ.");
     const boxes = Array.from(form.querySelectorAll(".debt-installment"));
-    const installments = boxes.map((box) => {
+    const installments = boxes.map((box, installmentIndex) => {
       const get = (name) => $('[data-field="' + name + '"]', box)?.value || "";
       const percent = Number(get("percent")) || 0;
       return {
@@ -261,12 +296,12 @@
         conditionMetAt: get("conditionMetAt"),
         expectedDate: get("expectedDate"),
         paidAmount: Number(get("paidAmount")) || 0,
-        transactions: []
+        transactions: (() => { try { return JSON.parse(box.dataset.transactions || "[]"); } catch (_) { return []; } })()
       };
     });
     const percentTotal = installments.reduce((s, item) => s + item.percent, 0);
     if (!installments.length || Math.abs(percentTotal - 100) > 0.001) return toast("Tổng tỷ lệ các đợt phải bằng 100%.");
-    if (installments.some((item) => item.paidAmount < 0 || item.paidAmount > item.amount)) return toast("Số đã thu/trả phải nằm trong khoảng 0 đến giá trị đợt.");
+    if (installments.some((item) => { const paid = item.transactions.length ? item.transactions.reduce((sum, t) => sum + (t.status === "void" ? 0 : (Number(t.amount) || 0)), 0) : item.paidAmount; return item.paidAmount < 0 || paid > item.amount || (!item.transactions.length && item.paidAmount > item.amount); })) return toast("Tổng giao dịch thực tế / số dư lịch sử không được vượt giá trị đợt.");
     const old = records.find((r) => r.id === selectedRecordId);
     const now = stamp();
     const data = {
