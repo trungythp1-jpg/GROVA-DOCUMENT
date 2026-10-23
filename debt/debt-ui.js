@@ -24,8 +24,7 @@
     if (!host) return;
     try {
       const { c, db } = context();
-      const snap = await db.collection("project_debts").get();
-      const debts = snap.docs.map(d => ({id:d.id,...d.data()})).sort((a,b)=>String(b.updatedAt||"").localeCompare(String(a.updatedAt||"")));
+      const debts = (await root.GROVA_DEBT_SERVICE.listDebts(db)).sort((a,b)=>String(b.updatedAt||"").localeCompare(String(a.updatedAt||"")));
       const projects = c.getProjects().filter(p => p && p.id);
       const debtIds = new Set(debts.map(d=>String(d.projectId || d.id)));
       const available = projects.filter(p => !debtIds.has(String(p.id)));
