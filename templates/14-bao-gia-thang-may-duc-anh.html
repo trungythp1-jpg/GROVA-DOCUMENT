@@ -662,12 +662,28 @@ function quotePrintNow(){
     alert('Vui lòng đăng nhập tài khoản được cấp quyền xuất PDF.');
     return;
   }
-  
+
   var paymentCheck=typeof validatePaymentPlan==='function'?validatePaymentPlan():{ok:true};
-  if(!paymentCheck.ok){alert('Chưa thể xuất báo giá: vui lòng kiểm tra giá trị báo giá và lịch thanh toán.');return;}
-  
-  if(typeof window.printPrepare==='function') window.printPrepare();
-  window.print();
+  if(!paymentCheck.ok){
+    alert('Chưa thể xuất báo giá: vui lòng kiểm tra giá trị báo giá và lịch thanh toán.');
+    return;
+  }
+
+  // Keep window.print() in the original tap/click call stack for iPad Safari.
+  // A preparation error must not silently prevent the native print dialog.
+  try {
+    if(typeof window.printPrepare==='function') window.printPrepare();
+  } catch(error) {
+    console.error('GROVA quote print preparation failed:', error);
+  }
+
+  try {
+    window.focus();
+    window.print();
+  } catch(error) {
+    console.error('GROVA quote print dialog failed:', error);
+    alert('Safari chưa mở được cửa sổ in. Hãy thử mở báo giá trong Safari, sau đó chọn Chia sẻ → In.');
+  }
 }
 
 (function(){
