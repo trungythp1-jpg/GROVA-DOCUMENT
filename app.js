@@ -5066,8 +5066,8 @@
       modalEditId
         ? projects.find(
             (item) =>
-              item.id ===
-              modalEditId
+              String(item.id) ===
+              String(modalEditId)
           )
         : null;
 
@@ -5251,10 +5251,19 @@
         );
 
       } else {
-
-        showToast(
-          "Không thể lưu công trình lên hệ thống. Dữ liệu cục bộ chưa bị thay đổi."
-        );
+        const errorCode = String(error?.code || "");
+        const errorMessage = String(error?.message || "");
+        console.error("GROVA DOCUMENT: project save detail", {
+          code: errorCode,
+          message: errorMessage
+        });
+        if (errorCode.includes("permission-denied") || errorMessage.includes("PERMISSION_DENIED")) {
+          showToast("Không có quyền sửa công trình trên Firestore. Hãy kiểm tra quyền tài khoản.");
+        } else if (errorCode.includes("unavailable") || errorMessage.includes("FIRESTORE_UNAVAILABLE")) {
+          showToast("Firestore chưa kết nối được. Kiểm tra mạng rồi thử lại.");
+        } else {
+          showToast("Lưu công trình thất bại (" + (errorCode || errorMessage || "UNKNOWN") + "). Mã chưa được xác nhận đã lưu.");
+        }
 
       }
 
