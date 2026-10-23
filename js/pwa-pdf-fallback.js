@@ -29,11 +29,28 @@
 
   function filename() {
     const title = (document.title || "GROVA-DOCUMENT")
-      .replace(/\\s*[-|—].*$/, "")
-      .replace(/[^\\p{L}\\p{N} _-]/gu, "")
+      .replace(/\s*[-|—].*$/, "")
+      .replace(/[^\p{L}\p{N} _-]/gu, "")
       .trim()
-      .replace(/\\s+/g, "-");
+      .replace(/\s+/g, "-");
     return (title || "GROVA-DOCUMENT") + ".pdf";
+  }
+
+  function pageOrientation() {
+    try {
+      for (const sheet of Array.from(document.styleSheets)) {
+        let rules;
+        try { rules = sheet.cssRules; } catch (_) { continue; }
+        for (const rule of Array.from(rules || [])) {
+          if (rule.type === CSSRule.PAGE_RULE) {
+            const size = String(rule.style.getPropertyValue("size") || "").toLowerCase();
+            if (size.includes("landscape")) return "landscape";
+            if (size.includes("portrait")) return "portrait";
+          }
+        }
+      }
+    } catch (_) {}
+    return "portrait";
   }
 
   async function exportPdf() {
@@ -70,7 +87,7 @@
           scrollY: 0,
           windowWidth: document.documentElement.scrollWidth
         },
-        jsPDF: { unit: "mm", format: "a4", orientation: "portrait", compress: true },
+        jsPDF: { unit: "mm", format: "a4", orientation: pageOrientation(), compress: true },
         pagebreak: { mode: ["css", "legacy"], avoid: [".no-break", ".no-break-inside", ".signature-block", ".finish-gallery-card"] }
       };
       const worker = html2pdf().set(options).from(document.body).toPdf();
