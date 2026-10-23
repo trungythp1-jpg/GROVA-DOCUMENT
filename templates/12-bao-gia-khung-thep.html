@@ -184,4 +184,5 @@ function preparePrintNotes(){document.querySelectorAll('textarea[data-field="spe
 function cleanupPrintNotes(){document.querySelectorAll('.print-note').forEach(n=>n.remove());document.querySelectorAll('textarea.print-source').forEach(t=>t.classList.remove('print-source'))}
 window.addEventListener('beforeprint',preparePrintNotes);window.addEventListener('afterprint',cleanupPrintNotes);buildFloors();recalc();
 </script>
+<script src="../js/pwa-pdf-fallback.js"></script>
 </body></html>
