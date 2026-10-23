@@ -107,7 +107,7 @@
 
     const totalReceivable = records.filter((x) => x.recordType === "receivable").reduce((s, x) => s + totals(x).balance, 0);
     const totalPayable = records.filter((x) => x.recordType === "payable").reduce((s, x) => s + totals(x).balance, 0);
-    const pendingConditions = records.reduce((s, x) => s + (x.installments || []).filter((i) => i.conditionType === "partner_receipt" && !i.conditionMetAt && (Number(i.amount) > Number(i.paidAmount || 0)).length, 0);
+    const pendingConditions = records.reduce((s, x) => s + (x.installments || []).filter((i) => i.conditionType === "partner_receipt" && !i.conditionMetAt && Number(i.amount) > Number(i.paidAmount || 0)).length, 0);
     const projectOptions = projects.map((p) => '<option value="' + esc(p.id) + '">' + esc((p.code ? p.code + " · " : "") + (p.name || "Công trình")) + '</option>').join("");
     const selected = records.find((x) => x.id === selectedRecordId);
     const listHtml = records.length ? records.map((record) => {
