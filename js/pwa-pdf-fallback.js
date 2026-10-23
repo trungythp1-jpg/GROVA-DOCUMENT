@@ -111,27 +111,7 @@
       edit.textContent = "Sửa lại";
       edit.style.cssText = "border:0;border-radius:6px;padding:10px 12px;background:#666;color:#fff;font-weight:700;";
       edit.onclick = closePreview;
-      const exportButton = document.createElement("button");
-      exportButton.type = "button";
-      exportButton.textContent = "Xuất PDF";
-      exportButton.style.cssText = "border:0;border-radius:6px;padding:10px 12px;background:#b08b3b;color:#fff;font-weight:700;";
-      exportButton.onclick = async () => {
-        const file = new File([blob], filename(), { type: "application/pdf" });
-        try {
-          if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-            await navigator.share({ files: [file], title: filename() });
-          } else {
-            const link = document.createElement("a");
-            link.href = previewUrl;
-            link.download = filename();
-            link.click();
-            alert("Đã tạo PDF. Nếu chưa lưu được, mở tệp rồi chọn Chia sẻ → Lưu vào Tệp.");
-          }
-        } catch (error) {
-          if (error?.name !== "AbortError") alert("Chưa xuất được PDF. Vui lòng thử lại.");
-        }
-      };
-      bar.append(title, edit, exportButton);
+      bar.append(title, edit);
       const frame = document.createElement("iframe");
       frame.title = "Bản xem trước PDF";
       frame.src = previewUrl;
