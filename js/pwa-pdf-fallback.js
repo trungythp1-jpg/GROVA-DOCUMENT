@@ -52,19 +52,67 @@
   }
 
   async function createPdfBlob() {
+    const html2pdf = await loadHtml2Pdf();
+    // Render a detached copy, not the live form. The user must preview the actual
+    // document content, with fields converted to their entered values and controls removed.
+    const source = document.body.cloneNode(true);
+    source.querySelectorAll(
+      ".toolbar, .topbar, .control-pane, .no-print, [data-no-print], .btn-back, .btn-export, .export-actions, .toast-container, #grova-pdf-preview-overlay, #internalPanel, #quoteAuthGate"
+    ).forEach(el => el.remove());
+
+    source.querySelectorAll("input, textarea, select").forEach(el => {
+      if (el.type === "hidden" || el.closest("#internalPanel")) {
+        el.remove();
+        return;
+      }
+      const printed = el.id ? source.querySelector("#" + CSS.escape(el.id) + "FieldPrint") : null;
+      let value = "";
+      if (el.type === "checkbox" || el.type === "radio") {
+        value = el.checked ? "✓" : "";
+      } else if (el.tagName === "SELECT") {
+        value = el.selectedOptions?.[0]?.textContent?.trim() || "";
+      } else {
+        value = String(el.value || "").trim() || el.getAttribute("placeholder") || "";
+      }
+      if (printed && printed !== el) {
+        printed.textContent = value;
+        el.remove();
+        printed.style.display = "block";
+      } else {
+        const span = document.createElement("span");
+        span.textContent = value;
+        span.style.whiteSpace = "pre-wrap";
+        span.style.overflowWrap = "anywhere";
+        span.style.display = "inline-block";
+        span.style.minHeight = "1em";
+        span.style.minWidth = "1em";
+        el.replaceWith(span);
+      }
+    });
+
+    source.querySelectorAll(".field-print-value, .print-value").forEach(el => {
+      if (el.textContent.trim()) el.style.display = "block";
+    });
+
     const style = document.createElement("style");
-    style.id = "grova-pwa-pdf-export-style";
     style.textContent = `
       .toolbar, .topbar, .control-pane, .no-print, [data-no-print],
       .btn-back, .btn-export, .export-actions, .toast-container,
-      #grova-pdf-preview-overlay { display:none!important; }
-      html, body { background:#fff!important; }
-      * { -webkit-print-color-adjust:exact!important; print-color-adjust:exact!important; }
+      #grova-pdf-preview-overlay, #internalPanel, #quoteAuthGate,
+      button, .payment-validation, .hidden { display:none!important; }
+      html, body { margin:0!important; padding:0!important; background:#fff!important; width:100%!important; }
+      * { -webkit-print-color-adjust:exact!important; print-color-adjust:exact!important; box-shadow:none!important; }
+      input, textarea, select { display:none!important; }
+      .field-print-value { white-space:pre-wrap!important; overflow-wrap:anywhere!important; }
+      .sheet, main, .wrap { box-shadow:none!important; }
     `;
+    source.prepend(style);
+
+    const container = document.createElement("div");
+    container.style.cssText = "position:fixed;left:-100000px;top:0;width:100%;background:#fff;";
+    container.appendChild(source);
+    document.body.appendChild(container);
     try {
-      document.head.appendChild(style);
-      document.body.classList.add("grova-pwa-pdf-exporting");
-      const html2pdf = await loadHtml2Pdf();
       const options = {
         margin: 0,
         filename: filename(),
@@ -73,15 +121,14 @@
           scale: 2, useCORS: true, allowTaint: false,
           backgroundColor: "#ffffff", logging: false,
           scrollX: 0, scrollY: 0,
-          windowWidth: document.documentElement.scrollWidth
+          windowWidth: Math.max(source.scrollWidth, document.documentElement.clientWidth)
         },
         jsPDF: { unit: "mm", format: "a4", orientation: pageOrientation(), compress: true },
         pagebreak: { mode: ["css", "legacy"], avoid: [".no-break", ".no-break-inside", ".signature-block", ".finish-gallery-card"] }
       };
-      return await html2pdf().set(options).from(document.body).toPdf().outputPdf("blob");
+      return await html2pdf().set(options).from(source).toPdf().outputPdf("blob");
     } finally {
-      document.getElementById("grova-pwa-pdf-export-style")?.remove();
-      document.body.classList.remove("grova-pwa-pdf-exporting");
+      container.remove();
     }
   }
 
