@@ -167,7 +167,7 @@
         ? "settled"
         : (nextReceived > 0 || nextPaid > 0 ? "partial" : "open");
 
-      tx.create(transactionRef, transactionPayload);
+      tx.set(transactionRef, transactionPayload);
       tx.update(debtRef, {
         receivedAmount: nextReceived,
         paidAmount: nextPaid,
