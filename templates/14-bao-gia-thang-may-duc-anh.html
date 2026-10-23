@@ -537,6 +537,37 @@ body.quote-auth-pending .wrap,body.quote-auth-pending .toolbar{visibility:hidden
   #imageGallerySheet + .sheet { display: none !important; }
 }
 
+/* PRINT PAGINATION FIX: keep quote configuration and pricing sections intact */
+@media print {
+  /* Make the first page's customer/configuration fields more compact. */
+  .sheet:first-of-type > .grid {
+    row-gap: 3px !important;
+  }
+  .sheet:first-of-type > .section:has(#capacity) {
+    margin-top: 5px !important;
+  }
+  .sheet:first-of-type > .section:has(#capacity) .grid {
+    row-gap: 2px !important;
+  }
+  .sheet:first-of-type > .section:has(#capacity) .field label {
+    margin-bottom: 0 !important;
+    line-height: 1.1 !important;
+  }
+  .sheet:first-of-type > .section:has(#capacity) .field input,
+  .sheet:first-of-type > .section:has(#capacity) .field select {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    line-height: 1.15 !important;
+  }
+
+  /* Start the commercial quote summary on a clean page instead of
+     letting its table/totals split across the configuration page. */
+  .sheet:first-of-type > .section:has(#saleLift) {
+    break-before: page !important;
+    page-break-before: always !important;
+  }
+}
+
 /* FIX PRINT: keep 3-item quote totals and amount-in-words on the same page */
 @media print{
   .section{margin-bottom:8px!important}
