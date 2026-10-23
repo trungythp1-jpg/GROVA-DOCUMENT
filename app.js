@@ -8599,6 +8599,7 @@
   ======================================================= */
 
   window.GROVA_PERMISSIONS = {
+    getProjects,
     getCurrentUserProfile,
     getDefaultPermissions,
     hasPermission,
