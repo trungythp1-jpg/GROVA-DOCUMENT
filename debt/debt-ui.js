@@ -61,18 +61,33 @@
       <h3>Tạo hồ sơ công nợ</h3>
       <form id="debtCreateForm" class="debt-form">
         <label class="full">Công trình<select name="projectId" required><option value="">-- Chọn công trình --</option>${available.map(p=>`<option value="${esc(p.id)}">${esc(p.code||"Chưa có mã")} — ${esc(p.name||"Chưa đặt tên")}</option>`).join("")}</select></label>
-        <label>Giá trị hợp đồng (VND)<input name="contractAmount" type="number" min="0" step="1" value="0" required></label>
-        <label>Tổng phải thu (VND)<input name="receivableAmount" type="number" min="0" step="1" value="0" required></label>
+        <label>Giá trị hợp đồng (VND)<input name="contractAmount" id="debtContractAmount" type="number" min="0" step="1" value="0" required></label>
+        <label>Cách tính phải thu<select name="receivableMode" id="debtReceivableMode"><option value="percent">Theo % hợp đồng</option><option value="amount">Nhập số tiền trực tiếp</option></select></label>
+        <label id="debtPercentWrap">Tỷ lệ phải thu (%)<input name="receivablePercent" id="debtReceivablePercent" type="number" min="0" max="100" step="0.01" value="100" required></label>
+        <label id="debtAmountWrap" hidden>Tổng phải thu (VND)<input name="receivableDirectAmount" id="debtReceivableDirectAmount" type="number" min="0" step="1" value="0"></label>
         <label>Tổng phải trả (VND)<input name="payableAmount" type="number" min="0" step="1" value="0" required></label>
+        <div class="full debt-calculation-preview"><span>Tiền phải thu</span><strong id="debtReceivablePreview">0 ₫</strong><span>Số còn phải thu sẽ tự trừ các khoản đã nhận.</span></div>
         <div class="full debt-actions"><button type="button" class="secondary" data-debt-action="cancel">Hủy</button><button type="submit" class="primary">Lưu hồ sơ</button></div>
       </form>`;
+    const createForm=editor.querySelector("#debtCreateForm");
+    const contractInput=createForm.querySelector("#debtContractAmount");
+    const modeInput=createForm.querySelector("#debtReceivableMode");
+    const percentInput=createForm.querySelector("#debtReceivablePercent");
+    const directInput=createForm.querySelector("#debtReceivableDirectAmount");
+    const percentWrap=createForm.querySelector("#debtPercentWrap");
+    const amountWrap=createForm.querySelector("#debtAmountWrap");
+    const preview=createForm.querySelector("#debtReceivablePreview");
+    const computedReceivable=()=>modeInput.value==="percent" ? Math.round(Math.max(0,Number(contractInput.value||0))*Math.max(0,Math.min(100,Number(percentInput.value||0)))/100) : Math.max(0,Math.round(Number(directInput.value||0)));
+    const updateReceivablePreview=()=>{const byPercent=modeInput.value==="percent";percentWrap.hidden=!byPercent;amountWrap.hidden=byPercent;percentInput.required=byPercent;directInput.required=!byPercent;preview.textContent=money(computedReceivable());};
+    [contractInput,modeInput,percentInput,directInput].forEach(el=>el.addEventListener("input",updateReceivablePreview));
+    updateReceivablePreview();
     editor.querySelector('[data-debt-action="cancel"]').onclick=()=>{editor.hidden=true;};
-    editor.querySelector("#debtCreateForm").onsubmit=async e=>{
+    createForm.onsubmit=async e=>{
       e.preventDefault();
       try {
         const {c,db}=context(); const fd=new FormData(e.currentTarget); const p=c.getProjects().find(x=>String(x.id)===String(fd.get("projectId")));
         if(!p) throw new Error("Không tìm thấy công trình đã chọn.");
-        const result=await root.GROVA_DEBT_SERVICE.createDebt(db,{projectId:p.id,projectCode:p.code,projectName:p.name,customerName:p.customer,contractAmount:Number(fd.get("contractAmount")),receivableAmount:Number(fd.get("receivableAmount")),payableAmount:Number(fd.get("payableAmount"))});
+        const result=await root.GROVA_DEBT_SERVICE.createDebt(db,{projectId:p.id,projectCode:p.code,projectName:p.name,customerName:p.customer,contractAmount:Number(fd.get("contractAmount")),receivableAmount:computedReceivable(),payableAmount:Number(fd.get("payableAmount"))});
         if(result.alreadyExists) throw new Error("Công trình này đã có hồ sơ công nợ. Hãy mở hồ sơ hiện có.");
         notify("Đã tạo hồ sơ công nợ."); await render();
       } catch(err) { notify(err.message||"Không thể tạo hồ sơ công nợ."); }
