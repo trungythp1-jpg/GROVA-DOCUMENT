@@ -124,7 +124,7 @@
         try {
           const fd=new FormData(e.currentTarget);
           const txId=(root.crypto&&root.crypto.randomUUID)?root.crypto.randomUUID():"TX-"+Date.now()+"-"+Math.random().toString(36).slice(2,10);
-          const result=await root.GROVA_DEBT_SERVICE.recordTransaction(db,id,txId,{direction:fd.get("direction"),date:fd.get("date"),amount:Number(fd.get("amount")),method:fd.get("method"),reference:fd.get("reference"),note:fd.get("note")});
+          const result=await root.GROVA_DEBT_SERVICE.recordTransaction(db,id,txId,{direction:fd.get("direction"),installment:fd.get("installment"),date:fd.get("date"),amount:Number(fd.get("amount")),method:fd.get("method"),reference:fd.get("reference"),note:fd.get("note")});
           if(result.duplicate) throw new Error("Giao dịch đã tồn tại; không ghi trùng.");
           notify("Đã lưu giao dịch thanh toán."); await render(); await showDetail(db,id);
         } catch(err) { notify(err.message||"Không thể lưu giao dịch."); }
