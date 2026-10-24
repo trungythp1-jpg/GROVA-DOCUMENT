@@ -41,11 +41,12 @@
         </div>
         <div id="debtEditor" class="debt-editor" hidden></div>
         <div class="debt-table-wrap"><table class="debt-table"><thead><tr><th>Công trình</th><th>Khách hàng</th><th>Giá trị hợp đồng</th><th>Phải thu</th><th>Đã thu</th><th>Còn thu</th><th>Phải trả</th><th>Đã trả</th><th>Còn trả</th><th></th></tr></thead><tbody>
-        ${debts.map(d=>`<tr><td><b>${esc(d.projectCode||"—")}</b><div>${esc(d.projectName||"")}</div></td><td>${esc(d.customerName||"—")}</td><td>${money(d.contractAmount)}</td><td>${money(d.receivableAmount)}</td><td>${money(d.receivedAmount)}</td><td>${money(Math.max(0,Number(d.receivableAmount||0)-Number(d.receivedAmount||0)))}</td><td>${money(d.payableAmount)}</td><td>${money(d.paidAmount)}</td><td>${money(Math.max(0,Number(d.payableAmount||0)-Number(d.paidAmount||0)))}</td><td><button class="secondary" data-debt-action="detail" data-id="${esc(d.id)}">Chi tiết</button></td></tr>`).join("")}
+        ${debts.map(d=>`<tr><td><b>${esc(d.projectCode||"—")}</b><div>${esc(d.projectName||"")}</div></td><td>${esc(d.customerName||"—")}</td><td>${money(d.contractAmount)}</td><td>${money(d.receivableAmount)}</td><td>${money(d.receivedAmount)}</td><td>${money(Math.max(0,Number(d.receivableAmount||0)-Number(d.receivedAmount||0)))}</td><td>${money(d.payableAmount)}</td><td>${money(d.paidAmount)}</td><td>${money(Math.max(0,Number(d.payableAmount||0)-Number(d.paidAmount||0)))}</td><td><div class="debt-actions-inline"><button class="secondary" data-debt-action="detail" data-id="${esc(d.id)}">Chi tiết</button><button class="danger" data-debt-action="delete" data-id="${esc(d.id)}">Xóa</button></div></td></tr>`).join("")}
         ${debts.length ? "" : '<tr><td colspan="10" class="debt-empty">Chưa có hồ sơ công nợ.</td></tr>'}
         </tbody></table></div>`;
       host.querySelector('[data-debt-action="new"]').addEventListener("click",()=>showCreate(available));
       host.querySelectorAll('[data-debt-action="detail"]').forEach(b=>b.addEventListener("click",()=>showDetail(db,b.dataset.id)));
+      host.querySelectorAll('[data-debt-action="delete"]').forEach(b=>b.addEventListener("click",async()=>{const d=debts.find(x=>String(x.id)===String(b.dataset.id));if(!d)return;if(!confirm(`Xóa hồ sơ công nợ của ${d.projectCode||d.projectName||"công trình này"}? Toàn bộ lịch sử thu/chi trong hồ sơ sẽ bị xóa. Công trình vẫn được giữ nguyên.`))return;try{await root.GROVA_DEBT_SERVICE.deleteDebt(db,d.id);notify("Đã xóa hồ sơ công nợ.");await render();}catch(err){notify(err.message||"Không thể xóa hồ sơ công nợ.");}}));
     } catch (e) {
       host.innerHTML = '<div class="debt-error">'+esc(e.message||"Không tải được công nợ.")+'</div>';
     }
@@ -92,6 +93,7 @@
         <h4>Ghi nhận thanh toán</h4>
         <form id="debtTxForm" class="debt-form">
           <label>Loại giao dịch<select name="direction"><option value="receivable">Thu tiền khách hàng</option><option value="payable">Chi / thanh toán</option></select></label>
+          <label>Đợt thanh toán<select name="installment">${Array.from({length:10},(_,i)=>`<option value="${i+1}">Đợt ${i+1}</option>`).join("")}<option value="supplemental">Phát sinh / bổ sung</option></select></label>
           <label>Ngày<input name="date" type="date" value="${new Date().toISOString().slice(0,10)}" required></label>
           <label>Số tiền (VND)<input name="amount" type="number" min="1" step="1" required></label>
           <label>Phương thức<input name="method" placeholder="Chuyển khoản / tiền mặt"></label>
@@ -100,7 +102,7 @@
           <div class="full debt-actions"><button class="primary" type="submit">Lưu thanh toán</button></div>
         </form>
         <h4>Lịch sử thu / chi</h4>
-        <div class="debt-table-wrap"><table class="debt-table"><thead><tr><th>Ngày</th><th>Loại</th><th>Số tiền</th><th>Phương thức</th><th>Chứng từ</th><th>Ghi chú</th></tr></thead><tbody>${txItems.map(t=>`<tr><td>${esc(t.date)}</td><td>${t.direction==="receivable"?"Thu":"Chi"}${t.voidedAt?" (Đã hủy)":""}</td><td>${money(t.amount)}</td><td>${esc(t.method)}</td><td>${esc(t.reference)}</td><td>${esc(t.note)}</td></tr>`).join("")||'<tr><td colspan="6" class="debt-empty">Chưa có giao dịch.</td></tr>'}</tbody></table></div>`;
+        <div class="debt-table-wrap"><table class="debt-table"><thead><tr><th>Ngày</th><th>Loại</th><th>Đợt</th><th>Số tiền</th><th>Phương thức</th><th>Chứng từ</th><th>Ghi chú</th></tr></thead><tbody>${txItems.map(t=>`<tr><td>${esc(t.date)}</td><td>${t.direction==="receivable"?"Thu":"Chi"}${t.voidedAt?" (Đã hủy)":""}</td><td>${t.installment==="supplemental"?"Bổ sung":("Đợt "+esc(t.installment||1))}</td><td>${money(t.amount)}</td><td>${esc(t.method)}</td><td>${esc(t.reference)}</td><td>${esc(t.note)}</td></tr>`).join("")||'<tr><td colspan="7" class="debt-empty">Chưa có giao dịch.</td></tr>'}</tbody></table></div>`;
       editor.querySelector('[data-debt-action="cancel"]').onclick=()=>{editor.hidden=true;};
       editor.querySelector("#debtTxForm").onsubmit=async e=>{
         e.preventDefault();
