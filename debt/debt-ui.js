@@ -146,15 +146,20 @@
       };
       const txAmount=()=>{
         if(txMode.value==="amount") return Math.max(0,Math.round(Number(txDirect.value||0)));
-        const base=txDirection.value==="receivable" ? Number(debt.receivableOutstanding||0) : Number(debt.payableOutstanding||0);
-        return Math.round(base*Math.min(100,Math.max(0,Number(txPercent.value||0)))/100);
+        const contractBase=Number(debt.contractAmount||0);
+        const totalBase=txDirection.value==="receivable" ? Number(debt.receivableAmount||0) : Number(debt.payableAmount||0);
+        const base=contractBase>0 ? contractBase : totalBase;
+        const pct=Math.min(100,Math.max(0,Number(txPercent.value||0)));
+        const requested=Math.round(base*pct/100);
+        const already=txItems.filter(t=>!t.voidedAt&&t.direction===txDirection.value).reduce((sum,t)=>sum+Number(t.amount||0),0);
+        return Math.min(requested,Math.max(0,base-already));
       };
       const updateTxPreview=()=>{
         const byPercent=txMode.value==="percent";
         txPercentWrap.hidden=!byPercent;txDirectWrap.hidden=byPercent;
         txPercent.required=byPercent;txDirect.required=!byPercent;
         const base=txDirection.value==="receivable" ? Number(debt.receivableOutstanding||0) : Number(debt.payableOutstanding||0);
-        txBasis.textContent="Tính theo số dư "+(txDirection.value==="receivable"?"phải thu":"phải trả")+" hiện tại: "+money(base);
+        txBasis.textContent="Tính theo tổng hợp đồng "+money(Number(debt.contractAmount||0))+"; phần trăm áp dụng trên tổng hợp đồng, không phải số dư còn lại.";
         txPreview.textContent=money(txAmount());refreshInstallments();
       };
       [txDirection,txMode,txPercent,txDirect].forEach(el=>el.addEventListener("input",updateTxPreview));
