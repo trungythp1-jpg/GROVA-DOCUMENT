@@ -46,6 +46,11 @@
       subtitle: "Quản lý công trình và tiến độ"
     },
 
+    debts: {
+      title: "Công nợ",
+      subtitle: "Theo dõi phải thu, phải trả và lịch sử thanh toán"
+    },
+
     customers: {
       title: "Khách hàng",
       subtitle: "Quản lý thông tin khách hàng"
@@ -2609,7 +2614,7 @@
 
     $$(".nav-item[data-page]").forEach((button) => {
       const page = button.dataset.page;
-      const allowed = canViewPage(page);
+      const allowed = page === "debts" ? isAdminUser() : canViewPage(page);
       button.style.display = allowed ? "" : "none";
       button.setAttribute("aria-hidden", allowed ? "false" : "true");
     });
@@ -2633,7 +2638,7 @@
       page = "dashboard";
     }
 
-    if (page !== "dashboard" && !canViewPage(page)) {
+    if (page !== "dashboard" && !(page === "debts" && isAdminUser()) && !canViewPage(page)) {
       refreshPermissionUI();
       showPermissionDenied(page);
       page = "dashboard";
@@ -2679,6 +2684,21 @@
 
     if (page === "projects") {
       renderProjects();
+    }
+
+    if (page === "debts") {
+      if (!isAdminUser()) {
+        showToast("Chỉ Admin được sử dụng mục Công nợ.");
+        showPage("dashboard");
+        return;
+      }
+      window.GROVA_DEBT_CONTEXT = {
+        isAdmin: () => isAdminUser(),
+        getDb: () => initializeFirestore() ? firestoreDb : null,
+        getProjects: () => getProjects(),
+        toast: (message) => showToast(message)
+      };
+      if (window.GROVA_DEBT_UI) void window.GROVA_DEBT_UI.render();
     }
 
     if (page === "customers") {
