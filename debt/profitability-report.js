@@ -24,6 +24,14 @@
     $("profitReportMeta").textContent="Báo cáo ước tính · "+stops+" stop · VAT "+(vr*100).toLocaleString("vi-VN")+"% · TNDN giả định "+(cr*100).toLocaleString("vi-VN")+"%";
   }
   root.addEventListener("input",calculate); root.addEventListener("change",calculate);
-  $("profitPrint").addEventListener("click",function(){calculate();window.print();});
+  $("profitPrint").addEventListener("click",function(){
+    calculate();
+    const style=document.createElement("style");
+    style.id="profitReportPrintStyle";
+    style.textContent="@media print{body *{visibility:hidden!important}#profitabilityReport,#profitabilityReport *{visibility:visible!important}#profitabilityReport{position:absolute;left:0;top:0;width:100%;padding:0!important;border:0!important;box-shadow:none!important}#profitInputs{display:none!important}#profitReportResults{display:block!important}.profit-report-heading button{display:none!important}.profit-results-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}";
+    document.head.appendChild(style);
+    window.print();
+    setTimeout(function(){const added=document.getElementById("profitReportPrintStyle");if(added)added.remove();},500);
+  });
   calculate();
 })();
