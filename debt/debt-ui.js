@@ -130,6 +130,20 @@
       const txDirectWrap=txForm.querySelector("#debtTxDirectWrap");
       const txPreview=txForm.querySelector("#debtTxAmountPreview");
       const txBasis=txForm.querySelector("#debtTxBasis");
+      const installmentSelect=txForm.querySelector('[name="installment"]');
+      const usedInstallments=()=>new Set(txItems.filter(t=>!t.voidedAt&&t.direction===txDirection.value&&String(t.installment||"1")!=="supplemental").map(t=>String(t.installment||"1")));
+      const refreshInstallments=()=>{
+        const used=usedInstallments();
+        Array.from(installmentSelect.options).forEach(opt=>{
+          if(opt.value==="supplemental"){opt.disabled=false;opt.textContent="Phát sinh / bổ sung";return;}
+          const taken=used.has(String(opt.value));opt.disabled=taken;
+          opt.textContent=taken?"Đợt "+opt.value+" — đã ghi nhận":"Đợt "+opt.value;
+        });
+        if(installmentSelect.selectedOptions[0]&&installmentSelect.selectedOptions[0].disabled){
+          const next=Array.from(installmentSelect.options).find(o=>!o.disabled);
+          if(next) installmentSelect.value=next.value;
+        }
+      };
       const txAmount=()=>{
         if(txMode.value==="amount") return Math.max(0,Math.round(Number(txDirect.value||0)));
         const base=txDirection.value==="receivable" ? Number(debt.receivableOutstanding||0) : Number(debt.payableOutstanding||0);
@@ -141,10 +155,11 @@
         txPercent.required=byPercent;txDirect.required=!byPercent;
         const base=txDirection.value==="receivable" ? Number(debt.receivableOutstanding||0) : Number(debt.payableOutstanding||0);
         txBasis.textContent="Tính theo số dư "+(txDirection.value==="receivable"?"phải thu":"phải trả")+" hiện tại: "+money(base);
-        txPreview.textContent=money(txAmount());
+        txPreview.textContent=money(txAmount());refreshInstallments();
       };
       [txDirection,txMode,txPercent,txDirect].forEach(el=>el.addEventListener("input",updateTxPreview));
       [txDirection,txMode].forEach(el=>el.addEventListener("change",updateTxPreview));
+      installmentSelect.addEventListener("change",refreshInstallments);
       updateTxPreview();
       editor.querySelector('[data-debt-action="cancel"]').onclick=()=>{editor.hidden=true;};
       txForm.onsubmit=async e=>{
