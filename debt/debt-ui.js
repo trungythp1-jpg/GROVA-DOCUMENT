@@ -110,7 +110,10 @@
           <label>Loại giao dịch<select name="direction"><option value="receivable">Thu tiền khách hàng</option><option value="payable">Chi / thanh toán</option></select></label>
           <label>Đợt thanh toán<select name="installment">${Array.from({length:10},(_,i)=>`<option value="${i+1}">Đợt ${i+1}</option>`).join("")}<option value="supplemental">Phát sinh / bổ sung</option></select></label>
           <label>Ngày<input name="date" type="date" value="${new Date().toISOString().slice(0,10)}" required></label>
-          <label>Số tiền (VND)<input name="amount" type="number" min="1" step="1" required></label>
+          <label>Cách nhập số tiền<select name="amountMode" id="debtTxAmountMode"><option value="percent">Theo % giá trị phải thu / phải trả</option><option value="amount">Nhập số tiền trực tiếp</option></select></label>
+          <label id="debtTxPercentWrap">Tỷ lệ thanh toán (%)<input name="percent" id="debtTxPercent" type="number" min="0.01" max="100" step="0.01" value="40" required></label>
+          <label id="debtTxDirectWrap" hidden>Số tiền (VND)<input name="directAmount" id="debtTxDirectAmount" type="number" min="1" step="1" value="1"></label>
+          <div class="full debt-calculation-preview"><span>Số tiền giao dịch</span><strong id="debtTxAmountPreview">0 ₫</strong><span id="debtTxBasis">Tính theo số dư phải thu / phải trả hiện tại.</span></div>
           <label>Phương thức<input name="method" placeholder="Chuyển khoản / tiền mặt"></label>
           <label>Mã chứng từ<input name="reference" placeholder="Số phiếu / giao dịch"></label>
           <label>Ghi chú<input name="note" placeholder="Nội dung thanh toán"></label>
@@ -118,13 +121,38 @@
         </form>
         <h4>Lịch sử thu / chi</h4>
         <div class="debt-table-wrap"><table class="debt-table"><thead><tr><th>Ngày</th><th>Loại</th><th>Đợt</th><th>Số tiền</th><th>Phương thức</th><th>Chứng từ</th><th>Ghi chú</th></tr></thead><tbody>${txItems.map(t=>`<tr><td>${esc(t.date)}</td><td>${t.direction==="receivable"?"Thu":"Chi"}${t.voidedAt?" (Đã hủy)":""}</td><td>${t.installment==="supplemental"?"Bổ sung":("Đợt "+esc(t.installment||1))}</td><td>${money(t.amount)}</td><td>${esc(t.method)}</td><td>${esc(t.reference)}</td><td>${esc(t.note)}</td></tr>`).join("")||'<tr><td colspan="7" class="debt-empty">Chưa có giao dịch.</td></tr>'}</tbody></table></div>`;
+      const txForm=editor.querySelector("#debtTxForm");
+      const txDirection=txForm.querySelector('[name="direction"]');
+      const txMode=txForm.querySelector("#debtTxAmountMode");
+      const txPercent=txForm.querySelector("#debtTxPercent");
+      const txDirect=txForm.querySelector("#debtTxDirectAmount");
+      const txPercentWrap=txForm.querySelector("#debtTxPercentWrap");
+      const txDirectWrap=txForm.querySelector("#debtTxDirectWrap");
+      const txPreview=txForm.querySelector("#debtTxAmountPreview");
+      const txBasis=txForm.querySelector("#debtTxBasis");
+      const txAmount=()=>{
+        if(txMode.value==="amount") return Math.max(0,Math.round(Number(txDirect.value||0)));
+        const base=txDirection.value==="receivable" ? Number(debt.receivableOutstanding||0) : Number(debt.payableOutstanding||0);
+        return Math.round(base*Math.min(100,Math.max(0,Number(txPercent.value||0)))/100);
+      };
+      const updateTxPreview=()=>{
+        const byPercent=txMode.value==="percent";
+        txPercentWrap.hidden=!byPercent;txDirectWrap.hidden=byPercent;
+        txPercent.required=byPercent;txDirect.required=!byPercent;
+        const base=txDirection.value==="receivable" ? Number(debt.receivableOutstanding||0) : Number(debt.payableOutstanding||0);
+        txBasis.textContent="Tính theo số dư "+(txDirection.value==="receivable"?"phải thu":"phải trả")+" hiện tại: "+money(base);
+        txPreview.textContent=money(txAmount());
+      };
+      [txDirection,txMode,txPercent,txDirect].forEach(el=>el.addEventListener("input",updateTxPreview));
+      [txDirection,txMode].forEach(el=>el.addEventListener("change",updateTxPreview));
+      updateTxPreview();
       editor.querySelector('[data-debt-action="cancel"]').onclick=()=>{editor.hidden=true;};
-      editor.querySelector("#debtTxForm").onsubmit=async e=>{
+      txForm.onsubmit=async e=>{
         e.preventDefault();
         try {
           const fd=new FormData(e.currentTarget);
           const txId=(root.crypto&&root.crypto.randomUUID)?root.crypto.randomUUID():"TX-"+Date.now()+"-"+Math.random().toString(36).slice(2,10);
-          const result=await root.GROVA_DEBT_SERVICE.recordTransaction(db,id,txId,{direction:fd.get("direction"),installment:fd.get("installment"),date:fd.get("date"),amount:Number(fd.get("amount")),method:fd.get("method"),reference:fd.get("reference"),note:fd.get("note")});
+          const result=await root.GROVA_DEBT_SERVICE.recordTransaction(db,id,txId,{direction:fd.get("direction"),installment:fd.get("installment"),date:fd.get("date"),amount:txAmount(),method:fd.get("method"),reference:fd.get("reference"),note:fd.get("note")});
           if(result.duplicate) throw new Error("Giao dịch đã tồn tại; không ghi trùng.");
           notify("Đã lưu giao dịch thanh toán."); await render(); await showDetail(db,id);
         } catch(err) { notify(err.message||"Không thể lưu giao dịch."); }
