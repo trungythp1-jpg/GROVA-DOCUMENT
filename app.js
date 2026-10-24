@@ -2696,6 +2696,7 @@
         isAdmin: () => isAdminUser(),
         getDb: () => initializeFirestore() ? firestoreDb : null,
         getProjects: () => getProjects(),
+        getEmployees: () => getEmployees(),
         toast: (message) => showToast(message)
       };
       if (window.GROVA_DEBT_UI) void window.GROVA_DEBT_UI.render();
