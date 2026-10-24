@@ -121,6 +121,18 @@
     editor.scrollIntoView({behavior:"smooth",block:"start"});
   }
 
+  function renderLaborAccounts(debt) {
+    const accounts = Array.isArray(debt.laborAccounts) ? debt.laborAccounts : [];
+    if (!accounts.length) return '<p class="debt-empty">Chưa có hồ sơ tiền công nhân viên trong công trình này.</p>';
+    return accounts.map(function(a) {
+      const payments = Array.isArray(a.payments) ? a.payments : [];
+      const paid = payments.filter(function(p) { return !p.voidedAt; }).reduce(function(s,p) { return s + Number(p.amount || 0); }, 0);
+      const history = payments.map(function(p) { return '<tr><td>' + esc(p.date || '') + '</td><td>' + (p.kind === 'advance' ? 'Tạm ứng' : 'Thanh toán') + '</td><td>' + money(p.amount) + '</td><td>' + esc(p.method || '—') + '</td><td>' + esc(p.reference || '—') + '</td><td>' + esc(p.note || '—') + '</td></tr>'; }).join('');
+      return '<section class="debt-labor-card"><div class="debt-toolbar"><div><h4>' + esc(a.employeeName) + '</h4><p>' + esc(a.position || 'Nhân viên') + ' · Tổng tiền công ' + money(a.agreedAmount) + '</p></div><div class="debt-labor-balance"><small>Còn phải trả</small><strong>' + money(Math.max(0, Number(a.agreedAmount || 0) - paid)) + '</strong></div></div>' +
+        '<form class="debt-labor-payment-form debt-form" data-account-id="' + esc(a.id) + '"><label>Loại thanh toán<select name="kind"><option value="advance">Tạm ứng</option><option value="payment">Thanh toán tiền công</option></select></label><label>Ngày<input name="date" type="date" value="' + new Date().toISOString().slice(0,10) + '" required></label><label>Cách nhập số tiền<select name="mode"><option value="percent">Theo % tổng tiền công</option><option value="amount">Nhập số tiền trực tiếp</option></select></label><label class="labor-percent-label">Tỷ lệ (%)<input name="percent" type="number" min="0.01" max="100" step="0.01" value="50"></label><label class="labor-direct-label" hidden>Số tiền (VND)<input name="directAmount" type="text" inputmode="numeric" placeholder="Ví dụ: 5.000.000"></label><div class="full debt-calculation-preview"><span>Số tiền trả</span><strong data-labor-preview>0 ₫</strong><span data-labor-basis></span></div><label>Phương thức<input name="method" placeholder="Chuyển khoản / tiền mặt"></label><label>Mã chứng từ<input name="reference" placeholder="Số phiếu / giao dịch"></label><label>Ghi chú<input name="note" placeholder="Nội dung thanh toán"></label><div class="full debt-actions"><button class="primary" type="submit">Lưu lần trả tiền</button></div></form>' +
+        '<h5>Lịch sử trả tiền</h5><div class="debt-table-wrap"><table class="debt-table"><thead><tr><th>Ngày</th><th>Loại</th><th>Số tiền</th><th>Phương thức</th><th>Chứng từ</th><th>Ghi chú</th></tr></thead><tbody>' + (history || '<tr><td colspan="6" class="debt-empty">Chưa có lần trả tiền.</td></tr>') + '</tbody></table></div></section>';
+    }).join('');
+  }
   async function showDetail(db, id) {
     const editor=document.getElementById("debtEditor"); if(!editor)return;
     try {
@@ -133,7 +145,7 @@
         <div class="debt-summary"><div><small>Phải thu còn lại</small><strong>${money(debt.receivableOutstanding)}</strong></div><div><small>Phải trả còn lại</small><strong>${money(debt.payableOutstanding)}</strong></div><div><small>Đã thu</small><strong>${money(debt.receivedAmount)}</strong></div><div><small>Đã trả</small><strong>${money(debt.paidAmount)}</strong></div></div>
         <h4>Ghi nhận thanh toán</h4>
         <form id="debtTxForm" class="debt-form">
-          <label>Loại giao dịch<select name="direction"><option value="receivable">Thu tiền khách hàng</option><option value="payable">Chi / thanh toán</option></select></label>
+          <label>Loại giao dịch<select name="direction"><option value="receivable">Thu tiền khách hàng</option></select></label>
           <label>Đợt thanh toán<select name="installment">${Array.from({length:10},(_,i)=>`<option value="${i+1}">Đợt ${i+1}</option>`).join("")}<option value="supplemental">Phát sinh / bổ sung</option></select></label>
           <label>Ngày<input name="date" type="date" value="${new Date().toISOString().slice(0,10)}" required></label>
           <label>Cách nhập số tiền<select name="amountMode" id="debtTxAmountMode"><option value="percent">Theo % giá trị phải thu / phải trả</option><option value="amount">Nhập số tiền trực tiếp</option></select></label>
@@ -145,8 +157,26 @@
           <label>Ghi chú<input name="note" placeholder="Nội dung thanh toán"></label>
           <div class="full debt-actions"><button class="primary" type="submit">Lưu thanh toán</button></div>
         </form>
-        <h4>Lịch sử thu / chi</h4>
-        <div class="debt-table-wrap"><table class="debt-table"><thead><tr><th>Ngày</th><th>Loại</th><th>Đợt</th><th>Số tiền</th><th>Phương thức</th><th>Chứng từ</th><th>Ghi chú</th></tr></thead><tbody>${txItems.map(t=>`<tr><td>${esc(t.date)}</td><td>${t.direction==="receivable"?"Thu":"Chi"}${t.voidedAt?" (Đã hủy)":""}</td><td>${t.installment==="supplemental"?"Bổ sung":("Đợt "+esc(t.installment||1))}</td><td>${money(t.amount)}</td><td>${esc(t.method)}</td><td>${esc(t.reference)}</td><td>${esc(t.note)}</td></tr>`).join("")||'<tr><td colspan="7" class="debt-empty">Chưa có giao dịch.</td></tr>'}</tbody></table></div>`;
+        <h4>Lịch sử thu khách hàng</h4>
+        <div class="debt-table-wrap"><table class="debt-table"><thead><tr><th>Ngày</th><th>Loại</th><th>Đợt</th><th>Số tiền</th><th>Phương thức</th><th>Chứng từ</th><th>Ghi chú</th></tr></thead><tbody>${txItems.map(t=>`<tr><td>${esc(t.date)}</td><td>${t.direction==="receivable"?"Thu":"Chi"}${t.voidedAt?" (Đã hủy)":""}</td><td>${t.installment==="supplemental"?"Bổ sung":("Đợt "+esc(t.installment||1))}</td><td>${money(t.amount)}</td><td>${esc(t.method)}</td><td>${esc(t.reference)}</td><td>${esc(t.note)}</td></tr>`).join("")||'<tr><td colspan="7" class="debt-empty">Chưa có giao dịch.</td></tr>'}</tbody></table></div>
+        <hr class="debt-section-divider"><h3>Phải trả nhân công</h3><p class="debt-muted">Mỗi nhân viên có tổng tiền công thỏa thuận, tạm ứng và lịch sử thực trả riêng.</p>
+        <form id="debtLaborCreateForm" class="debt-form"><label>Nhân viên nhận tiền<select name="employeeId" required><option value="">-- Chọn nhân viên --</option>${(root.GROVA_DEBT_CONTEXT.getEmployees ? root.GROVA_DEBT_CONTEXT.getEmployees() : []).map(e => `<option value="${esc(e.id)}">${esc(e.name || "Chưa có tên")}${e.position ? " — " + esc(e.position) : ""}</option>`).join("")}</select></label><label>Tổng tiền công thỏa thuận (VND)<input name="agreedAmount" type="text" inputmode="numeric" placeholder="Ví dụ: 20.000.000" required></label><div class="full debt-actions"><button class="primary" type="submit">＋ Thêm nhân công</button></div></form>
+        <div class="debt-labor-accounts">${renderLaborAccounts(debt)}</div>`;
+      const employees = root.GROVA_DEBT_CONTEXT.getEmployees ? root.GROVA_DEBT_CONTEXT.getEmployees() : [];
+      const parseMoney = value => { const digits = String(value == null ? "" : value).replace(/[^0-9]/g, ""); return digits ? Number(digits) : 0; };
+      const formatMoneyInput = value => { const digits = String(value == null ? "" : value).replace(/[^0-9]/g, ""); return digits ? new Intl.NumberFormat("vi-VN").format(Number(digits)) : ""; };
+      const laborCreate = editor.querySelector("#debtLaborCreateForm");
+      const agreedInput = laborCreate.querySelector("[name=agreedAmount]");
+      agreedInput.addEventListener("input", () => { const f = formatMoneyInput(agreedInput.value); if (f !== agreedInput.value) { const p = agreedInput.selectionStart; agreedInput.value = f; try { agreedInput.setSelectionRange(p,p); } catch (_) {} } });
+      laborCreate.onsubmit = async e => { e.preventDefault(); try { const fd = new FormData(e.currentTarget); const emp = employees.find(x => String(x.id) === String(fd.get("employeeId"))); if (!emp) throw new Error("Vui lòng chọn nhân viên trong danh sách Nhân sự."); await root.GROVA_DEBT_SERVICE.createLaborAccount(db,id,{employeeId:emp.id,employeeName:emp.name,position:emp.position,agreedAmount:parseMoney(fd.get("agreedAmount"))}); notify("Đã thêm hồ sơ tiền công nhân viên."); await showDetail(db,id); await render(); } catch (err) { notify(err.message || "Không thể tạo hồ sơ tiền công."); } };
+      editor.querySelectorAll(".debt-labor-payment-form").forEach(form => {
+        const mode=form.querySelector("[name=mode]"), pct=form.querySelector("[name=percent]"), direct=form.querySelector("[name=directAmount]"), pctLabel=form.querySelector(".labor-percent-label"), directLabel=form.querySelector(".labor-direct-label"), preview=form.querySelector("[data-labor-preview]"), basis=form.querySelector("[data-labor-basis]"), account=(debt.laborAccounts||[]).find(a=>String(a.id)===String(form.dataset.accountId));
+        const already=(account.payments||[]).filter(p=>!p.voidedAt).reduce((s,p)=>s+Number(p.amount||0),0);
+        const amount=()=>mode.value==="percent"?Math.min(Math.max(0,Number(account.agreedAmount||0)-already),Math.round(Number(account.agreedAmount||0)*Math.min(100,Math.max(0,Number(pct.value||0)))/100)):parseMoney(direct.value);
+        const update=()=>{const byPct=mode.value==="percent";pctLabel.hidden=!byPct;directLabel.hidden=byPct;pct.required=byPct;direct.required=!byPct;preview.textContent=money(amount());basis.textContent="Tổng tiền công "+money(account.agreedAmount)+"; đã trả "+money(already)+". % tính trên tổng tiền công.";};
+        direct.addEventListener("input",()=>{const f=formatMoneyInput(direct.value);if(f!==direct.value){const p=direct.selectionStart;direct.value=f;try{direct.setSelectionRange(p,p)}catch(_){}}update();}); [mode,pct].forEach(el=>el.addEventListener("input",update)); mode.addEventListener("change",update); update();
+        form.onsubmit=async e=>{e.preventDefault();try{const fd=new FormData(e.currentTarget),amt=amount();if(amt<1)throw new Error("Vui lòng nhập số tiền lớn hơn 0.");const pid=(root.crypto&&root.crypto.randomUUID)?root.crypto.randomUUID():"LABPAY-"+Date.now()+"-"+Math.random().toString(36).slice(2,8);await root.GROVA_DEBT_SERVICE.recordLaborPayment(db,id,account.id,pid,{kind:fd.get("kind"),amount:amt,date:fd.get("date"),method:fd.get("method"),reference:fd.get("reference"),note:fd.get("note")});notify("Đã lưu lần trả tiền nhân công.");await showDetail(db,id);await render();}catch(err){notify(err.message||"Không thể lưu lần trả tiền.");}};
+      });
       const txForm=editor.querySelector("#debtTxForm");
       const txDirection=txForm.querySelector('[name="direction"]');
       const txMode=txForm.querySelector("#debtTxAmountMode");
