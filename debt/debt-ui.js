@@ -120,13 +120,14 @@
     editor.querySelector('[data-debt-action="cancel"]').onclick=()=>{editor.hidden=true;};
     createForm.onsubmit=async e=>{
       e.preventDefault();
+      const submitButton=createForm.querySelector('[type="submit"]');if(submitButton.disabled)return;submitButton.disabled=true;submitButton.textContent="Đang lưu…";
       try {
         const {c,db}=context(); const fd=new FormData(e.currentTarget); const p=c.getProjects().find(x=>String(x.id)===String(fd.get("projectId")));
         if(!p) throw new Error("Không tìm thấy công trình đã chọn.");
         const result=await root.GROVA_DEBT_SERVICE.createDebt(db,{projectId:p.id,projectCode:p.code,projectName:p.name,customerName:p.customer,contractAmount:Number(fd.get("contractAmount")),receivableAmount:computedReceivable(),payableAmount:0});
         if(result.alreadyExists) throw new Error("Công trình này đã có hồ sơ công nợ. Hãy mở hồ sơ hiện có.");
         notify("Đã tạo hồ sơ công nợ."); await render();
-      } catch(err) { notify(err.message||"Không thể tạo hồ sơ công nợ."); }
+      } catch(err) { notify(err.message||"Không thể tạo hồ sơ công nợ."); } finally { if(submitButton.isConnected){submitButton.disabled=false;submitButton.textContent="Lưu hồ sơ";} }
     };
     editor.scrollIntoView({behavior:"smooth",block:"start"});
   }
@@ -148,7 +149,7 @@
     try {
       const debt=await root.GROVA_DEBT_SERVICE.getDebt(db,id);
       if(!debt) throw new Error("Không tìm thấy hồ sơ công nợ.");
-      selectedDebt=id; txItems=await root.GROVA_DEBT_SERVICE.listTransactions(db,id);
+      selectedDebt=id; txItems=(Array.isArray(debt.transactions)?debt.transactions:[]).slice().sort((a,b)=>String(b.date||"").localeCompare(String(a.date||"")));
       editor.hidden=false;
       editor.innerHTML=`
         <div class="debt-toolbar"><div><h3>${esc(debt.projectCode||"")} — ${esc(debt.projectName||"Công nợ")}</h3><p>${esc(debt.customerName||"")}</p></div><button class="secondary" data-debt-action="cancel">Đóng</button></div>
