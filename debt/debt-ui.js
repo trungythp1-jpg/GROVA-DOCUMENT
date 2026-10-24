@@ -112,7 +112,7 @@
           <label>Ngày<input name="date" type="date" value="${new Date().toISOString().slice(0,10)}" required></label>
           <label>Cách nhập số tiền<select name="amountMode" id="debtTxAmountMode"><option value="percent">Theo % giá trị phải thu / phải trả</option><option value="amount">Nhập số tiền trực tiếp</option></select></label>
           <label id="debtTxPercentWrap">Tỷ lệ thanh toán (%)<input name="percent" id="debtTxPercent" type="number" min="0.01" max="100" step="0.01" value="40" required></label>
-          <label id="debtTxDirectWrap" hidden>Số tiền (VND)<input name="directAmount" id="debtTxDirectAmount" type="number" min="1" step="1" value="1"></label>
+          <label id="debtTxDirectWrap" hidden>Số tiền (VND)<input name="directAmount" id="debtTxDirectAmount" type="text" inputmode="numeric" autocomplete="off" placeholder="Ví dụ: 5.000.000"></label>
           <div class="full debt-calculation-preview"><span>Số tiền giao dịch</span><strong id="debtTxAmountPreview">0 ₫</strong><span id="debtTxBasis">Tính theo số dư phải thu / phải trả hiện tại.</span></div>
           <label>Phương thức<input name="method" placeholder="Chuyển khoản / tiền mặt"></label>
           <label>Mã chứng từ<input name="reference" placeholder="Số phiếu / giao dịch"></label>
@@ -144,8 +144,10 @@
           if(next) installmentSelect.value=next.value;
         }
       };
+      const parseVnd=(value)=>{const digits=String(value==null?"":value).replace(/[^0-9]/g,"");return digits?Number(digits):0;};
+      const formatVndInput=(value)=>{const digits=String(value==null?"":value).replace(/[^0-9]/g,"");return digits?new Intl.NumberFormat("vi-VN").format(Number(digits)):"";};
       const txAmount=()=>{
-        if(txMode.value==="amount") return Math.max(0,Math.round(Number(txDirect.value||0)));
+        if(txMode.value==="amount") return parseVnd(txDirect.value);
         const contractBase=Number(debt.contractAmount||0);
         const totalBase=txDirection.value==="receivable" ? Number(debt.receivableAmount||0) : Number(debt.payableAmount||0);
         const base=contractBase>0 ? contractBase : totalBase;
@@ -162,7 +164,8 @@
         txBasis.textContent="Tính theo tổng hợp đồng "+money(Number(debt.contractAmount||0))+"; phần trăm áp dụng trên tổng hợp đồng, không phải số dư còn lại.";
         txPreview.textContent=money(txAmount());refreshInstallments();
       };
-      [txDirection,txMode,txPercent,txDirect].forEach(el=>el.addEventListener("input",updateTxPreview));
+      txDirect.addEventListener("input",()=>{const before=txDirect.value;const formatted=formatVndInput(before);if(before!==formatted){const end=txDirect.selectionStart;txDirect.value=formatted;try{txDirect.setSelectionRange(end,end);}catch(_){}}updateTxPreview();});
+      [txDirection,txMode,txPercent].forEach(el=>el.addEventListener("input",updateTxPreview));
       [txDirection,txMode].forEach(el=>el.addEventListener("change",updateTxPreview));
       installmentSelect.addEventListener("change",refreshInstallments);
       updateTxPreview();
