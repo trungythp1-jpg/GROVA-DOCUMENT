@@ -91,7 +91,6 @@
         <label>Cách tính phải thu<select name="receivableMode" id="debtReceivableMode"><option value="percent">Theo % hợp đồng</option><option value="amount">Nhập số tiền trực tiếp</option></select></label>
         <label id="debtPercentWrap">Tỷ lệ phải thu (%)<input name="receivablePercent" id="debtReceivablePercent" type="number" min="0" max="100" step="0.01" value="100" required></label>
         <label id="debtAmountWrap" hidden>Tổng phải thu (VND)<input name="receivableDirectAmount" id="debtReceivableDirectAmount" type="number" min="0" step="1" value="0"></label>
-        <label>Tổng phải trả (VND)<input name="payableAmount" type="number" min="0" step="1" value="0" required></label>
         <div class="full debt-calculation-preview"><span>Tiền phải thu</span><strong id="debtReceivablePreview">0 ₫</strong><span>Số còn phải thu sẽ tự trừ các khoản đã nhận.</span></div>
         <div class="full debt-actions"><button type="button" class="secondary" data-debt-action="cancel">Hủy</button><button type="submit" class="primary">Lưu hồ sơ</button></div>
       </form>`;
@@ -113,7 +112,7 @@
       try {
         const {c,db}=context(); const fd=new FormData(e.currentTarget); const p=c.getProjects().find(x=>String(x.id)===String(fd.get("projectId")));
         if(!p) throw new Error("Không tìm thấy công trình đã chọn.");
-        const result=await root.GROVA_DEBT_SERVICE.createDebt(db,{projectId:p.id,projectCode:p.code,projectName:p.name,customerName:p.customer,contractAmount:Number(fd.get("contractAmount")),receivableAmount:computedReceivable(),payableAmount:Number(fd.get("payableAmount"))});
+        const result=await root.GROVA_DEBT_SERVICE.createDebt(db,{projectId:p.id,projectCode:p.code,projectName:p.name,customerName:p.customer,contractAmount:Number(fd.get("contractAmount")),receivableAmount:computedReceivable(),payableAmount:0});
         if(result.alreadyExists) throw new Error("Công trình này đã có hồ sơ công nợ. Hãy mở hồ sơ hiện có.");
         notify("Đã tạo hồ sơ công nợ."); await render();
       } catch(err) { notify(err.message||"Không thể tạo hồ sơ công nợ."); }
@@ -168,7 +167,7 @@
       const laborCreate = editor.querySelector("#debtLaborCreateForm");
       const agreedInput = laborCreate.querySelector("[name=agreedAmount]");
       agreedInput.addEventListener("input", () => { const f = formatMoneyInput(agreedInput.value); if (f !== agreedInput.value) { const p = agreedInput.selectionStart; agreedInput.value = f; try { agreedInput.setSelectionRange(p,p); } catch (_) {} } });
-      laborCreate.onsubmit = async e => { e.preventDefault(); try { const fd = new FormData(e.currentTarget); const emp = employees.find(x => String(x.id) === String(fd.get("employeeId"))); if (!emp) throw new Error("Vui lòng chọn nhân viên trong danh sách Nhân sự."); await root.GROVA_DEBT_SERVICE.createLaborAccount(db,id,{employeeId:emp.id,employeeName:emp.name,position:emp.position,agreedAmount:parseMoney(fd.get("agreedAmount"))}); notify("Đã thêm hồ sơ tiền công nhân viên."); await showDetail(db,id); await render(); } catch (err) { notify(err.message || "Không thể tạo hồ sơ tiền công."); } };
+      laborCreate.onsubmit = async e => { e.preventDefault(); try { const fd = new FormData(e.currentTarget); const emp = employees.find(x => String(x.id) === String(fd.get("employeeId"))); if (!emp) throw new Error("Vui lòng chọn nhân viên trong danh sách Nhân sự."); await root.GROVA_DEBT_SERVICE.createLaborAccount(db,id,{employeeId:emp.id,employeeName:emp.name,position:emp.position,agreedAmount:parseMoney(fd.get("agreedAmount"))}); notify("Đã thêm hồ sơ tiền công nhân viên."); await render(); await showDetail(db,id); } catch (err) { notify(err.message || "Không thể tạo hồ sơ tiền công."); } };
       editor.querySelectorAll(".debt-labor-payment-form").forEach(form => {
         const mode=form.querySelector("[name=mode]"), pct=form.querySelector("[name=percent]"), direct=form.querySelector("[name=directAmount]"), pctLabel=form.querySelector(".labor-percent-label"), directLabel=form.querySelector(".labor-direct-label"), preview=form.querySelector("[data-labor-preview]"), basis=form.querySelector("[data-labor-basis]"), account=(debt.laborAccounts||[]).find(a=>String(a.id)===String(form.dataset.accountId));
         const already=(account.payments||[]).filter(p=>!p.voidedAt).reduce((s,p)=>s+Number(p.amount||0),0);
