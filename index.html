@@ -84,7 +84,7 @@
 
   <link
     rel="stylesheet"
-    href="./style.css?v=205"
+    href="./style.css?v=206"
   >
 
   <!-- =====================================================
@@ -750,6 +750,46 @@
             <div><small>QUẢN LÝ TÀI CHÍNH</small><h2>Công nợ</h2><p>Theo dõi phải thu, phải trả và lịch sử thanh toán theo từng công trình.</p></div>
           </div>
           <section class="panel debt-panel"><div id="debtPageContent"><p>Đang tải công nợ...</p></div></section>
+
+          <section id="profitabilityReport" class="panel debt-panel profit-report-panel">
+            <div class="profit-report-heading">
+              <div><small>CHỈ DÀNH CHO NỘI BỘ</small><h3>Báo cáo lợi nhuận công trình</h3><p>Ước tính doanh thu, VAT, chi phí lương và thuế TNDN. Không làm thay đổi dữ liệu công nợ.</p></div>
+              <button id="profitPrint" class="secondary" type="button">In báo cáo</button>
+            </div>
+            <div id="profitInputs" class="profit-input-grid">
+              <label>Số stop<input id="profitStops" type="number" min="0" step="1" value="5"></label>
+              <label>Giá bán đã gồm VAT / stop (VND)<input id="profitSalePerStop" type="number" min="0" step="1000" value="2450000"></label>
+              <label>Lương công nhân / stop (VND)<input id="profitLaborPerStop" type="number" min="0" step="1000" value="1500000"></label>
+              <label>Chi phí phát sinh đã chi (VND)<input id="profitExpense" type="number" min="0" step="1000" value="300000"></label>
+              <label>Thuế VAT (%)<select id="profitVatRate"><option value="0">0%</option><option value="5">5%</option><option value="8" selected>8% — giả định mẫu</option><option value="10">10%</option></select></label>
+              <label>Thuế suất TNDN (%)<select id="profitCitRate"><option value="15">15% — nếu đủ điều kiện</option><option value="17">17% — nếu đủ điều kiện</option><option value="20" selected>20% — giả định mẫu</option></select></label>
+            </div>
+            <div class="profit-checks">
+              <label><input id="profitSalaryDeductible" type="checkbox" checked> Hồ sơ tiền lương đủ điều kiện tính chi phí được trừ</label>
+              <label><input id="profitExpenseDeductible" type="checkbox" checked> Chi phí phát sinh đủ điều kiện tính chi phí được trừ</label>
+              <label><input id="profitExpenseVatEligible" type="checkbox" checked> Chi phí phát sinh đã gồm VAT, có hóa đơn hợp lệ để khấu trừ</label>
+            </div>
+            <p id="profitTaxNote" class="profit-report-note"></p>
+            <p id="profitExpenseNote" class="profit-report-note"></p>
+            <div id="profitReportResults">
+              <p id="profitReportMeta" class="profit-report-meta"></p>
+              <div class="profit-results-grid">
+                <div><small>Doanh thu gồm VAT</small><strong id="profitRevenueGross">—</strong></div>
+                <div><small>Doanh thu chưa VAT</small><strong id="profitRevenueNet">—</strong></div>
+                <div><small>VAT đầu ra</small><strong id="profitOutputVat">—</strong></div>
+                <div><small>VAT đầu vào khấu trừ</small><strong id="profitInputVat">—</strong></div>
+                <div><small>VAT phải nộp tạm tính</small><strong id="profitVatDue">—</strong></div>
+                <div><small>Chi phí lương công nhân</small><strong id="profitLaborTotal">—</strong></div>
+                <div><small>Chi phí phát sinh chưa VAT / chi phí ghi nhận</small><strong id="profitExpenseNet">—</strong></div>
+                <div><small>Lợi nhuận trước thuế TNDN</small><strong id="profitBeforeTax">—</strong></div>
+                <div><small>Thu nhập chịu thuế ước tính</small><strong id="profitTaxableEstimate">—</strong></div>
+                <div><small>Thuế TNDN dự kiến</small><strong id="profitCitEstimate">—</strong></div>
+                <div class="profit-result-highlight"><small>Lợi nhuận sau thuế dự kiến</small><strong id="profitAfterTax">—</strong></div>
+                <div><small>Tỷ suất lợi nhuận sau thuế</small><strong id="profitMargin">—</strong></div>
+              </div>
+              <p class="profit-report-disclaimer">Lưu ý: thuế TNDN thực tế được xác định theo kết quả và hồ sơ thuế của toàn doanh nghiệp trong kỳ, không quyết toán riêng theo từng công trình. Các mức thuế trong bảng là giả định để quản trị nội bộ; cần kế toán xác nhận mức VAT, điều kiện khấu trừ và chi phí được trừ trước khi dùng làm số liệu chính thức.</p>
+            </div>
+          </section>
         </section>
 
         <section
@@ -1321,6 +1361,7 @@
   <script src="./debt/debt-domain.js?v=2"></script>
   <script src="./debt/debt-firestore-service.js?v=5"></script>
   <script src="./debt/debt-ui.js?v=16"></script>
+  <script src="./debt/profitability-report.js?v=1"></script>
 
   <script
     src="./app.js?v=240"
