@@ -162,6 +162,13 @@
 
 /* Keep checkbox controls compact; global inputs default to width:100%. */
 .profit-checks input[type="checkbox"]{width:18px;height:18px;min-width:18px;flex:0 0 18px;padding:0;margin-top:2px;}
+
+/* Make the finance module easy to find beneath Settings. */
+.sidebar .nav-item.debt-nav-highlight{position:relative;margin-top:10px;min-height:52px;background:linear-gradient(110deg,#fff3cf,#ffe4a1);border:1px solid #e6b84f;color:#684500;box-shadow:0 5px 16px rgba(177,125,15,.18);font-weight:800;}
+.sidebar .nav-item.debt-nav-highlight .nav-icon{color:#9b6500;font-size:20px;}
+.sidebar .nav-item.debt-nav-highlight:hover,.sidebar .nav-item.debt-nav-highlight.active{background:linear-gradient(110deg,#ffe8a8,#ffd36a);color:#593900;border-color:#dba52c;box-shadow:0 7px 20px rgba(177,125,15,.25);}
+.sidebar .nav-item.debt-nav-highlight .debt-nav-badge{margin-left:auto;padding:4px 6px;border-radius:6px;background:#9b6500;color:#fff;font-size:8px;letter-spacing:.4px;white-space:nowrap;}
+@media(max-width:760px){.sidebar .nav-item.debt-nav-highlight{margin-top:8px;}}
 </style>
 </head>
 
@@ -241,17 +248,6 @@
 
         <button
           class="nav-item"
-          data-page="debts"
-          type="button"
-          id="debtNavItem"
-          style="display:none"
-        >
-          <span class="nav-icon">＄</span>
-          <span>Công nợ</span>
-        </button>
-
-        <button
-          class="nav-item"
           data-page="employees"
           type="button"
         >
@@ -295,6 +291,18 @@
         >
           <span class="nav-icon">⚙</span>
           <span>Cài đặt</span>
+        </button>
+
+        <button
+          class="nav-item debt-nav-highlight"
+          data-page="debts"
+          type="button"
+          id="debtNavItem"
+          aria-label="Công nợ — quản lý tài chính"
+        >
+          <span class="nav-icon">＄</span>
+          <span>Công nợ</span>
+          <span class="debt-nav-badge">TÀI CHÍNH</span>
         </button>
 
       </nav>
