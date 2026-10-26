@@ -35,6 +35,8 @@
         </div>
         <div class="debt-list-tools">
           <label class="debt-search-label">Tìm kiếm công trình<input id="debtSearchInput" type="search" placeholder="Nhập mã công trình, tên công trình hoặc khách hàng..."></label>
+          <label class="debt-search-label">Lọc theo khách hàng<input id="debtCustomerFilter" type="search" placeholder="Nhập tên khách hàng..."></label>
+          <label class="debt-search-label">Lọc theo công nợ<select id="debtBalanceFilter"><option value="all">Tất cả công nợ</option><option value="receivable-open">Còn phải thu</option><option value="receivable-settled">Đã thu đủ</option><option value="payable-open">Còn phải trả nhân viên</option><option value="payable-settled">Đã trả đủ nhân viên</option></select></label>
           <div class="debt-print-actions"><span id="debtSelectedCount">Đã chọn 0 công trình</span><button class="secondary" type="button" data-debt-action="print-selected">In công trình đã chọn</button><button class="secondary" type="button" data-debt-action="print-all">In toàn bộ</button></div>
         </div>
         <div class="debt-summary">
@@ -45,14 +47,32 @@
         </div>
         <div id="debtEditor" class="debt-editor" hidden></div>
         <div class="debt-table-wrap"><table class="debt-table"><thead><tr><th class="debt-select-col">Chọn in</th><th>Công trình</th><th>Khách hàng</th><th>Giá trị hợp đồng</th><th>Phải thu</th><th>Đã thu</th><th>Còn thu</th><th>Tiền công dự kiến</th><th>Đã trả nhân viên</th><th>Còn trả nhân viên</th><th></th></tr></thead><tbody>
-        ${debts.map(d=>`<tr data-debt-row data-search="${esc([d.projectCode,d.projectName,d.customerName].join(" ").toLocaleLowerCase("vi"))}"><td class="debt-select-col"><input type="checkbox" class="debt-print-check" data-id="${esc(d.id)}" aria-label="Chọn ${esc(d.projectCode||d.projectName||"công trình")} để in"></td><td><b>${esc(d.projectCode||"—")}</b><div>${esc(d.projectName||"")}</div></td><td>${esc(d.customerName||"—")}</td><td>${money(d.contractAmount)}</td><td>${money(d.receivableAmount)}</td><td>${money(d.receivedAmount)}</td><td>${money(Math.max(0,Number(d.receivableAmount||0)-Number(d.receivedAmount||0)))}</td><td>${money(d.payableAmount)}</td><td>${money(d.paidAmount)}</td><td>${money(Math.max(0,Number(d.payableAmount||0)-Number(d.paidAmount||0)))}</td><td><div class="debt-actions-inline"><button class="secondary" data-debt-action="detail" data-id="${esc(d.id)}">Chi tiết</button><button class="danger" data-debt-action="delete" data-id="${esc(d.id)}">Xóa</button></div></td></tr>`).join("")}
+        ${debts.map(d=>`<tr data-debt-row data-search="${esc([d.projectCode,d.projectName].join(" ").toLocaleLowerCase("vi"))}" data-customer="${esc(String(d.customerName||"").toLocaleLowerCase("vi"))}" data-receivable-left="${Math.max(0,Number(d.receivableAmount||0)-Number(d.receivedAmount||0))}" data-payable-left="${Math.max(0,Number(d.payableAmount||0)-Number(d.paidAmount||0))}"><td class="debt-select-col"><input type="checkbox" class="debt-print-check" data-id="${esc(d.id)}" aria-label="Chọn ${esc(d.projectCode||d.projectName||"công trình")} để in"></td><td><b>${esc(d.projectCode||"—")}</b><div>${esc(d.projectName||"")}</div></td><td>${esc(d.customerName||"—")}</td><td>${money(d.contractAmount)}</td><td>${money(d.receivableAmount)}</td><td>${money(d.receivedAmount)}</td><td>${money(Math.max(0,Number(d.receivableAmount||0)-Number(d.receivedAmount||0)))}</td><td>${money(d.payableAmount)}</td><td>${money(d.paidAmount)}</td><td>${money(Math.max(0,Number(d.payableAmount||0)-Number(d.paidAmount||0)))}</td><td><div class="debt-actions-inline"><button class="secondary" data-debt-action="detail" data-id="${esc(d.id)}">Chi tiết</button><button class="danger" data-debt-action="delete" data-id="${esc(d.id)}">Xóa</button></div></td></tr>`).join("")}
         ${debts.length ? "" : '<tr><td colspan="11" class="debt-empty">Chưa có hồ sơ công nợ.</td></tr>'}
         </tbody></table></div>`;
       const searchInput=host.querySelector("#debtSearchInput");
+      const customerFilter=host.querySelector("#debtCustomerFilter");
+      const balanceFilter=host.querySelector("#debtBalanceFilter");
       const checks=()=>Array.from(host.querySelectorAll(".debt-print-check"));
       const selectedCount=host.querySelector("#debtSelectedCount");
       const updateSelectedCount=()=>{selectedCount.textContent="Đã chọn "+checks().filter(x=>x.checked).length+" công trình";};
-      searchInput.addEventListener("input",()=>{const q=searchInput.value.trim().toLocaleLowerCase("vi");host.querySelectorAll("[data-debt-row]").forEach(row=>{row.hidden=!row.dataset.search.includes(q);});});
+      const applyDebtFilters=()=>{
+        const q=searchInput.value.trim().toLocaleLowerCase("vi");
+        const customer=customerFilter.value.trim().toLocaleLowerCase("vi");
+        const status=balanceFilter.value;
+        host.querySelectorAll("[data-debt-row]").forEach(row=>{
+          const receivableLeft=Number(row.dataset.receivableLeft||0);
+          const payableLeft=Number(row.dataset.payableLeft||0);
+          const statusMatch=status==="all"||
+            (status==="receivable-open"&&receivableLeft>0)||
+            (status==="receivable-settled"&&receivableLeft===0)||
+            (status==="payable-open"&&payableLeft>0)||
+            (status==="payable-settled"&&payableLeft===0);
+          row.hidden=!(row.dataset.search.includes(q)&&row.dataset.customer.includes(customer)&&statusMatch);
+        });
+      };
+      [searchInput,customerFilter].forEach(input=>input.addEventListener("input",applyDebtFilters));
+      balanceFilter.addEventListener("change",applyDebtFilters);
       checks().forEach(x=>x.addEventListener("change",updateSelectedCount));
       const printDebts=(items,type)=>{
         if(!items.length){notify("Hãy chọn ít nhất một công trình để in.");return;}
