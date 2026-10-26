@@ -5148,7 +5148,7 @@
 
     if (modalEditId) {
       const normalizedCode = String(data.code || "").trim().toUpperCase();
-      if (!/^CT-\\d{3}$/.test(normalizedCode)) {
+      if (!/^CT-(?:\d{3}|\d{8}-\d{3})$/.test(normalizedCode)) {
         showToast("Mã công trình không đúng định dạng. Chỉ chấp nhận CT-xxx, ví dụ CT-001.");
         $("#modalProjectCode")?.focus();
         return;
