@@ -771,17 +771,17 @@
               <button id="profitPrint" class="secondary" type="button">In báo cáo</button>
             </div>
             <div id="profitInputs" class="profit-input-grid">
-              <label>Số stop<input id="profitStops" type="number" min="0" step="1" value="5"></label>
-              <label>Giá bán đã gồm VAT / stop (VND)<input id="profitSalePerStop" type="number" min="0" step="1000" value="2450000"></label>
-              <label>Lương công nhân / stop (VND)<input id="profitLaborPerStop" type="number" min="0" step="1000" value="1500000"></label>
-              <label>Chi phí phát sinh đã chi (VND)<input id="profitExpense" type="number" min="0" step="1000" value="300000"></label>
-              <label>Thuế VAT (%)<select id="profitVatRate"><option value="0">0%</option><option value="5">5%</option><option value="8" selected>8% — giả định mẫu</option><option value="10">10%</option></select></label>
-              <label>Thuế suất TNDN (%)<select id="profitCitRate"><option value="15">15% — nếu đủ điều kiện</option><option value="17">17% — nếu đủ điều kiện</option><option value="20" selected>20% — giả định mẫu</option></select></label>
+              <label>Số stop<input id="profitStops" type="number" min="0" step="1" value="0"></label>
+              <label>Giá bán đã gồm VAT / stop (VND)<input id="profitSalePerStop" type="number" min="0" step="1000" value="0"></label>
+              <label>Lương công nhân / stop (VND)<input id="profitLaborPerStop" type="number" min="0" step="1000" value="0"></label>
+              <label>Chi phí phát sinh đã chi (VND)<input id="profitExpense" type="number" min="0" step="1000" value="0"></label>
+              <label>Thuế VAT (%)<select id="profitVatRate"><option value="0" selected>0%</option><option value="5">5%</option><option value="8">8% — giả định mẫu</option><option value="10">10%</option></select></label>
+              <label>Thuế suất TNDN (%)<select id="profitCitRate"><option value="0" selected>0%</option><option value="15">15% — nếu đủ điều kiện</option><option value="17">17% — nếu đủ điều kiện</option><option value="20">20% — giả định mẫu</option></select></label>
             </div>
             <div class="profit-checks">
-              <label><input id="profitSalaryDeductible" type="checkbox" checked> Hồ sơ tiền lương đủ điều kiện tính chi phí được trừ</label>
-              <label><input id="profitExpenseDeductible" type="checkbox" checked> Chi phí phát sinh đủ điều kiện tính chi phí được trừ</label>
-              <label><input id="profitExpenseVatEligible" type="checkbox" checked> Chi phí phát sinh đã gồm VAT, có hóa đơn hợp lệ để khấu trừ</label>
+              <label><input id="profitSalaryDeductible" type="checkbox"> Hồ sơ tiền lương đủ điều kiện tính chi phí được trừ</label>
+              <label><input id="profitExpenseDeductible" type="checkbox"> Chi phí phát sinh đủ điều kiện tính chi phí được trừ</label>
+              <label><input id="profitExpenseVatEligible" type="checkbox"> Chi phí phát sinh đã gồm VAT, có hóa đơn hợp lệ để khấu trừ</label>
             </div>
             <p id="profitTaxNote" class="profit-report-note"></p>
             <p id="profitExpenseNote" class="profit-report-note"></p>
