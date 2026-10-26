@@ -2100,3 +2100,5 @@ input,select,textarea { border-radius:12px; border-color:#d7e7e0; }
 @media(prefers-reduced-motion:reduce) {
  .stat,.doc-card,.sidebar .nav-item,.hero .primary { transition:none!important; }
 }
+
+.debt-pagination{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:14px 2px;margin:0 0 22px;color:#637971;font-size:13px}.debt-pagination-actions{display:flex;align-items:center;gap:8px}.debt-pagination-actions button{min-height:42px;min-width:94px;border-radius:12px}.debt-pagination-actions button:disabled{opacity:.4;cursor:not-allowed}@media(max-width:760px){.debt-pagination{align-items:stretch}.debt-pagination-actions{width:100%}.debt-pagination-actions button{flex:1}}
