@@ -1,4 +1,4 @@
-const CACHE_NAME = "grova-document-v23";
+const CACHE_NAME = "grova-document-v24";
 
 const APP_SHELL = [
   "./",
