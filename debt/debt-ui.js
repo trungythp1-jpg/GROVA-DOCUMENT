@@ -49,13 +49,31 @@
         <div class="debt-table-wrap"><table class="debt-table"><thead><tr><th class="debt-select-col">Chọn in</th><th>Công trình</th><th>Khách hàng</th><th>Giá trị hợp đồng</th><th>Phải thu</th><th>Đã thu</th><th>Còn thu</th><th>Tiền công dự kiến</th><th>Đã trả nhân viên</th><th>Còn trả nhân viên</th><th></th></tr></thead><tbody>
         ${debts.map(d=>`<tr data-debt-row data-search="${esc([d.projectCode,d.projectName].join(" ").toLocaleLowerCase("vi"))}" data-customer="${esc(String(d.customerName||"").toLocaleLowerCase("vi"))}" data-receivable-left="${Math.max(0,Number(d.receivableAmount||0)-Number(d.receivedAmount||0))}" data-payable-left="${Math.max(0,Number(d.payableAmount||0)-Number(d.paidAmount||0))}"><td class="debt-select-col"><input type="checkbox" class="debt-print-check" data-id="${esc(d.id)}" aria-label="Chọn ${esc(d.projectCode||d.projectName||"công trình")} để in"></td><td><b>${esc(d.projectCode||"—")}</b><div>${esc(d.projectName||"")}</div></td><td>${esc(d.customerName||"—")}</td><td>${money(d.contractAmount)}</td><td>${money(d.receivableAmount)}</td><td>${money(d.receivedAmount)}</td><td>${money(Math.max(0,Number(d.receivableAmount||0)-Number(d.receivedAmount||0)))}</td><td>${money(d.payableAmount)}</td><td>${money(d.paidAmount)}</td><td>${money(Math.max(0,Number(d.payableAmount||0)-Number(d.paidAmount||0)))}</td><td><div class="debt-actions-inline"><button class="secondary" data-debt-action="detail" data-id="${esc(d.id)}">Chi tiết</button><button class="danger" data-debt-action="delete" data-id="${esc(d.id)}">Xóa</button></div></td></tr>`).join("")}
         ${debts.length ? "" : '<tr><td colspan="11" class="debt-empty">Chưa có hồ sơ công nợ.</td></tr>'}
-        </tbody></table></div>`;
+        </tbody></table></div><div class="debt-pagination" id="debtPagination"><span id="debtPageCount" aria-live="polite"></span><div class="debt-pagination-actions"><button type="button" class="secondary" id="debtPrevPage">‹ Trước</button><button type="button" class="secondary" id="debtNextPage">Sau ›</button></div></div>`;
       const searchInput=host.querySelector("#debtSearchInput");
       const customerFilter=host.querySelector("#debtCustomerFilter");
       const balanceFilter=host.querySelector("#debtBalanceFilter");
+      const pageCount=host.querySelector("#debtPageCount");
+      const prevPage=host.querySelector("#debtPrevPage");
+      const nextPage=host.querySelector("#debtNextPage");
+      const pageSize=8;
+      let currentPage=1;
       const checks=()=>Array.from(host.querySelectorAll(".debt-print-check"));
       const selectedCount=host.querySelector("#debtSelectedCount");
       const updateSelectedCount=()=>{selectedCount.textContent="Đã chọn "+checks().filter(x=>x.checked).length+" công trình";};
+      const renderDebtPage=()=>{
+        const rows=Array.from(host.querySelectorAll("[data-debt-row]"));
+        const matched=rows.filter(row=>row.dataset.filterMatch!=="false");
+        const total=matched.length;
+        const totalPages=Math.max(1,Math.ceil(total/pageSize));
+        currentPage=Math.min(Math.max(1,currentPage),totalPages);
+        const start=(currentPage-1)*pageSize;
+        rows.forEach(row=>row.hidden=true);
+        matched.slice(start,start+pageSize).forEach(row=>row.hidden=false);
+        pageCount.textContent=total ? "Hiển thị "+(start+1)+"–"+Math.min(start+pageSize,total)+" / "+total+" công trình · Trang "+currentPage+"/"+totalPages : "Không có công trình phù hợp";
+        prevPage.disabled=currentPage<=1;
+        nextPage.disabled=currentPage>=totalPages;
+      };
       const applyDebtFilters=()=>{
         const q=searchInput.value.trim().toLocaleLowerCase("vi");
         const customer=customerFilter.value.trim().toLocaleLowerCase("vi");
@@ -68,11 +86,16 @@
             (status==="receivable-settled"&&receivableLeft===0)||
             (status==="payable-open"&&payableLeft>0)||
             (status==="payable-settled"&&payableLeft===0);
-          row.hidden=!(row.dataset.search.includes(q)&&row.dataset.customer.includes(customer)&&statusMatch);
+          row.dataset.filterMatch=String(row.dataset.search.includes(q)&&row.dataset.customer.includes(customer)&&statusMatch);
         });
+        currentPage=1;
+        renderDebtPage();
       };
+      prevPage.addEventListener("click",()=>{currentPage--;renderDebtPage();});
+      nextPage.addEventListener("click",()=>{currentPage++;renderDebtPage();});
       [searchInput,customerFilter].forEach(input=>input.addEventListener("input",applyDebtFilters));
       balanceFilter.addEventListener("change",applyDebtFilters);
+      applyDebtFilters();
       checks().forEach(x=>x.addEventListener("change",updateSelectedCount));
       const printDebts=(items,type)=>{
         if(!items.length){notify("Hãy chọn ít nhất một công trình để in.");return;}
