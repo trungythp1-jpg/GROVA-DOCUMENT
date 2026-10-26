@@ -2102,3 +2102,30 @@ input,select,textarea { border-radius:12px; border-color:#d7e7e0; }
 }
 
 .debt-pagination{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:14px 2px;margin:0 0 22px;color:#637971;font-size:13px}.debt-pagination-actions{display:flex;align-items:center;gap:8px}.debt-pagination-actions button{min-height:42px;min-width:94px;border-radius:12px}.debt-pagination-actions button:disabled{opacity:.4;cursor:not-allowed}@media(max-width:760px){.debt-pagination{align-items:stretch}.debt-pagination-actions{width:100%}.debt-pagination-actions button{flex:1}}
+
+
+/* Admin finance dashboard — read-only summary of existing debt ledgers */
+.dashboard-finance{margin:26px 0 10px;min-width:0}
+.dashboard-finance[hidden]{display:none!important}
+.dashboard-finance-heading{align-items:center;gap:12px}
+.dashboard-finance-heading h2,.dashboard-finance-table-head h3{margin:0;color:var(--ink,#17372f)}
+.dashboard-finance-heading p,.dashboard-finance-table-head p{margin:5px 0 0;color:var(--muted,#71817b);font-size:13px}
+.dashboard-finance-heading button,.dashboard-finance-table-head button{flex-shrink:0;min-height:40px}
+.dashboard-finance-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:14px 0}
+.dashboard-finance-card{display:flex;flex-direction:column;align-items:flex-start;gap:8px;min-width:0;padding:18px;border:1px solid var(--border,#e1e9e4);border-radius:18px;background:var(--card,#fff);box-shadow:0 5px 20px rgba(20,55,43,.045)}
+.dashboard-finance-icon{display:grid;place-items:center;width:36px;height:36px;border-radius:12px;background:#e9f5ef;color:#247657;font-weight:800;font-size:18px}
+.dashboard-finance-card small{color:var(--muted,#71817b);font-size:12px;font-weight:700}
+.dashboard-finance-card strong{font-size:clamp(17px,2vw,25px);line-height:1.25;overflow-wrap:anywhere;color:var(--ink,#17372f)}
+.dashboard-finance-hint{font-size:11px;color:var(--muted,#71817b);line-height:1.4}
+.dashboard-finance-table-card{padding:18px;border:1px solid var(--border,#e1e9e4);border-radius:18px;background:var(--card,#fff)}
+.dashboard-finance-table-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.dashboard-finance-content{min-width:0;overflow-x:auto}
+.dashboard-finance-table{width:100%;border-collapse:collapse;font-size:13px}
+.dashboard-finance-table th,.dashboard-finance-table td{padding:11px 10px;border-bottom:1px solid var(--border,#e5ece7);text-align:left;vertical-align:top}
+.dashboard-finance-table th{color:var(--muted,#71817b);font-size:11px;white-space:nowrap;background:transparent}
+.dashboard-finance-table td.money{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.dashboard-finance-table td.project-name{min-width:170px}
+.dashboard-finance-table .project-code{display:block;color:var(--muted,#71817b);font-size:11px;margin-top:3px}
+.dashboard-finance-state{padding:18px 4px;color:var(--muted,#71817b);font-size:13px}
+.dashboard-finance-disclaimer{margin:9px 2px 0;color:var(--muted,#71817b);font-size:11px;line-height:1.45}
+@media(max-width:760px){.dashboard-finance-cards{grid-template-columns:1fr;gap:10px}.dashboard-finance-card{padding:14px}.dashboard-finance-table-card{padding:14px}.dashboard-finance-table-head{align-items:flex-start;flex-wrap:wrap}.dashboard-finance-table{min-width:650px}}

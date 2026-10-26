@@ -6385,6 +6385,104 @@
 
     updateStats();
 
+    void renderDashboardFinance();
+  }
+
+  const dashboardMoney = (value) =>
+    new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 })
+      .format(Math.round(Number(value) || 0)) + " ₫";
+
+  let dashboardFinanceRequest = 0;
+
+  async function renderDashboardFinance(forceRefresh = false) {
+    const section = $("#dashboardFinance");
+    if (!section) return;
+    if (!isAdminUser()) {
+      section.hidden = true;
+      return;
+    }
+
+    section.hidden = false;
+    const content = $("#dashboardFinanceContent");
+    const refresh = $("#dashboardFinanceRefresh");
+    if (refresh && !refresh.dataset.bound) {
+      refresh.dataset.bound = "1";
+      refresh.addEventListener("click", () => void renderDashboardFinance(true));
+    }
+
+    const requestId = ++dashboardFinanceRequest;
+    if (content) content.innerHTML = '<p class="dashboard-finance-state">Đang tải dữ liệu công nợ…</p>';
+
+    try {
+      if (!currentUser || !window.firebase || !firebase.firestore || !window.GROVA_DEBT_SERVICE) {
+        throw new Error("Dịch vụ công nợ chưa sẵn sàng. Vui lòng tải lại trang.");
+      }
+      if (forceRefresh && typeof window.GROVA_DEBT_SERVICE.clearListCache === "function") {
+        window.GROVA_DEBT_SERVICE.clearListCache();
+      }
+      const debts = await window.GROVA_DEBT_SERVICE.listDebts(firebase.firestore());
+      if (requestId !== dashboardFinanceRequest) return;
+
+      const rows = (Array.isArray(debts) ? debts : []).map((debt) => {
+        const receivable = Math.max(0, Number(debt.receivableAmount || 0) - Number(debt.receivedAmount || 0));
+        const accounts = Array.isArray(debt.laborAccounts) ? debt.laborAccounts : [];
+        const agreedPayable = accounts.length
+          ? accounts.reduce((sum, account) => sum + Math.max(0, Number(account.agreedAmount || 0)), 0)
+          : Math.max(0, Number(debt.payableAmount || 0));
+        const paid = accounts.length
+          ? accounts.reduce((sum, account) => sum + (Array.isArray(account.payments)
+              ? account.payments.filter((payment) => !payment.voidedAt).reduce((part, payment) => part + Math.max(0, Number(payment.amount || 0)), 0)
+              : Math.max(0, Number(account.paidAmount || 0))), 0)
+          : Math.max(0, Number(debt.paidAmount || 0));
+        return {
+          ...debt,
+          contract: Math.max(0, Number(debt.contractAmount || 0)),
+          receivableOutstanding: receivable,
+          payableOutstanding: Math.max(0, agreedPayable - paid)
+        };
+      });
+
+      const totals = rows.reduce((sum, row) => {
+        sum.contract += row.contract;
+        sum.receivable += row.receivableOutstanding;
+        sum.payable += row.payableOutstanding;
+        return sum;
+      }, { contract: 0, receivable: 0, payable: 0 });
+
+      $("#dashboardFinanceContract").textContent = dashboardMoney(totals.contract);
+      $("#dashboardFinanceReceivable").textContent = dashboardMoney(totals.receivable);
+      $("#dashboardFinancePayable").textContent = dashboardMoney(totals.payable);
+
+      const activeRows = rows
+        .filter((row) => row.receivableOutstanding > 0 || row.payableOutstanding > 0)
+        .sort((a, b) => (b.receivableOutstanding + b.payableOutstanding) - (a.receivableOutstanding + a.payableOutstanding))
+        .slice(0, 8);
+
+      if (content) {
+        if (!rows.length) {
+          content.innerHTML = '<p class="dashboard-finance-state">Chưa có hồ sơ công nợ để tổng hợp. Các chỉ số sẽ xuất hiện khi công trình được tạo hồ sơ công nợ.</p>';
+        } else if (!activeRows.length) {
+          content.innerHTML = '<p class="dashboard-finance-state">Không có số dư phải thu hoặc phải trả trong các hồ sơ công nợ hiện tại.</p>';
+        } else {
+          content.innerHTML = '<table class="dashboard-finance-table"><thead><tr><th>Công trình / Khách hàng</th><th>Phải thu còn lại</th><th>Phải trả còn lại</th></tr></thead><tbody>' +
+            activeRows.map((row) => '<tr><td class="project-name"><strong>' +
+              escapeHTML(String(row.projectName || row.name || "Chưa có tên công trình")) +
+              '</strong><span class="project-code">' + escapeHTML(String(row.projectCode || row.code || "—")) +
+              ' · ' + escapeHTML(String(row.customerName || row.customer || "Chưa có khách hàng")) +
+              '</span></td><td class="money">' + dashboardMoney(row.receivableOutstanding) +
+              '</td><td class="money">' + dashboardMoney(row.payableOutstanding) + '</td></tr>').join("") +
+            '</tbody></table>';
+        }
+      }
+    } catch (error) {
+      if (requestId !== dashboardFinanceRequest) return;
+      console.error("GROVA dashboard finance summary failed:", error);
+      if (content) content.innerHTML = '<p class="dashboard-finance-state">Không tải được tổng quan công nợ. Anh có thể bấm “Làm mới” hoặc mở module Công nợ để kiểm tra.</p>';
+      ["#dashboardFinanceContract", "#dashboardFinanceReceivable", "#dashboardFinancePayable"].forEach((selector) => {
+        const node = $(selector);
+        if (node) node.textContent = "—";
+      });
+    }
   }
 
   /* =======================================================
