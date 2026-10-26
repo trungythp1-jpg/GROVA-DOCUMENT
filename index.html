@@ -84,7 +84,7 @@
 
   <link
     rel="stylesheet"
-    href="./style.css?v=208"
+    href="./style.css?v=209"
   >
 
   <!-- =====================================================
@@ -529,6 +529,24 @@
             </button>
 
           </div>
+
+          <!-- TỔNG QUAN TÀI CHÍNH — ADMIN ONLY -->
+          <section id="dashboardFinance" class="dashboard-finance" hidden>
+            <div class="section-title dashboard-finance-heading">
+              <div><h2>Tổng quan tài chính</h2><p>Tổng hợp từ các công trình đã có hồ sơ công nợ</p></div>
+              <button id="dashboardFinanceRefresh" class="secondary" type="button">↻ Làm mới</button>
+            </div>
+            <div class="dashboard-finance-cards">
+              <article class="dashboard-finance-card"><span class="dashboard-finance-icon">₫</span><small>Tổng giá trị hợp đồng</small><strong id="dashboardFinanceContract">—</strong><span class="dashboard-finance-hint">Trong hồ sơ công nợ</span></article>
+              <article class="dashboard-finance-card"><span class="dashboard-finance-icon">↙</span><small>Còn phải thu</small><strong id="dashboardFinanceReceivable">—</strong><span class="dashboard-finance-hint">Số dư khách hàng chưa thanh toán</span></article>
+              <article class="dashboard-finance-card"><span class="dashboard-finance-icon">↗</span><small>Còn phải trả</small><strong id="dashboardFinancePayable">—</strong><span class="dashboard-finance-hint">Số dư phải trả theo hồ sơ công nợ</span></article>
+            </div>
+            <div class="dashboard-finance-table-card">
+              <div class="dashboard-finance-table-head"><div><h3>Công trình cần theo dõi</h3><p>Các công trình còn số dư phải thu hoặc phải trả</p></div><button class="secondary" type="button" data-page-target="debts">Mở công nợ</button></div>
+              <div id="dashboardFinanceContent" class="dashboard-finance-content" aria-live="polite"><p class="dashboard-finance-state">Đang tải dữ liệu công nợ…</p></div>
+            </div>
+            <p class="dashboard-finance-disclaimer">Lưu ý: các chỉ số chỉ tính những công trình đã có hồ sơ công nợ. Đây là tổng hợp công nợ, không phải báo cáo lợi nhuận kế toán.</p>
+          </section>
 
           <!-- MẪU VĂN BẢN -->
 
@@ -1373,7 +1391,7 @@
        ===================================================== -->
 
   <script src="./debt/debt-domain.js?v=2"></script>
-  <script src="./debt/debt-firestore-service.js?v=5"></script>
+  <script src="./debt/debt-firestore-service.js?v=6"></script>
   <script src="./debt/debt-ui.js?v=21"></script>
   <script src="./debt/profitability-report.js?v=1"></script>
   <!-- GSAP motion enhancement; core app remains vanilla JavaScript. -->
@@ -1381,7 +1399,7 @@
   <script src="./js/ui-motion.js?v=1" defer></script>
 
   <script
-    src="./app.js?v=241"
+    src="./app.js?v=242"
   ></script>
   <!-- =====================================================
        SERVICE WORKER
