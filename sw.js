@@ -1,9 +1,9 @@
-const CACHE_NAME = "grova-document-v19";
+const CACHE_NAME = "grova-document-v20";
 
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./style.css?v=207",
+  "./style.css?v=208",
   "./auth.css?v=202",
   "./app.js?v=240",
   "./js/ui-motion.js?v=1",
