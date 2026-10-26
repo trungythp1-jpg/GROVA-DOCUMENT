@@ -560,11 +560,10 @@ body.quote-auth-pending .wrap,body.quote-auth-pending .toolbar{visibility:hidden
     line-height: 1.15 !important;
   }
 
-  /* Start the commercial quote summary on a clean page instead of
-     letting its table/totals split across the configuration page. */
+  /* Keep the commercial quote summary with the configuration when space allows. */
   .sheet:first-of-type > .section:has(#saleLift) {
-    break-before: page !important;
-    page-break-before: always !important;
+    break-before: auto !important;
+    page-break-before: auto !important;
   }
 }
 
