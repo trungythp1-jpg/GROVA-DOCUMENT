@@ -1,8 +1,5 @@
-/* =========================================================
-   GROVA DOCUMENT — DEBT DOMAIN CORE
-   Isolated pure helpers only. Not imported by the live app yet.
-   No Firestore writes, no auth changes, no UI integration.
-========================================================= */
+
+
 (function (root, factory) {
   "use strict";
   const api = factory();
