@@ -1,5 +1,5 @@
-/* GROVA DOCUMENT — debt data embedded in the existing projects documents.
-   Keeps existing project IDs and collection/rules. No new collection. */
+
+
 (function(root,factory){"use strict";var api=factory(root);root.GROVA_DEBT_SERVICE=api;if(typeof module==="object"&&module.exports)module.exports=api;})(typeof window!=="undefined"?window:globalThis,function(root){"use strict";
 function actor(){var u=root.firebase&&root.firebase.auth&&root.firebase.auth().currentUser;if(!u||!u.uid)throw Error("Bạn cần đăng nhập trước khi thao tác công nợ.");return u;}
 function dbok(db){if(!db||!db.collection||!db.runTransaction)throw Error("Firestore chưa sẵn sàng.");return db;}
