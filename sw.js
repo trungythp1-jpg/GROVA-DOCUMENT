@@ -13,10 +13,6 @@ const APP_SHELL = [
   "./data/grova_logo.png"
 ];
 
-/* =====================================================
-   INSTALL
-   Cache đúng bộ tài nguyên hiện tại.
-===================================================== */
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -25,10 +21,6 @@ self.addEventListener("install", (event) => {
   );
 });
 
-/* =====================================================
-   ACTIVATE
-   Xóa toàn bộ cache GROVA cũ.
-===================================================== */
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys()
@@ -41,20 +33,12 @@ self.addEventListener("activate", (event) => {
   );
 });
 
-/* =====================================================
-   MESSAGE
-===================================================== */
 self.addEventListener("message", (event) => {
   if (event.data && event.data.type === "SKIP_WAITING") {
     self.skipWaiting();
   }
 });
 
-/* =====================================================
-   FETCH
-   Network First để GitHub Pages luôn lấy bản mới;
-   cache chỉ làm fallback khi mất mạng.
-===================================================== */
 self.addEventListener("fetch", (event) => {
   const request = event.request;
 
