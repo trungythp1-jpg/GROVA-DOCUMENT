@@ -1,4 +1,4 @@
-/* Run with: node debt/debt-domain.test.js */
+
 "use strict";
 const assert = require("node:assert/strict");
 const debt = require("./debt-domain.js");
