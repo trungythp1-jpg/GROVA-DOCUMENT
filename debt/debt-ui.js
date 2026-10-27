@@ -1,4 +1,4 @@
-/* GROVA DOCUMENT — Admin-only debt UI. UI visibility only; Firestore Rules unchanged. */
+
 (function (root) {
   "use strict";
   const money = (n) => new Intl.NumberFormat("vi-VN").format(Number(n || 0)) + " ₫";

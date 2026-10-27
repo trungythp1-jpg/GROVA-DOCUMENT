@@ -1,12 +1,6 @@
 (function () {
   "use strict";
 
-  /* =========================================================
-     GROVA DOCUMENT
-     FIREBASE AUTHENTICATION
-     RESTORE — AUTH.JS
-     ========================================================= */
-
   var firebaseConfig = {
     apiKey: "AIzaSyBcqgrkL64utUMwyZz9wmb_cM0gA5Hy8II",
     authDomain: "grova-document.firebaseapp.com",

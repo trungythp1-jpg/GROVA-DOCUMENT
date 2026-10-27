@@ -1,8 +1,4 @@
-/* =========================================================
-   GROVA DOCUMENT
-   FIRESTORE DATA SERVICE
-   PHASE 1 — PROJECTS
-========================================================= */
+
 
 (function () {
   "use strict";
@@ -24,10 +20,6 @@
   const db = firebase.firestore();
 
   let persistenceEnabled = false;
-
-  /* =======================================================
-     OFFLINE CACHE
-  ======================================================= */
 
   try {
     db.enablePersistence({
@@ -52,10 +44,6 @@
       error
     );
   }
-
-  /* =======================================================
-     HELPERS
-  ======================================================= */
 
   function getCurrentUser() {
     if (
@@ -108,10 +96,6 @@
     };
   }
 
-  /* =======================================================
-     PROJECTS — READ
-  ======================================================= */
-
   async function getProjects() {
     const user = requireUser();
 
@@ -139,10 +123,6 @@
 
     return projects;
   }
-
-  /* =======================================================
-     PROJECTS — CREATE / UPDATE
-  ======================================================= */
 
   async function saveProject(project) {
     const user = requireUser();
@@ -208,10 +188,6 @@
     );
   }
 
-  /* =======================================================
-     PROJECTS — DELETE
-  ======================================================= */
-
   async function deleteProject(id) {
     requireUser();
 
@@ -228,10 +204,6 @@
 
     return true;
   }
-
-  /* =======================================================
-     PROJECTS — MIGRATION
-  ======================================================= */
 
   async function migrateProjects(localProjects) {
     requireUser();
@@ -250,10 +222,6 @@
       .collection("projects")
       .get();
 
-    /*
-     * Nếu Firestore đã có dữ liệu,
-     * KHÔNG ghi đè bằng localStorage.
-     */
     if (!snapshot.empty) {
       return {
         migrated: 0,
@@ -330,10 +298,6 @@
       skipped: false
     };
   }
-
-  /* =======================================================
-     PUBLIC API
-  ======================================================= */
 
   window.GROVA_FIRESTORE = {
 

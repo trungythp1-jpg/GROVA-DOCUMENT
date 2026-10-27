@@ -1,15 +1,5 @@
-/* =========================================================
-   GROVA DOCUMENT
-   DOCUMENT PERMISSION GUARD — VERSION 238
-   Shared permission layer for /templates/*.html
 
-   Actions:
-   view / create / edit / delete / export
 
-   The guard reads users/{uid}.permissions.documents.templates
-   and falls back to group-level documents permissions when an
-   individual template/action is not explicitly defined.
-========================================================= */
 (function () {
   "use strict";
 

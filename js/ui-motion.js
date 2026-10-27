@@ -1,4 +1,4 @@
-/* GROVA DOCUMENT — progressive GSAP motion, no business logic or data writes. */
+
 (function () {
   "use strict";
   const reducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -30,7 +30,7 @@
   document.addEventListener("click", function (event) {
     const nav = event.target.closest(".nav-item[data-page], [data-page-target]");
     if (!nav) return;
-    // App's existing click handler remains responsible for authorization and navigation.
+
     window.requestAnimationFrame(function () {
       const page = document.getElementById("page-" + (nav.dataset.page || nav.dataset.pageTarget));
       animatePage(page);
@@ -41,7 +41,6 @@
     animatePage(document.querySelector(".page.active"));
   });
 
-  // Gentle feedback for primary/secondary buttons; do not intercept clicks or forms.
   document.addEventListener("pointerover", function (event) {
     const button = event.target.closest("button.primary, button.secondary");
     if (!button || button.disabled || button.matches(":active")) return;

@@ -1,16 +1,4 @@
-/**
- * GROVA DOCUMENT — VERSION 228
- * GROVA AI — READ-ONLY, PERMISSION-AWARE BACKEND
- *
- * Security model:
- * - Firebase Auth must authenticate the caller.
- * - The server reads users/{uid} with Firebase Admin SDK.
- * - Client-supplied roles/permissions are never trusted.
- * - Only Firestore collections allowed by the user's view permissions are
- *   included in the AI context.
- * - GROVA AI v1 is read-only: it does not create/edit/delete Firestore data.
- * - OpenAI API key stays server-side in Firebase Secret Manager.
- */
+
 
 const { initializeApp } = require("firebase-admin/app");
 const { getFirestore } = require("firebase-admin/firestore");

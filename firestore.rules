@@ -3,17 +3,6 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    /* =====================================================
-       GROVA DOCUMENT — TASK 1
-       FIRESTORE SECURITY HARDENING
-
-       Authorization:
-       Firebase Auth -> users/{uid} -> active profile -> permission matrix
-
-       Rules below preserve the current V234/V233 data model and UI behavior.
-       No Firebase SDK / Functions / Hosting upgrade is required here.
-       ===================================================== */
-
     function signedIn() {
       return request.auth != null;
     }
@@ -71,10 +60,6 @@ service cloud.firestore {
         in ["active", "disabled"];
     }
 
-    /*
-      Safe default employee profile used when a user without
-      permission-management rights creates an employee profile.
-    */
     function isDefaultEmployeePermissions() {
       return request.resource.data.permissions.keys().hasOnly([
         "projects", "customers", "employees", "documents",
@@ -132,11 +117,6 @@ service cloud.firestore {
       && request.resource.data.permissions.ai.view == true;
     }
 
-    /* =====================================================
-       PROJECT DAILY COUNTERS — monotonic sequence per Vietnam date
-       Counter documents are never deleted or reset by application code.
-       ===================================================== */
-
     match /project_daily_counters/{dateKey} {
       allow read: if hasPermission("projects", "create");
       allow create: if hasPermission("projects", "create")
@@ -162,10 +142,6 @@ service cloud.firestore {
       allow delete: if false;
     }
 
-    /* =====================================================
-       PROJECTS
-       ===================================================== */
-
     match /projects/{projectId} {
       allow read: if hasPermission("projects", "view");
       allow create: if hasPermission("projects", "create");
@@ -173,27 +149,15 @@ service cloud.firestore {
       allow delete: if hasPermission("projects", "delete");
     }
 
-    /* =====================================================
-       CUSTOMERS
-       ===================================================== */
-
     match /customers/{customerId} {
       allow read: if hasPermission("customers", "view");
       allow create, update, delete: if isAdmin();
     }
 
-    /* =====================================================
-       EMPLOYEES
-       ===================================================== */
-
     match /employees/{employeeId} {
       allow read: if hasPermission("employees", "view");
       allow create, update, delete: if isAdmin();
     }
-
-    /* =====================================================
-       PROJECT ASSIGNMENT HISTORY — APPEND ONLY
-       ===================================================== */
 
     match /project_assignment_history/{recordId} {
       allow read: if isAdmin()
@@ -211,14 +175,6 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
-    /* =====================================================
-       HISTORY
-
-       Current UI stores history under the authenticated user's UID.
-       Firestore also enforces history.view so a custom role cannot
-       bypass the client permission check.
-       ===================================================== */
-
     match /history/{historyId} {
       allow read: if hasPermission("history", "view")
         && resource.data.createdBy == request.auth.uid;
@@ -234,26 +190,14 @@ service cloud.firestore {
         && resource.data.createdBy == request.auth.uid;
     }
 
-    /* =====================================================
-       USERS / ACCOUNT PROFILES
-       ===================================================== */
-
     match /users/{userId} {
 
-      /* A user may read only their own profile; Admin may read all. */
       allow read: if signedIn()
         && (
           userId == request.auth.uid
           || isAdmin()
         );
 
-      /*
-        Create:
-        - Admin / approved permission manager can create profiles.
-        - Non-admin permission holders may only create safe employee profiles.
-        - A user may create their own safe employee profile.
-        - Bootstrap Admin can never be created from the client.
-      */
       allow create: if
         userId != "nJmKgjEILgVOEjWKYWTsuonxbO03"
         && request.resource.data.uid == userId
@@ -288,13 +232,6 @@ service cloud.firestore {
           )
         );
 
-      /*
-        Update:
-        - Basic profile fields require users.edit.
-        - Status changes require users.lock.
-        - Role / permissions changes require managePermissions.
-        - Bootstrap Admin profile cannot be modified from the client.
-      */
       allow update: if
         userId != "nJmKgjEILgVOEjWKYWTsuonxbO03"
         && request.resource.data.uid == resource.data.uid
@@ -330,18 +267,9 @@ service cloud.firestore {
           )
         );
 
-      /* Client-side deletion is Administrator-only. */
       allow delete: if isAdmin()
         && userId != "nJmKgjEILgVOEjWKYWTsuonxbO03";
     }
-
-    /* =====================================================
-       DOCUMENTS
-
-       TASK 1 enforces the existing collection-level document
-       permission matrix. Template-level permissions remain in
-       document-permission.js and are not rewritten here.
-       ===================================================== */
 
     match /documents/{documentId} {
       allow read: if hasPermission("documents", "view");
@@ -350,20 +278,9 @@ service cloud.firestore {
       allow delete: if hasPermission("documents", "delete");
     }
 
-    /* =====================================================
-       DOCUMENT COUNTERS
-
-       Numbering is TASK 4. TASK 1 only protects the collection.
-       Ordinary users cannot read or mutate counters directly.
-       ===================================================== */
-
     match /document_counters/{counterId} {
       allow read, create, update, delete: if isAdmin();
     }
-
-    /* =====================================================
-       DEFAULT DENY
-       ===================================================== */
 
     match /{document=**} {
       allow read, write: if false;
