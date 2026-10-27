@@ -1,4 +1,4 @@
-/* GROVA internal profitability estimator. Local calculation only; no Firestore writes. */
+
 (function () {
   "use strict";
   const root = document.getElementById("profitabilityReport");
