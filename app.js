@@ -1,17 +1,7 @@
-/* =========================================================
-   GROVA DOCUMENT
-   APP.JS — VERSION 233
-   FIRESTORE PHASE 4 — HISTORY + PHASE 5A PERMISSION CORE + PHASE 5B.4 ACCOUNT MANAGEMENT UI + PHASE 5B.5 ACCOUNT PROFILE UI + PHASE 5B.6 ACCOUNT MANAGEMENT HARDENING + PHASE 5B.7 ACCOUNT PROFILE UI SYNC + SPARK ACCOUNT PROFILE MANAGEMENT + FULL VIEW/CREATE/EDIT/DELETE PERMISSION ENFORCEMENT
-   PROJECTS + CUSTOMERS + EMPLOYEES + HISTORY
-   CLEAN BASE FROM LOCKED VERSION 209
-========================================================= */
+
 
 (() => {
   "use strict";
-
-  /* =======================================================
-     BASIC HELPERS
-  ======================================================= */
 
   const $ = (selector) => document.querySelector(selector);
 
@@ -90,15 +80,7 @@
 
   let toastTimer = null;
 
-  /* =======================================================
-     PROJECT FIRESTORE STATE
-  ======================================================= */
-
   let currentUser = null;
-
-  /* =======================================================
-     PERMISSION CORE — PHASE 5A
-  ======================================================= */
 
   const ADMIN_UID = "nJmKgjEILgVOEjWKYWTsuonxbO03";
 
@@ -167,9 +149,6 @@
   let userProfileSyncToken = 0;
   let userProfileUnsubscribe = null;
 
-  /* =======================================================
-     PHASE 5B.4 — ACCOUNT MANAGEMENT UI STATE
-  ======================================================= */
   let accountUsers = [];
   let accountUsersLoading = false;
   let accountUsersPageToken = null;
@@ -216,10 +195,6 @@
     return Boolean(currentUserProfile.permissions?.[group]?.[action]);
   }
 
-  /* =======================================================
-     DOCUMENT PERMISSION MATRIX — PHASE 5C / V237
-  ======================================================= */
-
   function getDocumentTemplateIds() {
     return getTemplates().map((template) => String(template?.id || "").trim()).filter(Boolean);
   }
@@ -265,7 +240,6 @@
     if (!firestoreDb) return null;
     return firestoreDb.collection("users");
   }
-
 
   function refreshAccountProfileUI() {
     updateUserDisplay();
@@ -322,15 +296,10 @@
         }
       };
 
-      // Read once immediately so the first permission decision does not depend
-      // on a later realtime callback.
       const snapshot = await reference.get();
       if (token !== userProfileSyncToken) return null;
       applyProfileSnapshot(snapshot);
 
-      // Keep the current user's permission profile synchronized in realtime.
-      // When an Administrator changes role/status/permissions, this session
-      // receives the new matrix without requiring logout/login or page reload.
       userProfileUnsubscribe = reference.onSnapshot(
         (nextSnapshot) => {
           applyProfileSnapshot(nextSnapshot);
@@ -383,19 +352,11 @@
 
   let employeesSyncRunning = false;
 
-  /* =======================================================
-     HISTORY FIRESTORE STATE
-  ======================================================= */
-
   let historyCache = [];
 
   let historySyncToken = 0;
 
   let historySyncRunning = false;
-
-  /* =======================================================
-     DATA
-  ======================================================= */
 
   const DATA = window.GROVA_DATA || {
     app: {
@@ -413,10 +374,6 @@
 
     templates: []
   };
-
-  /* =======================================================
-     STORAGE HELPERS
-  ======================================================= */
 
   function readStorage(key, fallback = []) {
 
@@ -804,10 +761,6 @@
 
   }
 
-  /* =======================================================
-     FIRESTORE SERVICE — PROJECTS + CUSTOMERS
-  ======================================================= */
-
   function getAuthObject() {
 
     if (
@@ -878,10 +831,6 @@
       return null;
     }
 
-    /*
-      Firebase Auth có thể chưa hoàn tất khởi tạo dù giao diện đã mở.
-      Chờ trạng thái Auth ban đầu trước khi kết luận user chưa đăng nhập.
-    */
     if (typeof auth.authStateReady === "function") {
       try {
         await auth.authStateReady();
@@ -1571,7 +1520,6 @@
         return;
       }
 
-      /* Cloud có dữ liệu => Cloud thắng. */
       if (cloud.length > 0) {
 
         setProjectsCache(
@@ -1588,11 +1536,6 @@
         return;
       }
 
-      /*
-        Cloud đang rỗng:
-        chỉ migrate nếu local thật sự có dữ liệu.
-        Không bao giờ xóa V2 cache chỉ vì cloud rỗng.
-      */
       if (localProjects.length) {
 
         const migrated =
@@ -1615,12 +1558,10 @@
           return;
         }
 
-        /* Migration lỗi => giữ nguyên local cache. */
         renderProjectViews();
         return;
       }
 
-      /* Cả local và cloud đều rỗng. */
       setProjectsCache([]);
 
       writeProjectCache(
@@ -1760,10 +1701,6 @@
     });
 
   }
-
-  /* =======================================================
-     FIRESTORE SERVICE — CUSTOMERS
-  ======================================================= */
 
   function getCustomersCollection() {
     if (!firestoreDb) {
@@ -2155,7 +2092,6 @@
         return;
       }
 
-      /* Cloud có dữ liệu => Cloud thắng. */
       if (cloud.length > 0) {
         setCustomersCache(
           cloud
@@ -2175,11 +2111,6 @@
         return;
       }
 
-      /*
-        Cloud đang rỗng:
-        chỉ migrate nếu local thật sự có dữ liệu.
-        Không bao giờ xóa cache chỉ vì cloud rỗng.
-      */
       if (localCustomers.length) {
         const migrated =
           await migrateLocalCustomersIfNeeded(
@@ -2206,7 +2137,6 @@
           return;
         }
 
-        /* Migration lỗi => giữ nguyên local cache. */
         if (currentPage === "customers") {
           renderCustomers();
         }
@@ -2216,7 +2146,6 @@
         return;
       }
 
-      /* Cả local và cloud đều rỗng. */
       setCustomersCache([]);
 
       writeCustomerCache(
@@ -2249,10 +2178,6 @@
       }
     }
   }
-
-  /* =======================================================
-     FIRESTORE SERVICE — EMPLOYEES
-  ======================================================= */
 
   function getEmployeesCollection() {
     if (!firestoreDb) return null;
@@ -2410,10 +2335,6 @@
     }
   }
 
-  /* =======================================================
-     ID / DATE
-  ======================================================= */
-
   function createId(prefix = "GROVA") {
 
     return (
@@ -2480,10 +2401,6 @@
 
   }
 
-  /* =======================================================
-     ESCAPE HTML
-  ======================================================= */
-
   function escapeHTML(value) {
 
     return String(value ?? "")
@@ -2504,10 +2421,6 @@
       .replace(/\s+/g, "-");
 
   }
-
-  /* =======================================================
-     TOAST
-  ======================================================= */
 
   function showToast(message) {
 
@@ -2553,10 +2466,6 @@
     }, 2600);
 
   }
-
-  /* =======================================================
-     NAVIGATION
-  ======================================================= */
 
   function getPagePermission(page) {
     const map = {
@@ -2791,10 +2700,6 @@
 
   }
 
-  /* =======================================================
-     DOCUMENT TEMPLATES
-  ======================================================= */
-
   function getTemplates() {
 
     return Array.isArray(DATA.templates)
@@ -2852,7 +2757,6 @@
 
   }
 
-  // Shared pagination for long lists. Keep page state independent per module.
   const grovaPaginationState = Object.create(null);
   const GROVA_PAGE_SIZE = 5;
 
@@ -3137,12 +3041,6 @@
       return;
     }
 
-    /*
-      TASK 4 — DRAFT FIRST / OFFICIAL NUMBER ON PDF EXPORT
-      Mở mẫu chỉ tạo BẢN NHÁP. Không cấp số và không chạm
-      vào document_counters. Số chính thức chỉ được cấp khi
-      người dùng bấm “Xuất PDF” và xác nhận tạo văn bản chính thức.
-    */
     const rawFile = String(template.file || "");
     const hashIndex = rawFile.indexOf("#");
     const hash = hashIndex >= 0 ? rawFile.slice(hashIndex) : "";
@@ -3152,10 +3050,6 @@
 
     window.location.href = draftUrl;
   }
-
-  /* =======================================================
-     NEW DOCUMENT MODAL
-  ======================================================= */
 
   function openTemplatePicker() {
 
@@ -3243,10 +3137,6 @@
 
   }
 
-  /* =======================================================
-     MODAL
-  ======================================================= */
-
   function openModal() {
 
     const modal = $("#modal");
@@ -3290,10 +3180,6 @@
 
   }
 
-  /* =======================================================
-     EMPTY STATE
-  ======================================================= */
-
   function emptyState(
     title,
     description,
@@ -3319,10 +3205,6 @@
     `;
 
   }
-
-  /* =======================================================
-     HISTORY — FIRESTORE PHASE 4
-  ======================================================= */
 
   function getHistoryCollection() {
     if (!firestoreDb) return null;
@@ -3572,7 +3454,6 @@
 
       if (!cloud) return;
 
-      /* Cloud có dữ liệu => Cloud thắng. */
       if (cloud.length > 0) {
         setHistoryCache(cloud);
         writeHistoryCache(user.uid, cloud);
@@ -3585,10 +3466,6 @@
         return;
       }
 
-      /*
-        Cloud đang rỗng: chỉ migrate nếu local thật sự có dữ liệu.
-        Không xóa local chỉ vì cloud rỗng.
-      */
       if (localHistory.length) {
         const migrated =
           await migrateLocalHistoryIfNeeded(
@@ -3612,7 +3489,6 @@
           return;
         }
 
-        /* Migration lỗi => giữ nguyên local cache. */
         renderRecentDocuments();
         if (currentPage === "history") {
           renderHistory();
@@ -3621,7 +3497,6 @@
         return;
       }
 
-      /* Cả local và cloud đều rỗng. */
       setHistoryCache([]);
       writeHistoryCache(user.uid, []);
       clearLegacyHistoryStorage();
@@ -3671,10 +3546,6 @@
         ...filtered
       ]);
 
-    /*
-      Cập nhật local ngay lập tức.
-      Việc mở văn bản không được phụ thuộc vào Firebase.
-    */
     setHistoryCache(nextHistory);
 
     if (currentUser?.uid) {
@@ -3700,10 +3571,6 @@
       return true;
     }
 
-    /*
-      Đồng bộ Firestore chạy nền.
-      openTemplate() không await hàm này.
-    */
     try {
 
       const authUser =
@@ -3763,10 +3630,6 @@
         error
       );
 
-      /*
-        Không showToast ở đây vì trang có thể đã chuyển sang
-        văn bản. History local vẫn được giữ lại.
-      */
       return false;
 
     }
@@ -3900,13 +3763,6 @@
       }
     }
   }
-
-  /* =======================================================
-     LIST PRINTING — VERSION 224
-     Bản in danh sách A4 chuyên nghiệp, có logo GROVA,
-     đầy đủ tiêu đề, phạm vi dữ liệu, điều kiện tìm kiếm/lọc
-     và bảng dữ liệu. Không thay đổi dữ liệu, không cấp số.
-  ======================================================= */
 
   function printListDocument(title, columns, rows, scopeLabel, description = "") {
 
@@ -4186,8 +4042,6 @@
     printWindow.document.write(html);
     printWindow.document.close();
 
-    // Safari/iPad có thể không phát sinh load event ổn định sau document.write().
-    // Chờ DOM + logo tải xong rồi mới gọi print(), tránh mở trang trắng.
     const triggerPrint = () => {
       setTimeout(() => {
         try {
@@ -4350,10 +4204,6 @@
     );
   }
 
-  /* =======================================================
-     PROJECT ASSIGNMENT HISTORY — APPEND ONLY
-  ======================================================= */
-
   function getProjectAssignmentHistoryCollection() {
     if (!firestoreDb) return null;
     return firestoreDb.collection("project_assignment_history");
@@ -4387,10 +4237,6 @@
     if (!verification.exists) throw new Error("WRITE_VERIFICATION_FAILED");
     return { id: reference.id, ...record };
   }
-
-  /* =======================================================
-     PROJECTS
-  ======================================================= */
 
   function renderProjects() {
 
@@ -4651,7 +4497,6 @@
     openModal();
   }
 
-
   function openProjectModal(id = null) {
 
     const requiredAction = id ? "edit" : "create";
@@ -4884,15 +4729,12 @@
 
     if (!raw) return null;
 
-    // 1) geo:20.123,106.456
     let match = raw.match(/geo:\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/i);
     if (match) return normalizeCoordinates(match[1], match[2]);
 
-    // 2) Google Maps URL with @latitude,longitude
     match = raw.match(/@(-?\d+(?:\.\d+)?),\s*(-?\d+(?:\.\d+)?)/);
     if (match) return normalizeCoordinates(match[1], match[2]);
 
-    // 3) URL parameters: q=lat,lng / query=lat,lng / ll=lat,lng / destination=lat,lng
     try {
       const url = new URL(raw);
       const keys = ["q", "query", "ll", "destination", "daddr"];
@@ -4905,10 +4747,9 @@
         if (match) return normalizeCoordinates(match[1], match[2]);
       }
     } catch (error) {
-      // Continue with raw coordinate detection below.
+
     }
 
-    // 4) Pasted plain coordinates: 20.123456, 106.456789
     match = raw.match(/(^|[^\d-])(-?\d{1,3}(?:\.\d+)?)\s*,\s*(-?\d{1,3}(?:\.\d+)?)(?!\d)/);
     if (match) return normalizeCoordinates(match[2], match[3]);
 
@@ -5405,10 +5246,6 @@
 
   }
 
-  /* =======================================================
-     CUSTOMERS
-  ======================================================= */
-
   function renderCustomers() {
 
     if (!hasPermission("customers", "view")) {
@@ -5550,7 +5387,6 @@
       showToast("Chỉ Admin được quản lý dữ liệu này.");
       return;
     }
-
 
     modalMode = "customer";
 
@@ -5924,10 +5760,6 @@
     }
   }
 
-  /* =======================================================
-     EMPLOYEES
-  ======================================================= */
-
   function renderEmployees() {
 
     if (!hasPermission("employees", "view")) {
@@ -6072,7 +5904,6 @@
       showToast("Chỉ Admin được quản lý dữ liệu này.");
       return;
     }
-
 
     modalMode = "employee";
 
@@ -6327,10 +6158,6 @@
 
   }
 
-  /* =======================================================
-     DASHBOARD
-  ======================================================= */
-
   function updateStats() {
 
     const projects =
@@ -6484,10 +6311,6 @@
       });
     }
   }
-
-  /* =======================================================
-     REPORTS
-  ======================================================= */
 
   function renderReports() {
 
@@ -6672,13 +6495,6 @@
 
   }
 
-
-  /* =======================================================
-     PHASE 5B.4 — ACCOUNT MANAGEMENT UI
-     PHASE 5B.5 — ACCOUNT PROFILE UI
-     PHASE 5B.6 — ACCOUNT MANAGEMENT HARDENING
-  ======================================================= */
-
   const ACCOUNT_PERMISSION_META = {
     projects: {
       label: "Công trình",
@@ -6819,10 +6635,6 @@
       timeStyle: "short"
     });
   }
-
-  /* =======================================================
-     PHASE 5B.6 — ACCOUNT MANAGEMENT HARDENING
-  ======================================================= */
 
   function isCurrentAccount(uid) {
     return Boolean(
@@ -7209,7 +7021,7 @@
         <label>
           UID Firebase Authentication
           <input id="modalUserUid" type="text"
-            value="${escapeHTML(existing?.uid || "")}" 
+            value="${escapeHTML(existing?.uid || "")}"
             ${existing ? "readonly" : ""}
             placeholder="Dán UID từ Firebase Console...">
         </label>
@@ -7465,10 +7277,6 @@
     }
   }
 
-  /* =======================================================
-     GROVA AI — VERSION 235 / READ-ONLY ASSISTANT
-  ======================================================= */
-
   let grovaAiBusy = false;
 
   function appendGrovaAIMessage(role, text) {
@@ -7600,7 +7408,6 @@
       const contextParts = [];
       const contextWarnings = [];
 
-      // Refresh from Firestore for this question; do not rely only on the UI cache.
       if (hasPermission("projects", "view")) {
         try {
           const projects = await readCloudProjects();
@@ -7669,9 +7476,6 @@
         ...contextWarnings.map(w => "CẢNH BÁO DỮ LIỆU: " + w)
       ].join("\n");
 
-      // Cloudflare Worker currently accepts at most 4,000 characters in question.
-      // Reserve space for the user's question and the context header to avoid
-      // rejecting otherwise valid questions when Firestore data is attached.
       const contextHeader = "\n\n[NGỮ CẢNH GROVA DOCUMENT — DỮ LIỆU ĐỌC TRỰC TIẾP TỪ FIRESTORE]\n";
       const maxPromptLength = 3900;
       const availableContextLength = Math.max(0, maxPromptLength - question.length - contextHeader.length);
@@ -7725,10 +7529,6 @@
     delete container.dataset.initialized;
     renderGrovaAI();
   }
-
-  /* =======================================================
-     SETTINGS
-  ======================================================= */
 
   function renderSettings() {
 
@@ -7890,10 +7690,6 @@
     }
 
   }
-
-  /* =======================================================
-     FULL SYSTEM BACKUP / RESTORE — VERSION 227
-  ======================================================= */
 
   const SYSTEM_BACKUP_VERSION = "237";
 
@@ -8074,10 +7870,6 @@
     }
   }
 
-  /* =======================================================
-     EXPORT DATA
-  ======================================================= */
-
   function exportData() {
 
     const payload = {
@@ -8163,10 +7955,6 @@
 
   }
 
-  /* =======================================================
-     RESET DATA
-  ======================================================= */
-
   function resetData() {
 
     const ok =
@@ -8237,10 +8025,6 @@
     );
 
   }
-
-  /* =======================================================
-     EVENT HANDLERS
-  ======================================================= */
 
   function handleClick(event) {
 
@@ -8562,10 +8346,6 @@
 
   }
 
-  /* =======================================================
-     KEYBOARD / MODAL
-  ======================================================= */
-
   function handleKeydown(event) {
 
     if (
@@ -8593,10 +8373,6 @@
     }
 
   }
-
-  /* =======================================================
-     SERVICE WORKER
-  ======================================================= */
 
   function registerServiceWorker() {
 
@@ -8629,10 +8405,6 @@
     }
 
   }
-
-  /* =======================================================
-     INIT
-  ======================================================= */
 
   function init() {
 
@@ -8722,21 +8494,11 @@
 
     renderDashboard();
 
-    /*
-      QUAN TRỌNG:
-      Firestore bridge chạy SAU khi app đã render.
-      Lỗi Firebase/Firestore không được phép chặn init().
-    */
-
     initFirestoreAuthBridge();
 
     registerServiceWorker();
 
   }
-
-  /* =======================================================
-     PHASE 5A PUBLIC PERMISSION BRIDGE
-  ======================================================= */
 
   window.GROVA_PERMISSIONS = {
     getCurrentUserProfile,
@@ -8747,10 +8509,6 @@
     DEFAULT_PERMISSIONS,
     askGrovaAI
   };
-
-  /* =======================================================
-     START
-  ======================================================= */
 
   if (
     document.readyState ===
@@ -8769,5 +8527,4 @@
   }
 
 })();
-
 
