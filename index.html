@@ -1399,7 +1399,7 @@
   <script src="./js/ui-motion.js?v=1" defer></script>
 
   <script
-    src="./app.js?v=242"
+    src="./app.js?v=243"
   ></script>
   <!-- =====================================================
        SERVICE WORKER
@@ -1415,7 +1415,8 @@
 
           navigator.serviceWorker
             .register("./sw.js", {
-              scope: "./"
+              scope: "./",
+              updateViaCache: "none"
             })
 
             .then(function (registration) {
@@ -1424,6 +1425,7 @@
                 "GROVA DOCUMENT: Service Worker registered.",
                 registration.scope
               );
+              registration.update().catch(function () {});
 
             })
 
