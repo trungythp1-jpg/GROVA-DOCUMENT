@@ -163,10 +163,11 @@ function fitParty(){
 }
 async function exportPDF(){
   const btn = document.querySelector('.print-btn');
-  btn.disabled = true;
+  if (btn) btn.disabled = true;
+  try {
   const bg = new Image();
   bg.src = "../assets/grova-contract-cover-2026.png";
-  await new Promise((resolve,reject)=>{bg.onload=resolve;bg.onerror=reject;});
+  await new Promise((resolve,reject)=>{bg.onload=resolve;bg.onerror=()=>reject(new Error("Không tải được ảnh nền bìa hợp đồng."));});
   const W=2480,H=3508;
   const canvas=document.createElement("canvas");
   canvas.width=W; canvas.height=H;
@@ -216,7 +217,12 @@ async function exportPDF(){
   pdf.addImage(canvas.toDataURL("image/jpeg",0.96),"JPEG",0,0,210,297,undefined,"FAST");
   const safe=(fields.contractNo.value.trim()||"GROVA-CONTRACT").replace(/[^\w\-]+/g,"-");
   pdf.save(`${safe}-BIA-HOP-DONG.pdf`);
-  btn.disabled=false;
+  } catch (error) {
+    console.error("GROVA DOCUMENT: PDF export failed.", error);
+    alert("Không thể xuất PDF. Hãy kiểm tra kết nối và thử lại. Nếu đang dùng ứng dụng trên iPad/iPhone, hãy mở GROVA DOCUMENT bằng Safari rồi xuất PDF.");
+  } finally {
+    if (btn) btn.disabled = false;
+  }
 }
 
 </script>
