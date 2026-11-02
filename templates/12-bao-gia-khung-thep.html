@@ -30,7 +30,7 @@ table{width:100%;border-collapse:collapse;margin-top:8px}th,td{border:1px solid 
 <div class="toolbar">
 <button class="secondary" onclick="saveDraft()">Lưu nháp trên thiết bị</button>
 <button class="secondary" onclick="loadDraft()">Tải nháp</button>
-<button onclick="window.print()">In / Xuất PDF</button>
+<button type="button" id="printQuoteButton" onclick="printQuote()">In / Xuất PDF</button>
 </div>
 <main class="sheet">
 <header class="brand">
@@ -182,7 +182,8 @@ function loadDraft(){const x=localStorage.getItem('grova_steel_quote_draft_v2');
 document.getElementById('floorCount').addEventListener('change',()=>{buildFloors([...document.querySelectorAll('[data-floor]')].map(e=>num(e)));recalcGeometry();recalc()});document.getElementById('machinePosition').addEventListener('change',()=>{recalcGeometry();recalc()});document.querySelectorAll('#vat,#margin,#width,#depth,#pit,#oh,#steelRateCost,#frameFastenerCost,#pvcCost,#laborPerFloor,#transportCost').forEach(e=>e.addEventListener('input',()=>{recalcGeometry();recalc()}));document.querySelector('[data-field="specs"]').addEventListener('input',e=>e.target.dataset.userEdited='1');
 function preparePrintNotes(){document.querySelectorAll('textarea[data-field="specs"],textarea[data-field="exclusions"]').forEach(t=>{let n=t.nextElementSibling;if(!n||!n.classList.contains('print-note')){n=document.createElement('div');n.className='print-note';t.insertAdjacentElement('afterend',n)}n.textContent=t.value;n.style.display='block';t.classList.add('print-source')})}
 function cleanupPrintNotes(){document.querySelectorAll('.print-note').forEach(n=>n.remove());document.querySelectorAll('textarea.print-source').forEach(t=>t.classList.remove('print-source'))}
-window.addEventListener('beforeprint',preparePrintNotes);window.addEventListener('afterprint',cleanupPrintNotes);buildFloors();recalc();
+function printQuote(){const button=document.getElementById("printQuoteButton");try{recalcGeometry();recalc();preparePrintNotes();if(typeof window.print!=="function")throw new Error("Trình duyệt hiện tại không hỗ trợ in trực tiếp");if(button){button.disabled=true;button.textContent="Đang mở bản in..."}requestAnimationFrame(()=>requestAnimationFrame(()=>{try{window.print()}catch(e){cleanupPrintNotes();if(button){button.disabled=false;button.textContent="In / Xuất PDF"}alert("Không mở được chức năng in PDF: "+(e&&e.message?e.message:"Lỗi không xác định"))}}))}catch(e){cleanupPrintNotes();if(button){button.disabled=false;button.textContent="In / Xuất PDF"}alert("Không thể chuẩn bị báo giá để in: "+(e&&e.message?e.message:"Lỗi không xác định"))}}
+window.addEventListener('beforeprint',preparePrintNotes);window.addEventListener('afterprint',()=>{cleanupPrintNotes();const b=document.getElementById("printQuoteButton");if(b){b.disabled=false;b.textContent="In / Xuất PDF"}});buildFloors();recalc();
 </script>
 <script src="../js/pwa-pdf-fallback.js"></script>
 <script src="../js/online-signatures.js?v=1"></script>
