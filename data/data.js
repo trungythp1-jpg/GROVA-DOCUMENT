@@ -238,6 +238,18 @@ window.GROVA_DATA = {
       enabled: true
     },
 
+    {
+      id: "17",
+      code: "BBVP",
+      name: "Biên bản vi phạm và xử lý vi phạm",
+      title: "BIÊN BẢN VI PHẠM VÀ XỬ LÝ VI PHẠM",
+      description: "Ghi nhận vi phạm tại công trình, chọn công trình và nhân sự từ danh mục, ký online và xuất PDF A4.",
+      category: "Thi công",
+      icon: "⚠️",
+      file: "./templates/17-bien-ban-vi-pham.html",
+      enabled: true
+    },
+
   ],
 
   /* =======================================================
