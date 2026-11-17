@@ -582,6 +582,35 @@ body.quote-auth-pending .wrap,body.quote-auth-pending .toolbar{visibility:hidden
 .brand-logo{display:block;width:170px;height:54px;object-fit:contain;object-position:left center;margin-bottom:4px}
 .sheet::before{background-image:url("../data/Logo-DucAnh.png")!important;background-repeat:no-repeat!important;background-position:center!important;background-size:contain!important;opacity:.045!important}
 @media print{.brand-logo{width:150px;height:46px}.sheet::before{opacity:.045!important;print-color-adjust:exact;-webkit-print-color-adjust:exact}}
+
+
+/* GROVA FIX 2026-11-17: quotation print pagination */
+@media print {
+  /* Do not leave the pricing heading alone at the bottom of page 1. */
+  .sheet:first-of-type > .section:has(#saleLift) {
+    break-inside: avoid-page !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* Continue scope and commercial terms immediately after the price summary. */
+  .sheet:first-of-type > .section.scope-section {
+    break-before: auto !important;
+    page-break-before: auto !important;
+    break-inside: avoid-page !important;
+    page-break-inside: avoid !important;
+  }
+
+  .sheet:first-of-type > .section:has(#payment) {
+    break-inside: avoid-page !important;
+    page-break-inside: avoid !important;
+  }
+
+  .sheet:first-of-type > .section.scope-section + .section:has(#payment) {
+    break-before: auto !important;
+    page-break-before: auto !important;
+  }
+}
+
 </style>
 
 
