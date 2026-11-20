@@ -110,6 +110,24 @@
   }
 }
 
+
+/* PRINT FONT +1PT: improve readability while retaining A4 layout */
+@media print {
+  .sheet { font-size: 8pt !important; }
+  .company { font-size: 10pt !important; }
+  .contacts { font-size: 7.5pt !important; }
+  .title { font-size: 12pt !important; }
+  .field label { font-size: 7.7pt !important; }
+  .section-title { font-size: 8.2pt !important; }
+  table { font-size: 7.8pt !important; }
+  th, td { line-height: 1.12 !important; }
+  .small, .footer { font-size: 7pt !important; }
+  .material-choice a { font-size: 7.5pt !important; }
+  .finish-gallery-card figcaption,
+  .finish-gallery-card figcaption strong { font-size: 9pt !important; }
+  .gallery-footer { font-size: 8pt !important; }
+}
+
 </style></head><body>
 <div class="toolbar"><button class="primary" onclick="if(validateOrder()){preparePrint();window.print()}">Xuất PDF / In A4 ngang</button><button class="secondary" onclick="resetForm()">Xóa nội dung nhập</button></div>
 <main class="sheet">
