@@ -57,7 +57,7 @@
   th, td { padding: 1px 3px !important; line-height: 1.05 !important; height: auto !important; }
   td input, td select { padding: 0 !important; line-height: 1.05 !important; height: 12px !important; }
   .lower { gap: 5px !important; margin-top: 2px !important; break-inside: avoid !important; page-break-inside: avoid !important; }
-  .notes { height: 18px !important; min-height: 18px !important; padding: 2px 4px !important; resize: none !important; }
+  .notes { min-height: 18mm !important; padding: 2px 4px !important; resize: none !important; overflow: visible !important; white-space: pre-wrap !important; overflow-wrap: anywhere !important; }
   .signatures { margin-top: 3px !important; gap: 8px !important; line-height: 1.05 !important; break-inside: avoid !important; page-break-inside: avoid !important; }
   .signatures small { margin-top: 1px !important; }
   .small, .footer { font-size: 6pt !important; line-height: 1.05 !important; }
@@ -76,6 +76,22 @@
     page-break-after: auto !important;
   }
   .finish-gallery-card img { height: 38mm !important; }
+}
+
+
+/* PRINT NOTES FIX: allow the notes textarea to expand to its full content */
+@media print {
+  .lower section:first-child { min-width: 0 !important; }
+  .notes {
+    display: block !important;
+    min-height: 18mm !important;
+    max-height: none !important;
+    overflow: visible !important;
+    white-space: pre-wrap !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+    box-sizing: border-box !important;
+  }
 }
 
 </style></head><body>
