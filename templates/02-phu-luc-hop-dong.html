@@ -297,14 +297,14 @@ li{margin:2px 0;}
     <div class="form-group">
 
       <label class="form-label">
-        Tên công ty
+        Tên khách hàng / Tên đơn vị
       </label>
 
       <input
         id="partyBName"
         class="form-input"
         type="text"
-        placeholder="Tên công ty"
+        placeholder="Tên khách hàng / Tên đơn vị"
       >
 
     </div>
@@ -313,14 +313,14 @@ li{margin:2px 0;}
     <div class="form-group">
 
       <label class="form-label">
-        Mã số thuế
+        Mã số thuế / CCCD
       </label>
 
       <input
         id="partyBTax"
         class="form-input"
         type="text"
-        placeholder="Mã số thuế"
+        placeholder="Mã số thuế / CCCD"
       >
 
     </div>
@@ -344,7 +344,7 @@ li{margin:2px 0;}
     <div class="form-group">
 
       <label class="form-label">
-        Đại diện
+        Người đại diện (nếu có)
       </label>
 
       <input
@@ -360,14 +360,14 @@ li{margin:2px 0;}
     <div class="form-group">
 
       <label class="form-label">
-        Chức vụ
+        Chức vụ (nếu có)
       </label>
 
       <input
         id="partyBPosition"
         class="form-input"
         type="text"
-        placeholder="Chức vụ"
+        placeholder="Chức vụ (nếu có)"
       >
 
     </div>
@@ -865,7 +865,7 @@ li{margin:2px 0;}
           </div>
 
           <div class="party-line">
-            Mã số thuế:
+            Mã số thuế / CCCD / CCCD:
             <span id="previewCompanyTaxCode">
               0202328361
             </span>
@@ -879,14 +879,14 @@ li{margin:2px 0;}
           </div>
 
           <div class="party-line">
-            Đại diện:
+            Người đại diện (nếu có):
             <span id="previewCompanyRepresentative">
               PHẠM VĂN HỌC
             </span>
           </div>
 
           <div class="party-line">
-            Chức vụ:
+            Chức vụ (nếu có) (nếu có):
             <span id="previewCompanyPosition">
               Giám Đốc
             </span>
@@ -913,12 +913,12 @@ li{margin:2px 0;}
           </div>
 
           <div class="party-line">
-            Tên công ty:
+            Tên khách hàng / Tên đơn vị:
             <span id="previewPartyBName">............................................</span>
           </div>
 
           <div class="party-line">
-            Mã số thuế:
+            Mã số thuế / CCCD / CCCD:
             <span id="previewPartyBTax">............................................</span>
           </div>
 
@@ -928,12 +928,12 @@ li{margin:2px 0;}
           </div>
 
           <div class="party-line">
-            Đại diện:
+            Người đại diện (nếu có):
             <span id="previewPartyBRepresentative">................................................</span>
           </div>
 
           <div class="party-line">
-            Chức vụ:
+            Chức vụ (nếu có) (nếu có):
             <span id="previewPartyBPosition">................................................</span>
           </div>
 
@@ -1379,7 +1379,7 @@ li{margin:2px 0;}
             </div>
 
             <div class="signature-note">
-              (Ký, ghi rõ họ tên, đóng dấu)
+              (Khách hàng cá nhân: ký, ghi rõ họ tên; tổ chức: người đại diện ký, ghi rõ họ tên, chức vụ và đóng dấu nếu có)
             </div>
 
             <div class="signature-space"></div>
@@ -2095,6 +2095,7 @@ function loadDraft(){
 
           el.value =
             data[key] || "";
+          if (key === "partyBName") el.value = el.value.toLocaleUpperCase("vi-VN");
 
         }
 
@@ -2166,6 +2167,22 @@ function loadDraft(){
 ========================= */
 
 function bindEvents(){
+  const customerNameInput = $("partyBName");
+  if (customerNameInput) {
+    function uppercaseCustomerName() {
+      const start = customerNameInput.selectionStart;
+      const end = customerNameInput.selectionEnd;
+      const upper = customerNameInput.value.toLocaleUpperCase("vi-VN");
+      if (customerNameInput.value !== upper) {
+        customerNameInput.value = upper;
+        try { customerNameInput.setSelectionRange(start, end); } catch (e) {}
+      }
+    }
+    customerNameInput.addEventListener("input", uppercaseCustomerName);
+    customerNameInput.addEventListener("change", uppercaseCustomerName);
+    uppercaseCustomerName();
+  }
+
 
   document
     .querySelectorAll(
