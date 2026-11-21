@@ -206,6 +206,16 @@ body{min-height:100vh}
   </div>
 
 
+  <!-- THUẾ VAT -->
+  <div class="form-group">
+    <label class="form-label" for="vatTreatment">Thuế VAT áp dụng</label>
+    <select id="vatTreatment" class="form-input">
+      <option value="included" selected>Đã bao gồm VAT</option>
+      <option value="excluded">Không bao gồm VAT</option>
+    </select>
+  </div>
+
+
   <!-- BÊN B -->
 
   <div
@@ -719,7 +729,7 @@ body{min-height:100vh}
         </p>
 
 
-        <p>
+        <p id="previewVatTreatment">
           (Đã bao gồm VAT)
         </p>
 
@@ -1969,6 +1979,14 @@ function updatePreview(){
 
 
 
+  const vatTreatment = $("previewVatTreatment");
+  if (vatTreatment) {
+    vatTreatment.textContent = value("vatTreatment", "included") === "excluded"
+      ? "(Không bao gồm VAT)"
+      : "(Đã bao gồm VAT)";
+  }
+
+
   /* -----------------------------------------
      SAVE
   ----------------------------------------- */
@@ -1993,7 +2011,7 @@ function saveDraft(){
 
   document
     .querySelectorAll(
-      ".control-panel input, .control-panel textarea"
+      ".control-panel input, .control-panel textarea, .control-panel select"
     )
     .forEach(
       el => {
@@ -2121,7 +2139,7 @@ function bindEvents(){
 
   document
     .querySelectorAll(
-      ".control-panel input, .control-panel textarea"
+      ".control-panel input, .control-panel textarea, .control-panel select"
     )
     .forEach(
       el => {
