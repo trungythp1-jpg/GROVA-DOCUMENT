@@ -2135,6 +2135,10 @@ function loadDraft(){
           el.value =
             data[key] || "";
 
+          if (key === "partyBName") {
+            el.value = el.value.toLocaleUpperCase("vi-VN");
+          }
+
         }
       );
 
@@ -2156,6 +2160,22 @@ function loadDraft(){
 ========================================================= */
 
 function bindEvents(){
+
+  const customerNameInput = $("partyBName");
+  if (customerNameInput) {
+    function uppercaseCustomerName() {
+      const start = customerNameInput.selectionStart;
+      const end = customerNameInput.selectionEnd;
+      const upper = customerNameInput.value.toLocaleUpperCase("vi-VN");
+      if (customerNameInput.value !== upper) {
+        customerNameInput.value = upper;
+        try { customerNameInput.setSelectionRange(start, end); } catch (e) {}
+      }
+    }
+    customerNameInput.addEventListener("input", uppercaseCustomerName);
+    customerNameInput.addEventListener("change", uppercaseCustomerName);
+    uppercaseCustomerName();
+  }
 
   ["vatTreatment", "unitPrice"].forEach(function(id){
     const el = $(id);
