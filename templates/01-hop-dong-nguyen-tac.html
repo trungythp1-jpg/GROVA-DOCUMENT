@@ -210,9 +210,14 @@ body{min-height:100vh}
   <div class="form-group">
     <label class="form-label" for="vatTreatment">Thuế VAT áp dụng</label>
     <select id="vatTreatment" class="form-input">
-      <option value="included" selected>Đã bao gồm VAT</option>
-      <option value="excluded">Không bao gồm VAT</option>
+      <option value="included">Đã bao gồm VAT</option>
+      <option value="excluded" selected>Không bao gồm VAT</option>
     </select>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label" for="unitPrice">Đơn giá tiêu chuẩn (đồng/stop)</label>
+    <input id="unitPrice" class="form-input" type="number" min="0" step="1000" value="2500000" placeholder="Nhập đơn giá">
   </div>
 
 
@@ -725,7 +730,7 @@ body{min-height:100vh}
 
 
         <p>
-          2.500.000 đồng/stop
+          <span id="previewUnitPrice">2.500.000</span> đồng/stop
         </p>
 
 
@@ -1781,6 +1786,26 @@ function initializeNumber() {
 }
 
 
+function syncCommercialTerms(){
+  const vatSelect = $("vatTreatment");
+  const vatPreview = $("previewVatTreatment");
+  const vatValue = vatSelect ? vatSelect.value : "included";
+  if (vatPreview) {
+    vatPreview.textContent = vatValue === "excluded"
+      ? "(Không bao gồm VAT)"
+      : "(Đã bao gồm VAT)";
+  }
+
+  const priceInput = $("unitPrice");
+  const pricePreview = $("previewUnitPrice");
+  if (priceInput && pricePreview) {
+    const raw = String(priceInput.value || "").replace(/[^0-9]/g, "");
+    const amount = raw === "" ? 0 : Number(raw);
+    pricePreview.textContent = new Intl.NumberFormat("vi-VN").format(amount);
+  }
+}
+
+
 /* =========================================================
    UPDATE PREVIEW
 ========================================================= */
@@ -1979,12 +2004,7 @@ function updatePreview(){
 
 
 
-  const vatTreatment = $("previewVatTreatment");
-  if (vatTreatment) {
-    vatTreatment.textContent = value("vatTreatment", "included") === "excluded"
-      ? "(Không bao gồm VAT)"
-      : "(Đã bao gồm VAT)";
-  }
+  syncCommercialTerms();
 
 
   /* -----------------------------------------
@@ -2136,6 +2156,19 @@ function loadDraft(){
 ========================================================= */
 
 function bindEvents(){
+
+  ["vatTreatment", "unitPrice"].forEach(function(id){
+    const el = $(id);
+    if (!el) return;
+    el.addEventListener("input", function(){
+      syncCommercialTerms();
+      saveDraft();
+    });
+    el.addEventListener("change", function(){
+      syncCommercialTerms();
+      saveDraft();
+    });
+  });
 
   document
     .querySelectorAll(
